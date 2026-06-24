@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<title>Master of Epic 物理ダメージ計算webツール</title>
+<title>Master of Epic 物理ダメージ計算webツール</t</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
   :root {
@@ -598,10 +598,75 @@
     width: 50px;
   }
 
+
+  /* 複数使用条件 */
+  .weaponInputPanel {
+    overflow: hidden;
+  }
+  .weaponReqHeader {
+    margin-top: 8px;
+    display: grid;
+    gap: 2px;
+  }
+  .miniTable {
+    width: 100%;
+    table-layout: fixed;
+    font-size: 13px;
+    margin: 6px 0;
+  }
+  .miniTable th,
+  .miniTable td {
+    padding: 3px;
+  }
+  .miniTable th:nth-child(1),
+  .miniTable td:nth-child(1) {
+    width: auto;
+  }
+  .miniTable th:nth-child(2),
+  .miniTable td:nth-child(2),
+  .miniTable th:nth-child(3),
+  .miniTable td:nth-child(3) {
+    width: 58px;
+  }
+  .miniTable th:nth-child(4),
+  .miniTable td:nth-child(4) {
+    width: 30px;
+    text-align: center;
+  }
+  .miniTable input {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    font-size: 13px;
+    padding: 3px 4px;
+  }
+  .miniTable input[type="number"] {
+    width: 54px;
+    text-align: right;
+    -moz-appearance: textfield;
+  }
+  .miniTable input[type="number"]::-webkit-outer-spin-button,
+  .miniTable input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  .miniTable button {
+    width: 22px;
+    min-width: 22px;
+    height: 22px;
+    padding: 0;
+    margin: 0;
+    line-height: 1;
+  }
+  .miniButton {
+    padding: 5px 8px;
+    font-size: 13px;
+  }
+
 </style>
 </head>
 <body>
-<h1>MoE ダメージ試算ツール 装備数値欄微調整版</h1>
+<h1>MoE ダメージ試算ツール TSV入出力対応版</h1>
 <!--
 <p class="small">
   アタック/ヘビー クラッシュ/手入力テク、バフ24枠、予想攻撃力、割合ステータスBuff、ステータス変換、その他バフ枠に対応。
@@ -630,12 +695,30 @@
       <label>酩酊度<input id="drunk" type="number" step="0.1" value="0"></label>
     </div>
 
-    <div class="inputPanel">
+    <div class="inputPanel weaponInputPanel">
       <h3>武器</h3>
-      <label>武器スキル値<input id="weaponSkill" type="number" step="0.1" value="98"></label>
-      <label>武器必要スキル<input id="requiredSkill" type="number" step="0.1" value="100"></label>
+      <input id="weaponSkill" type="hidden" value="98">
+      <input id="requiredSkill" type="hidden" value="100">
       <label>武器ダメージ<input id="weaponDamage" type="number" step="0.1" value="100"></label>
       <label>武器重量<input id="weaponWeight" type="number" step="0.1" value="100"></label>
+
+      <div class="weaponReqHeader">
+        <b>使用条件</b>
+        <span class="small">複数条件は一番低い達成率で武器攻撃力を補正します。</span>
+      </div>
+      <table id="weaponReqTable" class="miniTable">
+        <thead>
+          <tr>
+            <th>スキル</th>
+            <th>現在</th>
+            <th>必要</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <button class="miniButton" onclick="addWeaponReqRow()">使用条件を追加</button>
+      <div id="weaponSkillModHint" class="small"></div>
     </div>
 
     <div class="inputPanel">
@@ -990,10 +1073,16 @@
 
 <section class="card wide">
   <h2>保存・読み込み</h2>
-  <button onclick="exportConfig()">設定をJSONに出力</button>
-  <button onclick="importConfig()">JSONから読み込み</button>
+  <button onclick="exportConfig()">JSON出力</button>
+  <button onclick="importConfig()">JSON読み込み</button>
+  <button onclick="exportTsvConfig()">TSV出力</button>
+  <button onclick="importTsvConfig()">TSV読み込み</button>
   <button onclick="resetConfig()">このツールの保存設定をリセット</button>
-  <textarea id="configBox" placeholder="ここにJSONを貼り付けて読み込み可能"></textarea>
+  <p class="small">
+    TSVはスプレッドシートに貼り付けて編集しやすい形式です。
+    JSONより読みやすいですが、完全なバックアップ用途ならJSONも残しておくのがおすすめです。
+  </p>
+  <textarea id="configBox" placeholder="JSONまたはTSVをここに貼り付けて読み込み可能"></textarea>
 </section>
 
 <script>
@@ -1075,6 +1164,9 @@ function normalizeEquipmentRows(rows) {
 }
 
 const DEFAULT_STATE = () => ({
+  weaponReq: [
+    {name: "武器スキル", current: 98, required: 100}
+  ],
   pct: [
     {enabled: false, slot: true, name: "攻撃力% Buff", target: "attack", percent: 0, note: ""},
     {enabled: false, slot: true, name: "魔力% Buff", target: "magic", percent: 0, note: ""},
@@ -1237,6 +1329,89 @@ function normalizeFlatRows(st) {
   (st.magicFlat || []).forEach(r => rows.push({...r, target:"magic"}));
   (st.atk || []).forEach(r => rows.push({...r, target:"attack"}));
   return rows;
+}
+
+function defaultWeaponReqFromInputs(inputs={}) {
+  return [{
+    name: "武器スキル",
+    current: parseFloat(inputs.weaponSkill) || 0,
+    required: parseFloat(inputs.requiredSkill) || 0
+  }];
+}
+function normalizeWeaponReqRows(rows, inputs={}) {
+  if (Array.isArray(rows) && rows.length) {
+    return rows.map(r => ({
+      name: r.name || "使用条件",
+      current: parseFloat(r.current) || 0,
+      required: parseFloat(r.required) || 0
+    }));
+  }
+  return defaultWeaponReqFromInputs(inputs);
+}
+function calcWeaponSkillMod(st, inputs={}) {
+  const rows = normalizeWeaponReqRows(st.weaponReq, inputs);
+  const active = rows.filter(r => (parseFloat(r.required) || 0) > 0);
+  if (!active.length) return {mod: 1, rows, limiting: null};
+  const evaluated = active.map(r => {
+    const current = parseFloat(r.current) || 0;
+    const required = Math.max(0.000001, parseFloat(r.required) || 0);
+    const ratio = Math.min(1, current / required);
+    return {...r, current, required, ratio};
+  });
+  const limiting = evaluated.reduce((a, b) => b.ratio < a.ratio ? b : a, evaluated[0]);
+  return {mod: limiting.ratio, rows, evaluated, limiting};
+}
+
+function renderWeaponReqTable() {
+  const tbody = document.querySelector("#weaponReqTable tbody");
+  if (!tbody) return;
+  tbody.innerHTML = "";
+  state.weaponReq = normalizeWeaponReqRows(state.weaponReq, collectInputs());
+
+  state.weaponReq.forEach((row, idx) => {
+    const tr = document.createElement("tr");
+
+    const name = makeCell("input", {value: row.name || ""});
+    name.oninput = () => { row.name = name.value; };
+    tr.appendChild(makeCell("td")).appendChild(name);
+
+    const current = makeCell("input", {type:"number", step:"0.1", value: row.current ?? 0});
+    current.oninput = () => {
+      row.current = parseFloat(current.value) || 0;
+      if (idx === 0) byId("weaponSkill").value = row.current;
+      calc();
+    };
+    tr.appendChild(makeCell("td")).appendChild(current);
+
+    const required = makeCell("input", {type:"number", step:"0.1", value: row.required ?? 0});
+    required.oninput = () => {
+      row.required = parseFloat(required.value) || 0;
+      if (idx === 0) byId("requiredSkill").value = row.required;
+      calc();
+    };
+    tr.appendChild(makeCell("td")).appendChild(required);
+
+    const del = makeCell("button", {type:"button", title:"削除"}, "×");
+    del.onclick = () => {
+      state.weaponReq.splice(idx, 1);
+      if (!state.weaponReq.length) state.weaponReq = [{name:"武器スキル", current:0, required:0}];
+      renderWeaponReqTable();
+      calc();
+    };
+    tr.appendChild(makeCell("td")).appendChild(del);
+
+    tbody.appendChild(tr);
+  });
+
+  if (state.weaponReq[0]) {
+    byId("weaponSkill").value = state.weaponReq[0].current ?? 0;
+    byId("requiredSkill").value = state.weaponReq[0].required ?? 0;
+  }
+}
+function addWeaponReqRow() {
+  state.weaponReq.push({name:"追加条件", current:0, required:0});
+  renderWeaponReqTable();
+  calc();
 }
 
 function renderPctTable() {
@@ -1488,6 +1663,7 @@ function addOtherRow() {
 }
 
 function renderAll() {
+  renderWeaponReqTable();
   renderPctTable();
   renderEquipmentTable();
   renderFlatTable();
@@ -1617,9 +1793,8 @@ function computeMetrics(st, inputs) {
   const stats = pctStats.stats;
 
   const weaponDamage = parseFloat(inputs.weaponDamage) || 0;
-  const weaponSkill = parseFloat(inputs.weaponSkill) || 0;
-  const requiredSkill = Math.max(1, parseFloat(inputs.requiredSkill) || 1);
-  const skillMod = Math.min(1, weaponSkill / requiredSkill);
+  const skillModInfo = calcWeaponSkillMod(st, inputs);
+  const skillMod = skillModInfo.mod;
   const ac = parseFloat(inputs.targetAC) || 0;
 
   const racialAtk = stats.str * raceCoeff;
@@ -1698,7 +1873,7 @@ function computeMetrics(st, inputs) {
 
   return {
     stats, pctStats, conv, pctAtkCalc, spirit, magicCoeff, baseMagicFromSpirit, flatStatRaw, equipmentRaw,
-    racialAtk, weaponAtk, baseNaturalAtk, conversionAtk, baseAtk, flatAtkRaw, extraRawBeforePct, cappedAddRawBeforePct, cappedAddBeforePct, atkBeforePct, atkPctMode, atkBuffRaw, atkCap, atkBuffCapped, atk,
+    racialAtk, weaponAtk, skillModInfo, baseNaturalAtk, conversionAtk, baseAtk, flatAtkRaw, extraRawBeforePct, cappedAddRawBeforePct, cappedAddBeforePct, atkBeforePct, atkPctMode, atkBuffRaw, atkCap, atkBuffCapped, atk,
     attackMultiplier, dmgMultiplier, defenseFactor, critAvg, postMultiplier, baseNoTech,
     rawDamage, finalDamage, slots, specialMultiplier
   };
@@ -1761,6 +1936,18 @@ function updateEquipmentSummary(m) {
   byId("equipmentSummary").innerHTML = lines.map(x => `<div>${x}</div>`).join("");
 }
 
+function updateWeaponSkillModHint(m) {
+  const el = byId("weaponSkillModHint");
+  if (!el) return;
+  const limiting = m.skillModInfo.limiting;
+  const detail = (m.skillModInfo.evaluated || []).map(r =>
+    `${escapeHtml(r.name)} ${r.current.toFixed(1)}/${r.required.toFixed(1)}=${(r.ratio * 100).toFixed(1)}%`
+  ).join(" / ");
+  el.innerHTML = limiting
+    ? `武器性能発揮率: <b>${(m.skillModInfo.mod * 100).toFixed(1)}%</b>（最低条件: ${escapeHtml(limiting.name)}）<br>${detail}`
+    : `武器性能発揮率: <b>100.0%</b>`;
+}
+
 function updatePredictedAtkUI(m) {
   byId("predictedAtk").textContent = `${m.atk.toFixed(3)}`;
   byId("predictedMagic").textContent = `${m.stats.magic.toFixed(3)}`;
@@ -1794,7 +1981,7 @@ function updatePredictedAtkUI(m) {
   let lines;
   if (m.atkPctMode === "afterAdds") {
     lines = [
-      `基礎系: 種族 ${m.racialAtk.toFixed(3)} + 武器 ${m.weaponAtk.toFixed(3)} = ${m.baseNaturalAtk.toFixed(3)}`,
+      `基礎系: 種族 ${m.racialAtk.toFixed(3)} + 武器 ${m.weaponAtk.toFixed(3)}（使用条件補正 ${(m.skillModInfo.mod * 100).toFixed(1)}%） = ${m.baseNaturalAtk.toFixed(3)}`,
       `変換上限外: +${m.conversionAtk.toFixed(3)}`,
       `上限対象: 攻撃力実数加算 ${m.flatAtkRaw.toFixed(3)} + 攻撃力%増分 ${m.pctAtkCalc.added.toFixed(3)} = raw ${m.atkBuffRaw.toFixed(3)}`,
       `最終上限: 基礎 ${m.baseNaturalAtk.toFixed(3)} + 変換 ${m.conversionAtk.toFixed(3)} + min(${m.atkBuffRaw.toFixed(3)}, ${m.atkCap.toFixed(3)}) = ${m.atk.toFixed(3)}${over}`,
@@ -1802,7 +1989,7 @@ function updatePredictedAtkUI(m) {
     ];
   } else {
     lines = [
-      `基礎系: 種族 ${m.racialAtk.toFixed(3)} + 武器 ${m.weaponAtk.toFixed(3)} = ${m.baseNaturalAtk.toFixed(3)}`,
+      `基礎系: 種族 ${m.racialAtk.toFixed(3)} + 武器 ${m.weaponAtk.toFixed(3)}（使用条件補正 ${(m.skillModInfo.mod * 100).toFixed(1)}%） = ${m.baseNaturalAtk.toFixed(3)}`,
       `変換上限外: +${m.conversionAtk.toFixed(3)}`,
       `上限対象: 攻撃力実数加算 ${m.flatAtkRaw.toFixed(3)} + 攻撃力% ${m.pctAtkCalc.added.toFixed(3)} = raw ${m.atkBuffRaw.toFixed(3)} / 適用 ${m.atkBuffCapped.toFixed(3)}${over}`,
       `攻撃力×0.8: ${(m.atk * 0.8).toFixed(3)}`
@@ -1828,6 +2015,7 @@ function calc() {
   byId("finalDamage").textContent = `${Math.floor(m.finalDamage).toLocaleString()} ダメージ前後`;
   updateSlotUI(m);
   updateEquipmentSummary(m);
+  updateWeaponSkillModHint(m);
   updatePredictedAtkUI(m);
 
   const pctStatLine = m.pctStats.steps.length
@@ -1845,6 +2033,10 @@ function calc() {
   lines.push(`<p>基礎魔力: 精神力 ${m.spirit.toFixed(3)} × 種族魔力係数 ${(RACE_MAGIC_COEFFS[inputs.raceSelect] ?? 1).toFixed(2)} = ${m.baseMagicFromSpirit.toFixed(3)}</p>`);
   if (m.equipmentRaw.attack || m.equipmentRaw.magic || m.equipmentRaw.speed || m.equipmentRaw.delay) {
     lines.push(`<p>武器・防具・装飾補正: 攻撃力 ${m.equipmentRaw.attack.toFixed(3)} / 魔力 ${m.equipmentRaw.magic.toFixed(3)} / 速度 ${m.equipmentRaw.speed.toFixed(3)} / 攻撃ディレイ ${m.equipmentRaw.delay.toFixed(3)}</p>`);
+  }
+  if (m.skillModInfo && m.skillModInfo.evaluated && m.skillModInfo.evaluated.length) {
+    const reqText = m.skillModInfo.evaluated.map(r => `${escapeHtml(r.name)} ${r.current.toFixed(1)}/${r.required.toFixed(1)}=${(r.ratio * 100).toFixed(1)}%`).join(" / ");
+    lines.push(`<p>武器使用条件: ${reqText} → 武器性能発揮率 <b>${(m.skillModInfo.mod * 100).toFixed(1)}%</b></p>`);
   }
   if (m.flatStatRaw.magic) lines.push(`<p>魔力実数加算合計: +${m.flatStatRaw.magic.toFixed(3)}（武器・防具・装飾込み。魔力%Buff・魔力変換の前に加算）</p>`);
   if (m.flatStatRaw.speed) lines.push(`<p>速度実数加算合計: +${m.flatStatRaw.speed.toFixed(3)}（武器・防具・装飾込み。速度%Buff・速度変換の前に加算）</p>`);
@@ -1866,7 +2058,7 @@ function calc() {
   }
   byId("breakdown").innerHTML = lines.join("");
 
-  localStorage.setItem("moeDamageSimEquipNumberAdjusted", JSON.stringify(collectConfig()));
+  localStorage.setItem("moeDamageSimTsvImportExport", JSON.stringify(collectConfig()));
   renderCompareResult();
   renderActualDiff();
   renderRaceTable();
@@ -2079,6 +2271,265 @@ function renderRaceTable() {
   </table>`;
 }
 
+function tsvEscape(value) {
+  return String(value ?? "")
+    .replace(/\\/g, "\\\\")
+    .replace(/\t/g, "\\t")
+    .replace(/\r?\n/g, "\\n");
+}
+function tsvUnescape(value) {
+  return String(value ?? "")
+    .replace(/\\n/g, "\n")
+    .replace(/\\t/g, "\t")
+    .replace(/\\\\/g, "\\");
+}
+function boolToCell(v) {
+  return v ? "1" : "0";
+}
+function cellToBool(v) {
+  const s = String(v ?? "").trim().toLowerCase();
+  return s === "1" || s === "true" || s === "on" || s === "yes" || s === "使用";
+}
+function cellToNum(v) {
+  const n = parseFloat(v);
+  return Number.isFinite(n) ? n : 0;
+}
+function makeTsvSection(name, headers, rows) {
+  const lines = [`[${name}]`, headers.join("\t")];
+  rows.forEach(row => {
+    lines.push(headers.map(h => tsvEscape(row[h])).join("\t"));
+  });
+  lines.push("");
+  return lines.join("\n");
+}
+function serializeConfigAsTsv(cfg) {
+  const inputs = cfg.inputs || {};
+  const st = cfg.state || {};
+  const out = [
+    "# MoE Damage Simulator TSV v1",
+    "# セクション名とヘッダー行は変更しないでください。",
+    ""
+  ];
+
+  out.push(makeTsvSection("inputs", ["key", "value"],
+    Object.keys(inputs).map(k => ({key: k, value: inputs[k]}))
+  ));
+
+  out.push(makeTsvSection("weaponReq", ["name", "current", "required"],
+    (st.weaponReq || []).map(r => ({
+      name: r.name || "",
+      current: r.current ?? 0,
+      required: r.required ?? 0
+    }))
+  ));
+
+  out.push(makeTsvSection("equipment", ["slot", "name", "attack", "magic", "speed", "delay", "note"],
+    normalizeEquipmentRows(st.equipment || []).map(r => ({
+      slot: r.slot || "",
+      name: r.name || "",
+      attack: r.attack ?? 0,
+      magic: r.magic ?? 0,
+      speed: r.speed ?? 0,
+      delay: r.delay ?? 0,
+      note: r.note || ""
+    }))
+  ));
+
+  out.push(makeTsvSection("pct", ["enabled", "slot", "name", "target", "percent", "note"],
+    (st.pct || []).map(r => ({
+      enabled: boolToCell(r.enabled),
+      slot: boolToCell(r.slot),
+      name: r.name || "",
+      target: r.target || "attack",
+      percent: r.percent ?? 0,
+      note: r.note || ""
+    }))
+  ));
+
+  out.push(makeTsvSection("flat", ["enabled", "slot", "name", "target", "value", "note"],
+    normalizeFlatRows(st).map(r => ({
+      enabled: boolToCell(r.enabled),
+      slot: boolToCell(r.slot),
+      name: r.name || "",
+      target: r.target || "magic",
+      value: r.value ?? 0,
+      note: r.note || ""
+    }))
+  ));
+
+  out.push(makeTsvSection("conv", ["enabled", "slot", "name", "source", "rate", "note"],
+    (st.conv || []).map(r => ({
+      enabled: boolToCell(r.enabled),
+      slot: boolToCell(r.slot),
+      name: r.name || "",
+      source: r.source || "magic",
+      rate: r.rate ?? 0,
+      note: r.note || ""
+    }))
+  ));
+
+  out.push(makeTsvSection("dmg", ["enabled", "slot", "name", "value", "category", "note"],
+    (st.dmg || []).map(r => ({
+      enabled: boolToCell(r.enabled),
+      slot: boolToCell(r.slot),
+      name: r.name || "",
+      value: r.value ?? 0,
+      category: r.category || "",
+      note: r.note || ""
+    }))
+  ));
+
+  out.push(makeTsvSection("special", ["enabled", "slot", "name", "value", "note"],
+    (st.special || []).map(r => ({
+      enabled: boolToCell(r.enabled),
+      slot: boolToCell(r.slot),
+      name: r.name || "",
+      value: r.value ?? 1,
+      note: r.note || ""
+    }))
+  ));
+
+  out.push(makeTsvSection("post", ["enabled", "slot", "name", "value", "note"],
+    (st.post || []).map(r => ({
+      enabled: boolToCell(r.enabled),
+      slot: boolToCell(r.slot),
+      name: r.name || "",
+      value: r.value ?? 1,
+      note: r.note || ""
+    }))
+  ));
+
+  out.push(makeTsvSection("other", ["enabled", "name", "note"],
+    (st.other || []).map(r => ({
+      enabled: boolToCell(r.enabled),
+      name: r.name || "",
+      note: r.note || ""
+    }))
+  ));
+
+  return out.join("\n");
+}
+function parseTsvSections(text) {
+  const sections = {};
+  let current = null;
+  let headers = null;
+
+  String(text || "").split(/\r?\n/).forEach(rawLine => {
+    const line = rawLine.replace(/\r$/, "");
+    if (!line.trim() || line.trim().startsWith("#")) return;
+
+    const m = line.match(/^\[([^\]]+)\]$/);
+    if (m) {
+      current = m[1].trim();
+      headers = null;
+      sections[current] = {headers: [], rows: []};
+      return;
+    }
+
+    if (!current) return;
+
+    const cells = line.split("\t").map(tsvUnescape);
+    if (!headers) {
+      headers = cells;
+      sections[current].headers = headers;
+      return;
+    }
+
+    const obj = {};
+    headers.forEach((h, i) => { obj[h] = cells[i] ?? ""; });
+    sections[current].rows.push(obj);
+  });
+
+  return sections;
+}
+function parseConfigFromTsv(text) {
+  const sections = parseTsvSections(text);
+  const inputs = {};
+
+  (sections.inputs?.rows || []).forEach(r => {
+    if (!r.key) return;
+    inputs[r.key] = r.key === "allowCrit" ? cellToBool(r.value) : r.value;
+  });
+
+  const stateFromDefaults = DEFAULT_STATE();
+
+  const stateOut = {
+    weaponReq: (sections.weaponReq?.rows || []).map(r => ({
+      name: r.name || "使用条件",
+      current: cellToNum(r.current),
+      required: cellToNum(r.required)
+    })),
+    equipment: (sections.equipment?.rows || []).map(r => ({
+      enabled: true,
+      slot: r.slot || "",
+      name: r.name || "",
+      attack: cellToNum(r.attack),
+      magic: cellToNum(r.magic),
+      speed: cellToNum(r.speed),
+      delay: cellToNum(r.delay),
+      note: r.note || ""
+    })),
+    pct: (sections.pct?.rows || []).map(r => ({
+      enabled: cellToBool(r.enabled),
+      slot: cellToBool(r.slot),
+      name: r.name || "",
+      target: r.target || "attack",
+      percent: cellToNum(r.percent),
+      note: r.note || ""
+    })),
+    flat: (sections.flat?.rows || []).map(r => ({
+      enabled: cellToBool(r.enabled),
+      slot: cellToBool(r.slot),
+      name: r.name || "",
+      target: r.target || "magic",
+      value: cellToNum(r.value),
+      note: r.note || ""
+    })),
+    conv: (sections.conv?.rows || []).map(r => ({
+      enabled: cellToBool(r.enabled),
+      slot: cellToBool(r.slot),
+      name: r.name || "",
+      source: r.source || "magic",
+      rate: cellToNum(r.rate),
+      capped: false,
+      note: r.note || ""
+    })),
+    dmg: (sections.dmg?.rows || []).map(r => ({
+      enabled: cellToBool(r.enabled),
+      slot: cellToBool(r.slot),
+      name: r.name || "",
+      value: cellToNum(r.value),
+      category: r.category || "",
+      note: r.note || ""
+    })),
+    special: (sections.special?.rows || []).map(r => ({
+      enabled: cellToBool(r.enabled),
+      slot: cellToBool(r.slot),
+      name: r.name || "",
+      value: cellToNum(r.value),
+      note: r.note || ""
+    })),
+    post: (sections.post?.rows || []).map(r => ({
+      enabled: cellToBool(r.enabled),
+      slot: cellToBool(r.slot),
+      name: r.name || "",
+      value: cellToNum(r.value),
+      note: r.note || ""
+    })),
+    other: (sections.other?.rows || []).map(r => ({
+      enabled: cellToBool(r.enabled),
+      name: r.name || "",
+      note: r.note || ""
+    }))
+  };
+
+  // セクションがない場合は初期値を維持
+  Object.keys(stateOut).forEach(k => {
+    if (!sections[k]) stateOut[k] = stateFromDefaults[k];
+  });
+
+  return {inputs, state: stateOut};
+}
 function exportConfig() {
   byId("configBox").value = JSON.stringify(collectConfig(), null, 2);
 }
@@ -2089,9 +2540,19 @@ function importConfig() {
     alert("JSONの読み込みに失敗: " + e.message);
   }
 }
+function exportTsvConfig() {
+  byId("configBox").value = serializeConfigAsTsv(collectConfig());
+}
+function importTsvConfig() {
+  try {
+    applyConfig(parseConfigFromTsv(byId("configBox").value));
+  } catch (e) {
+    alert("TSVの読み込みに失敗: " + e.message);
+  }
+}
 function resetConfig() {
   if (!confirm("保存済み設定をリセットして初期状態に戻しますか？")) return;
-  localStorage.removeItem("moeDamageSimEquipNumberAdjusted");
+  localStorage.removeItem("moeDamageSimTsvImportExport");
   state = DEFAULT_STATE();
   renderAll();
   calc();
@@ -2102,6 +2563,7 @@ function applyConfig(cfg) {
   const incoming = cfg.state || {};
   state = DEFAULT_STATE();
 
+  state.weaponReq = normalizeWeaponReqRows(incoming.weaponReq, cfg.inputs || {});
   state.equipment = normalizeEquipmentRows(incoming.equipment);
 
   if (Array.isArray(incoming.flat)) {
@@ -2126,7 +2588,7 @@ document.querySelectorAll("input,select").forEach(el => {
 });
 
 renderAll();
-const saved = localStorage.getItem("moeDamageSimEquipNumberAdjusted");
+const saved = localStorage.getItem("moeDamageSimTsvImportExport");
 if (saved) {
   try { applyConfig(JSON.parse(saved)); }
   catch { calc(); }
