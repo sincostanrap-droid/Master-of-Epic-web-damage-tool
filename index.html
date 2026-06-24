@@ -1,0 +1,2154 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>MoE ダメージ試算ツール 装備数値欄微調整版</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    color: #222;
+  }
+  body { margin: 24px; line-height: 1.5; max-width: 1380px; }
+  h1 { margin-bottom: .2rem; }
+  h2 { margin-top: 1.4rem; border-bottom: 1px solid #ddd; padding-bottom: .25rem; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(285px, 1fr)); gap: 12px; }
+  .card { border: 1px solid #ddd; border-radius: 10px; padding: 12px; background: #fff; }
+  label { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 8px; margin: 6px 0; }
+  input, select { padding: 6px; font: inherit; min-width: 0; box-sizing: border-box; }
+  input[type="number"] { width: 88px; text-align: right; font-variant-numeric: tabular-nums; }
+  label > select { width: 170px; max-width: 100%; }
+  #attackType, #heavyFormula, #atkPctMode { width: min(100%, 330px); }
+  label.stackControl {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+    gap: 4px;
+  }
+  label.stackControl > select {
+    width: 100%;
+    max-width: 100%;
+  }
+  .selectHelp {
+    margin: -2px 0 6px;
+    line-height: 1.45;
+  }
+  input[type="checkbox"] { width: 20px; height: 20px; }
+  table { border-collapse: collapse; width: 100%; margin: 8px 0; font-size: 14px; }
+  th, td { border: 1px solid #ddd; padding: 6px; vertical-align: middle; }
+  th { background: #f6f6f6; }
+  .small { font-size: 12px; color: #555; }
+  .result { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+  .bigNum { font-size: 24px; font-weight: 700; }
+  .ok { background: #eefaf0; border: 1px solid #9ad0a5; padding: 10px; border-radius: 8px; }
+  .warn { background: #fff7df; border: 1px solid #e8c866; padding: 10px; border-radius: 8px; }
+  .bad { background: #ffecec; border: 1px solid #e7a0a0; padding: 10px; border-radius: 8px; }
+  button { padding: 8px 10px; font: inherit; cursor: pointer; margin: 2px 4px 2px 0; }
+  textarea { width: 100%; min-height: 120px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  .wide { grid-column: 1 / -1; }
+  .muted { opacity: .6; }
+  .slotPanel {
+    position: relative;
+  }
+  .slotbar { height: 10px; background: #eee; border-radius: 999px; overflow: hidden; margin: 8px 0; }
+  .slotfill { height: 100%; width: 0%; background: currentColor; }
+  .slotHoverArea {
+    cursor: help;
+    border-radius: 8px;
+    padding: 2px 0;
+  }
+  .slotTooltip {
+    display: none;
+    position: absolute;
+    z-index: 20;
+    top: 72px;
+    left: 0;
+    width: min(420px, calc(100vw - 48px));
+    max-height: 360px;
+    overflow: auto;
+    padding: 10px 12px;
+    border: 1px solid #cfcfcf;
+    border-radius: 10px;
+    background: #fff;
+    box-shadow: 0 10px 24px rgba(0,0,0,.14);
+    font-size: 13px;
+    line-height: 1.45;
+  }
+  .slotHoverArea:hover + .slotTooltip,
+  .slotTooltip:hover {
+    display: block;
+  }
+  .slotTooltipTitle {
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .slotTooltipGroup {
+    margin-top: 8px;
+  }
+  .slotTooltipGroup b {
+    display: block;
+    margin-bottom: 2px;
+  }
+  .slotTooltip ul {
+    margin: 2px 0 0 1.2em;
+    padding: 0;
+  }
+  .slotTooltip li {
+    margin: 1px 0;
+  }
+  .row-actions { white-space: nowrap; }
+  .row-actions button { padding: 5px 7px; }
+  .num { text-align: right; font-variant-numeric: tabular-nums; }
+  .split { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 12px; }
+  .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  .analysisGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+    gap: 12px;
+    align-items: start;
+  }
+  .analysisPanel {
+    border: 1px solid #e2e2e2;
+    border-radius: 10px;
+    padding: 12px;
+    background: #fcfcfc;
+    min-width: 0;
+  }
+  .analysisPanel h3 {
+    margin: 0 0 8px;
+    font-size: 18px;
+    border-bottom: 1px solid #e7e7e7;
+    padding-bottom: 4px;
+  }
+  .analysisPanelWide {
+    grid-column: 1 / -1;
+  }
+  .scrollX {
+    overflow-x: auto;
+    max-width: 100%;
+  }
+  .compactControls {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 8px;
+    align-items: end;
+  }
+  .compactControls label {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+  .inputGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(235px, 1fr));
+    gap: 12px;
+    align-items: start;
+  }
+  .inputPanel,
+  .summaryPanel {
+    border: 1px solid #e2e2e2;
+    border-radius: 10px;
+    padding: 12px;
+    background: #fcfcfc;
+    min-width: 0;
+  }
+  .inputPanel h3,
+  .summaryPanel h3 {
+    margin: 0 0 8px;
+    font-size: 18px;
+    border-bottom: 1px solid #e7e7e7;
+    padding-bottom: 4px;
+  }
+  .summaryGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 12px;
+    align-items: start;
+  }
+  .summaryPanelWide {
+    grid-column: 1 / -1;
+  }
+  .summaryPanel .bigNum,
+  .summaryPanel .result {
+    margin: 2px 0 8px;
+  }
+  details.analysisDetails {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    background: #fff;
+    margin: 12px 0;
+    padding: 0;
+  }
+  details.analysisDetails > summary {
+    cursor: pointer;
+    list-style: none;
+    padding: 12px;
+    font-size: 20px;
+    font-weight: 700;
+    border-radius: 10px;
+    user-select: none;
+  }
+  details.analysisDetails > summary::-webkit-details-marker {
+    display: none;
+  }
+  details.analysisDetails > summary::before {
+    content: "＋";
+    display: inline-block;
+    width: 1.5em;
+    font-weight: 700;
+  }
+  details.analysisDetails[open] > summary::before {
+    content: "−";
+  }
+  .analysisDetailsBody {
+    padding: 0 12px 12px;
+  }
+  details.breakdownDetails {
+    border: 1px solid #e2e2e2;
+    border-radius: 10px;
+    background: #fcfcfc;
+    padding: 0;
+  }
+  details.breakdownDetails > summary {
+    cursor: pointer;
+    list-style: none;
+    padding: 12px;
+    font-size: 18px;
+    font-weight: 700;
+    user-select: none;
+  }
+  details.breakdownDetails > summary::-webkit-details-marker {
+    display: none;
+  }
+  details.breakdownDetails > summary::before {
+    content: "＋";
+    display: inline-block;
+    width: 1.5em;
+    font-weight: 700;
+  }
+  details.breakdownDetails[open] > summary::before {
+    content: "−";
+  }
+  .breakdownDetailsBody {
+    padding: 0 12px 12px;
+  }
+  .equipmentLayout {
+    display: grid;
+    gap: 12px;
+  }
+  .equipmentDuo {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 520px), 1fr));
+    gap: 12px;
+    align-items: start;
+  }
+  .equipmentPanel {
+    min-width: 0;
+    overflow-x: auto;
+  }
+  .equipmentPanel h3 {
+    margin: 4px 0 6px;
+    font-size: 16px;
+  }
+  .weaponGrid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .weaponSlot {
+    min-width: 0;
+    overflow-x: auto;
+  }
+  .weaponSlot h4 {
+    margin: 0 0 4px;
+    font-size: 14px;
+  }
+  .weaponSlotBullet {
+    grid-column: auto;
+  }
+  .equipmentTable {
+    width: 100%;
+    table-layout: fixed;
+    font-size: 13px;
+  }
+  .equipmentTable th,
+  .equipmentTable td {
+    padding: 3px;
+    overflow: hidden;
+  }
+  .equipmentTable th:nth-child(1),
+  .equipmentTable td:nth-child(1) {
+    width: 42px;
+    white-space: nowrap;
+  }
+  .equipmentTable th:nth-child(2),
+  .equipmentTable td:nth-child(2) {
+    width: 28%;
+  }
+  .equipmentTable th:nth-child(3),
+  .equipmentTable td:nth-child(3),
+  .equipmentTable th:nth-child(4),
+  .equipmentTable td:nth-child(4),
+  .equipmentTable th:nth-child(5),
+  .equipmentTable td:nth-child(5),
+  .equipmentTable th:nth-child(6),
+  .equipmentTable td:nth-child(6) {
+    width: 40px;
+  }
+  .equipmentTable th:nth-child(7),
+  .equipmentTable td:nth-child(7) {
+    width: 24%;
+  }
+  .weaponTable th:nth-child(1),
+  .weaponTable td:nth-child(1) {
+    width: 32%;
+  }
+  .weaponTable th:nth-child(2),
+  .weaponTable td:nth-child(2),
+  .weaponTable th:nth-child(3),
+  .weaponTable td:nth-child(3),
+  .weaponTable th:nth-child(4),
+  .weaponTable td:nth-child(4),
+  .weaponTable th:nth-child(5),
+  .weaponTable td:nth-child(5) {
+    width: 42px;
+  }
+  .weaponTable th:nth-child(6),
+  .weaponTable td:nth-child(6) {
+    width: 26%;
+  }
+  .equipmentTable input {
+    box-sizing: border-box;
+    max-width: 100%;
+    font-size: 12px;
+  }
+  .equipmentTable input.equipName {
+    min-width: 0;
+    width: 100%;
+  }
+  .equipmentTable input.equipNum {
+    width: 38px;
+    min-width: 0;
+    text-align: right;
+    padding: 2px 3px;
+  }
+  .equipmentTable input.equipNote {
+    min-width: 0;
+    width: 100%;
+  }
+  @media (max-width: 720px) {
+    .equipmentTable {
+      min-width: 480px;
+    }
+  }
+
+  .compactTable {
+    table-layout: fixed;
+    font-size: 13px;
+  }
+  .compactTable th,
+  .compactTable td {
+    padding: 4px;
+    overflow: hidden;
+  }
+  .compactTable input,
+  .compactTable select {
+    max-width: 100%;
+    box-sizing: border-box;
+    font-size: 13px;
+  }
+  .compactTable input[type="text"],
+  .compactTable input:not([type]),
+  .compactTable select {
+    width: 100%;
+  }
+  .compactTable input[type="number"] {
+    width: 58px;
+    min-width: 0;
+    padding: 3px 4px;
+    text-align: right;
+  }
+  .compactTable input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+  }
+  .compactTable .row-actions {
+    width: 92px;
+  }
+  .compactTable .row-actions button {
+    padding: 4px 6px;
+    margin: 1px;
+  }
+
+  #pctBuffTable th:nth-child(1), #pctBuffTable td:nth-child(1),
+  #pctBuffTable th:nth-child(2), #pctBuffTable td:nth-child(2),
+  #flatStatTable th:nth-child(1), #flatStatTable td:nth-child(1),
+  #flatStatTable th:nth-child(2), #flatStatTable td:nth-child(2),
+  #conversionTable th:nth-child(1), #conversionTable td:nth-child(1),
+  #conversionTable th:nth-child(2), #conversionTable td:nth-child(2),
+  #dmgBuffTable th:nth-child(1), #dmgBuffTable td:nth-child(1),
+  #dmgBuffTable th:nth-child(2), #dmgBuffTable td:nth-child(2),
+  #specialBuffTable th:nth-child(1), #specialBuffTable td:nth-child(1),
+  #specialBuffTable th:nth-child(2), #specialBuffTable td:nth-child(2),
+  #postBuffTable th:nth-child(1), #postBuffTable td:nth-child(1),
+  #postBuffTable th:nth-child(2), #postBuffTable td:nth-child(2),
+  #otherBuffTable th:nth-child(1), #otherBuffTable td:nth-child(1) {
+    width: 40px;
+    text-align: center;
+  }
+
+  #pctBuffTable th:nth-child(4), #pctBuffTable td:nth-child(4),
+  #flatStatTable th:nth-child(4), #flatStatTable td:nth-child(4),
+  #conversionTable th:nth-child(4), #conversionTable td:nth-child(4),
+  #dmgBuffTable th:nth-child(5), #dmgBuffTable td:nth-child(5) {
+    width: 86px;
+  }
+
+  #pctBuffTable th:nth-child(5), #pctBuffTable td:nth-child(5),
+  #flatStatTable th:nth-child(5), #flatStatTable td:nth-child(5),
+  #conversionTable th:nth-child(5), #conversionTable td:nth-child(5),
+  #dmgBuffTable th:nth-child(4), #dmgBuffTable td:nth-child(4),
+  #specialBuffTable th:nth-child(4), #specialBuffTable td:nth-child(4),
+  #postBuffTable th:nth-child(4), #postBuffTable td:nth-child(4) {
+    width: 62px;
+  }
+
+  #pctBuffTable th:nth-child(7), #pctBuffTable td:nth-child(7) {
+    width: 92px;
+  }
+  #flatStatTable th:nth-child(6), #flatStatTable td:nth-child(6),
+  #conversionTable th:nth-child(6), #conversionTable td:nth-child(6) {
+    width: 24%;
+  }
+  #flatStatTable th:nth-child(7), #flatStatTable td:nth-child(7),
+  #conversionTable th:nth-child(7), #conversionTable td:nth-child(7) {
+    width: 126px;
+    min-width: 126px;
+  }
+  #flatStatTable .row-actions,
+  #conversionTable .row-actions {
+    display: grid;
+    grid-template-columns: 28px 28px 52px;
+    gap: 3px;
+    white-space: nowrap;
+    align-items: center;
+  }
+  #flatStatTable .row-actions button,
+  #conversionTable .row-actions button {
+    width: 100%;
+    padding: 3px 2px;
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.2;
+  }
+
+  .compactTable .row-actions,
+  #flatStatTable .row-actions,
+  #conversionTable .row-actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 2px;
+    width: auto;
+    min-width: 0;
+    white-space: nowrap;
+  }
+  .compactTable .row-actions button,
+  #flatStatTable .row-actions button,
+  #conversionTable .row-actions button {
+    width: 24px;
+    min-width: 24px;
+    height: 24px;
+    padding: 0;
+    margin: 0;
+    line-height: 1;
+    font-size: 13px;
+    text-align: center;
+  }
+  .compactTable .row-actions button.dangerMini {
+    font-weight: 700;
+  }
+  #flatStatTable th:nth-child(7), #flatStatTable td:nth-child(7),
+  #conversionTable th:nth-child(7), #conversionTable td:nth-child(7) {
+    width: 86px;
+    min-width: 86px;
+  }
+  #flatStatTable th:nth-child(6), #flatStatTable td:nth-child(6),
+  #conversionTable th:nth-child(6), #conversionTable td:nth-child(6) {
+    width: 20%;
+  }
+  #dmgBuffTable th:nth-child(7), #dmgBuffTable td:nth-child(7),
+  #specialBuffTable th:nth-child(6), #specialBuffTable td:nth-child(6),
+  #postBuffTable th:nth-child(6), #postBuffTable td:nth-child(6),
+  #otherBuffTable th:nth-child(4), #otherBuffTable td:nth-child(4) {
+    width: 36px;
+    white-space: nowrap;
+    text-align: center;
+  }
+  #pctBuffTable th:nth-child(3), #pctBuffTable td:nth-child(3),
+  #dmgBuffTable th:nth-child(3), #dmgBuffTable td:nth-child(3),
+  #specialBuffTable th:nth-child(3), #specialBuffTable td:nth-child(3),
+  #postBuffTable th:nth-child(3), #postBuffTable td:nth-child(3) {
+    width: 24%;
+  }
+  #flatStatTable th:nth-child(3), #flatStatTable td:nth-child(3),
+  #conversionTable th:nth-child(3), #conversionTable td:nth-child(3) {
+    width: 25%;
+  }
+  #otherBuffTable th:nth-child(2), #otherBuffTable td:nth-child(2) {
+    width: 34%;
+  }
+  @media (max-width: 900px) {
+    .compactTable {
+      min-width: 720px;
+    }
+    #flatStatTable.compactTable,
+    #conversionTable.compactTable {
+      min-width: 760px;
+    }
+    #otherBuffTable.compactTable {
+      min-width: 520px;
+    }
+  }
+
+  /* 操作列の最終調整: tdをflex化せず、内側だけを小ボタン横並びにする */
+  #pctBuffTable th:last-child,
+  #pctBuffTable td.actionCell,
+  #flatStatTable th:last-child,
+  #flatStatTable td.actionCell,
+  #conversionTable th:last-child,
+  #conversionTable td.actionCell {
+    width: 82px;
+    min-width: 82px;
+    max-width: 82px;
+    padding: 2px 3px;
+    text-align: center;
+    overflow: visible;
+  }
+  #flatStatTable th:nth-child(6),
+  #flatStatTable td:nth-child(6),
+  #conversionTable th:nth-child(6),
+  #conversionTable td:nth-child(6) {
+    width: 18%;
+  }
+  #flatStatTable th:nth-child(3),
+  #flatStatTable td:nth-child(3),
+  #conversionTable th:nth-child(3),
+  #conversionTable td:nth-child(3) {
+    width: 26%;
+  }
+  .actionsWrap {
+    display: inline-grid;
+    grid-template-columns: 22px 22px 22px;
+    gap: 3px;
+    align-items: center;
+    justify-content: center;
+    width: 72px;
+  }
+  .actionsWrap button {
+    width: 22px;
+    min-width: 22px;
+    height: 22px;
+    padding: 0;
+    margin: 0;
+    line-height: 1;
+    font-size: 12px;
+    text-align: center;
+    box-sizing: border-box;
+  }
+  .actionsWrap button.dangerMini {
+    font-weight: 700;
+  }
+  @media (max-width: 900px) {
+    #flatStatTable.compactTable,
+    #conversionTable.compactTable {
+      min-width: 780px;
+    }
+  }
+
+
+  /* 武器・防具・装飾補正: 数値欄のスピンボタンが数値に被らないよう微調整 */
+  .equipmentTable input.equipNum {
+    width: 46px;
+    padding: 2px 3px;
+    text-align: right;
+    -moz-appearance: textfield;
+  }
+  .equipmentTable input.equipNum::-webkit-outer-spin-button,
+  .equipmentTable input.equipNum::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  .equipmentTable th:nth-child(3),
+  .equipmentTable td:nth-child(3),
+  .equipmentTable th:nth-child(4),
+  .equipmentTable td:nth-child(4),
+  .equipmentTable th:nth-child(5),
+  .equipmentTable td:nth-child(5),
+  .equipmentTable th:nth-child(6),
+  .equipmentTable td:nth-child(6) {
+    width: 48px;
+  }
+  .weaponTable th:nth-child(2),
+  .weaponTable td:nth-child(2),
+  .weaponTable th:nth-child(3),
+  .weaponTable td:nth-child(3),
+  .weaponTable th:nth-child(4),
+  .weaponTable td:nth-child(4),
+  .weaponTable th:nth-child(5),
+  .weaponTable td:nth-child(5) {
+    width: 50px;
+  }
+
+</style>
+</head>
+<body>
+<h1>MoE ダメージ試算ツール 装備数値欄微調整版</h1>
+<!--
+<p class="small">
+  アタック/ヘビー クラッシュ/手入力テク、バフ24枠、予想攻撃力、割合ステータスBuff、ステータス変換、その他バフ枠に対応。
+  さらに「構成A/B比較」「Buff寄与率」「実測との差分・逆算」「AC別表」「種族特攻/特攻倍率」を追加。攻撃力%Buffは実測寄せで「加算後攻撃力に乗算」を初期値にしています。魔力は種族と精神力から自動計算。魔力 / 攻撃力 / 速度の実数加算は1つの欄に統合済み。旧20倍壁は見ません。
+</p>
+-->
+
+<section class="card wide">
+  <h2>基本設定</h2>
+  <div class="inputGrid">
+    <div class="inputPanel">
+      <h3>キャラ</h3>
+      <label>種族
+        <select id="raceSelect">
+          <option value="newtar">ニューター</option>
+          <option value="cognite" selected>コグニート</option>
+          <option value="elmony">エルモニー</option>
+          <option value="pandemos">パンデモス</option>
+        </select>
+      </label>
+      <input id="raceCoeff" type="hidden" value="0.19">
+      <label>筋力<input id="str" type="number" step="0.1" value="100"></label>
+      <label>精神力<input id="spirit" type="number" step="0.1" value="100"></label>
+      <input id="magic" type="hidden" value="110">
+      <label>移動速度<input id="speed" type="number" step="0.1" value="100"></label>
+      <label>酩酊度<input id="drunk" type="number" step="0.1" value="0"></label>
+    </div>
+
+    <div class="inputPanel">
+      <h3>武器</h3>
+      <label>武器スキル値<input id="weaponSkill" type="number" step="0.1" value="98"></label>
+      <label>武器必要スキル<input id="requiredSkill" type="number" step="0.1" value="100"></label>
+      <label>武器ダメージ<input id="weaponDamage" type="number" step="0.1" value="100"></label>
+      <label>武器重量<input id="weaponWeight" type="number" step="0.1" value="100"></label>
+    </div>
+
+    <div class="inputPanel">
+      <h3>攻撃</h3>
+      <label class="stackControl">攻撃種別
+        <select id="attackType">
+          <option value="attack">アタック（1.00倍・クリ可）</option>
+          <option value="heavy" selected>ヘビー クラッシュ（重量依存）</option>
+          <option value="manual">その他テクニック（倍率手入力）</option>
+        </select>
+      </label>
+      <p class="small selectHelp">クリティカルはアタックのみ有効。ヘビクラ/その他テクでは自動で無効化します。</p>
+      <div id="heavyFields">
+        <label class="stackControl">ヘビクラ式
+          <select id="heavyFormula">
+            <option value="old">0.90 + 0.029 × 重量</option>
+            <option value="new" selected>(重量 + 31.2) × 0.029</option>
+          </select>
+        </label>
+      </div>
+      <label>攻撃/テク倍率<input id="techMultiplier" type="number" step="0.0001" value="3.8048"></label>
+      <label>対象AC<input id="targetAC" type="number" step="0.1" value="0"></label>
+
+      <div id="critFields">
+        <label>クリティカル計算<input id="allowCrit" type="checkbox"></label>
+        <input id="critRate" type="hidden" value="1">
+        <input id="critMultiplier" type="hidden" value="1.5">
+        <p class="small">チェックON時はクリティカル1.5倍として計算します。</p>
+
+      </div>
+      <p id="attackHint" class="small"></p>
+    </div>
+
+    <div class="inputPanel">
+      <h3>上限・計算モード</h3>
+      <label>攻撃力加算上限<input id="atkCap" type="number" step="1" value="500"></label>
+      <label class="stackControl">攻撃力%Buffの基準
+        <select id="atkPctMode">
+          <option value="afterAdds" selected>実測寄せ（加算後攻撃力に乗算）</option>
+          <option value="baseCappedAdd">旧式（基礎攻撃力への増分）</option>
+        </select>
+      </label>
+      <p class="small selectHelp">初期値は「実測寄せ」。攻撃力実数加算後に%Buffを乗せ、増加分を上限対象として扱います。</p>
+      <label>最終表示上限<input id="finalCap" type="number" step="1" value="0"></label>
+      <p class="small">
+        最終表示上限は0なら無効。
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="card wide">
+  <h2>サマリー</h2>
+  <div class="summaryGrid">
+    <div class="summaryPanel">
+      <h3>予想ダメージ</h3>
+      <div class="result" id="finalDamage">-</div>
+    </div>
+
+    <div class="summaryPanel">
+      <h3>予想攻撃力</h3>
+      <div class="bigNum" id="predictedAtk">-</div>
+      <div id="attackCapStatus" style="margin:8px 0;"></div>
+      <div id="predictedAtkBreakdown" class="small"></div>
+    </div>
+
+    <div class="summaryPanel">
+      <h3>予想魔力</h3>
+      <div class="bigNum" id="predictedMagic">-</div>
+      <div id="predictedMagicBreakdown" class="small"></div>
+    </div>
+
+    <div class="summaryPanel">
+      <h3>装備補正合計</h3>
+      <div id="equipmentSummary" class="small">-</div>
+    </div>
+
+    <div class="summaryPanel slotPanel">
+      <h3>バフ枠</h3>
+      <div class="slotHoverArea" title="カーソルを合わせると、枠に入っているバフ一覧を表示します">
+        <div class="bigNum" id="slotCount">- / 24</div>
+        <div class="slotbar"><div class="slotfill" id="slotFill"></div></div>
+        <div id="slotBreakdown" class="small"></div>
+      </div>
+      <div class="slotTooltip" id="slotTooltip">-</div>
+      <div id="slotWarning" style="margin-top:8px;"></div>
+      <p class="small">「使用ON + 枠ON」の行だけ24枠にカウント。その他バフは使用ONだけで枠カウントします。</p>
+    </div>
+
+    <div class="summaryPanel summaryPanelWide">
+      <details class="breakdownDetails">
+        <summary>計算内訳</summary>
+        <div class="breakdownDetailsBody" id="breakdown"></div>
+      </details>
+    </div>
+  </div>
+</section>
+
+
+<details class="analysisDetails">
+  <summary>分析</summary>
+  <div class="analysisDetailsBody">
+  <div class="analysisGrid">
+    <div class="analysisPanel">
+      <h3>構成A/B比較</h3>
+      <div class="compactControls">
+        <div>
+          <button onclick="saveSnapshot('A')">現在をAに保存</button>
+          <button onclick="loadSnapshot('A')">Aを読み込み</button>
+          <label>メモA<input id="snapshotMemoA" type="text" placeholder="例: 現在構成 / Buff差分など"></label>
+          <div id="snapshotA" class="small">A: 未保存</div>
+        </div>
+        <div>
+          <button onclick="saveSnapshot('B')">現在をBに保存</button>
+          <button onclick="loadSnapshot('B')">Bを読み込み</button>
+          <label>メモB<input id="snapshotMemoB" type="text" placeholder="例: 変更後構成 / 比較条件など"></label>
+          <div id="snapshotB" class="small">B: 未保存</div>
+        </div>
+      </div>
+      <div id="compareResult" class="scrollX"></div>
+    </div>
+
+    <div class="analysisPanel">
+      <h3>実測値との差分・逆算</h3>
+      <div class="compactControls">
+        <label>実測ダメージ<input id="actualDamage" type="number" step="1" value="0"></label>
+        <label>ゲーム内攻撃力<input id="actualAtk" type="number" step="0.1" value="0"></label>
+      </div>
+      <button onclick="renderActualDiff()">実測差分を更新</button>
+      <div id="actualDiffResult" class="scrollX"></div>
+    </div>
+
+    <div class="analysisPanel">
+      <h3>AC別 簡易表</h3>
+      <label>AC一覧<input id="acList" type="text" value="0,50,100,150,200"></label>
+      <button onclick="renderACTable()">AC別表を更新</button>
+      <div id="acTable" class="scrollX"></div>
+    </div>
+
+    <div class="analysisPanel">
+      <h3>種族比較</h3>
+      <p class="small">
+        現在の筋力・精神力・Buff構成をそのままに、種族だけを変えた場合の予想値です。
+      </p>
+      <button onclick="renderRaceTable()">種族比較を更新</button>
+      <div id="raceTable" class="scrollX"></div>
+    </div>
+
+    <div class="analysisPanel analysisPanelWide">
+      <h3>Buff寄与率・1枠効率</h3>
+      <p class="small">
+        使用中の各行を1つずつOFFにしたときのダメージ低下量を表示します。
+        「枠効率」は、枠を消費する行だけ「低下ダメージ ÷ 1枠」で表示します。
+      </p>
+      <button onclick="renderContributionTable()">寄与率を更新</button>
+      <div id="contributionTable" class="scrollX"></div>
+    </div>
+  </div>
+  </div>
+</details>
+
+<section class="card wide">
+  <h2>割合ステータスBuff：攻撃力% / 魔力% / 速度%</h2>
+  <p class="small">
+    上から順番に適用。%欄は「10%なら 10」。
+    攻撃力%は、基礎攻撃力側から増分を出して攻撃力加算上限に含めます。
+  </p>
+  <table id="pctBuffTable" class="compactTable">
+    <thead><tr><th>使用</th><th>枠</th><th>名称</th><th>対象</th><th>%</th><th>メモ / ソース</th><th>操作</th></tr></thead>
+    <tbody></tbody>
+  </table>
+  <button onclick="addPctRow('attack')">攻撃力%行を追加</button>
+  <button onclick="addPctRow('magic')">魔力%行を追加</button>
+  <button onclick="addPctRow('speed')">速度%行を追加</button>
+</section>
+
+<section class="card wide">
+  <h2>武器・防具・装飾補正</h2>
+  <p class="small">
+    右手・左手・弾丸、防具7部位、装飾7部位を固定行で用意しています。
+    装備欄は常に使用扱いです。未装備や補正なしの部位は空欄/0のままでOKです。
+    攻撃力・魔力・速度は計算に反映し、攻撃ディレイは合計値を表示します。
+  </p>
+
+  <div class="equipmentLayout">
+    <div class="equipmentPanel equipmentWeaponPanel">
+      <h3>武器</h3>
+      <div class="weaponGrid">
+        <div class="weaponSlot">
+          <h4>右手</h4>
+          <table class="equipmentTable weaponTable">
+            <thead>
+              <tr>
+                <th>名前</th>
+                <th>攻撃力</th>
+                <th>魔力</th>
+                <th>速度</th>
+                <th>ディレイ</th>
+                <th>メモ</th>
+              </tr>
+            </thead>
+            <tbody id="equipmentWeaponRightBody"></tbody>
+          </table>
+        </div>
+        <div class="weaponSlot">
+          <h4>左手</h4>
+          <table class="equipmentTable weaponTable">
+            <thead>
+              <tr>
+                <th>名前</th>
+                <th>攻撃力</th>
+                <th>魔力</th>
+                <th>速度</th>
+                <th>ディレイ</th>
+                <th>メモ</th>
+              </tr>
+            </thead>
+            <tbody id="equipmentWeaponLeftBody"></tbody>
+          </table>
+        </div>
+        <div class="weaponSlot weaponSlotBullet">
+          <h4>弾丸</h4>
+          <table class="equipmentTable weaponTable">
+            <thead>
+              <tr>
+                <th>名前</th>
+                <th>攻撃力</th>
+                <th>魔力</th>
+                <th>速度</th>
+                <th>ディレイ</th>
+                <th>メモ</th>
+              </tr>
+            </thead>
+            <tbody id="equipmentWeaponBulletBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="equipmentDuo">
+      <div class="equipmentPanel">
+        <h3>防具</h3>
+        <table class="equipmentTable">
+          <thead>
+            <tr>
+              <th>部位</th>
+              <th>名前</th>
+              <th>攻撃力</th>
+              <th>魔力</th>
+              <th>速度</th>
+              <th>ディレイ</th>
+              <th>メモ</th>
+            </tr>
+          </thead>
+          <tbody id="equipmentArmorBody"></tbody>
+        </table>
+      </div>
+      <div class="equipmentPanel">
+        <h3>装飾</h3>
+        <table class="equipmentTable">
+          <thead>
+            <tr>
+              <th>部位</th>
+              <th>名前</th>
+              <th>攻撃力</th>
+              <th>魔力</th>
+              <th>速度</th>
+              <th>ディレイ</th>
+              <th>メモ</th>
+            </tr>
+          </thead>
+          <tbody id="equipmentAccessoryBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="card wide">
+  <h2>実数ステータス加算：魔力 / 攻撃力 / 速度</h2>
+  <p class="small">
+    魔力+X、攻撃力+X、速度+Xを1つの表で管理します。
+    対象をプルダウンで選択してください。
+    魔力/速度は割合ステータスBuffやステータス変換の前に加算、攻撃力は攻撃力実数加算加算として攻撃力加算上限の対象にします。
+  </p>
+  <table id="flatStatTable" class="compactTable">
+    <thead><tr><th>使用</th><th>枠</th><th>名称</th><th>対象</th><th>加算値</th><th>メモ / ソース</th><th>操作</th></tr></thead>
+    <tbody></tbody>
+  </table>
+  <button onclick="addFlatRow('magic')">魔力行を追加</button>
+  <button onclick="addFlatRow('attack')">攻撃力行を追加</button>
+  <button onclick="addFlatRow('speed')">速度行を追加</button>
+</section>
+
+<section class="card wide">
+  <h2>ステータス変換：魔力/速度/酩酊度など → 攻撃力</h2>
+  <p class="small">
+    例: 魔力30%を攻撃力に足すなら「参照=魔力、変換率=30」。
+    魔力/速度/酩酊度などからの攻撃力変換は、攻撃力加算上限500を突破する上限外加算として扱います。
+  </p>
+  <table id="conversionTable" class="compactTable">
+    <thead><tr><th>使用</th><th>枠</th><th>名称</th><th>参照</th><th>変換率%</th><th>メモ / ソース</th><th>操作</th></tr></thead>
+    <tbody></tbody>
+  </table>
+  <button onclick="addConversionRow('magic')">魔力変換行を追加</button>
+  <button onclick="addConversionRow('speed')">速度変換行を追加</button>
+  <button onclick="addConversionRow('drunk')">酩酊度変換行を追加</button>
+</section>
+
+<section class="card wide">
+  <h2>種族特攻・特攻倍率：乗算倍率</h2>
+  <p class="small">
+    1.5倍なら 1.5、2倍なら 2.0。複数行ONの場合は乗算します。
+    特攻はダメージ本体だけでなく、ACがある場合の防御計算側にも入ります。
+  </p>
+  <table id="specialBuffTable" class="compactTable">
+    <thead><tr><th>使用</th><th>枠</th><th>名称</th><th>倍率</th><th>メモ / ソース</th><th>削除</th></tr></thead>
+    <tbody></tbody>
+  </table>
+  <button onclick="addRow('special')">特攻行を追加</button>
+</section>
+
+<section class="card wide">
+  <h2>物理与ダメージ増加：加算倍率</h2>
+  <p class="small">+100%なら 1.00、+20%なら 0.20。複数は 1 + 合計% で加算倍率化。</p>
+  <table id="dmgBuffTable" class="compactTable">
+    <thead><tr><th>使用</th><th>枠</th><th>名称</th><th>増加量</th><th>分類</th><th>メモ / ソース</th><th>削除</th></tr></thead>
+    <tbody></tbody>
+  </table>
+  <button onclick="addRow('dmg')">与ダメ行を追加</button>
+</section>
+
+<section class="card wide">
+  <h2>外枠補正：ネヤ補正・被ダメ増加・パンチングマシン補正など</h2>
+  <p class="small">ここは乗算扱い。自己Buff枠に数えるものだけ「枠」をONにしてください。</p>
+  <table id="postBuffTable" class="compactTable">
+    <thead><tr><th>使用</th><th>枠</th><th>名称</th><th>倍率</th><th>メモ / ソース</th><th>削除</th></tr></thead>
+    <tbody></tbody>
+  </table>
+  <button onclick="addRow('post')">外枠行を追加</button>
+</section>
+
+<section class="card wide">
+  <h2>その他バフ：ダメージ計算に使わないBuff</h2>
+  <p class="small">ダメージ計算には一切使わず、バフ24枠カウントだけに使います。</p>
+  <table id="otherBuffTable" class="compactTable">
+    <thead><tr><th>使用</th><th>名称</th><th>メモ / ソース</th><th>削除</th></tr></thead>
+    <tbody></tbody>
+  </table>
+  <button onclick="addOtherRow()">その他バフ行を追加</button>
+</section>
+
+<section class="card wide">
+  <h2>保存・読み込み</h2>
+  <button onclick="exportConfig()">設定をJSONに出力</button>
+  <button onclick="importConfig()">JSONから読み込み</button>
+  <button onclick="resetConfig()">このツールの保存設定をリセット</button>
+  <textarea id="configBox" placeholder="ここにJSONを貼り付けて読み込み可能"></textarea>
+</section>
+
+<script>
+const RACE_COEFFS = {
+  newtar: 0.20,
+  cognite: 0.19,
+  elmony: 0.19,
+  pandemos: 0.21
+};
+
+const RACE_MAGIC_COEFFS = {
+  newtar: 1.00,
+  cognite: 1.10,
+  elmony: 0.95,
+  pandemos: 0.90
+};
+
+const RACE_LABELS = {
+  newtar: "ニューター",
+  cognite: "コグニート",
+  elmony: "エルモニー",
+  pandemos: "パンデモス"
+};
+
+const EQUIPMENT_SLOTS = [
+  {slot: "武器: 右手"},
+  {slot: "武器: 左手"},
+  {slot: "武器: 弾丸"},
+  {slot: "防具: 頭"},
+  {slot: "防具: 胴"},
+  {slot: "防具: 手"},
+  {slot: "防具: パンツ"},
+  {slot: "防具: 靴"},
+  {slot: "防具: 肩"},
+  {slot: "防具: 腰"},
+  {slot: "装飾: 頭"},
+  {slot: "装飾: 顔"},
+  {slot: "装飾: 耳"},
+  {slot: "装飾: 指"},
+  {slot: "装飾: 胸"},
+  {slot: "装飾: 背中"},
+  {slot: "装飾: 腰"}
+];
+
+function defaultEquipmentRows() {
+  return EQUIPMENT_SLOTS.map(x => ({
+    enabled: true,
+    slot: x.slot,
+    name: "",
+    attack: 0,
+    magic: 0,
+    speed: 0,
+    delay: 0,
+    note: ""
+  }));
+}
+
+function normalizeEquipmentRows(rows) {
+  const incoming = Array.isArray(rows) ? rows : [];
+  const result = defaultEquipmentRows();
+
+  incoming.forEach(row => {
+    if (!row) return;
+    const normalizedSlot = row.slot === "武器: 右手武器" ? "武器: 右手"
+      : row.slot === "武器: 左手武器" ? "武器: 左手"
+      : row.slot;
+    const idx = result.findIndex(x => x.slot === normalizedSlot);
+    if (idx >= 0) result[idx] = {...result[idx], ...row, slot: normalizedSlot};
+  });
+
+  const slotless = incoming.filter(row => row && !row.slot);
+  const legacyStart = result.findIndex(x => x.slot === "防具: 頭");
+  slotless.forEach((row, idx) => {
+    const targetIdx = legacyStart >= 0 ? legacyStart + idx : idx;
+    if (targetIdx < result.length) result[targetIdx] = {...result[targetIdx], ...row, slot: result[targetIdx].slot};
+  });
+
+  return result;
+}
+
+const DEFAULT_STATE = () => ({
+  pct: [
+    {enabled: false, slot: true, name: "攻撃力% Buff", target: "attack", percent: 0, note: ""},
+    {enabled: false, slot: true, name: "魔力% Buff", target: "magic", percent: 0, note: ""},
+    {enabled: false, slot: true, name: "速度% Buff", target: "speed", percent: 0, note: ""}
+  ],
+  equipment: defaultEquipmentRows(),
+  flat: [
+    {enabled: false, slot: true, name: "魔力実数加算", target: "magic", value: 0, note: "魔力+X。魔力%Buffと魔力→攻撃力変換の前に加算"},
+    {enabled: false, slot: true, name: "速度実数加算", target: "speed", value: 0, note: "速度+X。速度%Buffと速度→攻撃力変換の前に加算"},
+    {enabled: false, slot: true, name: "バーサーク 戦技100 例", target: "attack", value: 26, note: "攻撃力+X。攻撃力加算上限対象"},
+    {enabled: false, slot: true, name: "任意攻撃力装備合計", target: "attack", value: 0, note: "手入力。攻撃力加算上限対象"}
+  ],
+  conv: [
+    {enabled: true, slot: true, name: "ちいずのバトハン 魔力→攻撃力", source: "magic", rate: 30, capped: false, note: "魔力の30%を攻撃力に加算。上限外加算"},
+    {enabled: false, slot: true, name: "速度→攻撃力 変換", source: "speed", rate: 0, capped: false, note: ""},
+    {enabled: false, slot: true, name: "酩酊度→攻撃力 変換", source: "drunk", rate: 0, capped: false, note: ""}
+  ],
+  dmg: [
+    {enabled: false, slot: true, name: "マスター ストレングス", value: 1.00, category: "物理与ダメ", note: "通常の与ダメ+100%として計算する場合"},
+    {enabled: false, slot: true, name: "アルゴノゥト", value: 1.00, category: "物理与ダメ?", note: "攻撃力参照テクには乗る想定。要検証"},
+    {enabled: false, slot: true, name: "絶断", value: 0.20, category: "物理与ダメ", note: "物理与ダメ+20%"},
+    {enabled: false, slot: true, name: "フォース ステップ", value: 0.10, category: "物理与ダメ", note: "物理与ダメ+10%"},
+    {enabled: false, slot: true, name: "与ダメ装備合計", value: 0.60, category: "装備", note: "候補装備の合計を手入力"}
+  ],
+  special: [
+    {enabled: false, slot: false, name: "種族特攻 / 特攻", value: 1.50, note: "例: 1.5倍。装備固有でBuff枠を使わない場合は枠OFF"},
+    {enabled: false, slot: false, name: "ちいずのバトハン特攻", value: 2.00, note: "対象に特攻が入る場合のみON"}
+  ],
+  post: [
+    {enabled: true, slot: false, name: "ネヤ補正", value: 2.00, note: "パンチングマシン・ネヤ補正用。自己Buff枠ではない想定"},
+    {enabled: false, slot: false, name: "パンチングマシン別補正", value: 2.00, note: "ネヤ補正と別に存在する場合のみON"},
+    {enabled: false, slot: false, name: "アーリー スラスト", value: 1.50, note: "対象側デバフ想定。自己Buff枠ではない想定"},
+    {enabled: false, slot: false, name: "アイスメイク・銀世界", value: 1.25, note: "対象側デバフ想定。自己Buff枠ではない想定"}
+  ],
+  other: [
+    {enabled: false, name: "その他バフ", note: "ダメージ計算には使わず、バフ枠だけカウント"}
+  ]
+});
+
+let state = DEFAULT_STATE();
+let snapshots = {A: null, B: null};
+
+function clone(obj) { return JSON.parse(JSON.stringify(obj)); }
+function byId(id) { return document.getElementById(id); }
+function num(id) {
+  const v = parseFloat(byId(id).value);
+  return Number.isFinite(v) ? v : 0;
+}
+function fmt(n, digits=3) {
+  if (!Number.isFinite(n)) return "-";
+  return Number(n).toLocaleString(undefined, {maximumFractionDigits: digits, minimumFractionDigits: 0});
+}
+function pct(n) {
+  if (!Number.isFinite(n)) return "-";
+  return (n * 100).toFixed(2) + "%";
+}
+function escapeHtml(s) {
+  return String(s ?? "").replace(/[&<>"']/g, ch => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  }[ch]));
+}
+function makeCell(tag, attrs={}, text="") {
+  const el = document.createElement(tag);
+  Object.entries(attrs).forEach(([k,v]) => {
+    if (k === "class") el.className = v;
+    else if (k === "type") el.type = v;
+    else if (k === "checked") el.checked = !!v;
+    else if (k === "value") el.value = v;
+    else if (k === "step") el.step = v;
+    else if (k === "readonly") el.readOnly = !!v;
+    else el.setAttribute(k,v);
+  });
+  if (text !== "") el.textContent = text;
+  return el;
+}
+function checkboxCell(row, prop) {
+  const cb = makeCell("input", {type:"checkbox", checked: !!row[prop]});
+  cb.onchange = () => { row[prop] = cb.checked; calc(); };
+  const td = makeCell("td");
+  td.appendChild(cb);
+  return td;
+}
+function actionCell(arr, idx, renderFn) {
+  const td = makeCell("td", {class:"actionCell"});
+  const wrap = makeCell("div", {class:"actionsWrap"});
+  const up = makeCell("button", {type:"button", title:"上へ"}, "↑");
+  up.onclick = () => { if (idx > 0) { [arr[idx-1], arr[idx]] = [arr[idx], arr[idx-1]]; renderFn(); calc(); } };
+  const down = makeCell("button", {type:"button", title:"下へ"}, "↓");
+  down.onclick = () => { if (idx < arr.length - 1) { [arr[idx+1], arr[idx]] = [arr[idx], arr[idx+1]]; renderFn(); calc(); } };
+  const del = makeCell("button", {type:"button", title:"削除", class:"dangerMini"}, "×");
+  del.onclick = () => { arr.splice(idx, 1); renderFn(); calc(); };
+  wrap.appendChild(up); wrap.appendChild(down); wrap.appendChild(del);
+  td.appendChild(wrap);
+  return td;
+}
+
+function collectInputs() {
+  const ids = [
+    "raceSelect","raceCoeff","str","spirit","magic","weaponSkill","requiredSkill","weaponDamage","weaponWeight",
+    "speed","drunk","targetAC","attackType","heavyFormula","techMultiplier",
+    "allowCrit","critRate","critMultiplier","atkCap","atkPctMode","finalCap"
+  ];
+  const inputs = {};
+  ids.forEach(id => {
+    const el = byId(id);
+    if (!el) return;
+    inputs[id] = el.type === "checkbox" ? el.checked : el.value;
+  });
+  return inputs;
+}
+function setInputs(inputs) {
+  const src = {...(inputs || {})};
+  if ((src.spirit === undefined || src.spirit === null || src.spirit === "") && src.magic !== undefined) {
+    const race = src.raceSelect || byId("raceSelect").value || "newtar";
+    const coeff = RACE_MAGIC_COEFFS[race] ?? 1.00;
+    const oldMagic = parseFloat(src.magic);
+    if (Number.isFinite(oldMagic) && coeff) src.spirit = (oldMagic / coeff).toFixed(3);
+  }
+  Object.entries(src).forEach(([id, val]) => {
+    const el = byId(id);
+    if (!el) return;
+    if (el.type === "checkbox") el.checked = !!val;
+    else el.value = val;
+  });
+  syncRaceCoeff();
+  syncBaseMagic();
+}
+function collectConfig() {
+  return {inputs: collectInputs(), state: clone(state)};
+}
+
+function targetOptions(value) {
+  const labels = {attack:"攻撃力%", magic:"魔力%", speed:"速度%"};
+  return Object.entries(labels).map(([k,v]) => `<option value="${k}" ${k===value?'selected':''}>${v}</option>`).join("");
+}
+function sourceOptions(value) {
+  const labels = {magic:"魔力", speed:"速度", drunk:"酩酊度", str:"筋力"};
+  return Object.entries(labels).map(([k,v]) => `<option value="${k}" ${k===value?'selected':''}>${v}</option>`).join("");
+}
+function labelOf(key) {
+  return ({attack:"攻撃力", magic:"魔力", speed:"速度", drunk:"酩酊度", str:"筋力"})[key] || key;
+}
+function targetName(target) {
+  return ({attack:"攻撃力% Buff", magic:"魔力% Buff", speed:"速度% Buff"})[target] || "割合Buff";
+}
+function flatTargetOptions(value) {
+  const labels = {magic:"魔力", attack:"攻撃力", speed:"速度"};
+  return Object.entries(labels).map(([k,v]) => `<option value="${k}" ${k===value?'selected':''}>${v}</option>`).join("");
+}
+function flatTargetDefaultName(target) {
+  return ({magic:"魔力実数加算", attack:"攻撃力実数加算", speed:"速度実数加算"})[target] || "実数加算";
+}
+function normalizeFlatRows(st) {
+  if (Array.isArray(st.flat) && st.flat.length) return st.flat;
+  const rows = [];
+  (st.magicFlat || []).forEach(r => rows.push({...r, target:"magic"}));
+  (st.atk || []).forEach(r => rows.push({...r, target:"attack"}));
+  return rows;
+}
+
+function renderPctTable() {
+  const tbody = document.querySelector("#pctBuffTable tbody");
+  tbody.innerHTML = "";
+  state.pct.forEach((row, idx) => {
+    const tr = document.createElement("tr");
+    tr.appendChild(checkboxCell(row, "enabled"));
+    tr.appendChild(checkboxCell(row, "slot"));
+
+    const name = makeCell("input", {value: row.name || ""});
+    name.oninput = () => { row.name = name.value; };
+    tr.appendChild(makeCell("td")).appendChild(name);
+
+    const target = makeCell("select");
+    target.innerHTML = targetOptions(row.target || "attack");
+    target.onchange = () => { row.target = target.value; calc(); };
+    tr.appendChild(makeCell("td")).appendChild(target);
+
+    const percent = makeCell("input", {type:"number", step:"1", value: row.percent ?? 0});
+    percent.oninput = () => { row.percent = parseFloat(percent.value) || 0; calc(); };
+    tr.appendChild(makeCell("td")).appendChild(percent);
+
+    const note = makeCell("input", {value: row.note || ""});
+    note.oninput = () => { row.note = note.value; };
+    tr.appendChild(makeCell("td")).appendChild(note);
+
+    tr.appendChild(actionCell(state.pct, idx, renderPctTable));
+    tbody.appendChild(tr);
+  });
+}
+function addPctRow(target="attack") {
+  state.pct.push({enabled:true, slot:true, name: targetName(target), target, percent:0, note:""});
+  renderPctTable();
+  calc();
+}
+
+
+
+function makeEquipmentInputRow(row, includeSlot=true) {
+  const tr = document.createElement("tr");
+
+  if (includeSlot) {
+    const slotTd = makeCell("td");
+    slotTd.textContent = (row.slot || "").replace(/^武器: /, "").replace(/^防具: /, "").replace(/^装飾: /, "");
+    tr.appendChild(slotTd);
+  }
+
+  const name = makeCell("input", {class:"equipName", value: row.name || ""});
+  name.oninput = () => { row.name = name.value; };
+  tr.appendChild(makeCell("td")).appendChild(name);
+
+  const attack = makeCell("input", {class:"equipNum", type:"number", step:"1", value: row.attack ?? 0});
+  attack.oninput = () => { row.attack = parseFloat(attack.value) || 0; calc(); };
+  tr.appendChild(makeCell("td")).appendChild(attack);
+
+  const magic = makeCell("input", {class:"equipNum", type:"number", step:"1", value: row.magic ?? 0});
+  magic.oninput = () => { row.magic = parseFloat(magic.value) || 0; calc(); };
+  tr.appendChild(makeCell("td")).appendChild(magic);
+
+  const speed = makeCell("input", {class:"equipNum", type:"number", step:"1", value: row.speed ?? 0});
+  speed.oninput = () => { row.speed = parseFloat(speed.value) || 0; calc(); };
+  tr.appendChild(makeCell("td")).appendChild(speed);
+
+  const delay = makeCell("input", {class:"equipNum", type:"number", step:"1", value: row.delay ?? 0});
+  delay.oninput = () => { row.delay = parseFloat(delay.value) || 0; calc(); };
+  tr.appendChild(makeCell("td")).appendChild(delay);
+
+  const note = makeCell("input", {class:"equipNote", value: row.note || ""});
+  note.oninput = () => { row.note = note.value; };
+  tr.appendChild(makeCell("td")).appendChild(note);
+
+  return tr;
+}
+
+function renderEquipmentTable() {
+  const rightBody = document.querySelector("#equipmentWeaponRightBody");
+  const leftBody = document.querySelector("#equipmentWeaponLeftBody");
+  const bulletBody = document.querySelector("#equipmentWeaponBulletBody");
+  const armorBody = document.querySelector("#equipmentArmorBody");
+  const accessoryBody = document.querySelector("#equipmentAccessoryBody");
+
+  rightBody.innerHTML = "";
+  leftBody.innerHTML = "";
+  bulletBody.innerHTML = "";
+  armorBody.innerHTML = "";
+  accessoryBody.innerHTML = "";
+  state.equipment = normalizeEquipmentRows(state.equipment);
+
+  state.equipment.forEach((row) => {
+    if (row.enabled === undefined) row.enabled = true;
+
+    if (row.slot === "武器: 右手") {
+      rightBody.appendChild(makeEquipmentInputRow(row, false));
+    } else if (row.slot === "武器: 左手") {
+      leftBody.appendChild(makeEquipmentInputRow(row, false));
+    } else if (row.slot === "武器: 弾丸") {
+      bulletBody.appendChild(makeEquipmentInputRow(row, false));
+    } else if ((row.slot || "").startsWith("装飾:")) {
+      accessoryBody.appendChild(makeEquipmentInputRow(row, true));
+    } else {
+      armorBody.appendChild(makeEquipmentInputRow(row, true));
+    }
+  });
+}
+
+function renderFlatTable() {
+  const tbody = document.querySelector("#flatStatTable tbody");
+  tbody.innerHTML = "";
+  state.flat.forEach((row, idx) => {
+    const tr = document.createElement("tr");
+    tr.appendChild(checkboxCell(row, "enabled"));
+    tr.appendChild(checkboxCell(row, "slot"));
+
+    const name = makeCell("input", {value: row.name || ""});
+    name.oninput = () => { row.name = name.value; };
+    tr.appendChild(makeCell("td")).appendChild(name);
+
+    const target = makeCell("select");
+    target.innerHTML = flatTargetOptions(row.target || "magic");
+    target.onchange = () => { row.target = target.value; calc(); };
+    tr.appendChild(makeCell("td")).appendChild(target);
+
+    const value = makeCell("input", {type:"number", step:"0.1", value: row.value ?? 0});
+    value.oninput = () => { row.value = parseFloat(value.value) || 0; calc(); };
+    tr.appendChild(makeCell("td")).appendChild(value);
+
+    const note = makeCell("input", {value: row.note || ""});
+    note.oninput = () => { row.note = note.value; };
+    tr.appendChild(makeCell("td")).appendChild(note);
+
+    tr.appendChild(actionCell(state.flat, idx, renderFlatTable));
+    tbody.appendChild(tr);
+  });
+}
+function addFlatRow(target="magic") {
+  state.flat.push({enabled:true, slot:true, name:flatTargetDefaultName(target), target, value:0, note:""});
+  renderFlatTable();
+  calc();
+}
+
+function renderConversionTable() {
+  const tbody = document.querySelector("#conversionTable tbody");
+  tbody.innerHTML = "";
+  state.conv.forEach((row, idx) => {
+    const tr = document.createElement("tr");
+    tr.appendChild(checkboxCell(row, "enabled"));
+    tr.appendChild(checkboxCell(row, "slot"));
+
+    const name = makeCell("input", {value: row.name || ""});
+    name.oninput = () => { row.name = name.value; };
+    tr.appendChild(makeCell("td")).appendChild(name);
+
+    const source = makeCell("select");
+    source.innerHTML = sourceOptions(row.source || "magic");
+    source.onchange = () => { row.source = source.value; calc(); };
+    tr.appendChild(makeCell("td")).appendChild(source);
+
+    const rate = makeCell("input", {type:"number", step:"1", value: row.rate ?? 0});
+    rate.oninput = () => { row.rate = parseFloat(rate.value) || 0; calc(); };
+    tr.appendChild(makeCell("td")).appendChild(rate);
+
+    const note = makeCell("input", {value: row.note || ""});
+    note.oninput = () => { row.note = note.value; };
+    tr.appendChild(makeCell("td")).appendChild(note);
+
+    tr.appendChild(actionCell(state.conv, idx, renderConversionTable));
+    tbody.appendChild(tr);
+  });
+}
+function addConversionRow(source="magic") {
+  state.conv.push({enabled:true, slot:true, name:`${labelOf(source)}→攻撃力 変換`, source, rate:0, capped:false, note:""});
+  renderConversionTable();
+  calc();
+}
+
+function renderNumericTable(type) {
+  const tableId = type === "magicFlat" ? "magicBuffTable" : type === "atk" ? "atkBuffTable" : type === "dmg" ? "dmgBuffTable" : type === "special" ? "specialBuffTable" : "postBuffTable";
+  const tbody = document.querySelector(`#${tableId} tbody`);
+  tbody.innerHTML = "";
+  state[type].forEach((row, idx) => {
+    const tr = document.createElement("tr");
+    tr.appendChild(checkboxCell(row, "enabled"));
+    tr.appendChild(checkboxCell(row, "slot"));
+
+    const name = makeCell("input", {value: row.name || ""});
+    name.oninput = () => { row.name = name.value; };
+    tr.appendChild(makeCell("td")).appendChild(name);
+
+    const value = makeCell("input", {type:"number", step:"0.1", value: row.value ?? 0});
+    value.oninput = () => { row.value = parseFloat(value.value) || 0; calc(); };
+    tr.appendChild(makeCell("td")).appendChild(value);
+
+    if (type === "dmg") {
+      const cat = makeCell("input", {value: row.category || ""});
+      cat.oninput = () => { row.category = cat.value; };
+      tr.appendChild(makeCell("td")).appendChild(cat);
+    }
+
+    const note = makeCell("input", {value: row.note || ""});
+    note.oninput = () => { row.note = note.value; };
+    tr.appendChild(makeCell("td")).appendChild(note);
+
+    const del = makeCell("button", {type:"button", title:"削除", class:"dangerMini"}, "×");
+    del.onclick = () => { state[type].splice(idx, 1); renderAll(); calc(); };
+    tr.appendChild(makeCell("td")).appendChild(del);
+
+    tbody.appendChild(tr);
+  });
+}
+function addRow(type) {
+  if (type === "magicFlat") state.magicFlat.push({enabled:true, slot:true, name:"新規魔力", value:0, note:""});
+  if (type === "atk") state.atk.push({enabled:true, slot:true, name:"新規攻撃力", value:0, note:""});
+  if (type === "dmg") state.dmg.push({enabled:true, slot:true, name:"新規与ダメ", value:0, category:"", note:""});
+  if (type === "special") state.special.push({enabled:true, slot:false, name:"新規特攻", value:1.5, note:""});
+  if (type === "post") state.post.push({enabled:true, slot:false, name:"新規外枠", value:1, note:""});
+  renderAll();
+  calc();
+}
+
+function renderOtherTable() {
+  const tbody = document.querySelector("#otherBuffTable tbody");
+  tbody.innerHTML = "";
+  state.other.forEach((row, idx) => {
+    const tr = document.createElement("tr");
+
+    const enabled = makeCell("input", {type:"checkbox", checked: !!row.enabled});
+    enabled.onchange = () => { row.enabled = enabled.checked; calc(); };
+    tr.appendChild(makeCell("td")).appendChild(enabled);
+
+    const name = makeCell("input", {value: row.name || ""});
+    name.oninput = () => { row.name = name.value; };
+    tr.appendChild(makeCell("td")).appendChild(name);
+
+    const note = makeCell("input", {value: row.note || ""});
+    note.oninput = () => { row.note = note.value; };
+    tr.appendChild(makeCell("td")).appendChild(note);
+
+    const del = makeCell("button", {type:"button", title:"削除", class:"dangerMini"}, "×");
+    del.onclick = () => { state.other.splice(idx, 1); renderOtherTable(); calc(); };
+    tr.appendChild(makeCell("td")).appendChild(del);
+    tbody.appendChild(tr);
+  });
+}
+function addOtherRow() {
+  state.other.push({enabled:true, name:"その他バフ", note:""});
+  renderOtherTable();
+  calc();
+}
+
+function renderAll() {
+  renderPctTable();
+  renderEquipmentTable();
+  renderFlatTable();
+  renderConversionTable();
+  renderNumericTable("dmg");
+  renderNumericTable("special");
+  renderNumericTable("post");
+  renderOtherTable();
+}
+
+function syncRaceCoeff() {
+  const coeff = RACE_COEFFS[byId("raceSelect").value] ?? 0.20;
+  byId("raceCoeff").value = coeff.toFixed(3);
+  return coeff;
+}
+function syncBaseMagic() {
+  const race = byId("raceSelect").value;
+  const spirit = parseFloat(byId("spirit").value) || 0;
+  const coeff = RACE_MAGIC_COEFFS[race] ?? 1.00;
+  const baseMagic = spirit * coeff;
+  byId("magic").value = baseMagic.toFixed(3);
+  return baseMagic;
+}
+function syncAttackTypeUI() {
+  const type = byId("attackType").value;
+  const isAttack = type === "attack";
+  const isHeavy = type === "heavy";
+  byId("heavyFields").style.display = isHeavy ? "" : "none";
+  byId("critFields").classList.toggle("muted", !isAttack);
+
+  if (isAttack) {
+    byId("techMultiplier").value = "1.0000";
+    byId("techMultiplier").readOnly = true;
+    byId("attackHint").textContent = "アタック: 倍率1.00。クリティカルを入れる場合はONにしてください。ON時は1.5倍固定です。";
+  } else if (isHeavy) {
+    byId("techMultiplier").readOnly = true;
+    byId("allowCrit").checked = false;
+    byId("attackHint").textContent = "ヘビー クラッシュ: クリティカルなし。倍率は武器重量と選択した式から自動計算します。";
+  } else {
+    byId("techMultiplier").readOnly = false;
+    byId("allowCrit").checked = false;
+    byId("attackHint").textContent = "その他テクニック: 倍率を手入力。クリティカルは無効として計算します。";
+  }
+}
+
+function statValue(stats, source) {
+  if (source === "str") return stats.str;
+  if (source === "magic") return stats.magic;
+  if (source === "speed") return stats.speed;
+  if (source === "drunk") return stats.drunk;
+  return 0;
+}
+function applyPercentStats(st, baseStats) {
+  const stats = {...baseStats};
+  const steps = [];
+  (st.pct || []).filter(r => r.enabled && r.target !== "attack").forEach(r => {
+    const key = r.target;
+    const before = stats[key] ?? 0;
+    const add = before * ((+r.percent || 0) / 100);
+    stats[key] = before + add;
+    steps.push({name:r.name, key, before, add, after:stats[key], percent:+r.percent || 0});
+  });
+  return {stats, steps};
+}
+function calcConversions(st, stats) {
+  let capped = 0;
+  let uncapped = 0;
+  const steps = [];
+  (st.conv || []).filter(r => r.enabled).forEach(r => {
+    const base = statValue(stats, r.source);
+    const add = base * ((+r.rate || 0) / 100);
+    // ステータス変換系は攻撃力加算上限を突破するため、全て上限外へ入れる。
+    uncapped += add;
+    steps.push({name:r.name, source:r.source, base, rate:+r.rate || 0, add, capped:false});
+  });
+  return {capped, uncapped, steps};
+}
+function calcPctAttack(st, baseAtk) {
+  let atk = baseAtk;
+  let added = 0;
+  const steps = [];
+  (st.pct || []).filter(r => r.enabled && r.target === "attack").forEach(r => {
+    const before = atk;
+    const add = before * ((+r.percent || 0) / 100);
+    atk = before + add;
+    added += add;
+    steps.push({name:r.name, before, add, after:atk, percent:+r.percent || 0});
+  });
+  return {added, after:atk, steps};
+}
+function attackMultiplierFromInputs(inputs) {
+  if (inputs.attackType === "attack") return 1.0;
+  if (inputs.attackType === "heavy") {
+    const weight = parseFloat(inputs.weaponWeight) || 0;
+    return inputs.heavyFormula === "new"
+      ? (weight + 31.2) * 0.029
+      : 0.90 + 0.029 * weight;
+  }
+  return parseFloat(inputs.techMultiplier) || 0;
+}
+function computeMetrics(st, inputs) {
+  const raceCoeff = RACE_COEFFS[inputs.raceSelect] ?? parseFloat(inputs.raceCoeff) ?? 0.20;
+  const spirit = parseFloat(inputs.spirit) || 0;
+  const magicCoeff = RACE_MAGIC_COEFFS[inputs.raceSelect] ?? 1.00;
+  const baseMagicFromSpirit = spirit * magicCoeff;
+  const equipmentRows = normalizeEquipmentRows(st.equipment).filter(r => r.enabled !== false);
+  const equipmentRaw = {
+    attack: equipmentRows.reduce((s, r) => s + (+r.attack || 0), 0),
+    magic: equipmentRows.reduce((s, r) => s + (+r.magic || 0), 0),
+    speed: equipmentRows.reduce((s, r) => s + (+r.speed || 0), 0),
+    delay: equipmentRows.reduce((s, r) => s + (+r.delay || 0), 0)
+  };
+
+  const flatRows = normalizeFlatRows(st).filter(r => r.enabled);
+  const flatStatRaw = {
+    magic: flatRows.filter(r => (r.target || "magic") === "magic").reduce((s, r) => s + (+r.value || 0), 0) + equipmentRaw.magic,
+    attack: flatRows.filter(r => r.target === "attack").reduce((s, r) => s + (+r.value || 0), 0) + equipmentRaw.attack,
+    speed: flatRows.filter(r => r.target === "speed").reduce((s, r) => s + (+r.value || 0), 0) + equipmentRaw.speed
+  };
+  const baseStats = {
+    str: parseFloat(inputs.str) || 0,
+    magic: baseMagicFromSpirit + flatStatRaw.magic,
+    speed: (parseFloat(inputs.speed) || 0) + flatStatRaw.speed,
+    drunk: parseFloat(inputs.drunk) || 0
+  };
+  const pctStats = applyPercentStats(st, baseStats);
+  const stats = pctStats.stats;
+
+  const weaponDamage = parseFloat(inputs.weaponDamage) || 0;
+  const weaponSkill = parseFloat(inputs.weaponSkill) || 0;
+  const requiredSkill = Math.max(1, parseFloat(inputs.requiredSkill) || 1);
+  const skillMod = Math.min(1, weaponSkill / requiredSkill);
+  const ac = parseFloat(inputs.targetAC) || 0;
+
+  const racialAtk = stats.str * raceCoeff;
+  const weaponAtk = ((stats.str + 300) / 350) * weaponDamage * skillMod;
+  const conv = calcConversions(st, stats);
+
+  // 攻撃力加算上限の基準:
+  // 武器攻撃力 + 種族ごとの基礎攻撃力は基礎攻撃力。
+  // ステータス変換系は上限外で突破する。
+  // それ以外の攻撃力増加だけを最大 atkCap までに収める。
+  const baseNaturalAtk = racialAtk + weaponAtk;
+  const conversionAtk = conv.uncapped + conv.capped;
+  const baseAtk = baseNaturalAtk + conversionAtk; // 変換込みの上限外基礎として扱う。
+
+  const flatAtkRaw = flatStatRaw.attack;
+  const atkCap = parseFloat(inputs.atkCap) || 0;
+  const atkBeforePctRaw = baseNaturalAtk + conversionAtk + flatAtkRaw;
+
+  const atkPctMode = inputs.atkPctMode || "afterAdds";
+  let pctAtkCalc;
+  let atkBuffRaw;
+  let atkBuffCapped;
+  let atk;
+  let atkBeforePct;
+  let cappedAddRawBeforePct;
+  let cappedAddBeforePct;
+  let extraRawBeforePct;
+
+  if (atkPctMode === "afterAdds") {
+    // 攻撃力%Buffは、固定加算・変換加算後の攻撃力に順次乗算。
+    // ただし上限外で突破するのは変換そのものだけ。
+    // 攻撃力%Buffによる増加分は、変換に由来する分も含めて上限対象側へ入れる。
+    pctAtkCalc = calcPctAttack(st, atkBeforePctRaw);
+    atkBuffRaw = pctAtkCalc.after - baseNaturalAtk - conversionAtk;
+    atkBuffCapped = atkCap > 0 ? Math.min(atkBuffRaw, atkCap) : atkBuffRaw;
+    atk = baseNaturalAtk + conversionAtk + atkBuffCapped;
+    atkBeforePct = atkBeforePctRaw;
+    extraRawBeforePct = flatAtkRaw;
+    cappedAddRawBeforePct = flatAtkRaw;
+    cappedAddBeforePct = atkCap > 0 ? Math.min(flatAtkRaw, atkCap) : flatAtkRaw;
+  } else {
+    // 旧式: 基礎攻撃力への攻撃力%増分を上限対象加算として扱う。
+    pctAtkCalc = calcPctAttack(st, baseNaturalAtk + conversionAtk);
+    atkBuffRaw = flatAtkRaw + pctAtkCalc.added;
+    atkBuffCapped = atkCap > 0 ? Math.min(atkBuffRaw, atkCap) : atkBuffRaw;
+    atk = baseNaturalAtk + conversionAtk + atkBuffCapped;
+    atkBeforePct = baseNaturalAtk + conversionAtk;
+    extraRawBeforePct = flatAtkRaw;
+    cappedAddRawBeforePct = flatAtkRaw;
+    cappedAddBeforePct = atkCap > 0 ? Math.min(flatAtkRaw, atkCap) : flatAtkRaw;
+  }
+
+  const attackMultiplier = attackMultiplierFromInputs(inputs);
+  const dmgBonusSum = (st.dmg || []).filter(r => r.enabled).reduce((s, r) => s + (+r.value || 0), 0);
+  const dmgMultiplier = 1 + dmgBonusSum;
+  const specialMultiplier = (st.special || []).filter(r => r.enabled).reduce((p, r) => p * (+r.value || 1), 1);
+
+  let defenseFactor = 1;
+  if (ac > 0) {
+    const atkDefInput = atk * dmgMultiplier * specialMultiplier;
+    defenseFactor = 1 - Math.pow(ac / (atkDefInput + ac), 1.244);
+  }
+
+  let critAvg = 1;
+  if (inputs.attackType === "attack" && inputs.allowCrit) {
+    const rate = Math.max(0, Math.min(1, parseFloat(inputs.critRate) || 0));
+    critAvg = 1 + rate * ((parseFloat(inputs.critMultiplier) || 1.5) - 1);
+  }
+
+  const postMultiplier = (st.post || []).filter(r => r.enabled).reduce((p, r) => p * (+r.value || 1), 1);
+  const baseNoTech = atk * 0.8;
+  const rawDamage = baseNoTech * attackMultiplier * dmgMultiplier * specialMultiplier * defenseFactor * critAvg * postMultiplier;
+  const finalCap = parseFloat(inputs.finalCap) || 0;
+  const finalDamage = finalCap > 0 ? Math.min(rawDamage, finalCap) : rawDamage;
+  const slots = buffSlotCountForState(st);
+
+  return {
+    stats, pctStats, conv, pctAtkCalc, spirit, magicCoeff, baseMagicFromSpirit, flatStatRaw, equipmentRaw,
+    racialAtk, weaponAtk, baseNaturalAtk, conversionAtk, baseAtk, flatAtkRaw, extraRawBeforePct, cappedAddRawBeforePct, cappedAddBeforePct, atkBeforePct, atkPctMode, atkBuffRaw, atkCap, atkBuffCapped, atk,
+    attackMultiplier, dmgMultiplier, defenseFactor, critAvg, postMultiplier, baseNoTech,
+    rawDamage, finalDamage, slots, specialMultiplier
+  };
+}
+function slotRowName(row, fallback) {
+  const name = (row && row.name ? String(row.name).trim() : "") || fallback;
+  return name;
+}
+function buffSlotCountForState(st) {
+  const details = [
+    ["割合", (st.pct || []).filter(r => r.enabled && r.slot).map(r => slotRowName(r, "割合Buff"))],
+    ["実数", normalizeFlatRows(st).filter(r => r.enabled && r.slot).map(r => slotRowName(r, "実数加算"))],
+    ["変換", (st.conv || []).filter(r => r.enabled && r.slot).map(r => slotRowName(r, "ステータス変換"))],
+    ["与ダメ", (st.dmg || []).filter(r => r.enabled && r.slot).map(r => slotRowName(r, "与ダメBuff"))],
+    ["特攻", (st.special || []).filter(r => r.enabled && r.slot).map(r => slotRowName(r, "特攻"))],
+    ["外枠", (st.post || []).filter(r => r.enabled && r.slot).map(r => slotRowName(r, "外枠補正"))],
+    ["その他", (st.other || []).filter(r => r.enabled).map(r => slotRowName(r, "その他バフ"))]
+  ];
+  const groups = details.map(([name, items]) => [name, items.length]);
+  return {total: groups.reduce((s, [,n]) => s+n, 0), groups, details};
+}
+
+function updateSlotUI(metrics) {
+  const {total, groups, details} = metrics.slots;
+  byId("slotCount").textContent = `${total} / 24`;
+  const p = Math.min(100, total / 24 * 100);
+  const fill = byId("slotFill");
+  fill.style.width = `${p}%`;
+  fill.style.color = total > 24 ? "#c0392b" : total >= 22 ? "#a66a00" : "#198754";
+  byId("slotBreakdown").textContent = groups.map(([name,n]) => `${name}:${n}`).join(" / ");
+
+  const activeDetails = (details || []).filter(([,items]) => items.length);
+  const tooltip = byId("slotTooltip");
+  if (activeDetails.length) {
+    tooltip.innerHTML = [
+      `<div class="slotTooltipTitle">使用中のバフ枠: ${total} / 24</div>`,
+      ...activeDetails.map(([group, items]) => {
+        const lis = items.map(x => `<li>${escapeHtml(x)}</li>`).join("");
+        return `<div class="slotTooltipGroup"><b>${escapeHtml(group)}: ${items.length}</b><ul>${lis}</ul></div>`;
+      })
+    ].join("");
+  } else {
+    tooltip.innerHTML = `<div class="slotTooltipTitle">使用中のバフ枠: 0 / 24</div><div class="small">枠を使っているバフはありません。</div>`;
+  }
+
+  byId("slotWarning").innerHTML = total > 24
+    ? `<div class="bad">24枠を ${total - 24} 枠超過しています。</div>`
+    : total >= 22
+      ? `<div class="warn">残り ${24 - total} 枠です。かなり詰まっています。</div>`
+      : `<div class="ok">残り ${24 - total} 枠あります。</div>`;
+}
+
+function updateEquipmentSummary(m) {
+  const lines = [
+    `攻撃力: ${m.equipmentRaw.attack.toFixed(3)}`,
+    `魔力: ${m.equipmentRaw.magic.toFixed(3)}`,
+    `速度: ${m.equipmentRaw.speed.toFixed(3)}`,
+    `攻撃ディレイ: ${m.equipmentRaw.delay.toFixed(3)}`
+  ];
+  byId("equipmentSummary").innerHTML = lines.map(x => `<div>${x}</div>`).join("");
+}
+
+function updatePredictedAtkUI(m) {
+  byId("predictedAtk").textContent = `${m.atk.toFixed(3)}`;
+  byId("predictedMagic").textContent = `${m.stats.magic.toFixed(3)}`;
+
+  const magicPctText = m.pctStats.steps
+    .filter(s => s.key === "magic")
+    .map(s => `${s.name}+${s.percent}%: ${s.before.toFixed(3)} → ${s.after.toFixed(3)}`)
+    .join(" / ");
+  const magicLines = [
+    `基礎魔力: 精神力 ${m.spirit.toFixed(3)} × 種族魔力係数 ${m.magicCoeff.toFixed(2)} = ${m.baseMagicFromSpirit.toFixed(3)}`,
+    `実数加算: +${m.flatStatRaw.magic.toFixed(3)}`,
+    magicPctText ? `魔力%Buff: ${magicPctText}` : `魔力%Buff: なし`
+  ];
+  byId("predictedMagicBreakdown").innerHTML = magicLines.map(x => `<div>${x}</div>`).join("");
+
+  const overAmount = m.atkBuffRaw - m.atkCap;
+  const reachedCap = m.atkCap > 0 && overAmount >= -0.000001;
+  const over = overAmount > 0 ? ` / 上限超過 ${overAmount.toFixed(3)}` : "";
+
+  if (m.atkCap <= 0) {
+    byId("attackCapStatus").innerHTML = `<div class="small">攻撃力加算上限: 無効</div>`;
+  } else if (reachedCap) {
+    const cut = Math.max(0, overAmount);
+    byId("attackCapStatus").innerHTML =
+      `<div class="warn"><b>攻撃力加算上限に到達</b><br>上限対象 上限対象 raw ${m.atkBuffRaw.toFixed(3)} / 上限 ${m.atkCap.toFixed(3)}${cut > 0 ? ` / 切り捨て ${cut.toFixed(3)}` : ""}</div>`;
+  } else {
+    byId("attackCapStatus").innerHTML =
+      `<div class="ok">攻撃力加算上限まであと ${(m.atkCap - m.atkBuffRaw).toFixed(3)} / 上限対象 raw ${m.atkBuffRaw.toFixed(3)} / 上限 ${m.atkCap.toFixed(3)}</div>`;
+  }
+
+  let lines;
+  if (m.atkPctMode === "afterAdds") {
+    lines = [
+      `基礎系: 種族 ${m.racialAtk.toFixed(3)} + 武器 ${m.weaponAtk.toFixed(3)} = ${m.baseNaturalAtk.toFixed(3)}`,
+      `変換上限外: +${m.conversionAtk.toFixed(3)}`,
+      `上限対象: 攻撃力実数加算 ${m.flatAtkRaw.toFixed(3)} + 攻撃力%増分 ${m.pctAtkCalc.added.toFixed(3)} = raw ${m.atkBuffRaw.toFixed(3)}`,
+      `最終上限: 基礎 ${m.baseNaturalAtk.toFixed(3)} + 変換 ${m.conversionAtk.toFixed(3)} + min(${m.atkBuffRaw.toFixed(3)}, ${m.atkCap.toFixed(3)}) = ${m.atk.toFixed(3)}${over}`,
+      `攻撃力×0.8: ${(m.atk * 0.8).toFixed(3)}`
+    ];
+  } else {
+    lines = [
+      `基礎系: 種族 ${m.racialAtk.toFixed(3)} + 武器 ${m.weaponAtk.toFixed(3)} = ${m.baseNaturalAtk.toFixed(3)}`,
+      `変換上限外: +${m.conversionAtk.toFixed(3)}`,
+      `上限対象: 攻撃力実数加算 ${m.flatAtkRaw.toFixed(3)} + 攻撃力% ${m.pctAtkCalc.added.toFixed(3)} = raw ${m.atkBuffRaw.toFixed(3)} / 適用 ${m.atkBuffCapped.toFixed(3)}${over}`,
+      `攻撃力×0.8: ${(m.atk * 0.8).toFixed(3)}`
+    ];
+  }
+  byId("predictedAtkBreakdown").innerHTML = lines.map(x => `<div>${x}</div>`).join("");
+}
+
+function calc() {
+  syncRaceCoeff();
+  syncBaseMagic();
+  syncAttackTypeUI();
+
+  const inputs = collectInputs();
+  // sync readonly and auto fields into inputs
+  inputs.raceCoeff = byId("raceCoeff").value;
+  inputs.techMultiplier = byId("techMultiplier").value;
+  const m = computeMetrics(state, inputs);
+
+  if (inputs.attackType === "attack") byId("techMultiplier").value = "1.0000";
+  if (inputs.attackType === "heavy") byId("techMultiplier").value = m.attackMultiplier.toFixed(4);
+
+  byId("finalDamage").textContent = `${Math.floor(m.finalDamage).toLocaleString()} ダメージ前後`;
+  updateSlotUI(m);
+  updateEquipmentSummary(m);
+  updatePredictedAtkUI(m);
+
+  const pctStatLine = m.pctStats.steps.length
+    ? `<p>割合ステータスBuff: ${m.pctStats.steps.map(s => `${s.name}+${s.percent}% → ${labelOf(s.key)} ${s.after.toFixed(3)}`).join(" / ")}</p>`
+    : "";
+  const convLine = m.conv.steps.length
+    ? `<p>ステータス変換: ${m.conv.steps.map(s => `${s.name}: ${labelOf(s.source)} ${s.base.toFixed(3)} × ${s.rate}% = ${s.add.toFixed(3)}（上限外）`).join(" / ")}</p>`
+    : "";
+  const atkPctLine = m.pctAtkCalc.steps.length
+    ? `<p>攻撃力%Buff増分: ${m.pctAtkCalc.steps.map(s => `${s.name}+${s.percent}% = ${s.add.toFixed(3)}`).join(" / ")}</p>`
+    : "";
+
+  const lines = [];
+  lines.push(`<p>実効ステータス: 筋力 ${m.stats.str.toFixed(3)} / 魔力 ${m.stats.magic.toFixed(3)} / 速度 ${m.stats.speed.toFixed(3)} / 酩酊度 ${m.stats.drunk.toFixed(3)}</p>`);
+  lines.push(`<p>基礎魔力: 精神力 ${m.spirit.toFixed(3)} × 種族魔力係数 ${(RACE_MAGIC_COEFFS[inputs.raceSelect] ?? 1).toFixed(2)} = ${m.baseMagicFromSpirit.toFixed(3)}</p>`);
+  if (m.equipmentRaw.attack || m.equipmentRaw.magic || m.equipmentRaw.speed || m.equipmentRaw.delay) {
+    lines.push(`<p>武器・防具・装飾補正: 攻撃力 ${m.equipmentRaw.attack.toFixed(3)} / 魔力 ${m.equipmentRaw.magic.toFixed(3)} / 速度 ${m.equipmentRaw.speed.toFixed(3)} / 攻撃ディレイ ${m.equipmentRaw.delay.toFixed(3)}</p>`);
+  }
+  if (m.flatStatRaw.magic) lines.push(`<p>魔力実数加算合計: +${m.flatStatRaw.magic.toFixed(3)}（武器・防具・装飾込み。魔力%Buff・魔力変換の前に加算）</p>`);
+  if (m.flatStatRaw.speed) lines.push(`<p>速度実数加算合計: +${m.flatStatRaw.speed.toFixed(3)}（武器・防具・装飾込み。速度%Buff・速度変換の前に加算）</p>`);
+  if (pctStatLine) lines.push(pctStatLine);
+  if (convLine) lines.push(convLine);
+  if (m.atkPctMode === "afterAdds") {
+    lines.push(`<p>攻撃力: <b>${m.atk.toFixed(3)}</b> = 基礎攻撃力 ${m.baseNaturalAtk.toFixed(3)} + 変換上限外 ${m.conversionAtk.toFixed(3)} + min(上限対象 raw ${m.atkBuffRaw.toFixed(3)}, 上限 ${m.atkCap.toFixed(3)})。攻撃力%Buffは加算後攻撃力 ${m.atkBeforePct.toFixed(3)} に順次乗算してから上限判定。</p>`);
+  } else {
+    lines.push(`<p>攻撃力: <b>${m.atk.toFixed(3)}</b> = 基礎攻撃力 ${m.baseNaturalAtk.toFixed(3)} + 変換上限外 ${m.conversionAtk.toFixed(3)} + min(上限対象 raw ${m.atkBuffRaw.toFixed(3)}, 上限 ${m.atkCap.toFixed(3)})</p>`);
+  }
+  if (atkPctLine) lines.push(atkPctLine);
+  lines.push(`<p>基礎: 攻撃力×0.8 = <b>${m.baseNoTech.toFixed(3)}</b></p>`);
+  lines.push(`<p>攻撃/テク倍率: <b>${m.attackMultiplier.toFixed(4)}</b> / 与ダメ倍率: <b>${m.dmgMultiplier.toFixed(3)}</b> / 特攻倍率: <b>${m.specialMultiplier.toFixed(3)}</b> / 防御係数: <b>${m.defenseFactor.toFixed(6)}</b> / クリ平均: <b>${m.critAvg.toFixed(3)}</b> / 外枠: <b>${m.postMultiplier.toFixed(3)}</b></p>`);
+  lines.push(`<p>計算式: 攻撃力×0.8×攻撃/テク倍率×与ダメ倍率×特攻倍率×防御係数×クリ平均×外枠</p>`);
+  if ((parseFloat(inputs.finalCap) || 0) > 0 && m.rawDamage > (parseFloat(inputs.finalCap) || 0)) {
+    lines.push(`<div class="warn">最終表示上限 ${Number(inputs.finalCap).toLocaleString()} により丸めています。丸め前: ${Math.floor(m.rawDamage).toLocaleString()}</div>`);
+  } else {
+    lines.push(`<div class="ok">丸め前ダメージをそのまま表示しています。</div>`);
+  }
+  byId("breakdown").innerHTML = lines.join("");
+
+  localStorage.setItem("moeDamageSimEquipNumberAdjusted", JSON.stringify(collectConfig()));
+  renderCompareResult();
+  renderActualDiff();
+  renderRaceTable();
+}
+
+function saveSnapshot(which) {
+  snapshots[which] = collectConfig();
+  const memoEl = byId("snapshotMemo" + which);
+  snapshots[which].memo = memoEl ? memoEl.value : "";
+  localStorage.setItem("moeDamageSnapshot" + which, JSON.stringify(snapshots[which]));
+  renderSnapshotLabels();
+  renderCompareResult();
+}
+function loadSnapshot(which) {
+  if (!snapshots[which]) {
+    alert(which + " が未保存です。");
+    return;
+  }
+  applyConfig(snapshots[which]);
+}
+function renderSnapshotLabels() {
+  ["A","B"].forEach(which => {
+    const el = byId("snapshot" + which);
+    if (!snapshots[which]) {
+      el.textContent = `${which}: 未保存`;
+      return;
+    }
+    const m = computeMetrics(snapshots[which].state, snapshots[which].inputs);
+    const memo = snapshots[which].memo ? `<br>メモ: ${escapeHtml(snapshots[which].memo)}` : "";
+    el.innerHTML = `${which}: ダメージ ${fmt(Math.floor(m.finalDamage),0)} / 攻撃力 ${fmt(m.atk)} / 枠 ${m.slots.total}/24${memo}`;
+  });
+}
+function updateSnapshotMemo(which) {
+  const el = byId("snapshotMemo" + which);
+  if (!el) return;
+  if (snapshots[which]) {
+    snapshots[which].memo = el.value;
+    localStorage.setItem("moeDamageSnapshot" + which, JSON.stringify(snapshots[which]));
+    renderSnapshotLabels();
+    renderCompareResult();
+  }
+}
+
+function renderCompareResult() {
+  if (!snapshots.A || !snapshots.B) {
+    byId("compareResult").innerHTML = "";
+    return;
+  }
+  const a = computeMetrics(snapshots.A.state, snapshots.A.inputs);
+  const b = computeMetrics(snapshots.B.state, snapshots.B.inputs);
+  const damageDiff = b.finalDamage - a.finalDamage;
+  const atkDiff = b.atk - a.atk;
+  const slotDiff = b.slots.total - a.slots.total;
+  const damagePct = a.finalDamage !== 0 ? damageDiff / a.finalDamage : NaN;
+  const atkPct = a.atk !== 0 ? atkDiff / a.atk : NaN;
+
+  byId("compareResult").innerHTML = `
+    <table>
+      <thead><tr><th>項目</th><th>A</th><th>B</th><th>B-A</th><th>変化率</th></tr></thead>
+      <tbody>
+        <tr><td>メモ</td><td>${escapeHtml(snapshots.A.memo || "")}</td><td>${escapeHtml(snapshots.B.memo || "")}</td><td>-</td><td>-</td></tr>
+        <tr><td>ダメージ</td><td class="num">${fmt(Math.floor(a.finalDamage),0)}</td><td class="num">${fmt(Math.floor(b.finalDamage),0)}</td><td class="num">${fmt(Math.floor(damageDiff),0)}</td><td class="num">${pct(damagePct)}</td></tr>
+        <tr><td>攻撃力</td><td class="num">${fmt(a.atk)}</td><td class="num">${fmt(b.atk)}</td><td class="num">${fmt(atkDiff)}</td><td class="num">${pct(atkPct)}</td></tr>
+        <tr><td>バフ枠</td><td class="num">${a.slots.total}/24</td><td class="num">${b.slots.total}/24</td><td class="num">${slotDiff}</td><td class="num">-</td></tr>
+        <tr><td>与ダメ倍率</td><td class="num">${fmt(a.dmgMultiplier)}</td><td class="num">${fmt(b.dmgMultiplier)}</td><td class="num">${fmt(b.dmgMultiplier-a.dmgMultiplier)}</td><td class="num">-</td></tr>
+        <tr><td>特攻倍率</td><td class="num">${fmt(a.specialMultiplier)}</td><td class="num">${fmt(b.specialMultiplier)}</td><td class="num">${fmt(b.specialMultiplier-a.specialMultiplier)}</td><td class="num">-</td></tr>
+        <tr><td>外枠倍率</td><td class="num">${fmt(a.postMultiplier)}</td><td class="num">${fmt(b.postMultiplier)}</td><td class="num">${fmt(b.postMultiplier-a.postMultiplier)}</td><td class="num">-</td></tr>
+      </tbody>
+    </table>`;
+}
+function renderContributionTable() {
+  const baseInputs = collectInputs();
+  const base = computeMetrics(state, baseInputs);
+  const rows = [];
+  const groups = [
+    ["割合", "pct"],
+    ["防具装飾", "equipment"],
+    ["実数", "flat"],
+    ["変換", "conv"],
+    ["与ダメ", "dmg"],
+    ["特攻", "special"],
+    ["外枠", "post"],
+    ["その他", "other"]
+  ];
+  groups.forEach(([label, key]) => {
+    (state[key] || []).forEach((row, idx) => {
+      if (row.enabled === false) return;
+      if (key === "equipment" && !(+row.attack || +row.magic || +row.speed || +row.delay)) return;
+      const st2 = clone(state);
+      st2[key][idx].enabled = false;
+      const m2 = computeMetrics(st2, baseInputs);
+      const dmgLoss = base.finalDamage - m2.finalDamage;
+      const atkLoss = base.atk - m2.atk;
+      const usesSlot = key === "other" ? true : key === "equipment" ? false : !!row.slot;
+      rows.push({
+        group: label,
+        name: row.name || "(名称なし)",
+        dmgLoss,
+        pctLoss: base.finalDamage ? dmgLoss / base.finalDamage : 0,
+        atkLoss,
+        slot: usesSlot ? 1 : 0,
+        slotEff: usesSlot ? dmgLoss : NaN
+      });
+    });
+  });
+  rows.sort((a,b) => b.dmgLoss - a.dmgLoss);
+  const body = rows.map(r => `
+    <tr>
+      <td>${r.group}</td>
+      <td>${r.name}</td>
+      <td class="num">${fmt(Math.floor(r.dmgLoss),0)}</td>
+      <td class="num">${pct(r.pctLoss)}</td>
+      <td class="num">${fmt(r.atkLoss)}</td>
+      <td class="num">${r.slot ? "1" : "0"}</td>
+      <td class="num">${r.slot ? fmt(Math.floor(r.slotEff),0) : "-"}</td>
+    </tr>`).join("");
+  byId("contributionTable").innerHTML = rows.length
+    ? `<table>
+        <thead><tr><th>分類</th><th>名称</th><th>外した時のダメージ低下</th><th>低下率</th><th>攻撃力低下</th><th>枠</th><th>1枠効率</th></tr></thead>
+        <tbody>${body}</tbody>
+      </table>`
+    : `<p class="small">使用中の項目がありません。</p>`;
+}
+function renderActualDiff() {
+  const actualDamage = parseFloat(byId("actualDamage").value) || 0;
+  const actualAtk = parseFloat(byId("actualAtk").value) || 0;
+  if (!actualDamage && !actualAtk) {
+    byId("actualDiffResult").innerHTML = `<p class="small">実測ダメージまたはゲーム内攻撃力を入力すると差分を表示します。</p>`;
+    return;
+  }
+  const inputs = collectInputs();
+  const m = computeMetrics(state, inputs);
+  const lines = [];
+  if (actualDamage) {
+    const diff = actualDamage - m.finalDamage;
+    const ratio = m.finalDamage ? actualDamage / m.finalDamage : NaN;
+    const withoutPost = m.baseNoTech * m.attackMultiplier * m.dmgMultiplier * m.specialMultiplier * m.defenseFactor * m.critAvg;
+    const reqPost = withoutPost ? actualDamage / withoutPost : NaN;
+    const postRatio = m.postMultiplier ? reqPost / m.postMultiplier : NaN;
+    lines.push(`<tr><td>実測ダメージ</td><td class="num">${fmt(actualDamage,0)}</td><td class="num">${fmt(Math.floor(m.finalDamage),0)}</td><td class="num">${fmt(diff,0)}</td><td class="num">${pct(ratio-1)}</td></tr>`);
+    lines.push(`<tr><td>逆算外枠倍率</td><td class="num">${fmt(reqPost)}</td><td class="num">現在 ${fmt(m.postMultiplier)}</td><td class="num">比率 ${fmt(postRatio)}</td><td class="num">-</td></tr>`);
+  }
+  if (actualAtk) {
+    const diff = actualAtk - m.atk;
+    const ratio = m.atk ? actualAtk / m.atk : NaN;
+    lines.push(`<tr><td>ゲーム内攻撃力</td><td class="num">${fmt(actualAtk)}</td><td class="num">${fmt(m.atk)}</td><td class="num">${fmt(diff)}</td><td class="num">${pct(ratio-1)}</td></tr>`);
+  }
+  byId("actualDiffResult").innerHTML = `<table><thead><tr><th>項目</th><th>実測</th><th>予測</th><th>差分</th><th>ズレ率</th></tr></thead><tbody>${lines.join("")}</tbody></table>`;
+}
+function parseNumberList(text) {
+  return text.split(",").map(s => parseFloat(s.trim())).filter(n => Number.isFinite(n));
+}
+function renderACTable() {
+  const values = parseNumberList(byId("acList").value);
+  const cfg = collectConfig();
+  const body = values.map(ac => {
+    const inputs = {...cfg.inputs, targetAC: String(ac)};
+    const m = computeMetrics(cfg.state, inputs);
+    return `<tr><td class="num">${fmt(ac)}</td><td class="num">${fmt(Math.floor(m.finalDamage),0)}</td><td class="num">${fmt(m.defenseFactor,6)}</td></tr>`;
+  }).join("");
+  byId("acTable").innerHTML = `<table><thead><tr><th>AC</th><th>ダメージ</th><th>防御係数</th></tr></thead><tbody>${body}</tbody></table>`;
+}
+
+function renderRaceTable() {
+  const cfg = collectConfig();
+  const currentRace = cfg.inputs.raceSelect;
+  const current = computeMetrics(cfg.state, cfg.inputs);
+  const races = ["newtar", "cognite", "elmony", "pandemos"];
+
+  const rows = races.map(race => {
+    const inputs = {...cfg.inputs, raceSelect: race, raceCoeff: String(RACE_COEFFS[race] ?? 0)};
+    const m = computeMetrics(cfg.state, inputs);
+    const damageDiff = m.finalDamage - current.finalDamage;
+    const attackDiff = m.atk - current.atk;
+    const magicDiff = m.stats.magic - current.stats.magic;
+    const damagePct = current.finalDamage ? damageDiff / current.finalDamage : 0;
+    const mark = race === currentRace ? "現在" : "";
+    const name = race === currentRace ? `<b>${RACE_LABELS[race]}</b>` : RACE_LABELS[race];
+
+    return `<tr>
+      <td>${name}</td>
+      <td>${mark}</td>
+      <td class="num">${fmt(m.baseMagicFromSpirit)}</td>
+      <td class="num">${fmt(m.stats.magic)}</td>
+      <td class="num">${fmt(m.atk)}</td>
+      <td class="num">${fmt(Math.floor(m.finalDamage),0)}</td>
+      <td class="num">${fmt(damageDiff,0)}</td>
+      <td class="num">${pct(damagePct)}</td>
+      <td class="num">${fmt(attackDiff)}</td>
+      <td class="num">${fmt(magicDiff)}</td>
+    </tr>`;
+  }).join("");
+
+  byId("raceTable").innerHTML = `<table>
+    <thead>
+      <tr>
+        <th>種族</th>
+        <th></th>
+        <th>基礎魔力</th>
+        <th>予想魔力</th>
+        <th>予想攻撃力</th>
+        <th>予想ダメージ</th>
+        <th>ダメージ差</th>
+        <th>差%</th>
+        <th>攻撃力差</th>
+        <th>魔力差</th>
+      </tr>
+    </thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+}
+
+function exportConfig() {
+  byId("configBox").value = JSON.stringify(collectConfig(), null, 2);
+}
+function importConfig() {
+  try {
+    applyConfig(JSON.parse(byId("configBox").value));
+  } catch (e) {
+    alert("JSONの読み込みに失敗: " + e.message);
+  }
+}
+function resetConfig() {
+  if (!confirm("保存済み設定をリセットして初期状態に戻しますか？")) return;
+  localStorage.removeItem("moeDamageSimEquipNumberAdjusted");
+  state = DEFAULT_STATE();
+  renderAll();
+  calc();
+}
+function applyConfig(cfg) {
+  if (!cfg || !cfg.inputs || !cfg.state) return;
+  setInputs(cfg.inputs);
+  const incoming = cfg.state || {};
+  state = DEFAULT_STATE();
+
+  state.equipment = normalizeEquipmentRows(incoming.equipment);
+
+  if (Array.isArray(incoming.flat)) {
+    state.flat = incoming.flat;
+  } else {
+    const mergedFlat = [];
+    (incoming.magicFlat || []).forEach(r => mergedFlat.push({...r, target:"magic"}));
+    (incoming.atk || []).forEach(r => mergedFlat.push({...r, target:"attack"}));
+    if (mergedFlat.length) state.flat = mergedFlat;
+  }
+
+  ["pct","conv","dmg","special","post","other"].forEach(k => {
+    state[k] = Array.isArray(incoming[k]) ? incoming[k] : [];
+  });
+  renderAll();
+  calc();
+}
+
+document.querySelectorAll("input,select").forEach(el => {
+  el.addEventListener("input", calc);
+  el.addEventListener("change", calc);
+});
+
+renderAll();
+const saved = localStorage.getItem("moeDamageSimEquipNumberAdjusted");
+if (saved) {
+  try { applyConfig(JSON.parse(saved)); }
+  catch { calc(); }
+} else {
+  calc();
+}
+["A","B"].forEach(w => {
+  const s = localStorage.getItem("moeDamageSnapshot" + w);
+  if (s) {
+    try { snapshots[w] = JSON.parse(s); } catch {}
+  }
+  const memoEl = byId("snapshotMemo" + w);
+  if (memoEl) {
+    memoEl.value = snapshots[w]?.memo || "";
+    memoEl.addEventListener("input", () => updateSnapshotMemo(w));
+  }
+});
+renderSnapshotLabels();
+renderCompareResult();
+renderActualDiff();
+renderACTable();
+renderRaceTable();
+</script>
+</body>
+</html>
