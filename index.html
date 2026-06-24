@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<title>Master of Epic 物理ダメージ計算webツール</t</title>
+<title>Master of Epic 物理ダメージ計算webツール</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
   :root {
@@ -663,10 +663,74 @@
     font-size: 13px;
   }
 
+
+  /* ステータス変換: 参照補正列追加後の幅調整 */
+  #conversionTable th:nth-child(4),
+  #conversionTable td:nth-child(4) {
+    width: 72px;
+  }
+  #conversionTable th:nth-child(5),
+  #conversionTable td:nth-child(5),
+  #conversionTable th:nth-child(6),
+  #conversionTable td:nth-child(6) {
+    width: 56px;
+  }
+  #conversionTable th:nth-child(7),
+  #conversionTable td:nth-child(7) {
+    width: 18%;
+  }
+  #conversionTable th:last-child,
+  #conversionTable td.actionCell {
+    width: 82px;
+    min-width: 82px;
+  }
+  @media (max-width: 900px) {
+    #conversionTable.compactTable {
+      min-width: 860px;
+    }
+  }
+
+
+  /* 武器使用条件: 旧レイアウト互換 */
+  #weaponReqTable th:nth-child(2),
+  #weaponReqTable td:nth-child(2),
+  #weaponReqTable th:nth-child(3),
+  #weaponReqTable td:nth-child(3) {
+    width: 54px;
+  }
+  #weaponReqTable th:nth-child(4),
+  #weaponReqTable td:nth-child(4) {
+    width: 78px;
+  }
+  #weaponReqTable th:nth-child(5),
+  #weaponReqTable td:nth-child(5) {
+    width: 28px;
+    text-align: center;
+  }
+  #weaponReqTable select {
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 12px;
+  }
+
+
+  /* 武器使用条件: 複数条件は全条件で補正 */
+  #weaponReqTable th:nth-child(2),
+  #weaponReqTable td:nth-child(2),
+  #weaponReqTable th:nth-child(3),
+  #weaponReqTable td:nth-child(3) {
+    width: 58px;
+  }
+  #weaponReqTable th:nth-child(4),
+  #weaponReqTable td:nth-child(4) {
+    width: 30px;
+    text-align: center;
+  }
+
 </style>
 </head>
 <body>
-<h1>MoE ダメージ試算ツール TSV入出力対応版</h1>
+<h1>MoE ダメージ試算ツール 最新補正式固定版</h1>
 <!--
 <p class="small">
   アタック/ヘビー クラッシュ/手入力テク、バフ24枠、予想攻撃力、割合ステータスBuff、ステータス変換、その他バフ枠に対応。
@@ -704,8 +768,12 @@
 
       <div class="weaponReqHeader">
         <b>使用条件</b>
-        <span class="small">複数条件は一番低い達成率で武器攻撃力を補正します。</span>
+        <span class="small">複数条件は全て8割以上が必要です。8割を満たした後は、各条件の達成分を合算した全体達成率で武器攻撃力を補正します。</span>
       </div>
+      <input id="weaponReqMode" type="hidden" value="official">
+      <p class="small selectHelp">
+        補正式: すべての条件が8割以上必要。複数条件では、各条件の達成分を合算して「全体の達成率」で補正します。
+      </p>
       <table id="weaponReqTable" class="miniTable">
         <thead>
           <tr>
@@ -738,6 +806,8 @@
             <option value="new" selected>(重量 + 31.2) × 0.029</option>
           </select>
         </label>
+        <label>ヘビクラ倍率上書き<input id="heavyManualMultiplier" type="number" step="0.0001" value="0"></label>
+        <p class="small selectHelp">0なら上の式で自動計算。実測合わせしたい場合だけ逆算値を入れてください。</p>
       </div>
       <label>攻撃/テク倍率<input id="techMultiplier" type="number" step="0.0001" value="3.8048"></label>
       <label>対象AC<input id="targetAC" type="number" step="0.1" value="0"></label>
@@ -1020,12 +1090,15 @@
     魔力/速度/酩酊度などからの攻撃力変換は、攻撃力加算上限500を突破する上限外加算として扱います。
   </p>
   <table id="conversionTable" class="compactTable">
-    <thead><tr><th>使用</th><th>枠</th><th>名称</th><th>参照</th><th>変換率%</th><th>メモ / ソース</th><th>操作</th></tr></thead>
+    <thead><tr><th>使用</th><th>枠</th><th>名称</th><th>参照</th><th>変換率%</th><th>参照補正</th><th>メモ / ソース</th><th>操作</th></tr></thead>
     <tbody></tbody>
   </table>
   <button onclick="addConversionRow('magic')">魔力変換行を追加</button>
   <button onclick="addConversionRow('speed')">速度変換行を追加</button>
   <button onclick="addConversionRow('drunk')">酩酊度変換行を追加</button>
+  <p class="small selectHelp">
+    参照補正は「参照ステータスに足してから%変換」します。例: 魔力125、率10%、参照補正10 → (125+10)×10%=13.5。
+  </p>
 </section>
 
 <section class="card wide">
@@ -1180,9 +1253,9 @@ const DEFAULT_STATE = () => ({
     {enabled: false, slot: true, name: "任意攻撃力装備合計", target: "attack", value: 0, note: "手入力。攻撃力加算上限対象"}
   ],
   conv: [
-    {enabled: true, slot: true, name: "ちいずのバトハン 魔力→攻撃力", source: "magic", rate: 30, capped: false, note: "魔力の30%を攻撃力に加算。上限外加算"},
-    {enabled: false, slot: true, name: "速度→攻撃力 変換", source: "speed", rate: 0, capped: false, note: ""},
-    {enabled: false, slot: true, name: "酩酊度→攻撃力 変換", source: "drunk", rate: 0, capped: false, note: ""}
+    {enabled: true, slot: true, name: "ちいずのバトハン 魔力→攻撃力", source: "magic", rate: 30, baseOffset: 0, offset: 0, capped: false, note: "魔力の30%を攻撃力に加算。上限外加算"},
+    {enabled: false, slot: true, name: "速度→攻撃力 変換", source: "speed", rate: 0, baseOffset: 0, offset: 0, capped: false, note: ""},
+    {enabled: false, slot: true, name: "酩酊度→攻撃力 変換", source: "drunk", rate: 0, baseOffset: 0, offset: 0, capped: false, note: ""}
   ],
   dmg: [
     {enabled: false, slot: true, name: "マスター ストレングス", value: 1.00, category: "物理与ダメ", note: "通常の与ダメ+100%として計算する場合"},
@@ -1269,8 +1342,8 @@ function actionCell(arr, idx, renderFn) {
 
 function collectInputs() {
   const ids = [
-    "raceSelect","raceCoeff","str","spirit","magic","weaponSkill","requiredSkill","weaponDamage","weaponWeight",
-    "speed","drunk","targetAC","attackType","heavyFormula","techMultiplier",
+    "raceSelect","raceCoeff","str","spirit","magic","weaponSkill","requiredSkill","weaponReqMode","weaponDamage","weaponWeight",
+    "speed","drunk","targetAC","attackType","heavyFormula","heavyManualMultiplier","techMultiplier",
     "allowCrit","critRate","critMultiplier","atkCap","atkPctMode","finalCap"
   ];
   const inputs = {};
@@ -1348,18 +1421,44 @@ function normalizeWeaponReqRows(rows, inputs={}) {
   }
   return defaultWeaponReqFromInputs(inputs);
 }
+function skillRequirementRatio(current, required) {
+  current = parseFloat(current) || 0;
+  required = Math.max(0.000001, parseFloat(required) || 0);
+
+  // 最新補正式:
+  // 8割未満は0、8割以上〜必要値未満は current/required、必要値以上は1
+  if (current >= required) return {ratio: 1, denom: required};
+  if (current < required * 0.8) return {ratio: 0, denom: required};
+  return {ratio: current / required, denom: required};
+}
+
 function calcWeaponSkillMod(st, inputs={}) {
   const rows = normalizeWeaponReqRows(st.weaponReq, inputs);
   const active = rows.filter(r => (parseFloat(r.required) || 0) > 0);
-  if (!active.length) return {mod: 1, rows, limiting: null};
+  const mode = "official";
+  if (!active.length) return {mod: 1, rows, evaluated: [], limiting: null, mode, gateFailed: null, totalCurrent: 0, totalRequired: 0};
+
   const evaluated = active.map(r => {
     const current = parseFloat(r.current) || 0;
     const required = Math.max(0.000001, parseFloat(r.required) || 0);
-    const ratio = Math.min(1, current / required);
-    return {...r, current, required, ratio};
+    const evalResult = skillRequirementRatio(current, required);
+    const meetsGate = current >= required * 0.8;
+    const cappedCurrent = Math.min(current, required);
+    return {...r, current, required, cappedCurrent, denom: evalResult.denom, ratio: evalResult.ratio, meetsGate};
   });
-  const limiting = evaluated.reduce((a, b) => b.ratio < a.ratio ? b : a, evaluated[0]);
-  return {mod: limiting.ratio, rows, evaluated, limiting};
+
+  // 複数必須条件:
+  // すべての条件が8割以上必要。
+  // 8割を満たした後は「全条件の達成分合計 / 全条件の必要値合計」で補正する。
+  // 必要値を超えた分で他条件の不足を埋めないよう、各条件の達成分は必要値で上限。
+  const gateFailed = evaluated.find(r => !r.meetsGate) || null;
+  const totalCurrent = evaluated.reduce((s, r) => s + r.cappedCurrent, 0);
+  const totalRequired = evaluated.reduce((s, r) => s + r.required, 0);
+  const overallRatio = totalRequired ? Math.min(1, totalCurrent / totalRequired) : 1;
+  const mod = gateFailed ? 0 : overallRatio;
+  const limiting = gateFailed || evaluated.reduce((a, b) => b.ratio < a.ratio ? b : a, evaluated[0]);
+
+  return {mod, rows, evaluated, limiting, mode, gateFailed, totalCurrent, totalRequired, overallRatio};
 }
 
 function renderWeaponReqTable() {
@@ -1574,6 +1673,10 @@ function renderConversionTable() {
     rate.oninput = () => { row.rate = parseFloat(rate.value) || 0; calc(); };
     tr.appendChild(makeCell("td")).appendChild(rate);
 
+    const baseOffset = makeCell("input", {type:"number", step:"0.1", value: row.baseOffset ?? 0});
+    baseOffset.oninput = () => { row.baseOffset = parseFloat(baseOffset.value) || 0; calc(); };
+    tr.appendChild(makeCell("td")).appendChild(baseOffset);
+
     const note = makeCell("input", {value: row.note || ""});
     note.oninput = () => { row.note = note.value; };
     tr.appendChild(makeCell("td")).appendChild(note);
@@ -1583,7 +1686,7 @@ function renderConversionTable() {
   });
 }
 function addConversionRow(source="magic") {
-  state.conv.push({enabled:true, slot:true, name:`${labelOf(source)}→攻撃力 変換`, source, rate:0, capped:false, note:""});
+  state.conv.push({enabled:true, slot:true, name:`${labelOf(source)}→攻撃力 変換`, source, rate:0, baseOffset:0, offset:0, capped:false, note:""});
   renderConversionTable();
   calc();
 }
@@ -1701,7 +1804,7 @@ function syncAttackTypeUI() {
   } else if (isHeavy) {
     byId("techMultiplier").readOnly = true;
     byId("allowCrit").checked = false;
-    byId("attackHint").textContent = "ヘビー クラッシュ: クリティカルなし。倍率は武器重量と選択した式から自動計算します。";
+    byId("attackHint").textContent = "ヘビー クラッシュ: クリティカルなし。上書き倍率が0なら武器重量と選択式から自動計算します。";
   } else {
     byId("techMultiplier").readOnly = false;
     byId("allowCrit").checked = false;
@@ -1734,10 +1837,14 @@ function calcConversions(st, stats) {
   const steps = [];
   (st.conv || []).filter(r => r.enabled).forEach(r => {
     const base = statValue(stats, r.source);
-    const add = base * ((+r.rate || 0) / 100);
+    const baseOffset = +r.baseOffset || 0;
+    const adjustedBase = base + baseOffset;
+    const ratePart = adjustedBase * ((+r.rate || 0) / 100);
+    const offset = +r.offset || 0; // 旧版互換用。通常は0。
+    const add = ratePart + offset;
     // ステータス変換系は攻撃力加算上限を突破するため、全て上限外へ入れる。
     uncapped += add;
-    steps.push({name:r.name, source:r.source, base, rate:+r.rate || 0, add, capped:false});
+    steps.push({name:r.name, source:r.source, base, baseOffset, adjustedBase, rate:+r.rate || 0, offset, ratePart, add, capped:false});
   });
   return {capped, uncapped, steps};
 }
@@ -1757,6 +1864,8 @@ function calcPctAttack(st, baseAtk) {
 function attackMultiplierFromInputs(inputs) {
   if (inputs.attackType === "attack") return 1.0;
   if (inputs.attackType === "heavy") {
+    const manual = parseFloat(inputs.heavyManualMultiplier) || 0;
+    if (manual > 0) return manual;
     const weight = parseFloat(inputs.weaponWeight) || 0;
     return inputs.heavyFormula === "new"
       ? (weight + 31.2) * 0.029
@@ -1940,11 +2049,15 @@ function updateWeaponSkillModHint(m) {
   const el = byId("weaponSkillModHint");
   if (!el) return;
   const limiting = m.skillModInfo.limiting;
-  const detail = (m.skillModInfo.evaluated || []).map(r =>
-    `${escapeHtml(r.name)} ${r.current.toFixed(1)}/${r.required.toFixed(1)}=${(r.ratio * 100).toFixed(1)}%`
-  ).join(" / ");
+  const detail = (m.skillModInfo.evaluated || []).map(r => {
+    const gate = r.meetsGate ? "" : " / 8割未満";
+    return `${escapeHtml(r.name)}: ${r.current.toFixed(1)}/${r.required.toFixed(1)}${r.denom !== r.required ? `（判定分母 ${r.denom.toFixed(1)}）` : ""}=${(r.ratio * 100).toFixed(1)}%${gate}`;
+  }).join(" / ");
+  const totalLine = m.skillModInfo.totalRequired
+    ? `全体達成率: ${m.skillModInfo.totalCurrent.toFixed(1)}/${m.skillModInfo.totalRequired.toFixed(1)} = ${(m.skillModInfo.overallRatio * 100).toFixed(1)}%`
+    : "";
   el.innerHTML = limiting
-    ? `武器性能発揮率: <b>${(m.skillModInfo.mod * 100).toFixed(1)}%</b>（最低条件: ${escapeHtml(limiting.name)}）<br>${detail}`
+    ? `武器性能発揮率: <b>${(m.skillModInfo.mod * 100).toFixed(1)}%</b>（${m.skillModInfo.gateFailed ? "8割未満あり" : "全体達成率"}）<br>${detail}${totalLine ? "<br>" + totalLine : ""}`
     : `武器性能発揮率: <b>100.0%</b>`;
 }
 
@@ -2022,7 +2135,7 @@ function calc() {
     ? `<p>割合ステータスBuff: ${m.pctStats.steps.map(s => `${s.name}+${s.percent}% → ${labelOf(s.key)} ${s.after.toFixed(3)}`).join(" / ")}</p>`
     : "";
   const convLine = m.conv.steps.length
-    ? `<p>ステータス変換: ${m.conv.steps.map(s => `${s.name}: ${labelOf(s.source)} ${s.base.toFixed(3)} × ${s.rate}% = ${s.add.toFixed(3)}（上限外）`).join(" / ")}</p>`
+    ? `<p>ステータス変換: ${m.conv.steps.map(s => `${s.name}: (${labelOf(s.source)} ${s.base.toFixed(3)}${s.baseOffset ? ` + 参照補正 ${s.baseOffset.toFixed(3)}` : ""}) × ${s.rate}%${s.offset ? ` + 固定補正 ${s.offset.toFixed(3)}` : ""} = ${s.add.toFixed(3)}（上限外）`).join(" / ")}</p>`
     : "";
   const atkPctLine = m.pctAtkCalc.steps.length
     ? `<p>攻撃力%Buff増分: ${m.pctAtkCalc.steps.map(s => `${s.name}+${s.percent}% = ${s.add.toFixed(3)}`).join(" / ")}</p>`
@@ -2035,8 +2148,11 @@ function calc() {
     lines.push(`<p>武器・防具・装飾補正: 攻撃力 ${m.equipmentRaw.attack.toFixed(3)} / 魔力 ${m.equipmentRaw.magic.toFixed(3)} / 速度 ${m.equipmentRaw.speed.toFixed(3)} / 攻撃ディレイ ${m.equipmentRaw.delay.toFixed(3)}</p>`);
   }
   if (m.skillModInfo && m.skillModInfo.evaluated && m.skillModInfo.evaluated.length) {
-    const reqText = m.skillModInfo.evaluated.map(r => `${escapeHtml(r.name)} ${r.current.toFixed(1)}/${r.required.toFixed(1)}=${(r.ratio * 100).toFixed(1)}%`).join(" / ");
-    lines.push(`<p>武器使用条件: ${reqText} → 武器性能発揮率 <b>${(m.skillModInfo.mod * 100).toFixed(1)}%</b></p>`);
+    const reqText = m.skillModInfo.evaluated.map(r => `${escapeHtml(r.name)} ${r.current.toFixed(1)}/${r.required.toFixed(1)}${r.denom !== r.required ? `（判定分母 ${r.denom.toFixed(1)}）` : ""}=${(r.ratio * 100).toFixed(1)}%${r.meetsGate ? "" : " / 8割未満"}`).join(" / ");
+    const totalReqText = m.skillModInfo.totalRequired
+      ? ` / 全体 ${m.skillModInfo.totalCurrent.toFixed(1)}/${m.skillModInfo.totalRequired.toFixed(1)}=${(m.skillModInfo.overallRatio * 100).toFixed(1)}%`
+      : "";
+    lines.push(`<p>武器使用条件: ${reqText}${totalReqText} → 武器性能発揮率 <b>${(m.skillModInfo.mod * 100).toFixed(1)}%</b></p>`);
   }
   if (m.flatStatRaw.magic) lines.push(`<p>魔力実数加算合計: +${m.flatStatRaw.magic.toFixed(3)}（武器・防具・装飾込み。魔力%Buff・魔力変換の前に加算）</p>`);
   if (m.flatStatRaw.speed) lines.push(`<p>速度実数加算合計: +${m.flatStatRaw.speed.toFixed(3)}（武器・防具・装飾込み。速度%Buff・速度変換の前に加算）</p>`);
@@ -2058,7 +2174,7 @@ function calc() {
   }
   byId("breakdown").innerHTML = lines.join("");
 
-  localStorage.setItem("moeDamageSimTsvImportExport", JSON.stringify(collectConfig()));
+  localStorage.setItem("moeDamageSimLatestReqFormulaOnly", JSON.stringify(collectConfig()));
   renderCompareResult();
   renderActualDiff();
   renderRaceTable();
@@ -2182,6 +2298,23 @@ function renderContributionTable() {
       </table>`
     : `<p class="small">使用中の項目がありません。</p>`;
 }
+function setHeavyManualMultiplier(value) {
+  const el = byId("heavyManualMultiplier");
+  if (!el) return;
+  el.value = Number(value).toFixed(4);
+  calc();
+}
+function defenseFactorForAtk(atk, inputs, m) {
+  const ac = parseFloat(inputs.targetAC) || 0;
+  if (ac <= 0) return 1;
+  const atkDefInput = atk * m.dmgMultiplier * m.specialMultiplier;
+  return 1 - Math.pow(ac / (atkDefInput + ac), 1.244);
+}
+function requiredHeavyMultiplier(actualDamage, atkForReverse, inputs, m) {
+  const def = defenseFactorForAtk(atkForReverse, inputs, m);
+  const denom = atkForReverse * 0.8 * m.dmgMultiplier * m.specialMultiplier * def * m.critAvg * m.postMultiplier;
+  return denom ? actualDamage / denom : NaN;
+}
 function renderActualDiff() {
   const actualDamage = parseFloat(byId("actualDamage").value) || 0;
   const actualAtk = parseFloat(byId("actualAtk").value) || 0;
@@ -2200,13 +2333,26 @@ function renderActualDiff() {
     const postRatio = m.postMultiplier ? reqPost / m.postMultiplier : NaN;
     lines.push(`<tr><td>実測ダメージ</td><td class="num">${fmt(actualDamage,0)}</td><td class="num">${fmt(Math.floor(m.finalDamage),0)}</td><td class="num">${fmt(diff,0)}</td><td class="num">${pct(ratio-1)}</td></tr>`);
     lines.push(`<tr><td>逆算外枠倍率</td><td class="num">${fmt(reqPost)}</td><td class="num">現在 ${fmt(m.postMultiplier)}</td><td class="num">比率 ${fmt(postRatio)}</td><td class="num">-</td></tr>`);
+
+    if (inputs.attackType === "heavy") {
+      const reqHeavyPredAtk = requiredHeavyMultiplier(actualDamage, m.atk, inputs, m);
+      const reqHeavyActualAtk = actualAtk ? requiredHeavyMultiplier(actualDamage, actualAtk, inputs, m) : NaN;
+      const useReq = Number.isFinite(reqHeavyActualAtk) ? reqHeavyActualAtk : reqHeavyPredAtk;
+      const button = Number.isFinite(useReq)
+        ? `<button class="miniButton" onclick="setHeavyManualMultiplier(${useReq.toFixed(6)})">この倍率を適用</button>`
+        : "-";
+      lines.push(`<tr><td>逆算ヘビクラ倍率</td><td class="num">${fmt(useReq,4)}</td><td class="num">現在 ${fmt(m.attackMultiplier,4)}</td><td class="num">${Number.isFinite(useReq) ? fmt(useReq - m.attackMultiplier,4) : "-"}</td><td class="num">${button}</td></tr>`);
+      if (actualAtk) {
+        lines.push(`<tr><td>逆算ヘビクラ倍率<br><span class="small">予測攻撃力基準</span></td><td class="num">${fmt(reqHeavyPredAtk,4)}</td><td class="num">攻撃力 ${fmt(m.atk)}</td><td class="num">-</td><td class="num">-</td></tr>`);
+      }
+    }
   }
   if (actualAtk) {
     const diff = actualAtk - m.atk;
     const ratio = m.atk ? actualAtk / m.atk : NaN;
     lines.push(`<tr><td>ゲーム内攻撃力</td><td class="num">${fmt(actualAtk)}</td><td class="num">${fmt(m.atk)}</td><td class="num">${fmt(diff)}</td><td class="num">${pct(ratio-1)}</td></tr>`);
   }
-  byId("actualDiffResult").innerHTML = `<table><thead><tr><th>項目</th><th>実測</th><th>予測</th><th>差分</th><th>ズレ率</th></tr></thead><tbody>${lines.join("")}</tbody></table>`;
+  byId("actualDiffResult").innerHTML = `<table><thead><tr><th>項目</th><th>実測/逆算</th><th>予測/現在</th><th>差分</th><th>補足</th></tr></thead><tbody>${lines.join("")}</tbody></table>`;
 }
 function parseNumberList(text) {
   return text.split(",").map(s => parseFloat(s.trim())).filter(n => Number.isFinite(n));
@@ -2294,6 +2440,14 @@ function cellToNum(v) {
   const n = parseFloat(v);
   return Number.isFinite(n) ? n : 0;
 }
+function inferConversionBaseOffset(row) {
+  const name = String(row?.name || "");
+  const source = row?.source || "magic";
+  const rate = cellToNum(row?.rate);
+  // 既存TSV互換: 剣聖の魔法陣は今回の実測から「(魔力+10)×10%」扱いで寄せる
+  if (name.includes("剣聖") && source === "magic" && Math.abs(rate - 10) < 0.0001) return 10;
+  return 0;
+}
 function makeTsvSection(name, headers, rows) {
   const lines = [`[${name}]`, headers.join("\t")];
   rows.forEach(row => {
@@ -2357,13 +2511,14 @@ function serializeConfigAsTsv(cfg) {
     }))
   ));
 
-  out.push(makeTsvSection("conv", ["enabled", "slot", "name", "source", "rate", "note"],
+  out.push(makeTsvSection("conv", ["enabled", "slot", "name", "source", "rate", "baseOffset", "note"],
     (st.conv || []).map(r => ({
       enabled: boolToCell(r.enabled),
       slot: boolToCell(r.slot),
       name: r.name || "",
       source: r.source || "magic",
       rate: r.rate ?? 0,
+      baseOffset: r.baseOffset ?? 0,
       note: r.note || ""
     }))
   ));
@@ -2491,6 +2646,8 @@ function parseConfigFromTsv(text) {
       name: r.name || "",
       source: r.source || "magic",
       rate: cellToNum(r.rate),
+      baseOffset: r.baseOffset !== undefined && r.baseOffset !== "" ? cellToNum(r.baseOffset) : inferConversionBaseOffset(r),
+      offset: r.offset !== undefined && r.offset !== "" ? cellToNum(r.offset) : 0,
       capped: false,
       note: r.note || ""
     })),
@@ -2552,7 +2709,7 @@ function importTsvConfig() {
 }
 function resetConfig() {
   if (!confirm("保存済み設定をリセットして初期状態に戻しますか？")) return;
-  localStorage.removeItem("moeDamageSimTsvImportExport");
+  localStorage.removeItem("moeDamageSimLatestReqFormulaOnly");
   state = DEFAULT_STATE();
   renderAll();
   calc();
@@ -2578,6 +2735,11 @@ function applyConfig(cfg) {
   ["pct","conv","dmg","special","post","other"].forEach(k => {
     state[k] = Array.isArray(incoming[k]) ? incoming[k] : [];
   });
+  state.conv = (state.conv || []).map(r => ({
+    ...r,
+    baseOffset: r.baseOffset !== undefined ? (+r.baseOffset || 0) : (r.offset !== undefined ? 0 : inferConversionBaseOffset(r)),
+    offset: r.offset !== undefined ? (+r.offset || 0) : 0
+  }));
   renderAll();
   calc();
 }
@@ -2588,7 +2750,7 @@ document.querySelectorAll("input,select").forEach(el => {
 });
 
 renderAll();
-const saved = localStorage.getItem("moeDamageSimTsvImportExport");
+const saved = localStorage.getItem("moeDamageSimLatestReqFormulaOnly");
 if (saved) {
   try { applyConfig(JSON.parse(saved)); }
   catch { calc(); }
