@@ -1,0 +1,92 @@
+# MoE Damage Simulator TSV v1
+# セクション名とヘッダー行は変更しないでください。
+
+[inputs]
+key	value
+raceSelect	cognite
+raceCoeff	0.190
+str	100
+spirit	100
+magic	110.000
+weaponSkill	100
+requiredSkill	100
+weaponReqMode	official
+weaponDamage	100
+weaponWeight	100
+speed	100
+drunk	0
+targetAC	0
+attackType	heavy
+heavyFormula	new
+heavyManualMultiplier	0
+techMultiplier	3.8048
+allowCrit	false
+critRate	1
+critMultiplier	1.5
+atkCap	500
+atkPctMode	afterAdds
+finalCap	0
+
+[weaponReq]
+name	current	required
+筋力	100	100
+こんぼう	98	100
+
+[composite]
+enabled	slot	name	tags	attackPct	magicPct	speedPct	flatAttack	flatMagic	flatSpeed	convMagicRate	convSpeedRate	dmgPct	special	note
+1	1	エイシスの青い天使さん	ちいずのバトハン	0	0	0	0	0	0	30	0	0	1	
+1	1	ドラゴニック ガントレッド	ガントレッド	3	0	0	0	0	0	0	0	10	1	
+1	1	ワーカー ソウル	オーバーオール	0	0	0	0	0	0	0	0	10	1	
+1	1	気炎万丈	和風の袴	0	0	0	0	0	0	0	0	10	1	
+1	1	黄金の呪い	ゴールデン スカル ネックレス	3	0	0	0	0	0	0	0	10	1	
+1	1	怒髪衝天	怒髪天ウィッグ	0	0	0	0	0	0	0	0	10	1	
+1	1	剛剣の使い手	背負い大鉈	0	0	0	0	0	0	0	0	15	1	
+1	1	天職：占術師	シア・ハウリア なりきりイヤー	0	0	0	0	0	0	0	0	10	1	
+1	1	疾風奮迅	リュー・リオン なりきりマント	0	0	0	0	0	0	0	10	0	1	
+1	1	レイジ ドライブ		0	0	0	0	0	0	0	0	20	1	
+1	1	ジャイアント		25	0	0	0	0	0	0	0	0	1	
+1	1	マスター ストレングス		0	0	0	0	0	0	0	0	100	1	
+1	1	ヒーロー ソング		0	0	0	42	42	0	0	0	0	1	
+1	1	バトル ソング		0	0	0	0	0	0	0	0	20	1	
+1	1	ウチデノコヅチ		15	15	0	0	0	0	0	0	0	1	
+
+[equipment]
+slot	name	tags	attack	magic	speed	delay	note
+武器: 右手	ちいずのバトハン	ちいずのバトハン	0	10	0	0	
+武器: 左手			0	0	0	0	
+武器: 弾丸			0	0	0	0	
+防具: 頭	怒髪天ウィッグ	怒髪天ウィッグ	5	0	0	0	
+防具: 胴	セクシー オーバーオール	オーバーオール	0	0	0	0	
+防具: 手	ドラゴニック ガントレッド	ガントレッド	3	3	0	0	
+防具: パンツ	和風の袴	和風の袴	3	0	0	0	
+防具: 靴			0	0	0	0	
+防具: 肩	リュー・リオン なりきりマント	リュー・リオン なりきりマント	0	2	2	0	
+防具: 腰			0	0	0	0	
+装飾: 頭	シア・ハウリア なりきりイヤー	シア・ハウリア なりきりイヤー	4	0	3	0	
+装飾: 顔			0	0	0	0	
+装飾: 耳			0	0	0	0	
+装飾: 指			0	0	0	0	
+装飾: 胸	ゴールデン スカル ネックレス	ゴールデン スカル ネックレス	3	0	0	0	
+装飾: 背中	背負い大鉈	背負い大鉈	4	0	0	0	
+装飾: 腰			0	0	0	0	
+
+[pct]
+enabled	slot	name	target	percent	note
+
+[flat]
+enabled	slot	name	target	value	note
+
+[conv]
+enabled	slot	name	source	rate	baseOffset	note
+
+[dmg]
+enabled	slot	name	value	category	note
+
+[special]
+enabled	slot	name	value	note
+
+[post]
+enabled	slot	name	value	note
+
+[other]
+enabled	name	note
