@@ -53,6 +53,7 @@ MoE固有の主な仮定:
 保守時の注意:
 - 表示文言としては「ATK」ではなく「攻撃力」を使っています。
 - 新しいBuffを追加するだけなら、まず複合Buff欄で表現できないか確認してください。
+- 装備とBuffをまとめて管理したい場合は、装備欄と複合Buff欄のtagsを同じ値にしてください。
 - 複合Buffに新しい効果列を足す場合は、normalizeCompositeRows / compositeEffectText /
   expandCompositeState / renderCompositeTable / TSV入出力の5箇所をセットで更新してください。
 - localStorageの保存キーを変えると、旧保存データは自動復元されなくなります。
@@ -1167,6 +1168,128 @@ MoE固有の主な仮定:
     padding: 2px 9px;
   }
 
+
+  /* タグ連携: 装備とBuffを任意タグでゆるく紐づける */
+  .tagInput {
+    min-width: 0;
+    width: 100%;
+    font-size: 12px;
+  }
+  .tagLinkSection {
+    border: 1px solid #cdd8ef;
+    background: linear-gradient(180deg, rgba(248,251,255,.98), rgba(255,255,255,.98));
+  }
+  .tagPill {
+    display: inline-flex;
+    align-items: center;
+    width: fit-content;
+    max-width: 100%;
+    border: 1px solid rgba(66,103,168,.22);
+    background: rgba(66,103,168,.09);
+    color: #284978;
+    border-radius: 999px;
+    padding: 1px 8px;
+    margin: 1px 3px 1px 0;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .tagItems {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .tagItem {
+    border: 1px solid #e2e7f2;
+    background: #fff;
+    border-radius: 8px;
+    padding: 3px 7px;
+    font-size: 12px;
+    line-height: 1.35;
+  }
+  .tagItem b {
+    color: #23395d;
+  }
+  .tagEmpty {
+    padding: 12px;
+    border-radius: 10px;
+    background: #fafafa;
+    color: #6b7280;
+  }
+
+  /* タグ列追加に合わせた上書き。既存CSSより後ろに置いて優先させる。 */
+  .equipmentTable th:nth-child(7),
+  .equipmentTable td:nth-child(7) {
+    width: 70px;
+  }
+  .equipmentTable th:nth-child(8),
+  .equipmentTable td:nth-child(8) {
+    width: 22%;
+  }
+  .weaponTable th:nth-child(6),
+  .weaponTable td:nth-child(6) {
+    width: 70px;
+  }
+  .weaponTable th:nth-child(7),
+  .weaponTable td:nth-child(7) {
+    width: 24%;
+  }
+  .equipmentTable input.equipTag {
+    min-width: 0;
+    width: 100%;
+  }
+
+  #compositeBuffTable.compactTable {
+    min-width: 1280px;
+  }
+  #compositeBuffTable th:nth-child(4),
+  #compositeBuffTable td:nth-child(4) {
+    width: 86px;
+  }
+  #compositeBuffTable th:nth-child(n+5):nth-child(-n+14),
+  #compositeBuffTable td:nth-child(n+5):nth-child(-n+14) {
+    width: 64px;
+  }
+  #compositeBuffTable th:nth-child(15),
+  #compositeBuffTable td:nth-child(15) {
+    width: 220px;
+  }
+  #compositeBuffTable th:nth-child(16),
+  #compositeBuffTable td:nth-child(16) {
+    width: 82px;
+  }
+
+
+  #contributionTable h4 {
+    margin: 12px 0 6px;
+    color: #23395d;
+  }
+  #contributionTable table + h4 {
+    margin-top: 18px;
+  }
+  #contributionTable .tagPill {
+    margin-right: 4px;
+  }
+
+
+  .analysisIntro {
+    margin: 0 0 12px;
+    padding: 10px 12px;
+    border-left: 4px solid #4267a8;
+    border-radius: 8px;
+    background: rgba(66,103,168,.07);
+    color: #42526b;
+  }
+
+
+  .valueBaseLine {
+    margin: 6px 0 8px;
+    padding: 8px 10px;
+    border-left: 4px solid #4267a8;
+    background: rgba(66,103,168,.07);
+    border-radius: 8px;
+  }
+
 </style>
 </head>
 <body>
@@ -1350,8 +1473,12 @@ MoE固有の主な仮定:
 
 
 <details class="analysisDetails">
-  <summary>分析</summary>
+  <summary>分析 <span class="summaryNote">実測合わせ・比較・価値判断用</span></summary>
   <div class="analysisDetailsBody">
+  <p class="analysisIntro small">
+    ここは通常入力ではなく、構成比較や検証に使う補助機能です。
+    A/B比較、実測値との差分、AC別表、種族比較、タグ別寄与率、攻撃力+1や与ダメ+1%の価値確認ができます。
+  </p>
   <div class="analysisGrid">
     <div class="analysisPanel">
       <h3>構成A/B比較</h3>
@@ -1402,7 +1529,8 @@ MoE固有の主な仮定:
       <h3>Buff寄与率・1枠効率</h3>
       <p class="small">
         使用中の各行を1つずつOFFにしたときのダメージ低下量を表示します。
-        「枠効率」は、枠を消費する行だけ「低下ダメージ ÷ 1枠」で表示します。
+        タグが付いている項目は、同じタグの装備/BuffをまとめてOFFにした「タグ別寄与率」も表示します。
+        「枠効率」は、枠を消費する行だけ「低下ダメージ ÷ 枠数」で表示します。
       </p>
       <button onclick="renderContributionTable()">寄与率を更新</button>
       <div id="contributionTable" class="scrollX"></div>
@@ -1411,8 +1539,9 @@ MoE固有の主な仮定:
     <div class="analysisPanel analysisPanelWide">
       <h3>価値表示</h3>
       <p class="small">
-        現在の構成で、攻撃力+1 / 魔力+1 / 与ダメ+1% などを足した時の増加量を表示します。
-        装備比較やBuff枠の判断用です。
+        現在の構成を基準に、攻撃力+1 / 魔力+1 / 与ダメ+1% などを足した時の増加量を表示します。
+        ステータスやBuffを変更すると、この表も自動で再計算されます。
+        なおAC0で倍率が同じ場合、攻撃力+1の価値は一定に見えやすいです。
       </p>
       <button onclick="renderValueTable()">価値表示を更新</button>
       <div id="valueTable" class="scrollX"></div>
@@ -1443,6 +1572,7 @@ MoE固有の主な仮定:
                 <th>魔力</th>
                 <th>速度</th>
                 <th>ディレイ</th>
+                <th>タグ</th>
                 <th>メモ</th>
               </tr>
             </thead>
@@ -1459,6 +1589,7 @@ MoE固有の主な仮定:
                 <th>魔力</th>
                 <th>速度</th>
                 <th>ディレイ</th>
+                <th>タグ</th>
                 <th>メモ</th>
               </tr>
             </thead>
@@ -1475,6 +1606,7 @@ MoE固有の主な仮定:
                 <th>魔力</th>
                 <th>速度</th>
                 <th>ディレイ</th>
+                <th>タグ</th>
                 <th>メモ</th>
               </tr>
             </thead>
@@ -1496,6 +1628,7 @@ MoE固有の主な仮定:
               <th>魔力</th>
               <th>速度</th>
               <th>ディレイ</th>
+              <th>タグ</th>
               <th>メモ</th>
             </tr>
           </thead>
@@ -1513,6 +1646,7 @@ MoE固有の主な仮定:
               <th>魔力</th>
               <th>速度</th>
               <th>ディレイ</th>
+              <th>タグ</th>
               <th>メモ</th>
             </tr>
           </thead>
@@ -1528,17 +1662,17 @@ MoE固有の主な仮定:
   <p class="small compositeLead">
     <b>1行 = 1Buff枠</b> として扱うメイン入力欄です。
     1つのBuffに複数効果がある場合、ここにまとめて入力してください。
-    計算時は内部で割合Buff・実数加算・変換・与ダメ・特攻へ展開します。
+    計算時は内部で割合Buff・実数加算・変換・与ダメ・特攻へ展開します。%欄は10%なら10と入力します。
   </p>
   <div class="scrollX">
     <table id="compositeBuffTable" class="compactTable compositeTable">
       <thead>
         <tr>
-          <th>使用</th><th>枠</th><th>名称</th>
+          <th>使用</th><th>枠</th><th>名称</th><th>タグ</th>
           <th>攻撃力%</th><th>魔力%</th><th>速度%</th>
           <th>攻撃力+</th><th>魔力+</th><th>速度+</th>
           <th>魔力→攻撃力%</th><th>速度→攻撃力%</th>
-          <th>与ダメ+</th><th>特攻倍率</th>
+          <th>与ダメ%</th><th>特攻倍率</th>
           <th>メモ</th><th>操作</th>
         </tr>
       </thead>
@@ -1547,6 +1681,17 @@ MoE固有の主な仮定:
   </div>
   <button onclick="addCompositeRow('blank')">複合Buff行を追加</button>
 </section>
+
+<section class="card wide tagLinkSection">
+  <h2>タグ連携</h2>
+  <p class="small">
+    装備欄と複合Buff欄で同じタグを入れると、ここにまとめて表示します。タグ名にスペースを含められます。複数タグはカンマ区切りです。
+    例: <span class="tagPill">パンチング</span> <span class="tagPill">魔力装備</span> <span class="tagPill">火力A</span>
+  </p>
+  <div id="tagLinkSummary" class="scrollX"></div>
+</section>
+
+
 
 
 
@@ -1731,6 +1876,7 @@ function defaultEquipmentRows() {
     magic: 0,
     speed: 0,
     delay: 0,
+    tags: "",
     note: ""
   }));
 }
@@ -1851,6 +1997,7 @@ function normalizeCompositeRows(rows) {
     enabled: !!r.enabled,
     slot: r.slot !== false,
     name: r.name || "複合Buff",
+    tags: r.tags || r.tag || "",
     attackPct: +r.attackPct || 0,
     magicPct: +r.magicPct || 0,
     speedPct: +r.speedPct || 0,
@@ -1859,7 +2006,11 @@ function normalizeCompositeRows(rows) {
     flatSpeed: +r.flatSpeed || 0,
     convMagicRate: +r.convMagicRate || 0,
     convSpeedRate: +r.convSpeedRate || 0,
-    dmg: +r.dmg || 0,
+    // 複合Buffの与ダメは、攻撃力%などと同じく「10%なら10」で保持する。
+    // 旧データで dmg:0.1 のような小数が来た場合は 10% として移行する。
+    dmgPct: r.dmgPct !== undefined
+      ? (+r.dmgPct || 0)
+      : ((+r.dmg || 0) > 0 && (+r.dmg || 0) <= 1 ? (+r.dmg || 0) * 100 : (+r.dmg || 0)),
     special: +r.special || 1,
     note: r.note || ""
   }));
@@ -1869,7 +2020,7 @@ function compositeHasEffect(r) {
   return !!(
     +r.attackPct || +r.magicPct || +r.speedPct ||
     +r.flatAttack || +r.flatMagic || +r.flatSpeed ||
-    +r.convMagicRate || +r.convSpeedRate || +r.dmg ||
+    +r.convMagicRate || +r.convSpeedRate || +r.dmgPct ||
     (+r.special && +r.special !== 1)
   );
 }
@@ -1884,7 +2035,7 @@ function compositeEffectText(r) {
   if (+r.flatSpeed) parts.push(`速度+${r.flatSpeed}`);
   if (+r.convMagicRate) parts.push(`魔力→攻撃力 ${r.convMagicRate}%`);
   if (+r.convSpeedRate) parts.push(`速度→攻撃力 ${r.convSpeedRate}%`);
-  if (+r.dmg) parts.push(`与ダメ+${r.dmg}`);
+  if (+r.dmgPct) parts.push(`与ダメ+${r.dmgPct}%`);
   if (+r.special && +r.special !== 1) parts.push(`特攻×${r.special}`);
   return parts.join(" / ") || "効果なし";
 }
@@ -1894,7 +2045,7 @@ function compositeEffectText(r) {
  * 例:
  *   擬竜 1行
  *     attackPct: 15
- *     dmg: 0.10
+ *     dmgPct: 10
  *   ↓ 内部計算上は
  *     攻撃力%Buff行 + 与ダメ行
  *
@@ -1920,12 +2071,144 @@ function expandCompositeState(st) {
     if (+r.flatSpeed) out.flat.push({enabled:true, slot:false, name:`${baseName} 速度+`, target:"speed", value:+r.flatSpeed, note});
     if (+r.convMagicRate) out.conv.push({enabled:true, slot:false, name:`${baseName} 魔力→攻撃力`, source:"magic", rate:+r.convMagicRate, baseOffset:0, offset:0, capped:false, note});
     if (+r.convSpeedRate) out.conv.push({enabled:true, slot:false, name:`${baseName} 速度→攻撃力`, source:"speed", rate:+r.convSpeedRate, baseOffset:0, offset:0, capped:false, note});
-    if (+r.dmg) out.dmg.push({enabled:true, slot:false, name:`${baseName} 与ダメ`, value:+r.dmg, category:"複合Buff", note});
+    if (+r.dmgPct) out.dmg.push({enabled:true, slot:false, name:`${baseName} 与ダメ`, value:(+r.dmgPct) / 100, category:"複合Buff", note});
     if (+r.special && +r.special !== 1) out.special.push({enabled:true, slot:false, name:`${baseName} 特攻`, value:+r.special, note});
   });
   return out;
 }
 /* テーブルの使用/枠チェックボックスを作る。変更時は即再計算。 */
+
+/**
+ * タグ文字列を配列へ分解する。
+ * 区切りはカンマ、読点、セミコロン、改行。空白はタグ名の一部として扱う。先頭の # はあってもなくても同じ扱い。
+ */
+function splitTags(value) {
+  const seen = new Set();
+
+  // タグ名にスペースを含めたいケースがあるため、空白では分割しない。
+  // 複数タグは カンマ / 読点 / セミコロン / 改行 で区切る。
+  return String(value || "")
+    .split(/[,，、;\n\r]+/)
+    .map(x => x.trim().replace(/^#/, ""))
+    .filter(Boolean)
+    .filter(x => {
+      const key = x.toLowerCase();
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+}
+
+/* タグ入力セル。タグ変更時はタグ連携表示と保存内容を更新する。 */
+function tagInputCell(row, className="tagInput") {
+  const input = makeCell("input", {
+    class: className,
+    value: row.tags || "",
+    placeholder: "例: 火力 A"
+  });
+  input.oninput = () => {
+    row.tags = input.value;
+    renderTagLinkSummary();
+    calc();
+  };
+  const td = makeCell("td");
+  td.appendChild(input);
+  return td;
+}
+
+function tagPillHtml(tag) {
+  return `<span class="tagPill">${escapeHtml(tag)}</span>`;
+}
+
+function taggedItemHtml(item) {
+  const detail = item.detail ? `<br><span class="small">${escapeHtml(item.detail)}</span>` : "";
+  return `<span class="tagItem"><b>${escapeHtml(item.kind)}</b>: ${escapeHtml(item.name)}${detail}</span>`;
+}
+
+function equipmentEffectText(row) {
+  const parts = [];
+  if (+row.attack) parts.push(`攻撃力+${row.attack}`);
+  if (+row.magic) parts.push(`魔力+${row.magic}`);
+  if (+row.speed) parts.push(`速度+${row.speed}`);
+  if (+row.delay) parts.push(`ディレイ${row.delay}`);
+  return parts.join(" / ");
+}
+
+/**
+ * 装備欄とBuff欄のタグを集計して、同じタグのものを横断表示する。
+ * 実際の計算には影響しない、管理・メモ用の紐づけ機能。
+ */
+function renderTagLinkSummary() {
+  const el = byId("tagLinkSummary");
+  if (!el) return;
+
+  const groups = new Map();
+  const add = (tag, item) => {
+    if (!groups.has(tag)) groups.set(tag, {equipment: [], buffs: []});
+    groups.get(tag)[item.type].push(item);
+  };
+
+  normalizeEquipmentRows(state.equipment).forEach(row => {
+    splitTags(row.tags).forEach(tag => {
+      const slot = (row.slot || "装備").replace(/^武器: /, "").replace(/^防具: /, "").replace(/^装飾: /, "");
+      const name = row.name ? `${slot}: ${row.name}` : slot;
+      add(tag, {type:"equipment", kind:"装備", name, detail: equipmentEffectText(row)});
+    });
+  });
+
+  normalizeCompositeRows(state.composite).forEach(row => {
+    splitTags(row.tags).forEach(tag => {
+      add(tag, {type:"buffs", kind:"複合Buff", name: row.name || "複合Buff", detail: compositeEffectText(row)});
+    });
+  });
+
+  // 旧項目にもtagsプロパティがある保存データ/TSVが来た場合は表示だけ対応する。
+  [
+    ["割合Buff", state.pct || [], r => `${labelOf(r.target || "attack")}+${r.percent || 0}%`],
+    ["実数加算", normalizeFlatRows(state), r => `${labelOf(r.target || "magic")}+${r.value || 0}`],
+    ["変換", state.conv || [], r => `${labelOf(r.source || "magic")}→攻撃力 ${r.rate || 0}%`],
+    ["与ダメ", state.dmg || [], r => `+${r.value || 0}`],
+    ["特攻", state.special || [], r => `×${r.value || 1}`],
+    ["外枠", state.post || [], r => `×${r.value || 1}`],
+    ["その他", state.other || [], r => r.note || ""]
+  ].forEach(([kind, rows, detailFn]) => {
+    rows.forEach(row => {
+      splitTags(row.tags).forEach(tag => {
+        add(tag, {type:"buffs", kind, name: row.name || kind, detail: detailFn(row)});
+      });
+    });
+  });
+
+  const tags = Array.from(groups.keys()).sort((a,b) => a.localeCompare(b, "ja"));
+  if (!tags.length) {
+    el.innerHTML = `<div class="tagEmpty">まだタグがありません。装備欄と複合Buff欄の「タグ」に同じ文字を入れると、ここで紐づけて確認できます。</div>`;
+    return;
+  }
+
+  const body = tags.map(tag => {
+    const g = groups.get(tag);
+    const equipment = g.equipment.length
+      ? `<div class="tagItems">${g.equipment.map(taggedItemHtml).join("")}</div>`
+      : `<span class="small">なし</span>`;
+    const buffs = g.buffs.length
+      ? `<div class="tagItems">${g.buffs.map(taggedItemHtml).join("")}</div>`
+      : `<span class="small">なし</span>`;
+    const linked = g.equipment.length && g.buffs.length ? "○" : "片側のみ";
+    return `<tr>
+      <td>${tagPillHtml(tag)}</td>
+      <td>${equipment}</td>
+      <td>${buffs}</td>
+      <td class="num">${linked}</td>
+    </tr>`;
+  }).join("");
+
+  el.innerHTML = `<table>
+    <thead><tr><th>タグ</th><th>装備</th><th>Buff</th><th>連携</th></tr></thead>
+    <tbody>${body}</tbody>
+  </table>`;
+}
+
+
 function checkboxCell(row, prop) {
   const cb = makeCell("input", {type:"checkbox", checked: !!row[prop]});
   cb.onchange = () => { row[prop] = cb.checked; calc(); };
@@ -2169,7 +2452,7 @@ function renderCompositeTable() {
   state.composite = normalizeCompositeRows(state.composite);
 
   if (!state.composite.length) {
-    renderEmptyRow(tbody, 15, "まだ複合Buffがありません。「複合Buff行を追加」から追加してください。");
+    renderEmptyRow(tbody, 16, "まだ複合Buffがありません。「複合Buff行を追加」から追加してください。");
     return;
   }
 
@@ -2179,8 +2462,10 @@ function renderCompositeTable() {
     tr.appendChild(checkboxCell(row, "slot"));
 
     const name = makeCell("input", {value: row.name || ""});
-    name.oninput = () => { row.name = name.value; };
+    name.oninput = () => { row.name = name.value; renderTagLinkSummary(); calc(); };
     tr.appendChild(makeCell("td")).appendChild(name);
+
+    tr.appendChild(tagInputCell(row));
 
     tr.appendChild(compositeNumberCell(row, "attackPct", "1"));
     tr.appendChild(compositeNumberCell(row, "magicPct", "1"));
@@ -2190,7 +2475,7 @@ function renderCompositeTable() {
     tr.appendChild(compositeNumberCell(row, "flatSpeed", "0.1"));
     tr.appendChild(compositeNumberCell(row, "convMagicRate", "1"));
     tr.appendChild(compositeNumberCell(row, "convSpeedRate", "1"));
-    tr.appendChild(compositeNumberCell(row, "dmg", "0.01"));
+    tr.appendChild(compositeNumberCell(row, "dmgPct", "1"));
     tr.appendChild(compositeNumberCell(row, "special", "0.01"));
 
     const note = makeCell("input", {value: row.note || ""});
@@ -2204,11 +2489,11 @@ function renderCompositeTable() {
 /* 空の複合Buff行を追加する。主要Buffが固まるまではプリセットボタンを置かない方針。 */
 function addCompositeRow(kind="blank") {
   const row = {
-    enabled:true, slot:true, name:"複合Buff",
+    enabled:true, slot:true, name:"複合Buff", tags:"",
     attackPct:0, magicPct:0, speedPct:0,
     flatAttack:0, flatMagic:0, flatSpeed:0,
     convMagicRate:0, convSpeedRate:0,
-    dmg:0, special:1,
+    dmgPct:0, special:1,
     note:""
   };
   state.composite.push(row);
@@ -2289,6 +2574,8 @@ function makeEquipmentInputRow(row, includeSlot=true) {
   const delay = makeCell("input", {class:"equipNum", type:"number", step:"1", value: row.delay ?? 0});
   delay.oninput = () => { row.delay = parseFloat(delay.value) || 0; calc(); };
   tr.appendChild(makeCell("td")).appendChild(delay);
+
+  tr.appendChild(tagInputCell(row, "equipTag tagInput"));
 
   const note = makeCell("input", {class:"equipNote", value: row.note || ""});
   note.oninput = () => { row.note = note.value; };
@@ -2518,6 +2805,7 @@ function renderAll() {
   renderNumericTable("special");
   renderNumericTable("post");
   renderOtherTable();
+  renderTagLinkSummary();
 }
 
 /* 種族プルダウンから攻撃力係数hidden値を同期する。 */
@@ -2955,11 +3243,12 @@ function calc() {
   }
   byId("breakdown").innerHTML = lines.join("");
 
-  localStorage.setItem("moeDamageSimHoverBreakdown", JSON.stringify(collectConfig()));
+  localStorage.setItem("moeDamageSimValueRefreshFix", JSON.stringify(collectConfig()));
   renderCompareResult();
   renderActualDiff();
   renderRaceTable();
   renderValueTable();
+  renderTagLinkSummary();
 }
 
 /* 分析用: 現在構成をA/B比較スナップショットへ保存する。 */
@@ -3033,16 +3322,26 @@ function renderCompareResult() {
     </table>`;
 }
 /* 価値表示用: 一時的な効果を追加したstateでメトリクスを計算する。 */
-function metricWithTempEffect(modifier) {
-  const cfg = collectConfig();
-  const st2 = clone(cfg.state);
+function metricWithTempEffect(baseState, inputs, modifier) {
+  // 価値表示は「現在のstate/inputs」を基準にした差分を見たいので、
+  // 各行の計算でcollectConfig()を呼び直さず、同じ基準値から派生させる。
+  const st2 = clone(baseState);
   modifier(st2);
-  return computeMetrics(st2, cfg.inputs);
+  return computeMetrics(st2, inputs);
 }
 /* 攻撃力+1、魔力+1、与ダメ+1%などの価値表示テーブルを描画する。 */
 function renderValueTable() {
+  // ボタンから単独更新された場合でも、種族係数と基礎魔力を最新化してから読む。
+  syncRaceCoeff();
+  syncBaseMagic();
+  syncAttackTypeUI();
+
   const inputs = collectInputs();
-  const base = computeMetrics(state, inputs);
+  inputs.raceCoeff = byId("raceCoeff").value;
+  inputs.techMultiplier = byId("techMultiplier").value;
+
+  const baseState = clone(state);
+  const base = computeMetrics(baseState, inputs);
   const tests = [
     {
       name: "攻撃力 +1",
@@ -3086,7 +3385,7 @@ function renderValueTable() {
     },
     {
       name: "与ダメ +1%",
-      note: "与ダメ増加 +0.01",
+      note: "与ダメ増加 +1%",
       apply: st => {
         st.dmg = Array.isArray(st.dmg) ? st.dmg : [];
         st.dmg.push({enabled:true, slot:false, name:"価値計算 与ダメ+1%", value:0.01, category:"価値計算", note:""});
@@ -3095,31 +3394,44 @@ function renderValueTable() {
   ];
 
   const body = tests.map(t => {
-    const m = metricWithTempEffect(t.apply);
+    const m = metricWithTempEffect(baseState, inputs, t.apply);
     const dmgDelta = m.finalDamage - base.finalDamage;
     const atkDelta = m.atk - base.atk;
     const magicDelta = m.stats.magic - base.stats.magic;
     return `<tr>
       <td>${escapeHtml(t.name)}</td>
-      <td class="num">${fmt(dmgDelta)}</td>
-      <td class="num">${fmt(atkDelta)}</td>
-      <td class="num">${fmt(magicDelta)}</td>
+      <td class="num">${fmt(dmgDelta, 4)}</td>
+      <td class="num">${fmt(atkDelta, 4)}</td>
+      <td class="num">${fmt(magicDelta, 4)}</td>
       <td class="num">${base.finalDamage ? pct(dmgDelta / base.finalDamage) : "-"}</td>
+      <td class="num">${fmt(m.finalDamage, 4)}</td>
       <td>${escapeHtml(t.note)}</td>
     </tr>`;
   }).join("");
 
-  byId("valueTable").innerHTML = `<table>
-    <thead><tr><th>追加するもの</th><th>ダメージ増加</th><th>攻撃力増加</th><th>魔力増加</th><th>ダメージ増加率</th><th>メモ</th></tr></thead>
-    <tbody>${body}</tbody>
-  </table>`;
+  byId("valueTable").innerHTML = `
+    <div class="small valueBaseLine">
+      基準: ダメージ ${fmt(base.finalDamage, 4)} / 攻撃力 ${fmt(base.atk, 4)} / 魔力 ${fmt(base.stats.magic, 4)} / 与ダメ倍率 ${fmt(base.dmgMultiplier, 4)}
+    </div>
+    <table>
+      <thead><tr><th>追加するもの</th><th>ダメージ増加</th><th>攻撃力増加</th><th>魔力増加</th><th>ダメージ増加率</th><th>追加後ダメージ</th><th>メモ</th></tr></thead>
+      <tbody>${body}</tbody>
+    </table>`;
 }
 
 /* 使用中の行を1つずつOFFにして、ダメージ寄与率と1枠効率を出す。 */
-function renderContributionTable() {
-  const baseInputs = collectInputs();
-  const base = computeMetrics(state, baseInputs);
-  const rows = [];
+function rowHasTag(row, tag) {
+  const key = String(tag || "").toLowerCase();
+  return splitTags(row?.tags).some(t => t.toLowerCase() === key);
+}
+
+function contributionSlotForRow(key, row) {
+  if (key === "other") return row.enabled ? 1 : 0;
+  if (key === "equipment") return 0;
+  return row.slot ? 1 : 0;
+}
+
+function contributionRowsForState(st) {
   const groups = [
     ["複合", "composite"],
     ["割合", "pct"],
@@ -3131,45 +3443,133 @@ function renderContributionTable() {
     ["外枠", "post"],
     ["その他", "other"]
   ];
+  const rows = [];
   groups.forEach(([label, key]) => {
-    (state[key] || []).forEach((row, idx) => {
+    const sourceRows = key === "equipment"
+      ? normalizeEquipmentRows(st.equipment)
+      : key === "flat"
+        ? normalizeFlatRows(st)
+        : (st[key] || []);
+    sourceRows.forEach((row, idx) => {
       if (row.enabled === false) return;
       if (key === "equipment" && !(+row.attack || +row.magic || +row.speed || +row.delay)) return;
       if (key === "composite" && !compositeHasEffect(row)) return;
-      const st2 = clone(state);
-      st2[key][idx].enabled = false;
-      const m2 = computeMetrics(st2, baseInputs);
-      const dmgLoss = base.finalDamage - m2.finalDamage;
-      const atkLoss = base.atk - m2.atk;
-      const usesSlot = key === "other" ? true : key === "equipment" ? false : !!row.slot;
-      rows.push({
-        group: label,
-        name: row.name || "(名称なし)",
-        dmgLoss,
-        pctLoss: base.finalDamage ? dmgLoss / base.finalDamage : 0,
-        atkLoss,
-        slot: usesSlot ? 1 : 0,
-        slotEff: usesSlot ? dmgLoss : NaN
-      });
+      rows.push({label, key, row, idx});
     });
   });
+  return rows;
+}
+
+function disableContributionRow(st, key, idx) {
+  if (key === "equipment") {
+    st.equipment = normalizeEquipmentRows(st.equipment);
+  }
+  if (key === "flat") {
+    st.flat = normalizeFlatRows(st);
+  }
+  if (st[key] && st[key][idx]) st[key][idx].enabled = false;
+}
+
+function disableRowsByTag(st, tag) {
+  contributionRowsForState(st).forEach(item => {
+    if (rowHasTag(item.row, tag)) disableContributionRow(st, item.key, item.idx);
+  });
+}
+
+function renderContributionTable() {
+  const baseInputs = collectInputs();
+  const base = computeMetrics(state, baseInputs);
+  const rows = [];
+  const tagged = new Map();
+
+  contributionRowsForState(state).forEach(({label, key, row, idx}) => {
+    const st2 = clone(state);
+    disableContributionRow(st2, key, idx);
+    const m2 = computeMetrics(st2, baseInputs);
+    const dmgLoss = base.finalDamage - m2.finalDamage;
+    const atkLoss = base.atk - m2.atk;
+    const slotCount = contributionSlotForRow(key, row);
+    const tags = splitTags(row.tags);
+
+    rows.push({
+      group: label,
+      name: row.name || "(名称なし)",
+      tags,
+      dmgLoss,
+      pctLoss: base.finalDamage ? dmgLoss / base.finalDamage : 0,
+      atkLoss,
+      slot: slotCount,
+      slotEff: slotCount ? dmgLoss / slotCount : NaN
+    });
+
+    tags.forEach(tag => {
+      if (!tagged.has(tag)) tagged.set(tag, {items: [], slots: 0});
+      tagged.get(tag).items.push({group: label, name: row.name || "(名称なし)"});
+      tagged.get(tag).slots += slotCount;
+    });
+  });
+
+  const tagRows = Array.from(tagged.entries()).map(([tag, info]) => {
+    const st2 = clone(state);
+    disableRowsByTag(st2, tag);
+    const m2 = computeMetrics(st2, baseInputs);
+    const dmgLoss = base.finalDamage - m2.finalDamage;
+    const atkLoss = base.atk - m2.atk;
+    const itemText = info.items.map(x => `${x.group}: ${x.name}`).join(" / ");
+    return {
+      tag,
+      itemText,
+      slots: info.slots,
+      dmgLoss,
+      pctLoss: base.finalDamage ? dmgLoss / base.finalDamage : 0,
+      atkLoss,
+      slotEff: info.slots ? dmgLoss / info.slots : NaN
+    };
+  }).sort((a,b) => b.dmgLoss - a.dmgLoss);
+
   rows.sort((a,b) => b.dmgLoss - a.dmgLoss);
-  const body = rows.map(r => `
+
+  const tagBody = tagRows.map(r => `
     <tr>
-      <td>${r.group}</td>
-      <td>${r.name}</td>
+      <td>${tagPillHtml(r.tag)}</td>
+      <td>${escapeHtml(r.itemText)}</td>
       <td class="num">${fmt(Math.floor(r.dmgLoss),0)}</td>
       <td class="num">${pct(r.pctLoss)}</td>
       <td class="num">${fmt(r.atkLoss)}</td>
-      <td class="num">${r.slot ? "1" : "0"}</td>
+      <td class="num">${r.slots}</td>
+      <td class="num">${r.slots ? fmt(Math.floor(r.slotEff),0) : "-"}</td>
+    </tr>`).join("");
+
+  const body = rows.map(r => `
+    <tr>
+      <td>${r.group}</td>
+      <td>${escapeHtml(r.name)}</td>
+      <td>${r.tags.length ? r.tags.map(tagPillHtml).join("") : "-"}</td>
+      <td class="num">${fmt(Math.floor(r.dmgLoss),0)}</td>
+      <td class="num">${pct(r.pctLoss)}</td>
+      <td class="num">${fmt(r.atkLoss)}</td>
+      <td class="num">${r.slot}</td>
       <td class="num">${r.slot ? fmt(Math.floor(r.slotEff),0) : "-"}</td>
     </tr>`).join("");
-  byId("contributionTable").innerHTML = rows.length
-    ? `<table>
-        <thead><tr><th>分類</th><th>名称</th><th>外した時のダメージ低下</th><th>低下率</th><th>攻撃力低下</th><th>枠</th><th>1枠効率</th></tr></thead>
+
+  const tagTable = tagRows.length
+    ? `<h4>タグ別寄与率</h4>
+      <p class="small">同じタグが付いた装備/BuffをまとめてOFFにした場合の低下量です。装備とBuffをセット単位で比較できます。</p>
+      <table>
+        <thead><tr><th>タグ</th><th>対象</th><th>外した時のダメージ低下</th><th>低下率</th><th>攻撃力低下</th><th>枠</th><th>1枠効率</th></tr></thead>
+        <tbody>${tagBody}</tbody>
+      </table>`
+    : `<h4>タグ別寄与率</h4><p class="small">タグ付きの使用中項目がありません。装備欄や複合Buff欄に同じタグを入れると、セット単位の寄与率を表示できます。</p>`;
+
+  const individualTable = rows.length
+    ? `<h4>個別行の寄与率</h4>
+      <table>
+        <thead><tr><th>分類</th><th>名称</th><th>タグ</th><th>外した時のダメージ低下</th><th>低下率</th><th>攻撃力低下</th><th>枠</th><th>1枠効率</th></tr></thead>
         <tbody>${body}</tbody>
       </table>`
-    : `<p class="small">使用中の項目がありません。</p>`;
+    : `<h4>個別行の寄与率</h4><p class="small">使用中の項目がありません。</p>`;
+
+  byId("contributionTable").innerHTML = tagTable + individualTable;
 }
 /* 実測逆算から得たヘビクラ倍率を入力欄へ反映する。 */
 function setHeavyManualMultiplier(value) {
@@ -3365,11 +3765,12 @@ function serializeConfigAsTsv(cfg) {
     }))
   ));
 
-  out.push(makeTsvSection("composite", ["enabled", "slot", "name", "attackPct", "magicPct", "speedPct", "flatAttack", "flatMagic", "flatSpeed", "convMagicRate", "convSpeedRate", "dmg", "special", "note"],
+  out.push(makeTsvSection("composite", ["enabled", "slot", "name", "tags", "attackPct", "magicPct", "speedPct", "flatAttack", "flatMagic", "flatSpeed", "convMagicRate", "convSpeedRate", "dmgPct", "special", "note"],
     normalizeCompositeRows(st.composite || []).map(r => ({
       enabled: boolToCell(r.enabled),
       slot: boolToCell(r.slot),
       name: r.name || "",
+      tags: r.tags || "",
       attackPct: r.attackPct ?? 0,
       magicPct: r.magicPct ?? 0,
       speedPct: r.speedPct ?? 0,
@@ -3378,16 +3779,17 @@ function serializeConfigAsTsv(cfg) {
       flatSpeed: r.flatSpeed ?? 0,
       convMagicRate: r.convMagicRate ?? 0,
       convSpeedRate: r.convSpeedRate ?? 0,
-      dmg: r.dmg ?? 0,
+      dmgPct: r.dmgPct ?? 0,
       special: r.special ?? 1,
       note: r.note || ""
     }))
   ));
 
-  out.push(makeTsvSection("equipment", ["slot", "name", "attack", "magic", "speed", "delay", "note"],
+  out.push(makeTsvSection("equipment", ["slot", "name", "tags", "attack", "magic", "speed", "delay", "note"],
     normalizeEquipmentRows(st.equipment || []).map(r => ({
       slot: r.slot || "",
       name: r.name || "",
+      tags: r.tags || "",
       attack: r.attack ?? 0,
       magic: r.magic ?? 0,
       speed: r.speed ?? 0,
@@ -3527,6 +3929,7 @@ function parseConfigFromTsv(text) {
       enabled: cellToBool(r.enabled),
       slot: cellToBool(r.slot),
       name: r.name || "複合Buff",
+      tags: r.tags || r.tag || "",
       attackPct: cellToNum(r.attackPct),
       magicPct: cellToNum(r.magicPct),
       speedPct: cellToNum(r.speedPct),
@@ -3535,7 +3938,9 @@ function parseConfigFromTsv(text) {
       flatSpeed: cellToNum(r.flatSpeed),
       convMagicRate: cellToNum(r.convMagicRate),
       convSpeedRate: cellToNum(r.convSpeedRate),
-      dmg: cellToNum(r.dmg),
+      dmgPct: r.dmgPct !== undefined && r.dmgPct !== ""
+        ? cellToNum(r.dmgPct)
+        : (cellToNum(r.dmg) > 0 && cellToNum(r.dmg) <= 1 ? cellToNum(r.dmg) * 100 : cellToNum(r.dmg)),
       special: r.special === undefined || r.special === "" ? 1 : cellToNum(r.special),
       note: r.note || ""
     })),
@@ -3543,6 +3948,7 @@ function parseConfigFromTsv(text) {
       enabled: true,
       slot: r.slot || "",
       name: r.name || "",
+      tags: r.tags || r.tag || "",
       attack: cellToNum(r.attack),
       magic: cellToNum(r.magic),
       speed: cellToNum(r.speed),
@@ -3698,7 +4104,7 @@ function importTsvConfig() {
 /* localStorageの現在構成を削除し、初期状態へ戻す。 */
 function resetConfig() {
   if (!confirm("保存済み設定をリセットして初期状態に戻しますか？")) return;
-  localStorage.removeItem("moeDamageSimHoverBreakdown");
+  localStorage.removeItem("moeDamageSimValueRefreshFix");
   state = DEFAULT_STATE();
   renderAll();
   calc();
@@ -3741,7 +4147,7 @@ document.querySelectorAll("input,select").forEach(el => {
 });
 
 renderAll();
-const saved = localStorage.getItem("moeDamageSimHoverBreakdown");
+const saved = localStorage.getItem("moeDamageSimValueRefreshFix");
 if (saved) {
   try { applyConfig(JSON.parse(saved)); }
   catch { calc(); }
@@ -3767,6 +4173,7 @@ renderActualDiff();
 renderACTable();
 renderRaceTable();
 renderValueTable();
+renderTagLinkSummary();
 </script>
 </body>
 </html>
