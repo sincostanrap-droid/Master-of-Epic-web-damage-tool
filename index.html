@@ -1290,6 +1290,31 @@ MoE固有の主な仮定:
     border-radius: 8px;
   }
 
+
+  .tagNoTag {
+    background: #f2f2f2;
+    border-color: #d8d8d8;
+    color: #666;
+  }
+  .contributionSingleRow {
+    background: rgba(248,248,248,.72);
+  }
+  .contributionDetails {
+    margin-top: 14px;
+    border: 1px solid #e0e5ef;
+    border-radius: 10px;
+    padding: 8px 10px;
+    background: rgba(255,255,255,.8);
+  }
+  .contributionDetails > summary {
+    cursor: pointer;
+    font-weight: 800;
+    color: #23395d;
+  }
+  .contributionDetails table {
+    margin-top: 8px;
+  }
+
 </style>
 </head>
 <body>
@@ -1529,7 +1554,8 @@ MoE固有の主な仮定:
       <h3>Buff寄与率・1枠効率</h3>
       <p class="small">
         使用中の各行を1つずつOFFにしたときのダメージ低下量を表示します。
-        タグが付いている項目は、同じタグの装備/BuffをまとめてOFFにした「タグ別寄与率」も表示します。
+        タグが付いている項目は、同じタグの装備/BuffをまとめてOFFにした「タグ別寄与率」として表示します。
+        タグが付いていない項目も、タグ別寄与率の表に単体項目として表示します。
         「枠効率」は、枠を消費する行だけ「低下ダメージ ÷ 枠数」で表示します。
       </p>
       <button onclick="renderContributionTable()">寄与率を更新</button>
@@ -3243,7 +3269,7 @@ function calc() {
   }
   byId("breakdown").innerHTML = lines.join("");
 
-  localStorage.setItem("moeDamageSimValueRefreshFix", JSON.stringify(collectConfig()));
+  localStorage.setItem("moeDamageSimContributionUntaggedFolded", JSON.stringify(collectConfig()));
   renderCompareResult();
   renderActualDiff();
   renderRaceTable();
@@ -3490,10 +3516,13 @@ function renderContributionTable() {
     const atkLoss = base.atk - m2.atk;
     const slotCount = contributionSlotForRow(key, row);
     const tags = splitTags(row.tags);
+    const rowName = row.name || "(名称なし)";
 
     rows.push({
       group: label,
-      name: row.name || "(名称なし)",
+      key,
+      idx,
+      name: rowName,
       tags,
       dmgLoss,
       pctLoss: base.finalDamage ? dmgLoss / base.finalDamage : 0,
@@ -3504,12 +3533,12 @@ function renderContributionTable() {
 
     tags.forEach(tag => {
       if (!tagged.has(tag)) tagged.set(tag, {items: [], slots: 0});
-      tagged.get(tag).items.push({group: label, name: row.name || "(名称なし)"});
+      tagged.get(tag).items.push({group: label, name: rowName});
       tagged.get(tag).slots += slotCount;
     });
   });
 
-  const tagRows = Array.from(tagged.entries()).map(([tag, info]) => {
+  const taggedRows = Array.from(tagged.entries()).map(([tag, info]) => {
     const st2 = clone(state);
     disableRowsByTag(st2, tag);
     const m2 = computeMetrics(st2, baseInputs);
@@ -3517,7 +3546,8 @@ function renderContributionTable() {
     const atkLoss = base.atk - m2.atk;
     const itemText = info.items.map(x => `${x.group}: ${x.name}`).join(" / ");
     return {
-      tag,
+      kind: "tag",
+      labelHtml: tagPillHtml(tag),
       itemText,
       slots: info.slots,
       dmgLoss,
@@ -3525,13 +3555,29 @@ function renderContributionTable() {
       atkLoss,
       slotEff: info.slots ? dmgLoss / info.slots : NaN
     };
-  }).sort((a,b) => b.dmgLoss - a.dmgLoss);
+  });
 
+  // タグなし項目は、タグ別寄与率の表に「単体」として出す。
+  // これで、個別行テーブルを閉じたままでも全項目の寄与を見渡せる。
+  const untaggedRows = rows
+    .filter(r => !r.tags.length)
+    .map(r => ({
+      kind: "single",
+      labelHtml: `<span class="tagPill tagNoTag">タグなし</span>`,
+      itemText: `${r.group}: ${r.name}`,
+      slots: r.slot,
+      dmgLoss: r.dmgLoss,
+      pctLoss: r.pctLoss,
+      atkLoss: r.atkLoss,
+      slotEff: r.slot ? r.dmgLoss / r.slot : NaN
+    }));
+
+  const topRows = taggedRows.concat(untaggedRows).sort((a,b) => b.dmgLoss - a.dmgLoss);
   rows.sort((a,b) => b.dmgLoss - a.dmgLoss);
 
-  const tagBody = tagRows.map(r => `
-    <tr>
-      <td>${tagPillHtml(r.tag)}</td>
+  const topBody = topRows.map(r => `
+    <tr class="${r.kind === "single" ? "contributionSingleRow" : ""}">
+      <td>${r.labelHtml}</td>
       <td>${escapeHtml(r.itemText)}</td>
       <td class="num">${fmt(Math.floor(r.dmgLoss),0)}</td>
       <td class="num">${pct(r.pctLoss)}</td>
@@ -3544,7 +3590,7 @@ function renderContributionTable() {
     <tr>
       <td>${r.group}</td>
       <td>${escapeHtml(r.name)}</td>
-      <td>${r.tags.length ? r.tags.map(tagPillHtml).join("") : "-"}</td>
+      <td>${r.tags.length ? r.tags.map(tagPillHtml).join("") : `<span class="tagPill tagNoTag">タグなし</span>`}</td>
       <td class="num">${fmt(Math.floor(r.dmgLoss),0)}</td>
       <td class="num">${pct(r.pctLoss)}</td>
       <td class="num">${fmt(r.atkLoss)}</td>
@@ -3552,24 +3598,27 @@ function renderContributionTable() {
       <td class="num">${r.slot ? fmt(Math.floor(r.slotEff),0) : "-"}</td>
     </tr>`).join("");
 
-  const tagTable = tagRows.length
+  const topTable = topRows.length
     ? `<h4>タグ別寄与率</h4>
-      <p class="small">同じタグが付いた装備/BuffをまとめてOFFにした場合の低下量です。装備とBuffをセット単位で比較できます。</p>
+      <p class="small">同じタグが付いた装備/BuffはまとめてOFF、タグがない項目は単体でOFFにした場合の低下量です。</p>
       <table>
         <thead><tr><th>タグ</th><th>対象</th><th>外した時のダメージ低下</th><th>低下率</th><th>攻撃力低下</th><th>枠</th><th>1枠効率</th></tr></thead>
-        <tbody>${tagBody}</tbody>
+        <tbody>${topBody}</tbody>
       </table>`
-    : `<h4>タグ別寄与率</h4><p class="small">タグ付きの使用中項目がありません。装備欄や複合Buff欄に同じタグを入れると、セット単位の寄与率を表示できます。</p>`;
+    : `<h4>タグ別寄与率</h4><p class="small">使用中の項目がありません。</p>`;
 
   const individualTable = rows.length
-    ? `<h4>個別行の寄与率</h4>
-      <table>
-        <thead><tr><th>分類</th><th>名称</th><th>タグ</th><th>外した時のダメージ低下</th><th>低下率</th><th>攻撃力低下</th><th>枠</th><th>1枠効率</th></tr></thead>
-        <tbody>${body}</tbody>
-      </table>`
-    : `<h4>個別行の寄与率</h4><p class="small">使用中の項目がありません。</p>`;
+    ? `<details class="contributionDetails">
+        <summary>個別行の寄与率</summary>
+        <p class="small">各行を1つずつOFFにした場合の詳細です。通常は上のタグ別寄与率だけ見ればOKです。</p>
+        <table>
+          <thead><tr><th>分類</th><th>名称</th><th>タグ</th><th>外した時のダメージ低下</th><th>低下率</th><th>攻撃力低下</th><th>枠</th><th>1枠効率</th></tr></thead>
+          <tbody>${body}</tbody>
+        </table>
+      </details>`
+    : `<details class="contributionDetails"><summary>個別行の寄与率</summary><p class="small">使用中の項目がありません。</p></details>`;
 
-  byId("contributionTable").innerHTML = tagTable + individualTable;
+  byId("contributionTable").innerHTML = topTable + individualTable;
 }
 /* 実測逆算から得たヘビクラ倍率を入力欄へ反映する。 */
 function setHeavyManualMultiplier(value) {
@@ -4104,7 +4153,7 @@ function importTsvConfig() {
 /* localStorageの現在構成を削除し、初期状態へ戻す。 */
 function resetConfig() {
   if (!confirm("保存済み設定をリセットして初期状態に戻しますか？")) return;
-  localStorage.removeItem("moeDamageSimValueRefreshFix");
+  localStorage.removeItem("moeDamageSimContributionUntaggedFolded");
   state = DEFAULT_STATE();
   renderAll();
   calc();
@@ -4147,7 +4196,7 @@ document.querySelectorAll("input,select").forEach(el => {
 });
 
 renderAll();
-const saved = localStorage.getItem("moeDamageSimValueRefreshFix");
+const saved = localStorage.getItem("moeDamageSimContributionUntaggedFolded");
 if (saved) {
   try { applyConfig(JSON.parse(saved)); }
   catch { calc(); }
