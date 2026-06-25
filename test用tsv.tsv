@@ -16,10 +16,10 @@ weaponWeight	100
 speed	100
 drunk	0
 targetAC	0
-attackType	attack
+attackType	heavy
 heavyFormula	new
 heavyManualMultiplier	0
-techMultiplier	1.0000
+techMultiplier	3.8048
 allowCrit	false
 critRate	1
 critMultiplier	1.5
@@ -34,15 +34,6 @@ name	current	required
 
 [composite]
 enabled	slot	name	tags	attackPct	magicPct	speedPct	flatAttack	flatMagic	flatSpeed	convMagicRate	convSpeedRate	dmgPct	special	note
-1	1	エイシスの青い天使さん	ちいずのバトハン	0	0	0	0	0	0	30	0	0	1	装備
-1	1	ドラゴニック ガントレッド	ガントレッド	3	0	0	0	0	0	0	0	10	1	装備
-1	1	ワーカー ソウル	オーバーオール	0	0	0	0	0	0	0	0	10	1	装備
-1	1	気炎万丈	和風の袴	0	0	0	0	0	0	0	0	10	1	装備
-1	1	黄金の呪い	ゴールデン スカル ネックレス	3	0	0	0	0	0	0	0	10	1	装備
-1	1	怒髪衝天	怒髪天ウィッグ	0	0	0	0	0	0	0	0	10	1	装備
-1	1	剛剣の使い手	背負い大鉈	0	0	0	0	0	0	0	0	15	1	装備
-1	1	天職：占術師	シア・ハウリア なりきりイヤー	0	0	0	0	0	0	0	0	10	1	装備
-1	1	疾風奮迅	リュー・リオン なりきりマント	0	0	0	0	0	0	0	10	0	1	装備
 1	1	レイジ ドライブ		0	0	0	0	0	0	0	0	20	1	自己
 1	1	ジャイアント		25	0	0	0	0	0	0	0	0	1	自己
 1	1	マスター ストレングス		0	0	0	0	0	0	0	0	100	1	自己
@@ -51,32 +42,33 @@ enabled	slot	name	tags	attackPct	magicPct	speedPct	flatAttack	flatMagic	flatSpee
 1	1	ウチデノコヅチ		15	15	0	0	0	0	0	0	0	1	Buffer
 1	1	キーンエッジ		0	0	0	70	0	0	0	0	0	1	Buffer
 1	1	トリニティエンハンス		20	0	0	0	0	0	0	0	0	1	Buffer
-1	1	リミットブレイク		0	0	0	53	0	0	0	0	0	1	自己
+0	1	リミットブレイク		0	0	0	53	0	0	0	0	0	1	自己
 1	1	アルゴノウト 		0	0	0	0	0	0	0	0	100	1	自己
-1	1	サモンズ ソード	剣聖の魔法陣	0	0	0	0	0	0	10	0	0	1	装備
 1	1	擬竜		10	0	0	0	0	0	0	0	10	1	自己
 1	1	大噴火		0	0	0	0	0	0	0	0	10	1	自己
 1	1	フォースドアウェイクン		0	0	0	0	0	0	0	0	20	1	Buffer
+1	1	フォース ステップ		0	0	0	0	0	0	0	0	10	1	Buffer
 
 [equipment]
-slot	name	tags	attack	magic	speed	delay	note
-武器: 右手	ちいずのバトハン	ちいずのバトハン	0	10	0	0	
-武器: 左手			0	0	0	0	
-武器: 弾丸			0	0	0	0	
-防具: 頭	怒髪天ウィッグ	怒髪天ウィッグ	5	0	0	0	
-防具: 胴	セクシー オーバーオール	オーバーオール	0	0	0	0	
-防具: 手	ドラゴニック ガントレッド	ガントレッド	3	3	0	0	
-防具: パンツ	和風の袴	和風の袴	3	0	0	0	
-防具: 靴	仮置きバフなし		2	0	0	-2	
-防具: 肩	リュー・リオン なりきりマント	リュー・リオン なりきりマント	0	2	2	0	
-防具: 腰	隠密9		0	0	0	-6	
-装飾: 頭	シア・ハウリア なりきりイヤー	シア・ハウリア なりきりイヤー	4	0	3	0	
-装飾: 顔	岸田メル		2	0	0	-2	
-装飾: 耳	オリハル		2	0	0	-3	
-装飾: 指	オリハル		2	0	0	-3	
-装飾: 胸	ゴールデン スカル ネックレス	ゴールデン スカル ネックレス	3	0	0	0	
-装飾: 背中	背負い大鉈	背負い大鉈	4	0	0	0	
-装飾: 腰	剣聖の魔法陣	剣聖の魔法陣	6	0	0	0	
+enabled	slot	name	tags	attack	magic	speed	delay	equipBuffEnabled	equipBuffSlot	equipBuffName	equipBuffAttackPct	equipBuffMagicPct	equipBuffSpeedPct	equipBuffFlatAttack	equipBuffFlatMagic	equipBuffFlatSpeed	equipBuffConvMagicRate	equipBuffConvSpeedRate	equipBuffDmgPct	equipBuffSpecial	equipBuffNote	note
+1	武器: 右手	ちいずのバトハン		0	10	0	0	1	1	エイシスの青い天使さん	0	0	0	0	0	0	30	0	0	1		
+1	武器: 左手			0	0	0	0	0	1		0	0	0	0	0	0	0	0	0	1		
+1	武器: 弾丸			0	0	0	0	0	1		0	0	0	0	0	0	0	0	0	1		
+1	防具: 頭	怒髪天ウィッグ		5	0	0	0	1	1	怒髪衝天	0	0	0	0	0	0	0	0	10	1		
+1	防具: 胴	セクシー オーバーオール		0	0	0	0	1	1	ワーカー ソウル	0	0	0	0	0	0	0	0	10	1		
+1	防具: 手	ドラゴニック ガントレッド		3	3	0	0	1	1	ドラゴニック ガントレッド	3	0	0	0	0	0	0	0	10	1		
+1	防具: パンツ	和風の袴		3	0	0	0	1	1	気炎万丈	0	0	0	0	0	0	0	0	10	1		
+1	防具: 靴	クロエ なりきりブーツ		4	0	0	-2	1	1	クラスカード・アーチャー	0	0	0	0	0	0	10	0	0	1		
+1	防具: 肩	仮置き		0	0	0	0	0	1		0	0	0	0	0	0	0	0	0	1		
+1	防具: 腰	隠密9		0	0	0	-6	0	1		0	0	0	0	0	0	0	0	0	1		
+1	装飾: 頭	シア・ハウリア なりきりイヤー		4	0	3	0	1	1	天職：占術師	0	0	0	0	0	0	0	0	10	1		
+1	装飾: 顔	岸田メル		2	0	0	-2	0	1		0	0	0	0	0	0	0	0	0	1		
+1	装飾: 耳	オリハル		2	0	0	-3	0	1		0	0	0	0	0	0	0	0	0	1		
+1	装飾: 指	オリハル		2	0	0	-3	0	1		0	0	0	0	0	0	0	0	0	1		
+1	装飾: 胸	ゴールデン スカル ネックレス		3	0	0	0	1	1	黄金の呪い	3	0	0	0	0	0	0	0	10	1		
+1	装飾: 背中	背負い大鉈		4	0	0	0	1	1	剛剣の使い手	0	0	0	0	0	0	0	0	15	1		
+1	装飾: 腰	剣聖の魔法陣		6	0	0	0	1	1	サモンズ ソード	0	0	0	0	0	0	10	0	0	1		
+0	防具: 肩	リュー・リオン なりきりマント		0	2	2	0	1	1	疾風奮迅	0	0	0	0	0	0	0	10	0	1		
 
 [pct]
 enabled	slot	name	target	percent	note
