@@ -4,7 +4,64 @@
 <meta charset="utf-8">
 <title>Master of Epic 物理ダメージ計算webツール</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<!--
+Master of Epic 物理ダメージ計算webツール
+
+このファイルは、GitHub Pages等にそのまま置ける単一HTMLアプリです。
+ビルド工程や外部ライブラリは不要で、HTML / CSS / JavaScriptを1ファイル内にまとめています。
+
+大まかな構成:
+1. <style>
+   - 画面レイアウト、テーブル幅、折りたたみUI、バフ枠ツールチップなど。
+2. <body>
+   - 入力フォーム、サマリー、分析、装備欄、複合Buff、旧項目、保存欄。
+3. <script>
+/* =========================================================
+   JavaScript: 計算・描画・保存処理
+
+   state:
+     Buff行、装備行、複合Buff行など、ユーザーが編集する表データを保持します。
+
+   inputs:
+     collectInputs()でフォームから取得する基本設定です。
+     stateとinputsをcomputeMetrics()へ渡すと、予想攻撃力や予想ダメージが返ります。
+
+   設計方針:
+     - 計算はできるだけcomputeMetrics()へ集約。
+     - DOM更新はrender/update系関数へ寄せる。
+     - JSON/TSV/プリセットはcollectConfig()/applyConfig()を通す。
+   ========================================================= */
+
+   - 状態管理、計算式、描画、プリセット保存、TSV/JSON入出力。
+
+計算の中心:
+- computeMetrics()
+  入力値とstateから、魔力・攻撃力・ダメージ・バフ枠など全メトリクスを計算します。
+- calc()
+  画面入力を集め、computeMetrics()を呼び、表示を更新します。
+- expandCompositeState()
+  複合Buffを内部的に既存の割合Buff/実数加算/変換/与ダメ/特攻へ分解します。
+  ただしバフ枠カウントでは複合Buff 1行を1枠として扱います。
+
+MoE固有の主な仮定:
+- 武器使用条件は「全条件が8割以上必要」。
+  8割未満の条件が1つでもある場合は武器性能0。
+  全条件が8割以上なら sum(min(現在値, 必要値)) / sum(必要値) を武器性能発揮率にします。
+- ステータス変換は攻撃力加算上限を突破する上限外加算として扱います。
+- 攻撃力%Buffは、現在の初期設定では加算後攻撃力に順次乗算し、その増加分を上限対象に入れます。
+
+保守時の注意:
+- 表示文言としては「ATK」ではなく「攻撃力」を使っています。
+- 新しいBuffを追加するだけなら、まず複合Buff欄で表現できないか確認してください。
+- 複合Buffに新しい効果列を足す場合は、normalizeCompositeRows / compositeEffectText /
+  expandCompositeState / renderCompositeTable / TSV入出力の5箇所をセットで更新してください。
+- localStorageの保存キーを変えると、旧保存データは自動復元されなくなります。
+-->
+
 <style>
+  /* =========================================================
+     CSS: 全体の見た目とレイアウト
+     ========================================================= */
   :root {
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     color: #222;
@@ -100,6 +157,7 @@
   .num { text-align: right; font-variant-numeric: tabular-nums; }
   .split { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 12px; }
   .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  /* 分析パネル: A/B比較、実測差分、価値表示などをカード状に並べる */
   .analysisGrid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
@@ -230,6 +288,7 @@
   .breakdownDetailsBody {
     padding: 0 12px 12px;
   }
+  /* 武器・防具・装飾補正の固定行テーブル */
   .equipmentLayout {
     display: grid;
     gap: 12px;
@@ -727,10 +786,406 @@
     text-align: center;
   }
 
+
+  /* 名前付きプリセット保存/読込UI */
+  .presetControls {
+    margin: 10px 0;
+    display: grid;
+    grid-template-columns: minmax(220px, 1fr) auto minmax(220px, 1fr) auto auto;
+    gap: 8px;
+    align-items: end;
+  }
+  .presetControls label {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+  @media (max-width: 900px) {
+    .presetControls {
+      grid-template-columns: 1fr;
+    }
+  }
+  #compositeBuffTable.compactTable {
+    min-width: 1200px;
+  }
+  #compositeBuffTable th:nth-child(1),
+  #compositeBuffTable td:nth-child(1),
+  #compositeBuffTable th:nth-child(2),
+  #compositeBuffTable td:nth-child(2) {
+    width: 38px;
+    text-align: center;
+  }
+  #compositeBuffTable th:nth-child(3),
+  #compositeBuffTable td:nth-child(3) {
+    width: 160px;
+  }
+  #compositeBuffTable th:nth-child(n+4):nth-child(-n+13),
+  #compositeBuffTable td:nth-child(n+4):nth-child(-n+13) {
+    width: 64px;
+  }
+  #compositeBuffTable th:nth-child(14),
+  #compositeBuffTable td:nth-child(14) {
+    width: 220px;
+  }
+  #compositeBuffTable th:nth-child(15),
+  #compositeBuffTable td:nth-child(15) {
+    width: 82px;
+  }
+  #compositeBuffTable input[type="number"] {
+    width: 58px;
+  }
+  #valueTable table td,
+  #valueTable table th {
+    white-space: nowrap;
+  }
+
+
+  details.collapsedBuffSection {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    background: #fff;
+    margin: 12px 0;
+    padding: 0;
+  }
+  details.collapsedBuffSection > summary {
+    cursor: pointer;
+    list-style: none;
+    padding: 12px;
+    font-size: 18px;
+    font-weight: 700;
+    user-select: none;
+  }
+  details.collapsedBuffSection > summary::-webkit-details-marker {
+    display: none;
+  }
+  details.collapsedBuffSection > summary::before {
+    content: "＋";
+    display: inline-block;
+    width: 1.5em;
+    font-weight: 700;
+  }
+  details.collapsedBuffSection[open] > summary::before {
+    content: "−";
+  }
+  .collapsedBuffBody {
+    padding: 0 12px 12px;
+  }
+
+
+  details.legacyItemsSection {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    background: #fff;
+    margin: 12px 0;
+    padding: 0;
+  }
+  details.legacyItemsSection > summary {
+    cursor: pointer;
+    list-style: none;
+    padding: 12px;
+    font-size: 18px;
+    font-weight: 700;
+    user-select: none;
+  }
+  details.legacyItemsSection > summary::-webkit-details-marker {
+    display: none;
+  }
+  details.legacyItemsSection > summary::before {
+    content: "＋";
+    display: inline-block;
+    width: 1.5em;
+    font-weight: 700;
+  }
+  details.legacyItemsSection[open] > summary::before {
+    content: "−";
+  }
+  .legacyItemsBody {
+    padding: 0 12px 12px;
+    display: grid;
+    gap: 12px;
+  }
+  .legacyItemPanel {
+    border: 1px solid #e2e2e2;
+    border-radius: 10px;
+    padding: 12px;
+    background: #fcfcfc;
+    overflow-x: auto;
+  }
+  .legacyItemPanel h3 {
+    margin: 0 0 8px;
+    font-size: 17px;
+    border-bottom: 1px solid #e7e7e7;
+    padding-bottom: 4px;
+  }
+
+
+  /* =========================================================
+     見栄え改善: 公開用の視線誘導
+     - 上部説明カード
+     - サマリーカード
+     - 複合Buffの強調
+     - ON/OFF行の視認性
+     - 空状態メッセージ
+     ========================================================= */
+  body {
+    background:
+      radial-gradient(circle at top left, rgba(74, 115, 179, .08), transparent 34rem),
+      linear-gradient(180deg, #fbfaf6 0%, #f6f2e8 100%);
+  }
+  .heroCard {
+    border: 1px solid #d8cba9;
+    border-radius: 16px;
+    padding: 16px 18px;
+    margin: 10px 0 16px;
+    background:
+      linear-gradient(135deg, rgba(255,255,255,.96), rgba(244,238,222,.96)),
+      radial-gradient(circle at right top, rgba(74,115,179,.12), transparent 22rem);
+    box-shadow: 0 8px 22px rgba(54, 43, 24, .08);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 14px;
+    align-items: center;
+  }
+  .heroCard p {
+    margin: 6px 0 0;
+    color: #403a2f;
+  }
+  .heroBadge {
+    display: inline-flex;
+    align-items: center;
+    width: fit-content;
+    border-radius: 999px;
+    padding: 3px 10px;
+    background: #23395d;
+    color: #fff;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: .02em;
+  }
+  .heroMini {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: flex-end;
+  }
+  .heroMini span {
+    border: 1px solid #d7c69f;
+    background: rgba(255,255,255,.7);
+    color: #594b2b;
+    border-radius: 999px;
+    padding: 4px 9px;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+  @media (max-width: 760px) {
+    .heroCard {
+      grid-template-columns: 1fr;
+    }
+    .heroMini {
+      justify-content: flex-start;
+    }
+  }
+
+  .summaryGrid {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  }
+  .metricCard {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(35,57,93,.14);
+    box-shadow: 0 8px 18px rgba(29, 41, 57, .06);
+  }
+  .metricCard::after {
+    content: "";
+    position: absolute;
+    inset: auto -35px -45px auto;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.32);
+    pointer-events: none;
+  }
+  .metricLabel {
+    font-weight: 800;
+    color: #3b465a;
+    border-bottom: 1px solid rgba(0,0,0,.08);
+    padding-bottom: 4px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .metricDamage .metricLabel::before { content: "⚔"; }
+  .metricAttack .metricLabel::before { content: "💪"; }
+  .metricMagic .metricLabel::before { content: "✦"; }
+  .metricEquipment .metricLabel::before { content: "🛡"; }
+  .metricSlot .metricLabel::before { content: "枠"; font-size: 12px; background:#23395d; color:#fff; border-radius:6px; padding:1px 5px; }
+  .metricDamage {
+    background: linear-gradient(135deg, #fff7e8, #ffffff 58%);
+  }
+  .metricAttack {
+    background: linear-gradient(135deg, #eef5ff, #ffffff 58%);
+  }
+  .metricMagic {
+    background: linear-gradient(135deg, #f7efff, #ffffff 58%);
+  }
+  .metricEquipment {
+    background: linear-gradient(135deg, #eefaf5, #ffffff 58%);
+  }
+  .metricSlot {
+    background: linear-gradient(135deg, #fffbea, #ffffff 58%);
+  }
+  .metricCard .bigNum,
+  .metricCard .result {
+    color: #1f2f4d;
+    text-shadow: 0 1px 0 rgba(255,255,255,.9);
+  }
+
+  .compositeMainSection {
+    border: 2px solid #91a9d6;
+    background:
+      linear-gradient(180deg, rgba(246,249,255,.98), rgba(255,255,255,.98));
+    box-shadow: 0 10px 26px rgba(35,57,93,.10);
+  }
+  .compositeMainSection h2 {
+    border-bottom-color: #b9c8e6;
+  }
+  .compositeLead {
+    border-left: 4px solid #4267a8;
+    padding: 8px 10px;
+    background: rgba(66,103,168,.08);
+    border-radius: 8px;
+  }
+  .compositeMainSection button {
+    font-weight: 700;
+  }
+  #compositeBuffTable thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: #eaf0fb;
+  }
+  #compositeBuffTable tbody tr:has(> td:first-child input[type="checkbox"]:checked) {
+    background: #f3f8ff;
+    box-shadow: inset 4px 0 0 #4267a8;
+  }
+
+  .compactTable tbody tr:has(> td:first-child input[type="checkbox"]:checked) {
+    background-color: #f8fbff;
+  }
+  .compactTable tbody tr:has(> td:first-child input[type="checkbox"]:not(:checked)) {
+    opacity: .58;
+    background-color: #fafafa;
+  }
+  .compactTable tbody tr:has(> td:first-child input[type="checkbox"]:checked) input,
+  .compactTable tbody tr:has(> td:first-child input[type="checkbox"]:checked) select {
+    font-weight: 600;
+  }
+  .compactTable tbody tr:hover {
+    opacity: 1;
+    background-color: #fffdf3;
+  }
+  .compactTable tbody tr.emptyRow,
+  .compactTable tbody tr.emptyRow:hover {
+    opacity: 1;
+    background: #fff;
+    box-shadow: none;
+  }
+  .emptyState {
+    padding: 14px 12px;
+    text-align: center;
+    color: #6b7280;
+    background: repeating-linear-gradient(135deg, #fafafa, #fafafa 8px, #f5f5f5 8px, #f5f5f5 16px);
+    border-radius: 8px;
+    font-size: 13px;
+  }
+
+
+  /* 予想攻撃力/予想魔力の長い内訳は、バフ枠と同じくホバー時だけ表示する。 */
+  .metricHoverCard {
+    overflow: visible;
+    z-index: 2;
+  }
+  .metricHoverArea {
+    position: relative;
+    cursor: help;
+  }
+  .hoverHint {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 4px;
+    padding: 2px 8px;
+    border: 1px solid rgba(35,57,93,.18);
+    border-radius: 999px;
+    background: rgba(255,255,255,.72);
+    color: #536078;
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .hoverHint::before {
+    content: "ⓘ";
+    font-weight: 800;
+  }
+  .metricTooltip {
+    display: none;
+    position: absolute;
+    z-index: 20;
+    left: 12px;
+    right: 12px;
+    top: calc(100% - 8px);
+    max-height: 340px;
+    overflow: auto;
+    padding: 10px 12px;
+    border: 1px solid #cfcfcf;
+    border-radius: 10px;
+    background: #fff;
+    box-shadow: 0 10px 24px rgba(0,0,0,.16);
+    color: #222;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  .metricHoverArea:hover + .metricTooltip,
+  .metricTooltip:hover {
+    display: block;
+  }
+  .metricTooltip div {
+    margin: 2px 0;
+  }
+  .legacyItemsSection > summary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .summaryNote {
+    font-size: 12px;
+    font-weight: 600;
+    color: #5f6b7a;
+    background: rgba(66,103,168,.08);
+    border: 1px solid rgba(66,103,168,.18);
+    border-radius: 999px;
+    padding: 2px 9px;
+  }
+
 </style>
 </head>
 <body>
 <h1>Master of Epic 物理ダメージ計算webツール</h1>
+<section class="heroCard">
+  <div>
+    <div class="heroBadge">MoE / Physical Damage Calculator</div>
+    <p>
+      Master of Epic向けの物理ダメージ計算webツールです。
+      武器使用条件、装備補正、複合Buff、バフ24枠、実測差分、プリセット保存に対応しています。
+    </p>
+  </div>
+  <div class="heroMini">
+    <span>単一HTML</span>
+    <span>GitHub Pages対応</span>
+    <span>ローカル保存</span>
+  </div>
+</section>
+
 <!--
 <p class="small">
   アタック/ヘビー クラッシュ/手入力テク、バフ24枠、予想攻撃力、割合ステータスBuff、ステータス変換、その他バフ枠に対応。
@@ -745,26 +1200,26 @@
       <h3>キャラ</h3>
       <label>種族
         <select id="raceSelect">
-          <option value="newtar">ニューター</option>
-          <option value="cognite" selected>コグニート</option>
+          <option value="newtar" selected>ニューター</option>
+          <option value="cognite">コグニート</option>
           <option value="elmony">エルモニー</option>
           <option value="pandemos">パンデモス</option>
         </select>
       </label>
-      <input id="raceCoeff" type="hidden" value="0.19">
-      <label>筋力<input id="str" type="number" step="0.1" value="100"></label>
-      <label>精神力<input id="spirit" type="number" step="0.1" value="100"></label>
-      <input id="magic" type="hidden" value="110">
+      <input id="raceCoeff" type="hidden" value="0.20">
+      <label>筋力<input id="str" type="number" step="0.1" value="0"></label>
+      <label>精神力<input id="spirit" type="number" step="0.1" value="0"></label>
+      <input id="magic" type="hidden" value="0">
       <label>移動速度<input id="speed" type="number" step="0.1" value="100"></label>
       <label>酩酊度<input id="drunk" type="number" step="0.1" value="0"></label>
     </div>
 
     <div class="inputPanel weaponInputPanel">
       <h3>武器</h3>
-      <input id="weaponSkill" type="hidden" value="98">
-      <input id="requiredSkill" type="hidden" value="100">
-      <label>武器ダメージ<input id="weaponDamage" type="number" step="0.1" value="100"></label>
-      <label>武器重量<input id="weaponWeight" type="number" step="0.1" value="100"></label>
+      <input id="weaponSkill" type="hidden" value="0">
+      <input id="requiredSkill" type="hidden" value="0">
+      <label>武器ダメージ<input id="weaponDamage" type="number" step="0.1" value="0"></label>
+      <label>武器重量<input id="weaponWeight" type="number" step="0.1" value="0"></label>
 
       <div class="weaponReqHeader">
         <b>使用条件</b>
@@ -793,8 +1248,8 @@
       <h3>攻撃</h3>
       <label class="stackControl">攻撃種別
         <select id="attackType">
-          <option value="attack">アタック（1.00倍・クリ可）</option>
-          <option value="heavy" selected>ヘビー クラッシュ（重量依存）</option>
+          <option value="attack" selected>アタック（1.00倍・クリ可）</option>
+          <option value="heavy">ヘビー クラッシュ（重量依存）</option>
           <option value="manual">その他テクニック（倍率手入力）</option>
         </select>
       </label>
@@ -809,7 +1264,7 @@
         <label>ヘビクラ倍率上書き<input id="heavyManualMultiplier" type="number" step="0.0001" value="0"></label>
         <p class="small selectHelp">0なら上の式で自動計算。実測合わせしたい場合だけ逆算値を入れてください。</p>
       </div>
-      <label>攻撃/テク倍率<input id="techMultiplier" type="number" step="0.0001" value="3.8048"></label>
+      <label>攻撃/テク倍率<input id="techMultiplier" type="number" step="0.0001" value="1.0000"></label>
       <label>対象AC<input id="targetAC" type="number" step="0.1" value="0"></label>
 
       <div id="critFields">
@@ -843,31 +1298,37 @@
 <section class="card wide">
   <h2>サマリー</h2>
   <div class="summaryGrid">
-    <div class="summaryPanel">
-      <h3>予想ダメージ</h3>
+    <div class="summaryPanel metricCard metricDamage">
+      <div class="metricLabel">予想ダメージ</div>
       <div class="result" id="finalDamage">-</div>
     </div>
 
-    <div class="summaryPanel">
-      <h3>予想攻撃力</h3>
-      <div class="bigNum" id="predictedAtk">-</div>
-      <div id="attackCapStatus" style="margin:8px 0;"></div>
-      <div id="predictedAtkBreakdown" class="small"></div>
+    <div class="summaryPanel metricCard metricAttack metricHoverCard">
+      <div class="metricLabel">予想攻撃力</div>
+      <div class="metricHoverArea" title="カーソルを合わせると攻撃力の計算内訳を表示します">
+        <div class="bigNum" id="predictedAtk">-</div>
+        <div id="attackCapStatus" style="margin:8px 0;"></div>
+        <div class="hoverHint">内訳を見る</div>
+      </div>
+      <div id="predictedAtkBreakdown" class="metricTooltip">-</div>
     </div>
 
-    <div class="summaryPanel">
-      <h3>予想魔力</h3>
-      <div class="bigNum" id="predictedMagic">-</div>
-      <div id="predictedMagicBreakdown" class="small"></div>
+    <div class="summaryPanel metricCard metricMagic metricHoverCard">
+      <div class="metricLabel">予想魔力</div>
+      <div class="metricHoverArea" title="カーソルを合わせると魔力の計算内訳を表示します">
+        <div class="bigNum" id="predictedMagic">-</div>
+        <div class="hoverHint">内訳を見る</div>
+      </div>
+      <div id="predictedMagicBreakdown" class="metricTooltip">-</div>
     </div>
 
-    <div class="summaryPanel">
-      <h3>装備補正合計</h3>
+    <div class="summaryPanel metricCard metricEquipment">
+      <div class="metricLabel">装備補正合計</div>
       <div id="equipmentSummary" class="small">-</div>
     </div>
 
-    <div class="summaryPanel slotPanel">
-      <h3>バフ枠</h3>
+    <div class="summaryPanel slotPanel metricCard metricSlot">
+      <div class="metricLabel">バフ枠</div>
       <div class="slotHoverArea" title="カーソルを合わせると、枠に入っているバフ一覧を表示します">
         <div class="bigNum" id="slotCount">- / 24</div>
         <div class="slotbar"><div class="slotfill" id="slotFill"></div></div>
@@ -946,24 +1407,19 @@
       <button onclick="renderContributionTable()">寄与率を更新</button>
       <div id="contributionTable" class="scrollX"></div>
     </div>
+
+    <div class="analysisPanel analysisPanelWide">
+      <h3>価値表示</h3>
+      <p class="small">
+        現在の構成で、攻撃力+1 / 魔力+1 / 与ダメ+1% などを足した時の増加量を表示します。
+        装備比較やBuff枠の判断用です。
+      </p>
+      <button onclick="renderValueTable()">価値表示を更新</button>
+      <div id="valueTable" class="scrollX"></div>
+    </div>
   </div>
   </div>
 </details>
-
-<section class="card wide">
-  <h2>割合ステータスBuff：攻撃力% / 魔力% / 速度%</h2>
-  <p class="small">
-    上から順番に適用。%欄は「10%なら 10」。
-    攻撃力%は、基礎攻撃力側から増分を出して攻撃力加算上限に含めます。
-  </p>
-  <table id="pctBuffTable" class="compactTable">
-    <thead><tr><th>使用</th><th>枠</th><th>名称</th><th>対象</th><th>%</th><th>メモ / ソース</th><th>操作</th></tr></thead>
-    <tbody></tbody>
-  </table>
-  <button onclick="addPctRow('attack')">攻撃力%行を追加</button>
-  <button onclick="addPctRow('magic')">魔力%行を追加</button>
-  <button onclick="addPctRow('speed')">速度%行を追加</button>
-</section>
 
 <section class="card wide">
   <h2>武器・防具・装飾補正</h2>
@@ -1067,8 +1523,63 @@
   </div>
 </section>
 
-<section class="card wide">
-  <h2>実数ステータス加算：魔力 / 攻撃力 / 速度</h2>
+<section class="card wide compositeMainSection">
+  <h2>複合Buff：1枠で複数効果</h2>
+  <p class="small compositeLead">
+    <b>1行 = 1Buff枠</b> として扱うメイン入力欄です。
+    1つのBuffに複数効果がある場合、ここにまとめて入力してください。
+    計算時は内部で割合Buff・実数加算・変換・与ダメ・特攻へ展開します。
+  </p>
+  <div class="scrollX">
+    <table id="compositeBuffTable" class="compactTable compositeTable">
+      <thead>
+        <tr>
+          <th>使用</th><th>枠</th><th>名称</th>
+          <th>攻撃力%</th><th>魔力%</th><th>速度%</th>
+          <th>攻撃力+</th><th>魔力+</th><th>速度+</th>
+          <th>魔力→攻撃力%</th><th>速度→攻撃力%</th>
+          <th>与ダメ+</th><th>特攻倍率</th>
+          <th>メモ</th><th>操作</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+  <button onclick="addCompositeRow('blank')">複合Buff行を追加</button>
+</section>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<details class="card wide legacyItemsSection">
+  <summary>旧項目 <span class="summaryNote">単体Buffも複合Buffセクションでまとめて入力してOKです</span></summary>
+  <div class="legacyItemsBody">
+    <section class="legacyItemPanel">
+  <h3>割合ステータスBuff：攻撃力% / 魔力% / 速度%</h3>
+  <p class="small">
+    上から順番に適用。%欄は「10%なら 10」。
+    攻撃力%は、基礎攻撃力側から増分を出して攻撃力加算上限に含めます。
+  </p>
+  <table id="pctBuffTable" class="compactTable">
+    <thead><tr><th>使用</th><th>枠</th><th>名称</th><th>対象</th><th>%</th><th>メモ / ソース</th><th>操作</th></tr></thead>
+    <tbody></tbody>
+  </table>
+  <button onclick="addPctRow('attack')">攻撃力%行を追加</button>
+  <button onclick="addPctRow('magic')">魔力%行を追加</button>
+  <button onclick="addPctRow('speed')">速度%行を追加</button>
+</section><section class="legacyItemPanel">
+  <h3>実数ステータス加算：魔力 / 攻撃力 / 速度</h3>
   <p class="small">
     魔力+X、攻撃力+X、速度+Xを1つの表で管理します。
     対象をプルダウンで選択してください。
@@ -1081,10 +1592,8 @@
   <button onclick="addFlatRow('magic')">魔力行を追加</button>
   <button onclick="addFlatRow('attack')">攻撃力行を追加</button>
   <button onclick="addFlatRow('speed')">速度行を追加</button>
-</section>
-
-<section class="card wide">
-  <h2>ステータス変換：魔力/速度/酩酊度など → 攻撃力</h2>
+</section><section class="legacyItemPanel">
+  <h3>ステータス変換：魔力/速度/酩酊度など → 攻撃力</h3>
   <p class="small">
     例: 魔力30%を攻撃力に足すなら「参照=魔力、変換率=30」。
     魔力/速度/酩酊度などからの攻撃力変換は、攻撃力加算上限500を突破する上限外加算として扱います。
@@ -1099,10 +1608,8 @@
   <p class="small selectHelp">
     参照補正は「参照ステータスに足してから%変換」します。例: 魔力125、率10%、参照補正10 → (125+10)×10%=13.5。
   </p>
-</section>
-
-<section class="card wide">
-  <h2>種族特攻・特攻倍率：乗算倍率</h2>
+</section><section class="legacyItemPanel">
+  <h3>種族特攻・特攻倍率：乗算倍率</h3>
   <p class="small">
     1.5倍なら 1.5、2倍なら 2.0。複数行ONの場合は乗算します。
     特攻はダメージ本体だけでなく、ACがある場合の防御計算側にも入ります。
@@ -1112,10 +1619,8 @@
     <tbody></tbody>
   </table>
   <button onclick="addRow('special')">特攻行を追加</button>
-</section>
-
-<section class="card wide">
-  <h2>物理与ダメージ増加：加算倍率</h2>
+</section><section class="legacyItemPanel">
+  <h3>物理与ダメージ増加：加算倍率</h3>
   <p class="small">+100%なら 1.00、+20%なら 0.20。複数は 1 + 合計% で加算倍率化。</p>
   <table id="dmgBuffTable" class="compactTable">
     <thead><tr><th>使用</th><th>枠</th><th>名称</th><th>増加量</th><th>分類</th><th>メモ / ソース</th><th>削除</th></tr></thead>
@@ -1123,6 +1628,8 @@
   </table>
   <button onclick="addRow('dmg')">与ダメ行を追加</button>
 </section>
+  </div>
+</details>
 
 <section class="card wide">
   <h2>外枠補正：ネヤ補正・被ダメ増加・パンチングマシン補正など</h2>
@@ -1151,14 +1658,24 @@
   <button onclick="exportTsvConfig()">TSV出力</button>
   <button onclick="importTsvConfig()">TSV読み込み</button>
   <button onclick="resetConfig()">このツールの保存設定をリセット</button>
+
+  <div class="presetControls">
+    <label>プリセット名<input id="presetName" type="text" placeholder="例: パンチング用 / 通常狩り用"></label>
+    <button onclick="saveNamedPreset()">現在をプリセット保存</button>
+    <label>保存済みプリセット<select id="presetSelect"></select></label>
+    <button onclick="loadNamedPreset()">読み込み</button>
+    <button onclick="deleteNamedPreset()">削除</button>
+  </div>
+
   <p class="small">
-    TSVはスプレッドシートに貼り付けて編集しやすい形式です。
+    プリセットはこのブラウザ内に保存されます。TSVはスプレッドシートに貼り付けて編集しやすい形式です。
     JSONより読みやすいですが、完全なバックアップ用途ならJSONも残しておくのがおすすめです。
   </p>
   <textarea id="configBox" placeholder="JSONまたはTSVをここに貼り付けて読み込み可能"></textarea>
 </section>
 
 <script>
+/* 種族係数。攻撃力係数と魔力係数は別管理。 */
 const RACE_COEFFS = {
   newtar: 0.20,
   cognite: 0.19,
@@ -1180,6 +1697,7 @@ const RACE_LABELS = {
   pandemos: "パンデモス"
 };
 
+/* 装備欄は固定スロット制。空欄/0なら実質未装備として扱う。 */
 const EQUIPMENT_SLOTS = [
   {slot: "武器: 右手"},
   {slot: "武器: 左手"},
@@ -1200,6 +1718,10 @@ const EQUIPMENT_SLOTS = [
   {slot: "装飾: 腰"}
 ];
 
+/**
+ * 装備固定行の初期データを作る。
+ * 防具/装飾/武器の行数を常に一定にして、保存データの欠けや旧形式を吸収しやすくする。
+ */
 function defaultEquipmentRows() {
   return EQUIPMENT_SLOTS.map(x => ({
     enabled: true,
@@ -1236,66 +1758,48 @@ function normalizeEquipmentRows(rows) {
   return result;
 }
 
+/* 新規起動時の初期状態。検証用データは入れず、基本的に空で始める。 */
 const DEFAULT_STATE = () => ({
   weaponReq: [
-    {name: "武器スキル", current: 98, required: 100}
+    {name: "武器スキル", current: 0, required: 0}
   ],
-  pct: [
-    {enabled: false, slot: true, name: "攻撃力% Buff", target: "attack", percent: 0, note: ""},
-    {enabled: false, slot: true, name: "魔力% Buff", target: "magic", percent: 0, note: ""},
-    {enabled: false, slot: true, name: "速度% Buff", target: "speed", percent: 0, note: ""}
-  ],
+  composite: [],
+  pct: [],
   equipment: defaultEquipmentRows(),
-  flat: [
-    {enabled: false, slot: true, name: "魔力実数加算", target: "magic", value: 0, note: "魔力+X。魔力%Buffと魔力→攻撃力変換の前に加算"},
-    {enabled: false, slot: true, name: "速度実数加算", target: "speed", value: 0, note: "速度+X。速度%Buffと速度→攻撃力変換の前に加算"},
-    {enabled: false, slot: true, name: "バーサーク 戦技100 例", target: "attack", value: 26, note: "攻撃力+X。攻撃力加算上限対象"},
-    {enabled: false, slot: true, name: "任意攻撃力装備合計", target: "attack", value: 0, note: "手入力。攻撃力加算上限対象"}
-  ],
-  conv: [
-    {enabled: true, slot: true, name: "ちいずのバトハン 魔力→攻撃力", source: "magic", rate: 30, baseOffset: 0, offset: 0, capped: false, note: "魔力の30%を攻撃力に加算。上限外加算"},
-    {enabled: false, slot: true, name: "速度→攻撃力 変換", source: "speed", rate: 0, baseOffset: 0, offset: 0, capped: false, note: ""},
-    {enabled: false, slot: true, name: "酩酊度→攻撃力 変換", source: "drunk", rate: 0, baseOffset: 0, offset: 0, capped: false, note: ""}
-  ],
-  dmg: [
-    {enabled: false, slot: true, name: "マスター ストレングス", value: 1.00, category: "物理与ダメ", note: "通常の与ダメ+100%として計算する場合"},
-    {enabled: false, slot: true, name: "アルゴノゥト", value: 1.00, category: "物理与ダメ?", note: "攻撃力参照テクには乗る想定。要検証"},
-    {enabled: false, slot: true, name: "絶断", value: 0.20, category: "物理与ダメ", note: "物理与ダメ+20%"},
-    {enabled: false, slot: true, name: "フォース ステップ", value: 0.10, category: "物理与ダメ", note: "物理与ダメ+10%"},
-    {enabled: false, slot: true, name: "与ダメ装備合計", value: 0.60, category: "装備", note: "候補装備の合計を手入力"}
-  ],
-  special: [
-    {enabled: false, slot: false, name: "種族特攻 / 特攻", value: 1.50, note: "例: 1.5倍。装備固有でBuff枠を使わない場合は枠OFF"},
-    {enabled: false, slot: false, name: "ちいずのバトハン特攻", value: 2.00, note: "対象に特攻が入る場合のみON"}
-  ],
-  post: [
-    {enabled: true, slot: false, name: "ネヤ補正", value: 2.00, note: "パンチングマシン・ネヤ補正用。自己Buff枠ではない想定"},
-    {enabled: false, slot: false, name: "パンチングマシン別補正", value: 2.00, note: "ネヤ補正と別に存在する場合のみON"},
-    {enabled: false, slot: false, name: "アーリー スラスト", value: 1.50, note: "対象側デバフ想定。自己Buff枠ではない想定"},
-    {enabled: false, slot: false, name: "アイスメイク・銀世界", value: 1.25, note: "対象側デバフ想定。自己Buff枠ではない想定"}
-  ],
-  other: [
-    {enabled: false, name: "その他バフ", note: "ダメージ計算には使わず、バフ枠だけカウント"}
-  ]
+  flat: [],
+  conv: [],
+  dmg: [],
+  special: [],
+  post: [],
+  other: []
 });
 
+/* 現在編集中の構成。localStorageやTSV/JSONから復元される。 */
 let state = DEFAULT_STATE();
 let snapshots = {A: null, B: null};
+let namedPresets = {};
+const NAMED_PRESET_KEY = "moeDamageNamedPresetsV1";
 
+/* JSON化できる単純なstate/config用のディープコピー。 */
 function clone(obj) { return JSON.parse(JSON.stringify(obj)); }
+/* document.getElementByIdの短縮。画面要素取得を読みやすくするための小物。 */
 function byId(id) { return document.getElementById(id); }
+/* number inputから数値を読む。空欄や不正値は0扱い。 */
 function num(id) {
   const v = parseFloat(byId(id).value);
   return Number.isFinite(v) ? v : 0;
 }
+/* 表示用数値フォーマット。計算値そのものは丸めない。 */
 function fmt(n, digits=3) {
   if (!Number.isFinite(n)) return "-";
   return Number(n).toLocaleString(undefined, {maximumFractionDigits: digits, minimumFractionDigits: 0});
 }
+/* 比率をパーセント文字列に変換する表示用関数。 */
 function pct(n) {
   if (!Number.isFinite(n)) return "-";
   return (n * 100).toFixed(2) + "%";
 }
+/* ユーザー入力文字列をHTMLに差し込む前の最低限のエスケープ。 */
 function escapeHtml(s) {
   return String(s ?? "").replace(/[&<>"']/g, ch => ({
     "&": "&amp;",
@@ -1305,6 +1809,10 @@ function escapeHtml(s) {
     "'": "&#39;"
   }[ch]));
 }
+/**
+ * DOM要素生成ヘルパー。
+ * テーブル描画関数内で input/select/button を大量に作るため、記述量を減らしている。
+ */
 function makeCell(tag, attrs={}, text="") {
   const el = document.createElement(tag);
   Object.entries(attrs).forEach(([k,v]) => {
@@ -1319,6 +1827,105 @@ function makeCell(tag, attrs={}, text="") {
   if (text !== "") el.textContent = text;
   return el;
 }
+/**
+ * 複合Buff行を安全な形へ正規化する。
+ * 空欄や古い保存データで列が欠けていても、計算側がNaNにならないようにする。
+ */
+
+/**
+ * 空の表に「まだ行がありません」メッセージを出す。
+ * colSpanは対象テーブルの列数に合わせる。
+ */
+function renderEmptyRow(tbody, colSpan, message) {
+  const tr = document.createElement("tr");
+  tr.className = "emptyRow";
+  const td = document.createElement("td");
+  td.colSpan = colSpan;
+  td.innerHTML = `<div class="emptyState">${escapeHtml(message)}</div>`;
+  tr.appendChild(td);
+  tbody.appendChild(tr);
+}
+
+function normalizeCompositeRows(rows) {
+  return (Array.isArray(rows) ? rows : []).map(r => ({
+    enabled: !!r.enabled,
+    slot: r.slot !== false,
+    name: r.name || "複合Buff",
+    attackPct: +r.attackPct || 0,
+    magicPct: +r.magicPct || 0,
+    speedPct: +r.speedPct || 0,
+    flatAttack: +r.flatAttack || 0,
+    flatMagic: +r.flatMagic || 0,
+    flatSpeed: +r.flatSpeed || 0,
+    convMagicRate: +r.convMagicRate || 0,
+    convSpeedRate: +r.convSpeedRate || 0,
+    dmg: +r.dmg || 0,
+    special: +r.special || 1,
+    note: r.note || ""
+  }));
+}
+/* 複合Buff行が実際に何かしらの効果を持っているか判定する。 */
+function compositeHasEffect(r) {
+  return !!(
+    +r.attackPct || +r.magicPct || +r.speedPct ||
+    +r.flatAttack || +r.flatMagic || +r.flatSpeed ||
+    +r.convMagicRate || +r.convSpeedRate || +r.dmg ||
+    (+r.special && +r.special !== 1)
+  );
+}
+/* バフ枠ツールチップ用に、複合Buffの効果を人間向けの文字列へまとめる。 */
+function compositeEffectText(r) {
+  const parts = [];
+  if (+r.attackPct) parts.push(`攻撃力+${r.attackPct}%`);
+  if (+r.magicPct) parts.push(`魔力+${r.magicPct}%`);
+  if (+r.speedPct) parts.push(`速度+${r.speedPct}%`);
+  if (+r.flatAttack) parts.push(`攻撃力+${r.flatAttack}`);
+  if (+r.flatMagic) parts.push(`魔力+${r.flatMagic}`);
+  if (+r.flatSpeed) parts.push(`速度+${r.flatSpeed}`);
+  if (+r.convMagicRate) parts.push(`魔力→攻撃力 ${r.convMagicRate}%`);
+  if (+r.convSpeedRate) parts.push(`速度→攻撃力 ${r.convSpeedRate}%`);
+  if (+r.dmg) parts.push(`与ダメ+${r.dmg}`);
+  if (+r.special && +r.special !== 1) parts.push(`特攻×${r.special}`);
+  return parts.join(" / ") || "効果なし";
+}
+/**
+ * 複合Buffを計算用の既存カテゴリへ展開する。
+ *
+ * 例:
+ *   擬竜 1行
+ *     attackPct: 15
+ *     dmg: 0.10
+ *   ↓ 内部計算上は
+ *     攻撃力%Buff行 + 与ダメ行
+ *
+ * ただし展開行はslot:falseにして、バフ枠は元の複合Buff 1行だけで数える。
+ */
+function expandCompositeState(st) {
+  const out = clone(st || {});
+  out.pct = Array.isArray(out.pct) ? out.pct : [];
+  out.flat = normalizeFlatRows(out);
+  out.conv = Array.isArray(out.conv) ? out.conv : [];
+  out.dmg = Array.isArray(out.dmg) ? out.dmg : [];
+  out.special = Array.isArray(out.special) ? out.special : [];
+  out.post = Array.isArray(out.post) ? out.post : [];
+
+  normalizeCompositeRows((st || {}).composite).filter(r => r.enabled).forEach(r => {
+    const baseName = r.name || "複合Buff";
+    const note = r.note || "";
+    if (+r.attackPct) out.pct.push({enabled:true, slot:false, name:`${baseName} 攻撃力%`, target:"attack", percent:+r.attackPct, note});
+    if (+r.magicPct) out.pct.push({enabled:true, slot:false, name:`${baseName} 魔力%`, target:"magic", percent:+r.magicPct, note});
+    if (+r.speedPct) out.pct.push({enabled:true, slot:false, name:`${baseName} 速度%`, target:"speed", percent:+r.speedPct, note});
+    if (+r.flatAttack) out.flat.push({enabled:true, slot:false, name:`${baseName} 攻撃力+`, target:"attack", value:+r.flatAttack, note});
+    if (+r.flatMagic) out.flat.push({enabled:true, slot:false, name:`${baseName} 魔力+`, target:"magic", value:+r.flatMagic, note});
+    if (+r.flatSpeed) out.flat.push({enabled:true, slot:false, name:`${baseName} 速度+`, target:"speed", value:+r.flatSpeed, note});
+    if (+r.convMagicRate) out.conv.push({enabled:true, slot:false, name:`${baseName} 魔力→攻撃力`, source:"magic", rate:+r.convMagicRate, baseOffset:0, offset:0, capped:false, note});
+    if (+r.convSpeedRate) out.conv.push({enabled:true, slot:false, name:`${baseName} 速度→攻撃力`, source:"speed", rate:+r.convSpeedRate, baseOffset:0, offset:0, capped:false, note});
+    if (+r.dmg) out.dmg.push({enabled:true, slot:false, name:`${baseName} 与ダメ`, value:+r.dmg, category:"複合Buff", note});
+    if (+r.special && +r.special !== 1) out.special.push({enabled:true, slot:false, name:`${baseName} 特攻`, value:+r.special, note});
+  });
+  return out;
+}
+/* テーブルの使用/枠チェックボックスを作る。変更時は即再計算。 */
 function checkboxCell(row, prop) {
   const cb = makeCell("input", {type:"checkbox", checked: !!row[prop]});
   cb.onchange = () => { row[prop] = cb.checked; calc(); };
@@ -1326,6 +1933,7 @@ function checkboxCell(row, prop) {
   td.appendChild(cb);
   return td;
 }
+/* 行の上下移動/削除ボタン。Buffの適用順序を調整できるようにする。 */
 function actionCell(arr, idx, renderFn) {
   const td = makeCell("td", {class:"actionCell"});
   const wrap = makeCell("div", {class:"actionsWrap"});
@@ -1340,6 +1948,10 @@ function actionCell(arr, idx, renderFn) {
   return td;
 }
 
+/**
+ * 基本設定フォームから現在値を集める。
+ * テーブル類はstate側に持つため、ここではキャラ/武器/攻撃/上限などを読む。
+ */
 function collectInputs() {
   const ids = [
     "raceSelect","raceCoeff","str","spirit","magic","weaponSkill","requiredSkill","weaponReqMode","weaponDamage","weaponWeight",
@@ -1354,6 +1966,7 @@ function collectInputs() {
   });
   return inputs;
 }
+/* 保存データやプリセットから基本設定フォームへ値を戻す。 */
 function setInputs(inputs) {
   const src = {...(inputs || {})};
   if ((src.spirit === undefined || src.spirit === null || src.spirit === "") && src.magic !== undefined) {
@@ -1371,31 +1984,42 @@ function setInputs(inputs) {
   syncRaceCoeff();
   syncBaseMagic();
 }
+/* JSON/TSV/プリセット保存用に、inputsとstateを1つのオブジェクトへまとめる。 */
 function collectConfig() {
   return {inputs: collectInputs(), state: clone(state)};
 }
 
+/* 割合Buffの対象selectを生成する。 */
 function targetOptions(value) {
   const labels = {attack:"攻撃力%", magic:"魔力%", speed:"速度%"};
   return Object.entries(labels).map(([k,v]) => `<option value="${k}" ${k===value?'selected':''}>${v}</option>`).join("");
 }
+/* ステータス変換の参照元selectを生成する。 */
 function sourceOptions(value) {
   const labels = {magic:"魔力", speed:"速度", drunk:"酩酊度", str:"筋力"};
   return Object.entries(labels).map(([k,v]) => `<option value="${k}" ${k===value?'selected':''}>${v}</option>`).join("");
 }
+/* 内部キーを画面表示名へ変換する。 */
 function labelOf(key) {
   return ({attack:"攻撃力", magic:"魔力", speed:"速度", drunk:"酩酊度", str:"筋力"})[key] || key;
 }
+/* 新規割合Buff行のデフォルト名を作る。 */
 function targetName(target) {
   return ({attack:"攻撃力% Buff", magic:"魔力% Buff", speed:"速度% Buff"})[target] || "割合Buff";
 }
+/* 実数加算の対象selectを生成する。 */
 function flatTargetOptions(value) {
   const labels = {magic:"魔力", attack:"攻撃力", speed:"速度"};
   return Object.entries(labels).map(([k,v]) => `<option value="${k}" ${k===value?'selected':''}>${v}</option>`).join("");
 }
+/* 新規実数加算行のデフォルト名を作る。 */
 function flatTargetDefaultName(target) {
   return ({magic:"魔力実数加算", attack:"攻撃力実数加算", speed:"速度実数加算"})[target] || "実数加算";
 }
+/**
+ * 実数加算行を現在形式へ正規化する。
+ * 旧版のmagicFlat/atk形式から来たデータもapplyConfig側でflatへ統合する。
+ */
 function normalizeFlatRows(st) {
   if (Array.isArray(st.flat) && st.flat.length) return st.flat;
   const rows = [];
@@ -1404,6 +2028,7 @@ function normalizeFlatRows(st) {
   return rows;
 }
 
+/* 旧形式のweaponSkill/requiredSkillだけがある場合に、使用条件行へ変換する。 */
 function defaultWeaponReqFromInputs(inputs={}) {
   return [{
     name: "武器スキル",
@@ -1411,6 +2036,7 @@ function defaultWeaponReqFromInputs(inputs={}) {
     required: parseFloat(inputs.requiredSkill) || 0
   }];
 }
+/* 武器使用条件行を数値化し、空欄によるNaNを防ぐ。 */
 function normalizeWeaponReqRows(rows, inputs={}) {
   if (Array.isArray(rows) && rows.length) {
     return rows.map(r => ({
@@ -1421,6 +2047,10 @@ function normalizeWeaponReqRows(rows, inputs={}) {
   }
   return defaultWeaponReqFromInputs(inputs);
 }
+/**
+ * 使用条件1行分の補正を計算する。
+ * 8割未満は0、必要値以上は1、その間は current/required。
+ */
 function skillRequirementRatio(current, required) {
   current = parseFloat(current) || 0;
   required = Math.max(0.000001, parseFloat(required) || 0);
@@ -1432,6 +2062,14 @@ function skillRequirementRatio(current, required) {
   return {ratio: current / required, denom: required};
 }
 
+/**
+ * 複数使用条件を含む武器性能発揮率を計算する。
+ *
+ * 仕様:
+ *   - どれか1条件でも8割未満ならmod=0。
+ *   - 全条件が8割以上なら、sum(min(current, required)) / sum(required)。
+ *   - required超過分で他条件の不足を補填しないため、currentはrequiredで上限をかける。
+ */
 function calcWeaponSkillMod(st, inputs={}) {
   const rows = normalizeWeaponReqRows(st.weaponReq, inputs);
   const active = rows.filter(r => (parseFloat(r.required) || 0) > 0);
@@ -1461,6 +2099,7 @@ function calcWeaponSkillMod(st, inputs={}) {
   return {mod, rows, evaluated, limiting, mode, gateFailed, totalCurrent, totalRequired, overallRatio};
 }
 
+/* 武器使用条件テーブルをstate.weaponReqから描画する。 */
 function renderWeaponReqTable() {
   const tbody = document.querySelector("#weaponReqTable tbody");
   if (!tbody) return;
@@ -1507,15 +2146,85 @@ function renderWeaponReqTable() {
     byId("requiredSkill").value = state.weaponReq[0].required ?? 0;
   }
 }
+/* 使用条件を1行追加する。 */
 function addWeaponReqRow() {
   state.weaponReq.push({name:"追加条件", current:0, required:0});
   renderWeaponReqTable();
   calc();
 }
 
+/* 複合Buff表の数値入力セルを作る。 */
+function compositeNumberCell(row, prop, step="0.1") {
+  const input = makeCell("input", {type:"number", step, value: row[prop] ?? 0});
+  input.oninput = () => { row[prop] = parseFloat(input.value) || 0; calc(); };
+  const td = makeCell("td");
+  td.appendChild(input);
+  return td;
+}
+/* 複合Buff表をstate.compositeから描画する。 */
+function renderCompositeTable() {
+  const tbody = document.querySelector("#compositeBuffTable tbody");
+  if (!tbody) return;
+  tbody.innerHTML = "";
+  state.composite = normalizeCompositeRows(state.composite);
+
+  if (!state.composite.length) {
+    renderEmptyRow(tbody, 15, "まだ複合Buffがありません。「複合Buff行を追加」から追加してください。");
+    return;
+  }
+
+  state.composite.forEach((row, idx) => {
+    const tr = document.createElement("tr");
+    tr.appendChild(checkboxCell(row, "enabled"));
+    tr.appendChild(checkboxCell(row, "slot"));
+
+    const name = makeCell("input", {value: row.name || ""});
+    name.oninput = () => { row.name = name.value; };
+    tr.appendChild(makeCell("td")).appendChild(name);
+
+    tr.appendChild(compositeNumberCell(row, "attackPct", "1"));
+    tr.appendChild(compositeNumberCell(row, "magicPct", "1"));
+    tr.appendChild(compositeNumberCell(row, "speedPct", "1"));
+    tr.appendChild(compositeNumberCell(row, "flatAttack", "0.1"));
+    tr.appendChild(compositeNumberCell(row, "flatMagic", "0.1"));
+    tr.appendChild(compositeNumberCell(row, "flatSpeed", "0.1"));
+    tr.appendChild(compositeNumberCell(row, "convMagicRate", "1"));
+    tr.appendChild(compositeNumberCell(row, "convSpeedRate", "1"));
+    tr.appendChild(compositeNumberCell(row, "dmg", "0.01"));
+    tr.appendChild(compositeNumberCell(row, "special", "0.01"));
+
+    const note = makeCell("input", {value: row.note || ""});
+    note.oninput = () => { row.note = note.value; };
+    tr.appendChild(makeCell("td")).appendChild(note);
+
+    tr.appendChild(actionCell(state.composite, idx, renderCompositeTable));
+    tbody.appendChild(tr);
+  });
+}
+/* 空の複合Buff行を追加する。主要Buffが固まるまではプリセットボタンを置かない方針。 */
+function addCompositeRow(kind="blank") {
+  const row = {
+    enabled:true, slot:true, name:"複合Buff",
+    attackPct:0, magicPct:0, speedPct:0,
+    flatAttack:0, flatMagic:0, flatSpeed:0,
+    convMagicRate:0, convSpeedRate:0,
+    dmg:0, special:1,
+    note:""
+  };
+  state.composite.push(row);
+  renderCompositeTable();
+  calc();
+}
+
+/* 旧項目: 割合ステータスBuff表を描画する。 */
 function renderPctTable() {
   const tbody = document.querySelector("#pctBuffTable tbody");
   tbody.innerHTML = "";
+  if (!state.pct.length) {
+    renderEmptyRow(tbody, 7, "割合Buff行はありません。必要な場合だけ行を追加してください。");
+    return;
+  }
+
   state.pct.forEach((row, idx) => {
     const tr = document.createElement("tr");
     tr.appendChild(checkboxCell(row, "enabled"));
@@ -1542,6 +2251,7 @@ function renderPctTable() {
     tbody.appendChild(tr);
   });
 }
+/* 旧項目: 割合ステータスBuff行を追加する。 */
 function addPctRow(target="attack") {
   state.pct.push({enabled:true, slot:true, name: targetName(target), target, percent:0, note:""});
   renderPctTable();
@@ -1550,6 +2260,7 @@ function addPctRow(target="attack") {
 
 
 
+/* 装備1行分の入力欄を作る。装備は常に使用扱いで、0なら効果なし。 */
 function makeEquipmentInputRow(row, includeSlot=true) {
   const tr = document.createElement("tr");
 
@@ -1586,6 +2297,7 @@ function makeEquipmentInputRow(row, includeSlot=true) {
   return tr;
 }
 
+/* 武器/防具/装飾の固定行テーブルを描画する。 */
 function renderEquipmentTable() {
   const rightBody = document.querySelector("#equipmentWeaponRightBody");
   const leftBody = document.querySelector("#equipmentWeaponLeftBody");
@@ -1617,9 +2329,15 @@ function renderEquipmentTable() {
   });
 }
 
+/* 旧項目: 実数ステータス加算表を描画する。 */
 function renderFlatTable() {
   const tbody = document.querySelector("#flatStatTable tbody");
   tbody.innerHTML = "";
+  if (!state.flat.length) {
+    renderEmptyRow(tbody, 7, "実数加算行はありません。必要な場合だけ行を追加してください。");
+    return;
+  }
+
   state.flat.forEach((row, idx) => {
     const tr = document.createElement("tr");
     tr.appendChild(checkboxCell(row, "enabled"));
@@ -1646,15 +2364,22 @@ function renderFlatTable() {
     tbody.appendChild(tr);
   });
 }
+/* 旧項目: 実数ステータス加算行を追加する。 */
 function addFlatRow(target="magic") {
   state.flat.push({enabled:true, slot:true, name:flatTargetDefaultName(target), target, value:0, note:""});
   renderFlatTable();
   calc();
 }
 
+/* 旧項目: ステータス変換表を描画する。 */
 function renderConversionTable() {
   const tbody = document.querySelector("#conversionTable tbody");
   tbody.innerHTML = "";
+  if (!state.conv.length) {
+    renderEmptyRow(tbody, 8, "ステータス変換行はありません。必要な場合だけ行を追加してください。");
+    return;
+  }
+
   state.conv.forEach((row, idx) => {
     const tr = document.createElement("tr");
     tr.appendChild(checkboxCell(row, "enabled"));
@@ -1685,16 +2410,24 @@ function renderConversionTable() {
     tbody.appendChild(tr);
   });
 }
+/* 旧項目: ステータス変換行を追加する。 */
 function addConversionRow(source="magic") {
   state.conv.push({enabled:true, slot:true, name:`${labelOf(source)}→攻撃力 変換`, source, rate:0, baseOffset:0, offset:0, capped:false, note:""});
   renderConversionTable();
   calc();
 }
 
+/* 与ダメ/特攻/外枠など、単一数値を持つ表を描画する共通関数。 */
 function renderNumericTable(type) {
   const tableId = type === "magicFlat" ? "magicBuffTable" : type === "atk" ? "atkBuffTable" : type === "dmg" ? "dmgBuffTable" : type === "special" ? "specialBuffTable" : "postBuffTable";
   const tbody = document.querySelector(`#${tableId} tbody`);
   tbody.innerHTML = "";
+  if (!state[type].length) {
+    const label = type === "dmg" ? "与ダメ行" : type === "special" ? "特攻行" : "外枠補正行";
+    renderEmptyRow(tbody, type === "dmg" ? 7 : 6, `${label}はありません。必要な場合だけ行を追加してください。`);
+    return;
+  }
+
   state[type].forEach((row, idx) => {
     const tr = document.createElement("tr");
     tr.appendChild(checkboxCell(row, "enabled"));
@@ -1725,6 +2458,7 @@ function renderNumericTable(type) {
     tbody.appendChild(tr);
   });
 }
+/* 与ダメ/特攻/外枠などの行を追加する共通関数。 */
 function addRow(type) {
   if (type === "magicFlat") state.magicFlat.push({enabled:true, slot:true, name:"新規魔力", value:0, note:""});
   if (type === "atk") state.atk.push({enabled:true, slot:true, name:"新規攻撃力", value:0, note:""});
@@ -1735,9 +2469,15 @@ function addRow(type) {
   calc();
 }
 
+/* その他バフ表を描画する。ここはダメージ計算せずバフ枠だけに使う。 */
 function renderOtherTable() {
   const tbody = document.querySelector("#otherBuffTable tbody");
   tbody.innerHTML = "";
+  if (!state.other.length) {
+    renderEmptyRow(tbody, 4, "その他バフ行はありません。バフ枠だけ数えたいものがある場合に追加してください。");
+    return;
+  }
+
   state.other.forEach((row, idx) => {
     const tr = document.createElement("tr");
 
@@ -1759,14 +2499,17 @@ function renderOtherTable() {
     tbody.appendChild(tr);
   });
 }
+/* その他バフ行を追加する。 */
 function addOtherRow() {
   state.other.push({enabled:true, name:"その他バフ", note:""});
   renderOtherTable();
   calc();
 }
 
+/* state全体を画面へ再描画する。applyConfig後やリセット後に呼ぶ。 */
 function renderAll() {
   renderWeaponReqTable();
+  renderCompositeTable();
   renderPctTable();
   renderEquipmentTable();
   renderFlatTable();
@@ -1777,11 +2520,13 @@ function renderAll() {
   renderOtherTable();
 }
 
+/* 種族プルダウンから攻撃力係数hidden値を同期する。 */
 function syncRaceCoeff() {
   const coeff = RACE_COEFFS[byId("raceSelect").value] ?? 0.20;
   byId("raceCoeff").value = coeff.toFixed(3);
   return coeff;
 }
+/* 精神力と種族から基礎魔力を自動計算し、hiddenのmagicへ同期する。 */
 function syncBaseMagic() {
   const race = byId("raceSelect").value;
   const spirit = parseFloat(byId("spirit").value) || 0;
@@ -1790,6 +2535,7 @@ function syncBaseMagic() {
   byId("magic").value = baseMagic.toFixed(3);
   return baseMagic;
 }
+/* 攻撃種別に応じてヘビクラ欄やクリティカル欄の表示を切り替える。 */
 function syncAttackTypeUI() {
   const type = byId("attackType").value;
   const isAttack = type === "attack";
@@ -1812,6 +2558,7 @@ function syncAttackTypeUI() {
   }
 }
 
+/* 変換計算用に、statsから指定ソースの値を取り出す。 */
 function statValue(stats, source) {
   if (source === "str") return stats.str;
   if (source === "magic") return stats.magic;
@@ -1819,6 +2566,7 @@ function statValue(stats, source) {
   if (source === "drunk") return stats.drunk;
   return 0;
 }
+/* 魔力%/速度%など、攻撃力以外の割合ステータスBuffを順番に適用する。 */
 function applyPercentStats(st, baseStats) {
   const stats = {...baseStats};
   const steps = [];
@@ -1831,6 +2579,7 @@ function applyPercentStats(st, baseStats) {
   });
   return {stats, steps};
 }
+/* 魔力/速度/酩酊度などから攻撃力へ変換する。現在は全て上限外加算扱い。 */
 function calcConversions(st, stats) {
   let capped = 0;
   let uncapped = 0;
@@ -1848,6 +2597,7 @@ function calcConversions(st, stats) {
   });
   return {capped, uncapped, steps};
 }
+/* 攻撃力%Buffを順番に適用し、増加分を攻撃力加算上限対象として返す。 */
 function calcPctAttack(st, baseAtk) {
   let atk = baseAtk;
   let added = 0;
@@ -1861,6 +2611,7 @@ function calcPctAttack(st, baseAtk) {
   });
   return {added, after:atk, steps};
 }
+/* 攻撃種別からテク倍率を決める。ヘビクラは重量式または手動上書きを使う。 */
 function attackMultiplierFromInputs(inputs) {
   if (inputs.attackType === "attack") return 1.0;
   if (inputs.attackType === "heavy") {
@@ -1873,11 +2624,27 @@ function attackMultiplierFromInputs(inputs) {
   }
   return parseFloat(inputs.techMultiplier) || 0;
 }
+/**
+ * このツールの計算本体。
+ *
+ * 入力:
+ *   st     : Buff/装備/使用条件などのstate
+ *   inputs : 基本設定フォームの値
+ *
+ * 出力:
+ *   攻撃力、魔力、ダメージ、内訳、バフ枠、分析用の中間値。
+ *
+ * 注意:
+ *   画面更新はここでは行わない。純粋な計算関数として扱うと保守しやすい。
+ */
 function computeMetrics(st, inputs) {
+  // 複合Buffは計算前に既存カテゴリへ展開しておく。
+  st = expandCompositeState(st);
   const raceCoeff = RACE_COEFFS[inputs.raceSelect] ?? parseFloat(inputs.raceCoeff) ?? 0.20;
   const spirit = parseFloat(inputs.spirit) || 0;
   const magicCoeff = RACE_MAGIC_COEFFS[inputs.raceSelect] ?? 1.00;
   const baseMagicFromSpirit = spirit * magicCoeff;
+  // 装備補正はBuff枠とは別枠。攻撃力/魔力/速度/ディレイを単純合算する。
   const equipmentRows = normalizeEquipmentRows(st.equipment).filter(r => r.enabled !== false);
   const equipmentRaw = {
     attack: equipmentRows.reduce((s, r) => s + (+r.attack || 0), 0),
@@ -1886,6 +2653,7 @@ function computeMetrics(st, inputs) {
     delay: equipmentRows.reduce((s, r) => s + (+r.delay || 0), 0)
   };
 
+  // 実数加算。魔力/速度は%Buffや変換より前、攻撃力は上限対象側に入る。
   const flatRows = normalizeFlatRows(st).filter(r => r.enabled);
   const flatStatRaw = {
     magic: flatRows.filter(r => (r.target || "magic") === "magic").reduce((s, r) => s + (+r.value || 0), 0) + equipmentRaw.magic,
@@ -1898,9 +2666,11 @@ function computeMetrics(st, inputs) {
     speed: (parseFloat(inputs.speed) || 0) + flatStatRaw.speed,
     drunk: parseFloat(inputs.drunk) || 0
   };
+  // 攻撃力以外の割合ステータスBuffを適用して、変換計算で使う実効ステータスを作る。
   const pctStats = applyPercentStats(st, baseStats);
   const stats = pctStats.stats;
 
+  // 武器性能発揮率を反映した武器攻撃力を計算する。
   const weaponDamage = parseFloat(inputs.weaponDamage) || 0;
   const skillModInfo = calcWeaponSkillMod(st, inputs);
   const skillMod = skillModInfo.mod;
@@ -1987,12 +2757,15 @@ function computeMetrics(st, inputs) {
     rawDamage, finalDamage, slots, specialMultiplier
   };
 }
+/* バフ枠一覧に表示する行名を作る。 */
 function slotRowName(row, fallback) {
   const name = (row && row.name ? String(row.name).trim() : "") || fallback;
   return name;
 }
+/* バフ24枠の使用数を数える。複合Buffは効果が複数あっても1行=1枠。 */
 function buffSlotCountForState(st) {
   const details = [
+    ["複合", normalizeCompositeRows(st.composite).filter(r => r.enabled && r.slot && compositeHasEffect(r)).map(r => `${slotRowName(r, "複合Buff")}（${compositeEffectText(r)}）`)],
     ["割合", (st.pct || []).filter(r => r.enabled && r.slot).map(r => slotRowName(r, "割合Buff"))],
     ["実数", normalizeFlatRows(st).filter(r => r.enabled && r.slot).map(r => slotRowName(r, "実数加算"))],
     ["変換", (st.conv || []).filter(r => r.enabled && r.slot).map(r => slotRowName(r, "ステータス変換"))],
@@ -2005,6 +2778,7 @@ function buffSlotCountForState(st) {
   return {total: groups.reduce((s, [,n]) => s+n, 0), groups, details};
 }
 
+/* サマリーのバフ枠バー、内訳、ツールチップ、警告を更新する。 */
 function updateSlotUI(metrics) {
   const {total, groups, details} = metrics.slots;
   byId("slotCount").textContent = `${total} / 24`;
@@ -2035,6 +2809,7 @@ function updateSlotUI(metrics) {
       : `<div class="ok">残り ${24 - total} 枠あります。</div>`;
 }
 
+/* 装備補正合計の表示を更新する。 */
 function updateEquipmentSummary(m) {
   const lines = [
     `攻撃力: ${m.equipmentRaw.attack.toFixed(3)}`,
@@ -2045,6 +2820,7 @@ function updateEquipmentSummary(m) {
   byId("equipmentSummary").innerHTML = lines.map(x => `<div>${x}</div>`).join("");
 }
 
+/* 使用条件補正の説明表示を更新する。 */
 function updateWeaponSkillModHint(m) {
   const el = byId("weaponSkillModHint");
   if (!el) return;
@@ -2061,6 +2837,7 @@ function updateWeaponSkillModHint(m) {
     : `武器性能発揮率: <b>100.0%</b>`;
 }
 
+/* 予想攻撃力/予想魔力/攻撃力上限状態の表示を更新する。 */
 function updatePredictedAtkUI(m) {
   byId("predictedAtk").textContent = `${m.atk.toFixed(3)}`;
   byId("predictedMagic").textContent = `${m.stats.magic.toFixed(3)}`;
@@ -2111,6 +2888,10 @@ function updatePredictedAtkUI(m) {
   byId("predictedAtkBreakdown").innerHTML = lines.map(x => `<div>${x}</div>`).join("");
 }
 
+/**
+ * 画面全体の再計算エントリーポイント。
+ * 入力イベントのたびに呼ばれ、computeMetrics()→各UI更新→localStorage保存まで行う。
+ */
 function calc() {
   syncRaceCoeff();
   syncBaseMagic();
@@ -2174,12 +2955,14 @@ function calc() {
   }
   byId("breakdown").innerHTML = lines.join("");
 
-  localStorage.setItem("moeDamageSimLatestReqFormulaOnly", JSON.stringify(collectConfig()));
+  localStorage.setItem("moeDamageSimHoverBreakdown", JSON.stringify(collectConfig()));
   renderCompareResult();
   renderActualDiff();
   renderRaceTable();
+  renderValueTable();
 }
 
+/* 分析用: 現在構成をA/B比較スナップショットへ保存する。 */
 function saveSnapshot(which) {
   snapshots[which] = collectConfig();
   const memoEl = byId("snapshotMemo" + which);
@@ -2188,6 +2971,7 @@ function saveSnapshot(which) {
   renderSnapshotLabels();
   renderCompareResult();
 }
+/* 分析用: A/Bスナップショットを現在構成へ読み込む。 */
 function loadSnapshot(which) {
   if (!snapshots[which]) {
     alert(which + " が未保存です。");
@@ -2195,6 +2979,7 @@ function loadSnapshot(which) {
   }
   applyConfig(snapshots[which]);
 }
+/* A/Bスナップショットの保存状態ラベルを更新する。 */
 function renderSnapshotLabels() {
   ["A","B"].forEach(which => {
     const el = byId("snapshot" + which);
@@ -2207,6 +2992,7 @@ function renderSnapshotLabels() {
     el.innerHTML = `${which}: ダメージ ${fmt(Math.floor(m.finalDamage),0)} / 攻撃力 ${fmt(m.atk)} / 枠 ${m.slots.total}/24${memo}`;
   });
 }
+/* A/B比較メモを保存済みスナップショットへ反映する。 */
 function updateSnapshotMemo(which) {
   const el = byId("snapshotMemo" + which);
   if (!el) return;
@@ -2218,6 +3004,7 @@ function updateSnapshotMemo(which) {
   }
 }
 
+/* A/B比較表を描画する。 */
 function renderCompareResult() {
   if (!snapshots.A || !snapshots.B) {
     byId("compareResult").innerHTML = "";
@@ -2245,11 +3032,96 @@ function renderCompareResult() {
       </tbody>
     </table>`;
 }
+/* 価値表示用: 一時的な効果を追加したstateでメトリクスを計算する。 */
+function metricWithTempEffect(modifier) {
+  const cfg = collectConfig();
+  const st2 = clone(cfg.state);
+  modifier(st2);
+  return computeMetrics(st2, cfg.inputs);
+}
+/* 攻撃力+1、魔力+1、与ダメ+1%などの価値表示テーブルを描画する。 */
+function renderValueTable() {
+  const inputs = collectInputs();
+  const base = computeMetrics(state, inputs);
+  const tests = [
+    {
+      name: "攻撃力 +1",
+      note: "攻撃力実数加算。上限対象",
+      apply: st => {
+        st.flat = normalizeFlatRows(st);
+        st.flat.push({enabled:true, slot:false, name:"価値計算 攻撃力+1", target:"attack", value:1, note:""});
+      }
+    },
+    {
+      name: "魔力 +1",
+      note: "魔力加算。魔力%・魔力変換前",
+      apply: st => {
+        st.flat = normalizeFlatRows(st);
+        st.flat.push({enabled:true, slot:false, name:"価値計算 魔力+1", target:"magic", value:1, note:""});
+      }
+    },
+    {
+      name: "速度 +1",
+      note: "速度加算。速度変換前",
+      apply: st => {
+        st.flat = normalizeFlatRows(st);
+        st.flat.push({enabled:true, slot:false, name:"価値計算 速度+1", target:"speed", value:1, note:""});
+      }
+    },
+    {
+      name: "攻撃力% +1",
+      note: "攻撃力%Buffを+1%",
+      apply: st => {
+        st.pct = Array.isArray(st.pct) ? st.pct : [];
+        st.pct.push({enabled:true, slot:false, name:"価値計算 攻撃力%+1", target:"attack", percent:1, note:""});
+      }
+    },
+    {
+      name: "魔力% +1",
+      note: "魔力%Buffを+1%",
+      apply: st => {
+        st.pct = Array.isArray(st.pct) ? st.pct : [];
+        st.pct.push({enabled:true, slot:false, name:"価値計算 魔力%+1", target:"magic", percent:1, note:""});
+      }
+    },
+    {
+      name: "与ダメ +1%",
+      note: "与ダメ増加 +0.01",
+      apply: st => {
+        st.dmg = Array.isArray(st.dmg) ? st.dmg : [];
+        st.dmg.push({enabled:true, slot:false, name:"価値計算 与ダメ+1%", value:0.01, category:"価値計算", note:""});
+      }
+    }
+  ];
+
+  const body = tests.map(t => {
+    const m = metricWithTempEffect(t.apply);
+    const dmgDelta = m.finalDamage - base.finalDamage;
+    const atkDelta = m.atk - base.atk;
+    const magicDelta = m.stats.magic - base.stats.magic;
+    return `<tr>
+      <td>${escapeHtml(t.name)}</td>
+      <td class="num">${fmt(dmgDelta)}</td>
+      <td class="num">${fmt(atkDelta)}</td>
+      <td class="num">${fmt(magicDelta)}</td>
+      <td class="num">${base.finalDamage ? pct(dmgDelta / base.finalDamage) : "-"}</td>
+      <td>${escapeHtml(t.note)}</td>
+    </tr>`;
+  }).join("");
+
+  byId("valueTable").innerHTML = `<table>
+    <thead><tr><th>追加するもの</th><th>ダメージ増加</th><th>攻撃力増加</th><th>魔力増加</th><th>ダメージ増加率</th><th>メモ</th></tr></thead>
+    <tbody>${body}</tbody>
+  </table>`;
+}
+
+/* 使用中の行を1つずつOFFにして、ダメージ寄与率と1枠効率を出す。 */
 function renderContributionTable() {
   const baseInputs = collectInputs();
   const base = computeMetrics(state, baseInputs);
   const rows = [];
   const groups = [
+    ["複合", "composite"],
     ["割合", "pct"],
     ["防具装飾", "equipment"],
     ["実数", "flat"],
@@ -2263,6 +3135,7 @@ function renderContributionTable() {
     (state[key] || []).forEach((row, idx) => {
       if (row.enabled === false) return;
       if (key === "equipment" && !(+row.attack || +row.magic || +row.speed || +row.delay)) return;
+      if (key === "composite" && !compositeHasEffect(row)) return;
       const st2 = clone(state);
       st2[key][idx].enabled = false;
       const m2 = computeMetrics(st2, baseInputs);
@@ -2298,23 +3171,27 @@ function renderContributionTable() {
       </table>`
     : `<p class="small">使用中の項目がありません。</p>`;
 }
+/* 実測逆算から得たヘビクラ倍率を入力欄へ反映する。 */
 function setHeavyManualMultiplier(value) {
   const el = byId("heavyManualMultiplier");
   if (!el) return;
   el.value = Number(value).toFixed(4);
   calc();
 }
+/* 指定攻撃力でのAC防御係数を計算する。実測逆算で使用。 */
 function defenseFactorForAtk(atk, inputs, m) {
   const ac = parseFloat(inputs.targetAC) || 0;
   if (ac <= 0) return 1;
   const atkDefInput = atk * m.dmgMultiplier * m.specialMultiplier;
   return 1 - Math.pow(ac / (atkDefInput + ac), 1.244);
 }
+/* 実測ダメージに一致するために必要なヘビクラ倍率を逆算する。 */
 function requiredHeavyMultiplier(actualDamage, atkForReverse, inputs, m) {
   const def = defenseFactorForAtk(atkForReverse, inputs, m);
   const denom = atkForReverse * 0.8 * m.dmgMultiplier * m.specialMultiplier * def * m.critAvg * m.postMultiplier;
   return denom ? actualDamage / denom : NaN;
 }
+/* 実測ダメージ/実測攻撃力と現在予測の差分・逆算値を表示する。 */
 function renderActualDiff() {
   const actualDamage = parseFloat(byId("actualDamage").value) || 0;
   const actualAtk = parseFloat(byId("actualAtk").value) || 0;
@@ -2354,9 +3231,11 @@ function renderActualDiff() {
   }
   byId("actualDiffResult").innerHTML = `<table><thead><tr><th>項目</th><th>実測/逆算</th><th>予測/現在</th><th>差分</th><th>補足</th></tr></thead><tbody>${lines.join("")}</tbody></table>`;
 }
+/* AC別表用に、カンマ区切り数値リストを配列へ変換する。 */
 function parseNumberList(text) {
   return text.split(",").map(s => parseFloat(s.trim())).filter(n => Number.isFinite(n));
 }
+/* 指定ACごとの予想ダメージ表を描画する。 */
 function renderACTable() {
   const values = parseNumberList(byId("acList").value);
   const cfg = collectConfig();
@@ -2368,6 +3247,7 @@ function renderACTable() {
   byId("acTable").innerHTML = `<table><thead><tr><th>AC</th><th>ダメージ</th><th>防御係数</th></tr></thead><tbody>${body}</tbody></table>`;
 }
 
+/* 種族だけを変えた比較表を描画する。 */
 function renderRaceTable() {
   const cfg = collectConfig();
   const currentRace = cfg.inputs.raceSelect;
@@ -2417,29 +3297,35 @@ function renderRaceTable() {
   </table>`;
 }
 
+/* TSVセル用エスケープ。改行やタブを\n/\tへ逃がす。 */
 function tsvEscape(value) {
   return String(value ?? "")
     .replace(/\\/g, "\\\\")
     .replace(/\t/g, "\\t")
     .replace(/\r?\n/g, "\\n");
 }
+/* TSVセルの\n/\tエスケープを元に戻す。 */
 function tsvUnescape(value) {
   return String(value ?? "")
     .replace(/\\n/g, "\n")
     .replace(/\\t/g, "\t")
     .replace(/\\\\/g, "\\");
 }
+/* booleanをTSV用の0/1へ変換する。 */
 function boolToCell(v) {
   return v ? "1" : "0";
 }
+/* TSVセルの0/1/true/false等をbooleanへ変換する。 */
 function cellToBool(v) {
   const s = String(v ?? "").trim().toLowerCase();
   return s === "1" || s === "true" || s === "on" || s === "yes" || s === "使用";
 }
+/* TSVセルを数値へ変換する。不正値は0。 */
 function cellToNum(v) {
   const n = parseFloat(v);
   return Number.isFinite(n) ? n : 0;
 }
+/* 旧TSV互換用。既知の変換名から参照補正を推定する。 */
 function inferConversionBaseOffset(row) {
   const name = String(row?.name || "");
   const source = row?.source || "magic";
@@ -2448,6 +3334,7 @@ function inferConversionBaseOffset(row) {
   if (name.includes("剣聖") && source === "magic" && Math.abs(rate - 10) < 0.0001) return 10;
   return 0;
 }
+/* TSVの1セクションを生成する。ヘッダー名は読み込み側と揃える必要がある。 */
 function makeTsvSection(name, headers, rows) {
   const lines = [`[${name}]`, headers.join("\t")];
   rows.forEach(row => {
@@ -2456,6 +3343,7 @@ function makeTsvSection(name, headers, rows) {
   lines.push("");
   return lines.join("\n");
 }
+/* 現在構成を人間が表計算で編集しやすいTSVへ変換する。 */
 function serializeConfigAsTsv(cfg) {
   const inputs = cfg.inputs || {};
   const st = cfg.state || {};
@@ -2474,6 +3362,25 @@ function serializeConfigAsTsv(cfg) {
       name: r.name || "",
       current: r.current ?? 0,
       required: r.required ?? 0
+    }))
+  ));
+
+  out.push(makeTsvSection("composite", ["enabled", "slot", "name", "attackPct", "magicPct", "speedPct", "flatAttack", "flatMagic", "flatSpeed", "convMagicRate", "convSpeedRate", "dmg", "special", "note"],
+    normalizeCompositeRows(st.composite || []).map(r => ({
+      enabled: boolToCell(r.enabled),
+      slot: boolToCell(r.slot),
+      name: r.name || "",
+      attackPct: r.attackPct ?? 0,
+      magicPct: r.magicPct ?? 0,
+      speedPct: r.speedPct ?? 0,
+      flatAttack: r.flatAttack ?? 0,
+      flatMagic: r.flatMagic ?? 0,
+      flatSpeed: r.flatSpeed ?? 0,
+      convMagicRate: r.convMagicRate ?? 0,
+      convSpeedRate: r.convSpeedRate ?? 0,
+      dmg: r.dmg ?? 0,
+      special: r.special ?? 1,
+      note: r.note || ""
     }))
   ));
 
@@ -2564,6 +3471,7 @@ function serializeConfigAsTsv(cfg) {
 
   return out.join("\n");
 }
+/* TSV文字列をセクションごとの行オブジェクトへ分解する。 */
 function parseTsvSections(text) {
   const sections = {};
   let current = null;
@@ -2597,6 +3505,7 @@ function parseTsvSections(text) {
 
   return sections;
 }
+/* TSVからcollectConfig()互換のconfigオブジェクトを復元する。 */
 function parseConfigFromTsv(text) {
   const sections = parseTsvSections(text);
   const inputs = {};
@@ -2613,6 +3522,22 @@ function parseConfigFromTsv(text) {
       name: r.name || "使用条件",
       current: cellToNum(r.current),
       required: cellToNum(r.required)
+    })),
+    composite: (sections.composite?.rows || []).map(r => ({
+      enabled: cellToBool(r.enabled),
+      slot: cellToBool(r.slot),
+      name: r.name || "複合Buff",
+      attackPct: cellToNum(r.attackPct),
+      magicPct: cellToNum(r.magicPct),
+      speedPct: cellToNum(r.speedPct),
+      flatAttack: cellToNum(r.flatAttack),
+      flatMagic: cellToNum(r.flatMagic),
+      flatSpeed: cellToNum(r.flatSpeed),
+      convMagicRate: cellToNum(r.convMagicRate),
+      convSpeedRate: cellToNum(r.convSpeedRate),
+      dmg: cellToNum(r.dmg),
+      special: r.special === undefined || r.special === "" ? 1 : cellToNum(r.special),
+      note: r.note || ""
     })),
     equipment: (sections.equipment?.rows || []).map(r => ({
       enabled: true,
@@ -2687,9 +3612,70 @@ function parseConfigFromTsv(text) {
 
   return {inputs, state: stateOut};
 }
+/* 名前付きプリセットをlocalStorageから読む。 */
+function loadNamedPresetsFromStorage() {
+  try {
+    namedPresets = JSON.parse(localStorage.getItem(NAMED_PRESET_KEY) || "{}") || {};
+  } catch {
+    namedPresets = {};
+  }
+}
+/* 名前付きプリセットをlocalStorageへ保存する。 */
+function saveNamedPresetsToStorage() {
+  localStorage.setItem(NAMED_PRESET_KEY, JSON.stringify(namedPresets));
+}
+/* 保存済みプリセットselectを更新する。 */
+function renderPresetSelect() {
+  const sel = byId("presetSelect");
+  if (!sel) return;
+  const names = Object.keys(namedPresets).sort((a,b) => a.localeCompare(b, "ja"));
+  sel.innerHTML = names.length
+    ? names.map(name => `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`).join("")
+    : `<option value="">保存済みなし</option>`;
+}
+/* 現在構成を名前付きプリセットとして保存する。 */
+function saveNamedPreset() {
+  let name = (byId("presetName").value || "").trim();
+  if (!name) {
+    name = prompt("プリセット名を入力してください", "");
+    if (!name) return;
+    name = name.trim();
+  }
+  if (!name) return;
+  namedPresets[name] = {
+    savedAt: new Date().toISOString(),
+    config: collectConfig()
+  };
+  saveNamedPresetsToStorage();
+  renderPresetSelect();
+  byId("presetSelect").value = name;
+  byId("presetName").value = name;
+}
+/* 選択中の名前付きプリセットを読み込む。 */
+function loadNamedPreset() {
+  const name = byId("presetSelect").value;
+  if (!name || !namedPresets[name]) {
+    alert("読み込むプリセットがありません。");
+    return;
+  }
+  const cfg = namedPresets[name].config || namedPresets[name];
+  applyConfig(cfg);
+}
+/* 選択中の名前付きプリセットを削除する。 */
+function deleteNamedPreset() {
+  const name = byId("presetSelect").value;
+  if (!name || !namedPresets[name]) return;
+  if (!confirm(`プリセット「${name}」を削除しますか？`)) return;
+  delete namedPresets[name];
+  saveNamedPresetsToStorage();
+  renderPresetSelect();
+}
+
+/* JSON形式で現在構成をテキストエリアへ出力する。 */
 function exportConfig() {
   byId("configBox").value = JSON.stringify(collectConfig(), null, 2);
 }
+/* テキストエリアのJSONを読み込む。 */
 function importConfig() {
   try {
     applyConfig(JSON.parse(byId("configBox").value));
@@ -2697,9 +3683,11 @@ function importConfig() {
     alert("JSONの読み込みに失敗: " + e.message);
   }
 }
+/* TSV形式で現在構成をテキストエリアへ出力する。 */
 function exportTsvConfig() {
   byId("configBox").value = serializeConfigAsTsv(collectConfig());
 }
+/* テキストエリアのTSVを読み込む。 */
 function importTsvConfig() {
   try {
     applyConfig(parseConfigFromTsv(byId("configBox").value));
@@ -2707,13 +3695,15 @@ function importTsvConfig() {
     alert("TSVの読み込みに失敗: " + e.message);
   }
 }
+/* localStorageの現在構成を削除し、初期状態へ戻す。 */
 function resetConfig() {
   if (!confirm("保存済み設定をリセットして初期状態に戻しますか？")) return;
-  localStorage.removeItem("moeDamageSimLatestReqFormulaOnly");
+  localStorage.removeItem("moeDamageSimHoverBreakdown");
   state = DEFAULT_STATE();
   renderAll();
   calc();
 }
+/* JSON/TSV/プリセットから復元したconfigを画面とstateへ適用する。 */
 function applyConfig(cfg) {
   if (!cfg || !cfg.inputs || !cfg.state) return;
   setInputs(cfg.inputs);
@@ -2721,6 +3711,7 @@ function applyConfig(cfg) {
   state = DEFAULT_STATE();
 
   state.weaponReq = normalizeWeaponReqRows(incoming.weaponReq, cfg.inputs || {});
+  state.composite = Array.isArray(incoming.composite) ? normalizeCompositeRows(incoming.composite) : state.composite;
   state.equipment = normalizeEquipmentRows(incoming.equipment);
 
   if (Array.isArray(incoming.flat)) {
@@ -2750,7 +3741,7 @@ document.querySelectorAll("input,select").forEach(el => {
 });
 
 renderAll();
-const saved = localStorage.getItem("moeDamageSimLatestReqFormulaOnly");
+const saved = localStorage.getItem("moeDamageSimHoverBreakdown");
 if (saved) {
   try { applyConfig(JSON.parse(saved)); }
   catch { calc(); }
@@ -2768,11 +3759,14 @@ if (saved) {
     memoEl.addEventListener("input", () => updateSnapshotMemo(w));
   }
 });
+loadNamedPresetsFromStorage();
+renderPresetSelect();
 renderSnapshotLabels();
 renderCompareResult();
 renderActualDiff();
 renderACTable();
 renderRaceTable();
+renderValueTable();
 </script>
 </body>
 </html>
