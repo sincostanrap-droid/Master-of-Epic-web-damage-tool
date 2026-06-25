@@ -1315,6 +1315,33 @@ MoE固有の主な仮定:
     margin-top: 8px;
   }
 
+
+  /* バフ枠ツールチップは24枠すべて見えるように、カード外へはみ出せるようにする。 */
+  .metricSlot,
+  .slotPanel.metricCard {
+    overflow: visible;
+    z-index: 30;
+  }
+  .slotTooltip {
+    width: min(760px, calc(100vw - 48px));
+    max-height: min(72vh, 680px);
+    overflow: auto;
+    overscroll-behavior: contain;
+  }
+  .slotTooltipGroup ul {
+    column-width: 260px;
+    column-gap: 22px;
+  }
+  .slotTooltipGroup li {
+    break-inside: avoid;
+    margin-bottom: 3px;
+  }
+  .slotTooltipMeta {
+    margin-top: 6px;
+    color: #5f6b7a;
+    font-size: 12px;
+  }
+
 </style>
 </head>
 <body>
@@ -3105,8 +3132,10 @@ function updateSlotUI(metrics) {
   const activeDetails = (details || []).filter(([,items]) => items.length);
   const tooltip = byId("slotTooltip");
   if (activeDetails.length) {
+    const listedTotal = activeDetails.reduce((s, [, items]) => s + items.length, 0);
     tooltip.innerHTML = [
       `<div class="slotTooltipTitle">使用中のバフ枠: ${total} / 24</div>`,
+      `<div class="slotTooltipMeta">内訳リスト表示: ${listedTotal}件。多い場合はこの枠内をスクロールできます。</div>`,
       ...activeDetails.map(([group, items]) => {
         const lis = items.map(x => `<li>${escapeHtml(x)}</li>`).join("");
         return `<div class="slotTooltipGroup"><b>${escapeHtml(group)}: ${items.length}</b><ul>${lis}</ul></div>`;
@@ -3269,7 +3298,7 @@ function calc() {
   }
   byId("breakdown").innerHTML = lines.join("");
 
-  localStorage.setItem("moeDamageSimContributionUntaggedFolded", JSON.stringify(collectConfig()));
+  localStorage.setItem("moeDamageSimSlotTooltipFix", JSON.stringify(collectConfig()));
   renderCompareResult();
   renderActualDiff();
   renderRaceTable();
@@ -4153,7 +4182,7 @@ function importTsvConfig() {
 /* localStorageの現在構成を削除し、初期状態へ戻す。 */
 function resetConfig() {
   if (!confirm("保存済み設定をリセットして初期状態に戻しますか？")) return;
-  localStorage.removeItem("moeDamageSimContributionUntaggedFolded");
+  localStorage.removeItem("moeDamageSimSlotTooltipFix");
   state = DEFAULT_STATE();
   renderAll();
   calc();
@@ -4196,7 +4225,7 @@ document.querySelectorAll("input,select").forEach(el => {
 });
 
 renderAll();
-const saved = localStorage.getItem("moeDamageSimContributionUntaggedFolded");
+const saved = localStorage.getItem("moeDamageSimSlotTooltipFix");
 if (saved) {
   try { applyConfig(JSON.parse(saved)); }
   catch { calc(); }
