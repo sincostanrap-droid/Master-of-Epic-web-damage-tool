@@ -2449,6 +2449,12 @@ MoE固有の主な仮定:
     white-space: pre;
   }
 
+
+  #postBuffTable input.tagInput,
+  #otherBuffTable input.tagInput {
+    width: 100%;
+  }
+
 </style>
 </head>
 <body>
@@ -3168,7 +3174,7 @@ MoE固有の主な仮定:
 <section class="card wide tagLinkSection" data-tab-target="groups">
   <h2>競合グループ管理</h2>
   <p class="small">
-    装備Buffや装備以外Buffに同じ競合グループ名を入れると、同一グループとして扱います。同じグループのBuffが複数ONの場合、計算上は代表1つだけを採用します。グループ名にスペースを含められます。複数指定時は先頭のグループを競合判定に使います。
+    装備Buff・装備以外Buff・外枠補正・その他バフに同じ競合グループ名を入れると、同一グループとして扱います。同じグループのBuffが複数ONの場合、計算上は代表1つだけを採用します。グループ名にスペースを含められます。複数指定時は先頭のグループを競合判定に使います。
     例: <span class="tagPill">攻撃力上昇A</span> <span class="tagPill">与ダメ上昇A</span> <span class="tagPill">変身系</span>
   </p>
   <div id="tagLinkSummary" class="scrollX"></div>
@@ -3195,7 +3201,7 @@ MoE固有の主な仮定:
   <h2>外枠補正：ネヤ補正・被ダメ増加・パンチングマシン補正など</h2>
   <p class="small">ここは乗算扱い。Buff枠に数えるものだけ「枠」をONにしてください。</p>
   <table id="postBuffTable" class="compactTable">
-    <thead><tr><th>使用</th><th>枠</th><th>名称</th><th>倍率</th><th>メモ / ソース</th><th>削除</th></tr></thead>
+    <thead><tr><th>使用</th><th>枠</th><th>名称</th><th>競合グループ</th><th>倍率</th><th>メモ / ソース</th><th>削除</th></tr></thead>
     <tbody></tbody>
   </table>
   <button onclick="addRow('post')">外枠行を追加</button>
@@ -3205,7 +3211,7 @@ MoE固有の主な仮定:
   <h2>その他バフ：ダメージ計算に使わないBuff</h2>
   <p class="small">ダメージ計算には一切使わず、バフ24枠カウントだけに使います。</p>
   <table id="otherBuffTable" class="compactTable">
-    <thead><tr><th>使用</th><th>名称</th><th>メモ / ソース</th><th>削除</th></tr></thead>
+    <thead><tr><th>使用</th><th>名称</th><th>競合グループ</th><th>メモ / ソース</th><th>削除</th></tr></thead>
     <tbody></tbody>
   </table>
   <button onclick="addOtherRow()">その他バフ行を追加</button>
@@ -3219,12 +3225,21 @@ MoE固有の主な仮定:
       <p class="small">
         このセクションでは候補の追加はしません。
         「装備登録」タブに積んだ装備候補と、「Buff登録」タブに積んだ装備以外Buff候補を使って、上位構成を探します。
-        装備Buff、追加ステータス、競合グループも計算に反映します。競合グループが同じ装備候補は同時採用しません。その他バフは「その他バフの使用を強制する」がONの時だけ現在ON/OFF状態を固定枠として扱い、最適化対象にはしません。
+        装備Buff、追加ステータス、競合グループも計算に反映します。競合グループが同じ装備候補は同時採用しません。Buff側の標準探索を軽量な局所改善方式にしました。必要な時だけ「深掘り」に切り替えられます。攻撃力上限などで最終値に寄与しなくなったBuffは探索後に自動で外します。その他バフは「その他バフの使用を強制する」がONの時だけ現在ON/OFF状態を固定枠として扱い、最適化対象にはしません。
       </p>
       <div class="optimizerControls">
         <label>バフ枠上限<input id="optimizerMaxSlots" type="number" min="0" step="1" value="24"></label>
         <label>上位表示件数<input id="optimizerTopN" type="number" min="1" step="1" value="10"></label>
-        <label>探索幅<input id="optimizerBeamWidth" type="number" min="10" step="10" value="160"></label>
+        <label>探索幅<input id="optimizerBeamWidth" type="number" min="10" step="10" value="60"></label>
+        <label>装備評価数<input id="optimizerEquipmentEvalLimit" type="number" min="1" step="1" value="30"></label>
+        <label>Buff探索モード
+          <select id="optimizerBuffMode">
+            <option value="local" selected>標準（局所改善・軽量）</option>
+            <option value="fast">高速（最軽量・近似）</option>
+            <option value="beam">深掘り（重い）</option>
+          </select>
+        </label>
+        <label>深掘りBuff幅<input id="optimizerBuffBeamWidth" type="number" min="20" step="10" value="80"></label>
         <label>目的
           <select id="optimizerObjective">
             <option value="damage">最大ダメージ</option>
@@ -4283,12 +4298,110 @@ function resolveCompositeRowsForGroups(rows) {
   };
 }
 
+
+function simpleBuffGroupScore(type, row) {
+  if (type === "post") return ((+row.value || 1) - 1) * 100000;
+  if (type === "other") return 0;
+  return compositeGroupScore(row);
+}
+
+function simpleBuffEffectText(type, row) {
+  if (type === "post") return `外枠倍率×${fmt(+row.value || 1, 3)}`;
+  if (type === "other") return row.note ? `その他バフ枠 / ${row.note}` : "その他バフ枠";
+  return compositeEffectText(row);
+}
+
+function collectActiveBuffConflictCandidates(st) {
+  const candidates = [];
+  let order = 0;
+
+  normalizeCompositeRows(st.composite || []).forEach((row, idx) => {
+    if (!(row.enabled && compositeHasEffect(row))) return;
+    const group = buffGroupName(row);
+    if (!group) return;
+    candidates.push({
+      type:"composite", idx, row, group,
+      name: row.name || "装備以外Buff",
+      detail: compositeEffectText(row),
+      _groupOrder: order++,
+      _groupScore: compositeGroupScore(row)
+    });
+  });
+
+  (st.post || []).forEach((row, idx) => {
+    if (!row.enabled) return;
+    const group = buffGroupName(row);
+    if (!group) return;
+    candidates.push({
+      type:"post", idx, row, group,
+      name: row.name || "外枠補正",
+      detail: simpleBuffEffectText("post", row),
+      _groupOrder: order++,
+      _groupScore: simpleBuffGroupScore("post", row)
+    });
+  });
+
+  (st.other || []).forEach((row, idx) => {
+    if (!row.enabled) return;
+    const group = buffGroupName(row);
+    if (!group) return;
+    candidates.push({
+      type:"other", idx, row, group,
+      name: row.name || "その他バフ",
+      detail: simpleBuffEffectText("other", row),
+      _groupOrder: order++,
+      _groupScore: simpleBuffGroupScore("other", row)
+    });
+  });
+
+  return candidates;
+}
+
+function resolveAllBuffRowsForGroups(st) {
+  const out = clone(st || {});
+  const byGroup = new Map();
+
+  collectActiveBuffConflictCandidates(out).forEach(candidate => {
+    const key = candidate.group.toLowerCase();
+    if (!byGroup.has(key)) {
+      byGroup.set(key, {group:candidate.group, winner:candidate, skipped:[], candidates:[candidate]});
+      return;
+    }
+    const rec = byGroup.get(key);
+    rec.candidates.push(candidate);
+    if (candidate._groupScore > rec.winner._groupScore) {
+      rec.skipped.push(rec.winner);
+      rec.winner = candidate;
+    } else {
+      rec.skipped.push(candidate);
+    }
+  });
+
+  const suppressed = new Set();
+  byGroup.forEach(rec => {
+    rec.skipped.forEach(c => suppressed.add(`${c.type}:${c.idx}`));
+  });
+
+  out.composite = normalizeCompositeRows(out.composite || []).map((row, idx) =>
+    suppressed.has(`composite:${idx}`) ? {...row, enabled:false, _suppressedByGroup:true} : row
+  );
+  out.post = (out.post || []).map((row, idx) =>
+    suppressed.has(`post:${idx}`) ? {...row, enabled:false, _suppressedByGroup:true} : row
+  );
+  out.other = (out.other || []).map((row, idx) =>
+    suppressed.has(`other:${idx}`) ? {...row, enabled:false, _suppressedByGroup:true} : row
+  );
+
+  return {
+    state: out,
+    groups: Array.from(byGroup.values()).sort((a,b) => a.group.localeCompare(b.group, "ja"))
+  };
+}
+
+
 /* 競合グループ適用: 同一グループの複数Buffは代表1つだけ計算に反映する。 */
 function applyBuffGroupRules(st) {
-  const out = clone(st || {});
-  const resolved = resolveCompositeRowsForGroups(out.composite || []);
-  out.composite = resolved.rows;
-  return out;
+  return resolveAllBuffRowsForGroups(st).state;
 }
 
 
@@ -4341,8 +4454,8 @@ function equipmentBuffMonitorCandidate(row, order) {
 }
 
 function buildConflictMonitorGroups() {
-  const activeExpanded = expandEquipmentBuffState(state);
-  const activeResolved = resolveCompositeRowsForGroups(activeExpanded.composite || []);
+  const expanded = expandEquipmentBuffState(state);
+  const resolved = resolveAllBuffRowsForGroups(expanded);
   const map = new Map();
 
   const ensure = group => {
@@ -4351,23 +4464,25 @@ function buildConflictMonitorGroups() {
     return map.get(key);
   };
 
-  activeResolved.groups.forEach(g => {
+  resolved.groups.forEach(g => {
     const rec = ensure(g.group);
     rec.winner = g.winner;
     rec.skipped = g.skipped || [];
     g.candidates.forEach(c => {
-      const isWinner = c === g.winner || (c.name === g.winner.name && c._groupOrder === g.winner._groupOrder);
+      const isWinner = c === g.winner || (c.type === g.winner.type && c.idx === g.winner.idx && c._groupOrder === g.winner._groupOrder);
+      const typeLabel = c.type === "post" ? "外枠" : c.type === "other" ? "その他" : "Buff";
       rec.candidates.push({
         ...c,
         _monitorActive: true,
         _monitorMark: isWinner ? "採用" : "抑制",
         _monitorClass: isWinner ? "ok" : "muted",
-        _monitorDetail: "現在ON"
+        _monitorDetail: `${typeLabel} / ${c.detail || simpleBuffEffectText(c.type, c.row)}`
       });
     });
   });
 
   let monitorOrder = 100000;
+
   normalizeEquipmentRows(state.equipment).forEach(row => {
     if (!(row.enabled === false && row.equipBuffEnabled && equipmentBuffHasEffect(row))) return;
     const candidate = equipmentBuffMonitorCandidate(row, monitorOrder++);
@@ -4380,11 +4495,67 @@ function buildConflictMonitorGroups() {
     });
   });
 
+  normalizeCompositeRows(state.composite).forEach((row, idx) => {
+    if (row.enabled || !compositeHasEffect(row)) return;
+    splitTags(row.tags).forEach(group => {
+      const rec = ensure(group);
+      rec.candidates.push({
+        type:"composite", idx, row, group,
+        name: row.name || "装備以外Buff",
+        detail: compositeEffectText(row),
+        _groupOrder: monitorOrder++,
+        _groupScore: compositeGroupScore(row),
+        _monitorActive:false,
+        _monitorMark:"未使用Buff",
+        _monitorClass:"tagWatch",
+        _monitorDetail:"装備以外Buff"
+      });
+      rec.inactiveCount++;
+    });
+  });
+
+  (state.post || []).forEach((row, idx) => {
+    if (row.enabled) return;
+    splitTags(row.tags).forEach(group => {
+      const rec = ensure(group);
+      rec.candidates.push({
+        type:"post", idx, row, group,
+        name: row.name || "外枠補正",
+        detail: simpleBuffEffectText("post", row),
+        _groupOrder: monitorOrder++,
+        _groupScore: simpleBuffGroupScore("post", row),
+        _monitorActive:false,
+        _monitorMark:"未使用外枠",
+        _monitorClass:"tagWatch",
+        _monitorDetail:"外枠補正"
+      });
+      rec.inactiveCount++;
+    });
+  });
+
+  (state.other || []).forEach((row, idx) => {
+    if (row.enabled) return;
+    splitTags(row.tags).forEach(group => {
+      const rec = ensure(group);
+      rec.candidates.push({
+        type:"other", idx, row, group,
+        name: row.name || "その他バフ",
+        detail: simpleBuffEffectText("other", row),
+        _groupOrder: monitorOrder++,
+        _groupScore: simpleBuffGroupScore("other", row),
+        _monitorActive:false,
+        _monitorMark:"未使用その他",
+        _monitorClass:"tagWatch",
+        _monitorDetail:"その他バフ"
+      });
+      rec.inactiveCount++;
+    });
+  });
+
   return Array.from(map.values())
     .filter(g => g.candidates.length)
     .sort((a,b) => a.group.localeCompare(b.group, "ja"));
 }
-
 
 /**
  * 装備欄とBuff欄のタグを集計して、同じ競合グループのものを横断表示する。
@@ -5558,7 +5729,8 @@ function renderNumericTable(type) {
   tbody.innerHTML = "";
   if (!state[type].length) {
     const label = type === "dmg" ? "与ダメ行" : type === "special" ? "特攻行" : "外枠補正行";
-    renderEmptyRow(tbody, type === "dmg" ? 7 : 6, `${label}はありません。必要な場合だけ行を追加してください。`);
+    const colspan = type === "dmg" ? 7 : type === "post" ? 7 : 6;
+    renderEmptyRow(tbody, colspan, `${label}はありません。必要な場合だけ行を追加してください。`);
     return;
   }
 
@@ -5568,8 +5740,12 @@ function renderNumericTable(type) {
     tr.appendChild(checkboxCell(row, "slot"));
 
     const name = makeCell("input", {value: row.name || ""});
-    name.oninput = () => { row.name = name.value; };
+    name.oninput = () => { row.name = name.value; renderTagLinkSummary(); };
     tr.appendChild(makeCell("td")).appendChild(name);
+
+    if (type === "post") {
+      tr.appendChild(tagInputCell(row));
+    }
 
     const value = makeCell("input", {type:"number", step:"0.1", value: row.value ?? 0});
     value.oninput = () => { row.value = parseFloat(value.value) || 0; calc(); };
@@ -5598,7 +5774,7 @@ function addRow(type) {
   if (type === "atk") state.atk.push({enabled:true, slot:true, name:"新規攻撃力", value:0, note:""});
   if (type === "dmg") state.dmg.push({enabled:true, slot:true, name:"新規与ダメ", value:0, category:"", note:""});
   if (type === "special") state.special.push({enabled:true, slot:false, name:"新規特攻", value:1.5, note:""});
-  if (type === "post") state.post.push({enabled:true, slot:false, name:"新規外枠", value:1, note:""});
+  if (type === "post") state.post.push({enabled:true, slot:false, name:"新規外枠", tags:"", value:1, note:""});
   renderAll();
   calc();
 }
@@ -5608,7 +5784,7 @@ function renderOtherTable() {
   const tbody = document.querySelector("#otherBuffTable tbody");
   tbody.innerHTML = "";
   if (!state.other.length) {
-    renderEmptyRow(tbody, 4, "その他バフ行はありません。バフ枠だけ数えたいものがある場合に追加してください。");
+    renderEmptyRow(tbody, 5, "その他バフ行はありません。バフ枠だけ数えたいものがある場合に追加してください。");
     return;
   }
 
@@ -5620,8 +5796,10 @@ function renderOtherTable() {
     tr.appendChild(makeCell("td")).appendChild(enabled);
 
     const name = makeCell("input", {value: row.name || ""});
-    name.oninput = () => { row.name = name.value; };
+    name.oninput = () => { row.name = name.value; renderTagLinkSummary(); };
     tr.appendChild(makeCell("td")).appendChild(name);
+
+    tr.appendChild(tagInputCell(row));
 
     const note = makeCell("input", {value: row.note || ""});
     note.oninput = () => { row.note = note.value; };
@@ -5635,7 +5813,7 @@ function renderOtherTable() {
 }
 /* その他バフ行を追加する。 */
 function addOtherRow() {
-  state.other.push({enabled:true, name:"その他バフ", note:""});
+  state.other.push({enabled:true, name:"その他バフ", tags:"", note:""});
   renderOtherTable();
   calc();
 }
@@ -5648,7 +5826,10 @@ function integratedOptimizerSettings() {
   return {
     maxSlots: Math.max(0, parseInt(byId("optimizerMaxSlots")?.value, 10) || 24),
     topN: Math.max(1, parseInt(byId("optimizerTopN")?.value, 10) || 10),
-    beamWidth: Math.max(10, parseInt(byId("optimizerBeamWidth")?.value, 10) || 160),
+    beamWidth: Math.max(10, parseInt(byId("optimizerBeamWidth")?.value, 10) || 60),
+    equipmentEvalLimit: Math.max(1, parseInt(byId("optimizerEquipmentEvalLimit")?.value, 10) || 30),
+    buffMode: byId("optimizerBuffMode")?.value || "local",
+    buffBeamWidth: Math.max(20, parseInt(byId("optimizerBuffBeamWidth")?.value, 10) || 80),
     objective: byId("optimizerObjective")?.value || "damage",
     fixCurrentEquipment: !!byId("optimizerFixCurrentEquipment")?.checked,
     includeDisabledBuffs: byId("optimizerIncludeDisabledBuffs") ? !!byId("optimizerIncludeDisabledBuffs").checked : true,
@@ -5787,15 +5968,61 @@ function optimizerCompositeCandidates(settings) {
     .filter(x => settings.includeDisabledBuffs || x.row.enabled);
 }
 
-function optimizerSelectExternalBuffs(equipmentIdxs, inputs, settings) {
+
+function optimizerScoreTolerance(score) {
+  return Math.max(0.000001, Math.abs(+score || 0) * 0.000000001);
+}
+
+function optimizerEvaluateBuffSelection(equipmentIdxs, compositeIdxs, inputs, settings) {
+  const st = optimizerStateForSelection(equipmentIdxs, compositeIdxs, settings);
+  const metrics = computeMetrics(st, inputs);
+  return {metrics, score: optimizerMetricValue(metrics, settings.objective)};
+}
+
+function optimizerPruneExternalBuffs(equipmentIdxs, selected, fixedSet, inputs, settings) {
+  let current = optimizerEvaluateBuffSelection(equipmentIdxs, selected, inputs, settings);
+  let prunedCount = 0;
+  let changed = true;
+
+  while (changed) {
+    changed = false;
+
+    for (let i = selected.length - 1; i >= 0; i--) {
+      const idx = selected[i];
+      if (fixedSet && fixedSet.has(idx)) continue;
+
+      const trialSelected = selected.slice(0, i).concat(selected.slice(i + 1));
+      const trial = optimizerEvaluateBuffSelection(equipmentIdxs, trialSelected, inputs, settings);
+      const tol = optimizerScoreTolerance(current.score);
+
+      const scoreKept = trial.score >= current.score - tol;
+      const slotsNotWorse = trial.metrics.slots.total <= current.metrics.slots.total;
+      const buffCountReduced = trialSelected.length < selected.length;
+
+      if (scoreKept && slotsNotWorse && buffCountReduced) {
+        selected = trialSelected;
+        current = trial;
+        prunedCount++;
+        changed = true;
+        break;
+      }
+    }
+  }
+
+  if (settings) settings.optimizerPrunedBuffs = (settings.optimizerPrunedBuffs || 0) + prunedCount;
+  return {compositeIdxs: selected, metrics: current.metrics, score: current.score, prunedCount};
+}
+
+
+function optimizerSelectExternalBuffsGreedy(equipmentIdxs, inputs, settings) {
   const candidates = optimizerCompositeCandidates(settings);
   const fixed = settings.fixCurrentBuffs ? candidates.filter(x => x.row.enabled) : [];
-  const selected = fixed.map(x => x.idx);
+  let selected = fixed.map(x => x.idx);
   const selectedSet = new Set(selected);
+  const fixedSet = new Set(selected);
 
-  let st = optimizerStateForSelection(equipmentIdxs, selected, settings);
-  let m = computeMetrics(st, inputs);
-  let score = optimizerMetricValue(m, settings.objective);
+  let evaluated = optimizerEvaluateBuffSelection(equipmentIdxs, selected, inputs, settings);
+  let score = evaluated.score;
 
   let improved = true;
   while (improved) {
@@ -5805,26 +6032,162 @@ function optimizerSelectExternalBuffs(equipmentIdxs, inputs, settings) {
     candidates.forEach(cand => {
       if (selectedSet.has(cand.idx)) return;
       const trialBuffs = selected.concat([cand.idx]);
-      const trialState = optimizerStateForSelection(equipmentIdxs, trialBuffs, settings);
-      const trial = computeMetrics(trialState, inputs);
-      if (trial.slots.total > settings.maxSlots) return;
+      const trial = optimizerEvaluateBuffSelection(equipmentIdxs, trialBuffs, inputs, settings);
+      if (trial.metrics.slots.total > settings.maxSlots) return;
 
-      const trialScore = optimizerMetricValue(trial, settings.objective);
-      if (!best || trialScore > best.score) {
-        best = {idx: cand.idx, metrics: trial, score: trialScore};
+      if (!best || trial.score > best.score) {
+        best = {idx: cand.idx, metrics: trial.metrics, score: trial.score};
       }
     });
 
-    if (best && best.score > score + 0.000001) {
+    if (best && best.score > score + optimizerScoreTolerance(score)) {
       selected.push(best.idx);
       selectedSet.add(best.idx);
-      m = best.metrics;
       score = best.score;
       improved = true;
     }
   }
 
-  return {compositeIdxs: selected, metrics: m, score};
+  return optimizerPruneExternalBuffs(equipmentIdxs, selected, fixedSet, inputs, settings);
+}
+
+function optimizerSelectExternalBuffsLocal(equipmentIdxs, inputs, settings) {
+  // 高速greedyで初期解を作り、そこから「1件入れ替え」「1件追加」を少数回だけ試す。
+  // 深掘りbeamよりかなり軽く、攻撃力上限到達後の無駄Buffや入れ替え漏れを拾いやすい。
+  const candidates = optimizerCompositeCandidates(settings);
+  const fixed = settings.fixCurrentBuffs ? candidates.filter(x => x.row.enabled) : [];
+  const fixedSet = new Set(fixed.map(x => x.idx));
+
+  let current = optimizerSelectExternalBuffsGreedy(equipmentIdxs, inputs, settings);
+  let selected = current.compositeIdxs.slice();
+  let selectedSet = new Set(selected);
+  let score = current.score;
+  let metrics = current.metrics;
+
+  const maxPasses = 4;
+  for (let pass = 0; pass < maxPasses; pass++) {
+    let best = null;
+
+    // 追加
+    candidates.forEach(add => {
+      if (selectedSet.has(add.idx)) return;
+      const trialIdxs = selected.concat([add.idx]);
+      const trial = optimizerEvaluateBuffSelection(equipmentIdxs, trialIdxs, inputs, settings);
+      if (trial.metrics.slots.total > settings.maxSlots) return;
+      if (!best || trial.score > best.score + optimizerScoreTolerance(best.score)) {
+        best = {type:"add", idxs:trialIdxs, metrics:trial.metrics, score:trial.score};
+      }
+    });
+
+    // 1件入れ替え
+    selected.forEach(removeIdx => {
+      if (fixedSet.has(removeIdx)) return;
+      candidates.forEach(add => {
+        if (selectedSet.has(add.idx)) return;
+        const trialIdxs = selected.filter(idx => idx !== removeIdx).concat([add.idx]);
+        const trial = optimizerEvaluateBuffSelection(equipmentIdxs, trialIdxs, inputs, settings);
+        if (trial.metrics.slots.total > settings.maxSlots) return;
+        if (!best || trial.score > best.score + optimizerScoreTolerance(best.score)) {
+          best = {type:"swap", idxs:trialIdxs, metrics:trial.metrics, score:trial.score};
+        }
+      });
+    });
+
+    if (!best || best.score <= score + optimizerScoreTolerance(score)) break;
+
+    selected = best.idxs;
+    selectedSet = new Set(selected);
+    score = best.score;
+    metrics = best.metrics;
+
+    const pruned = optimizerPruneExternalBuffs(equipmentIdxs, selected, fixedSet, inputs, settings);
+    selected = pruned.compositeIdxs.slice();
+    selectedSet = new Set(selected);
+    score = pruned.score;
+    metrics = pruned.metrics;
+  }
+
+  const final = optimizerPruneExternalBuffs(equipmentIdxs, selected, fixedSet, inputs, settings);
+  return {compositeIdxs: final.compositeIdxs, metrics: final.metrics, score: final.score, prunedCount: final.prunedCount || current.prunedCount || 0};
+}
+
+function optimizerSelectExternalBuffsBeam(equipmentIdxs, inputs, settings) {
+  const candidates = optimizerCompositeCandidates(settings);
+  const fixed = settings.fixCurrentBuffs ? candidates.filter(x => x.row.enabled) : [];
+  const fixedSelected = fixed.map(x => x.idx);
+  const fixedSet = new Set(fixedSelected);
+
+  const initial = optimizerEvaluateBuffSelection(equipmentIdxs, fixedSelected, inputs, settings);
+  let beams = [{
+    compositeIdxs: fixedSelected,
+    selectedSet: new Set(fixedSelected),
+    metrics: initial.metrics,
+    score: initial.score
+  }];
+
+  const buffBeamWidth = Math.max(1, settings.buffBeamWidth || 80);
+
+  const rankBuffBeams = list => {
+    const bestByKey = new Map();
+    list.forEach(b => {
+      const key = b.compositeIdxs.join(",");
+      const current = bestByKey.get(key);
+      if (
+        !current ||
+        b.score > current.score + optimizerScoreTolerance(current.score) ||
+        (
+          Math.abs(b.score - current.score) <= optimizerScoreTolerance(current.score) &&
+          (
+            b.metrics.slots.total < current.metrics.slots.total ||
+            (
+              b.metrics.slots.total === current.metrics.slots.total &&
+              b.compositeIdxs.length < current.compositeIdxs.length
+            )
+          )
+        )
+      ) {
+        bestByKey.set(key, b);
+      }
+    });
+
+    return Array.from(bestByKey.values())
+      .sort((a,b) => {
+        const scoreDiff = b.score - a.score;
+        if (Math.abs(scoreDiff) > optimizerScoreTolerance(Math.max(Math.abs(a.score), Math.abs(b.score)))) return scoreDiff;
+        if (a.metrics.slots.total !== b.metrics.slots.total) return a.metrics.slots.total - b.metrics.slots.total;
+        return a.compositeIdxs.length - b.compositeIdxs.length;
+      })
+      .slice(0, buffBeamWidth);
+  };
+
+  candidates.forEach(cand => {
+    if (fixedSet.has(cand.idx)) return;
+
+    const next = beams.slice();
+    beams.forEach(beam => {
+      if (beam.selectedSet.has(cand.idx)) return;
+      const compositeIdxs = beam.compositeIdxs.concat([cand.idx]);
+      const evaluated = optimizerEvaluateBuffSelection(equipmentIdxs, compositeIdxs, inputs, settings);
+      if (evaluated.metrics.slots.total > settings.maxSlots) return;
+      next.push({compositeIdxs, selectedSet: new Set(compositeIdxs), metrics: evaluated.metrics, score: evaluated.score});
+    });
+
+    beams = rankBuffBeams(next);
+  });
+
+  const best = rankBuffBeams(beams)[0] || beams[0] || {
+    compositeIdxs: fixedSelected,
+    metrics: initial.metrics,
+    score: initial.score
+  };
+
+  return optimizerPruneExternalBuffs(equipmentIdxs, best.compositeIdxs, fixedSet, inputs, settings);
+}
+
+function optimizerSelectExternalBuffs(equipmentIdxs, inputs, settings) {
+  if (settings.buffMode === "fast") return optimizerSelectExternalBuffsGreedy(equipmentIdxs, inputs, settings);
+  if (settings.buffMode === "beam") return optimizerSelectExternalBuffsBeam(equipmentIdxs, inputs, settings);
+  return optimizerSelectExternalBuffsLocal(equipmentIdxs, inputs, settings);
 }
 
 function optimizerEquipmentRowHasVisibleData(row) {
@@ -5915,10 +6278,12 @@ function runIntegratedOptimizer() {
   state.composite = normalizeCompositeRows(state.composite);
 
   const settings = integratedOptimizerSettings();
+  settings.optimizerPrunedBuffs = 0;
   const startTime = performance.now();
 
   const equipmentBeams = optimizerBuildEquipmentBeams(inputs, settings);
-  const results = equipmentBeams.map(beam => {
+  const buffEvalBeams = equipmentBeams.slice(0, settings.equipmentEvalLimit || equipmentBeams.length);
+  const results = buffEvalBeams.map(beam => {
     const buff = optimizerSelectExternalBuffs(beam.equipmentIdxs, inputs, settings);
     return {
       equipmentIdxs: beam.equipmentIdxs,
@@ -5927,6 +6292,7 @@ function runIntegratedOptimizer() {
       score: buff.score,
       equipmentSummary: optimizerEquipmentSummaryByIdx(beam.equipmentIdxs, buff.metrics),
       equipmentConflicts: optimizerEquipmentConflictNames(beam.equipmentIdxs),
+      prunedCount: buff.prunedCount || 0,
       forceOtherBuffs: settings.forceOtherBuffs
     };
   })
@@ -5943,7 +6309,9 @@ function runIntegratedOptimizer() {
     const fixedOtherSlots = settings.forceOtherBuffs ? (state.other || []).filter(r => r.enabled).length : 0;
     const otherMode = settings.forceOtherBuffs ? `${fixedOtherSlots}件` : "無視";
     const conflictSkipText = settings.equipmentConflictSkipped ? ` / 競合装備除外 ${settings.equipmentConflictSkipped}件` : "";
-    status.textContent = `探索完了: 装備候補 ${equipCount}件 / 装備以外Buff候補 ${buffCount}件 / その他固定枠 ${otherMode}${conflictSkipText} / 装備構成候補 ${equipmentBeams.length}件 / 表示 ${results.length}件 / ${elapsed}ms`;
+    const pruneText = settings.optimizerPrunedBuffs ? ` / 不要Buff整理 ${settings.optimizerPrunedBuffs}件` : "";
+    const buffModeText = settings.buffMode === "fast" ? "高速" : settings.buffMode === "beam" ? `深掘り 幅${settings.buffBeamWidth}` : "標準";
+    status.textContent = `探索完了: 装備候補 ${equipCount}件 / 装備以外Buff候補 ${buffCount}件 / Buff探索 ${buffModeText} / その他固定枠 ${otherMode}${conflictSkipText}${pruneText} / 装備構成候補 ${equipmentBeams.length}件中 ${buffEvalBeams.length}件評価 / 表示 ${results.length}件 / ${elapsed}ms`;
   }
   renderIntegratedOptimizerResults();
 }
@@ -6569,7 +6937,8 @@ function computeMetrics(st, inputs) {
 /* バフ枠一覧に表示する行名を作る。 */
 function slotRowName(row, fallback) {
   const name = (row && row.name ? String(row.name).trim() : "") || fallback;
-  return name;
+  const group = buffGroupName(row);
+  return group ? `${name} [${group}]` : name;
 }
 /* バフ24枠の使用数を数える。装備以外Buffは効果が複数あっても1行=1枠。 */
 function buffSlotCountForState(st) {
@@ -6781,7 +7150,7 @@ function calc() {
   }
   byId("breakdown").innerHTML = lines.join("");
 
-  localStorage.setItem("moeDamageSimShowcaseTab", JSON.stringify(collectConfig()));
+  localStorage.setItem("moeDamageSimOptimizerLocalSearchLight", JSON.stringify(collectConfig()));
   renderCompareResult();
   renderActualDiff();
   renderRaceTable();
@@ -7449,20 +7818,22 @@ function serializeConfigAsTsv(cfg) {
     }))
   ));
 
-  out.push(makeTsvSection("post", ["enabled", "slot", "name", "value", "note"],
+  out.push(makeTsvSection("post", ["enabled", "slot", "name", "tags", "value", "note"],
     (st.post || []).map(r => ({
       enabled: boolToCell(r.enabled),
       slot: boolToCell(r.slot),
       name: r.name || "",
+      tags: r.tags || "",
       value: r.value ?? 1,
       note: r.note || ""
     }))
   ));
 
-  out.push(makeTsvSection("other", ["enabled", "name", "note"],
+  out.push(makeTsvSection("other", ["enabled", "name", "tags", "note"],
     (st.other || []).map(r => ({
       enabled: boolToCell(r.enabled),
       name: r.name || "",
+      tags: r.tags || "",
       note: r.note || ""
     }))
   ));
@@ -7636,12 +8007,14 @@ function parseConfigFromTsv(text) {
       enabled: cellToBool(r.enabled),
       slot: cellToBool(r.slot),
       name: r.name || "",
+      tags: r.tags || r.tag || "",
       value: cellToNum(r.value),
       note: r.note || ""
     })),
     other: (sections.other?.rows || []).map(r => ({
       enabled: cellToBool(r.enabled),
       name: r.name || "",
+      tags: r.tags || r.tag || "",
       note: r.note || ""
     }))
   };
@@ -7743,7 +8116,7 @@ function importTsvConfig() {
 /* localStorageの現在構成を削除し、初期状態へ戻す。 */
 function resetConfig() {
   if (!confirm("保存済み設定をリセットして初期状態に戻しますか？")) return;
-  localStorage.removeItem("moeDamageSimShowcaseTab");
+  localStorage.removeItem("moeDamageSimOptimizerLocalSearchLight");
   state = DEFAULT_STATE();
   renderAll();
   calc();
@@ -7788,7 +8161,7 @@ document.querySelectorAll("input,select").forEach(el => {
 });
 
 renderAll();
-const saved = localStorage.getItem("moeDamageSimShowcaseTab");
+const saved = localStorage.getItem("moeDamageSimOptimizerLocalSearchLight");
 if (saved) {
   try { applyConfig(JSON.parse(saved)); }
   catch { calc(); }
