@@ -2335,6 +2335,15 @@ MoE固有の主な仮定:
     z-index: 5;
   }
 
+
+  .skillSimFormulaNote {
+    margin: 8px 0 10px;
+    padding: 8px 10px;
+    border-left: 4px solid #4267a8;
+    background: rgba(66,103,168,.07);
+    border-radius: 8px;
+  }
+
 </style>
 </head>
 <body>
@@ -2602,6 +2611,9 @@ MoE固有の主な仮定:
     <button type="button" onclick="resetSkillSim()">スキルをリセット</button>
   </div>
 
+  <p class="small skillSimFormulaNote">
+    ステータスは「種族別初期値 + スキル値 × 上昇値 × 種族別倍率」で算出します。
+  </p>
   <div class="skillSimSummary">
     <div class="metricCard">
       <div class="metricLabel">スキル合計</div>
@@ -3531,12 +3543,45 @@ const SKILL_SIM_GROUPS = [
 const SKILL_SIM_ALL = SKILL_SIM_GROUPS.flatMap(([, list]) => list);
 const SKILL_SIM_WEAPON = ["素手", "刀剣", "こんぼう", "槍", "銃器", "弓", "投げ", "牙", "キック", "罠"];
 
-const SKILL_SIM_RACE = {
-  newtar:   {hp:3.00, mp:3.00, st:3.00, atk:0.20, def:0.20, hit:1.00, avoid:1.00, magic:1.00, resist:1.00, weight:1.50},
-  cognite:  {hp:2.85, mp:3.30, st:2.85, atk:0.19, def:0.19, hit:1.05, avoid:0.95, magic:1.10, resist:1.10, weight:1.35},
-  elmony:   {hp:2.85, mp:3.00, st:3.15, atk:0.19, def:0.19, hit:1.05, avoid:1.10, magic:0.95, resist:1.00, weight:1.50},
-  pandemos: {hp:3.15, mp:2.85, st:3.00, atk:0.21, def:0.20, hit:1.00, avoid:0.95, magic:0.90, resist:0.90, weight:1.80}
+const SKILL_SIM_STAT_COEFF = {
+  hp: 3.0,
+  mp: 3.0,
+  st: 3.0,
+  atk: 0.2,
+  hit: 1.0,
+  def: 0.2,
+  avoid: 1.0,
+  magic: 1.0,
+  resist: 1.0,
+  weight: 1.5
 };
+
+const SKILL_SIM_RACE = {
+  newtar: {
+    base: {hp:30, mp:30, st:30, atk:0, hit:0, def:0, avoid:0, magic:0, resist:0, weight:10},
+    mult: {hp:1.00, mp:1.00, st:1.00, atk:1.00, hit:1.00, def:1.00, avoid:1.00, magic:1.00, resist:1.00, weight:1.00}
+  },
+  cognite: {
+    base: {hp:30, mp:35, st:30, atk:0, hit:0, def:0, avoid:0, magic:0, resist:0, weight:5},
+    mult: {hp:0.95, mp:1.10, st:0.95, atk:0.95, hit:1.05, def:0.95, avoid:0.95, magic:1.10, resist:1.10, weight:0.90}
+  },
+  elmony: {
+    base: {hp:25, mp:30, st:35, atk:0, hit:0, def:0, avoid:0, magic:0, resist:0, weight:10},
+    mult: {hp:0.95, mp:1.00, st:1.05, atk:0.95, hit:1.05, def:0.95, avoid:1.10, magic:0.95, resist:1.00, weight:1.00}
+  },
+  pandemos: {
+    base: {hp:35, mp:20, st:30, atk:0, hit:0, def:0, avoid:0, magic:0, resist:0, weight:15},
+    mult: {hp:1.05, mp:0.95, st:1.00, atk:1.05, hit:1.00, def:1.00, avoid:0.95, magic:0.90, resist:0.90, weight:1.20}
+  }
+};
+
+function skillSimStat(raceKey, statKey, skillValue) {
+  const race = SKILL_SIM_RACE[raceKey] || SKILL_SIM_RACE.newtar;
+  const base = +(race.base?.[statKey] || 0);
+  const mult = +(race.mult?.[statKey] || 1);
+  const coeff = +(SKILL_SIM_STAT_COEFF[statKey] || 0);
+  return base + ((+skillValue || 0) * coeff * mult);
+}
 
 function defaultSkillSimState() {
   const skills = {};
@@ -3582,22 +3627,22 @@ function skillSimTotal() {
 
 function skillSimDerived() {
   state.skillSim = normalizeSkillSim(state.skillSim);
-  const c = SKILL_SIM_RACE[state.skillSim.race] || SKILL_SIM_RACE.newtar;
+  const race = state.skillSim.race || "newtar";
   const weapon = skillSimValue(state.skillSim.weaponSkill);
   const total = skillSimTotal();
   return {
     total,
     remain: (state.skillSim.cap || 850) - total,
-    hp: skillSimValue("生命力") * c.hp,
-    mp: skillSimValue("知能") * c.mp,
-    st: skillSimValue("持久力") * c.st,
-    weight: skillSimValue("筋力") * c.weight,
-    atk: skillSimValue("筋力") * c.atk,
-    def: skillSimValue("着こなし") * c.def,
-    hit: weapon * c.hit,
-    avoid: skillSimValue("攻撃回避") * c.avoid,
-    magic: skillSimValue("精神力") * c.magic,
-    resist: skillSimValue("呪文抵抗力") * c.resist,
+    hp: skillSimStat(race, "hp", skillSimValue("生命力")),
+    mp: skillSimStat(race, "mp", skillSimValue("知能")),
+    st: skillSimStat(race, "st", skillSimValue("持久力")),
+    weight: skillSimStat(race, "weight", skillSimValue("筋力")),
+    atk: skillSimStat(race, "atk", skillSimValue("筋力")),
+    def: skillSimStat(race, "def", skillSimValue("着こなし")),
+    hit: skillSimStat(race, "hit", weapon),
+    avoid: skillSimStat(race, "avoid", skillSimValue("攻撃回避")),
+    magic: skillSimStat(race, "magic", skillSimValue("精神力")),
+    resist: skillSimStat(race, "resist", skillSimValue("呪文抵抗力")),
     weapon,
     drunk: skillSimValue("酩酊")
   };
@@ -6368,7 +6413,7 @@ function calc() {
   }
   byId("breakdown").innerHTML = lines.join("");
 
-  localStorage.setItem("moeDamageSimSimplifiedBasicHoverBreakdown", JSON.stringify(collectConfig()));
+  localStorage.setItem("moeDamageSimSkillStatusFormulaFix", JSON.stringify(collectConfig()));
   renderCompareResult();
   renderActualDiff();
   renderRaceTable();
@@ -7330,7 +7375,7 @@ function importTsvConfig() {
 /* localStorageの現在構成を削除し、初期状態へ戻す。 */
 function resetConfig() {
   if (!confirm("保存済み設定をリセットして初期状態に戻しますか？")) return;
-  localStorage.removeItem("moeDamageSimSimplifiedBasicHoverBreakdown");
+  localStorage.removeItem("moeDamageSimSkillStatusFormulaFix");
   state = DEFAULT_STATE();
   renderAll();
   calc();
@@ -7375,7 +7420,7 @@ document.querySelectorAll("input,select").forEach(el => {
 });
 
 renderAll();
-const saved = localStorage.getItem("moeDamageSimSimplifiedBasicHoverBreakdown");
+const saved = localStorage.getItem("moeDamageSimSkillStatusFormulaFix");
 if (saved) {
   try { applyConfig(JSON.parse(saved)); }
   catch { calc(); }
