@@ -1909,6 +1909,432 @@ MoE固有の主な仮定:
     }
   }
 
+
+  /* タブUI: 機能が増えたため、計算/装備/Buff/最適化/保存を分離 */
+  .mainTabNav {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 8px 0 10px;
+    margin: 10px 0 12px;
+    background: linear-gradient(180deg, rgba(247,249,252,.98), rgba(247,249,252,.92));
+    border-bottom: 1px solid #dfe6f2;
+    backdrop-filter: blur(6px);
+  }
+  .mainTabButton {
+    appearance: none;
+    border: 1px solid #d2d9e8;
+    background: #fff;
+    color: #2d405f;
+    border-radius: 999px;
+    padding: 8px 14px;
+    font-weight: 900;
+    white-space: nowrap;
+    cursor: pointer;
+    box-shadow: 0 1px 2px rgba(0,0,0,.04);
+  }
+  .mainTabButton:hover {
+    background: #f6f8fc;
+  }
+  .mainTabButton.active {
+    border-color: #4267a8;
+    background: #4267a8;
+    color: #fff;
+  }
+  .mainTabPanel {
+    display: grid;
+    gap: 12px;
+  }
+  .mainTabPanel[hidden] {
+    display: none !important;
+  }
+  .mainTabPanels {
+    min-height: 280px;
+  }
+  .tabSectionHint {
+    margin: 0 0 8px;
+    padding: 10px 12px;
+    border: 1px solid #e0e6f0;
+    border-radius: 10px;
+    background: #fbfcff;
+    color: #556;
+  }
+
+
+  /* 装備登録タブ: 防具/装飾を部位ごとのカテゴリに分ける */
+  .equipmentStackedGroups {
+    display: grid;
+    gap: 14px;
+  }
+  .equipmentGroupedPanel {
+    display: grid;
+    gap: 8px;
+  }
+  .equipmentSlotCategories {
+    display: grid;
+    gap: 10px;
+  }
+  .equipmentSlotCategory {
+    border: 1px solid #dfe5ef;
+    border-radius: 12px;
+    background: #fbfcff;
+    overflow: hidden;
+  }
+  .equipmentSlotCategory > summary {
+    cursor: pointer;
+    padding: 8px 12px;
+    font-weight: 900;
+    color: #23395d;
+    background: #f3f6fb;
+    border-bottom: 1px solid #e2e7f2;
+  }
+  .equipmentSlotCategoryBody {
+    padding: 10px;
+    overflow-x: auto;
+  }
+  .equipmentSlotCategoryBody > button,
+  .weaponSlot > button {
+    margin-top: 6px;
+  }
+  .equipmentSlotTable {
+    min-width: 1080px !important;
+  }
+  /* 部位列がなくなったので、防具/装飾も武器と同じ列設計に寄せる */
+  .equipmentSlotTable th:nth-child(2),
+  .equipmentSlotTable td:nth-child(2),
+  .weaponTable th:nth-child(2),
+  .weaponTable td:nth-child(2) {
+    width: 280px !important;
+  }
+  .equipmentSlotTable th:nth-child(6),
+  .equipmentSlotTable td:nth-child(6),
+  .weaponTable th:nth-child(6),
+  .weaponTable td:nth-child(6) {
+    width: 48px !important;
+  }
+
+
+  /* 汎用構成シミュレーター向け追加ステータス入力 */
+  .extraStatsEditor {
+    border: 1px solid #e1e6f0;
+    border-radius: 12px;
+    background: #fbfcff;
+    padding: 10px;
+    margin-top: 4px;
+  }
+  .extraStatsTitle {
+    font-weight: 900;
+    color: #23395d;
+    margin-bottom: 8px;
+  }
+  .extraStatsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(105px, 1fr));
+    gap: 8px;
+  }
+  .extraStatsGrid label {
+    grid-template-columns: 1fr;
+    gap: 3px;
+    margin: 0;
+    font-size: 12px;
+  }
+  .extraStatsGrid input {
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .compositeExtraCell {
+    min-width: 96px;
+  }
+  .compositeExtraDetailCell {
+    padding: 10px 12px !important;
+    background: #fbfcff;
+  }
+  .compositeExtraToggle {
+    width: 100%;
+    min-width: 78px;
+  }
+
+
+  /* 装備一覧から攻撃ディレイ列を外したため、一覧側の横幅を少し圧縮 */
+  .equipmentSlotTable {
+    min-width: 1000px !important;
+  }
+  .weaponTable {
+    min-width: 1040px !important;
+  }
+
+
+  /* スキルシミュレータタブ: 計算本体とは独立 */
+  .skillSimControls {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 10px;
+    align-items: end;
+    margin: 10px 0 14px;
+  }
+  .skillSimControls label {
+    grid-template-columns: 1fr;
+    gap: 4px;
+    margin: 0;
+  }
+  .skillSimSummary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 12px;
+    margin: 10px 0 14px;
+  }
+  .skillSimMiniGrid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(84px, 1fr));
+    gap: 6px 12px;
+    font-size: 13px;
+  }
+  .skillSimMiniGrid div {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    border-bottom: 1px dotted #d6dce8;
+  }
+  .skillSimGroups {
+    display: grid;
+    gap: 12px;
+  }
+  .skillSimGroup {
+    border: 1px solid #dfe5ef;
+    border-radius: 12px;
+    background: #fbfcff;
+    padding: 10px;
+  }
+  .skillSimGroup h3 {
+    margin: 0 0 8px;
+  }
+  .skillSimGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+    gap: 8px;
+  }
+  .skillSimGrid label {
+    grid-template-columns: minmax(68px, 1fr) 74px;
+    gap: 6px;
+    margin: 0;
+    font-size: 13px;
+  }
+  .skillSimGrid input[type="number"] {
+    width: 74px;
+  }
+
+
+  /* 計算タブの武器入力は装備登録タブへ統合 */
+  .weaponInputPanelMoved {
+    background: #fbfcff;
+    border-color: #dfe6f2;
+  }
+  .weaponCalcSummary {
+    display: grid;
+    gap: 3px;
+    margin-top: 8px;
+  }
+
+  /* 武器詳細: 数値欄は3桁程度に絞り、武器性能と使用条件を本当に横並びにする */
+  .weaponCalcEditor {
+    border: 1px solid #dbe4f3;
+    border-radius: 12px;
+    background: #f8fbff;
+    padding: 8px;
+    margin-bottom: 4px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .weaponCalcEditor.equipBuffWide {
+    grid-column: 1 / -1;
+  }
+  .weaponCalcNote {
+    margin: 2px 0 7px;
+  }
+  .weaponCalcLayout {
+    display: flex !important;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: flex-start;
+    width: 100%;
+  }
+  .weaponCalcLayout .equipBuffWide {
+    grid-column: auto !important;
+  }
+  .weaponCalcPane {
+    border: 1px solid #e0e7f2;
+    border-radius: 10px;
+    background: #fff;
+    padding: 8px;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+  .weaponCalcPerfPane {
+    flex: 0 0 auto;
+    width: auto;
+  }
+  .weaponReqPane {
+    flex: 1 1 520px;
+    min-width: 420px;
+  }
+  .weaponCalcPaneTitle,
+  .weaponReqEditor .extraStatsTitle {
+    font-size: 12px;
+    font-weight: 900;
+    margin: 0 0 6px;
+  }
+  .weaponCalcGrid {
+    display: grid;
+    grid-template-columns: repeat(6, 66px);
+    gap: 6px;
+    align-items: end;
+  }
+  .weaponCalcGrid label {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 3px;
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.25;
+    min-width: 0;
+  }
+  .weaponCalcGrid input[type="number"],
+  .weaponCalcGrid select {
+    width: 62px !important;
+    max-width: 62px !important;
+    min-width: 0 !important;
+    box-sizing: border-box;
+    padding-left: 4px;
+    padding-right: 4px;
+  }
+  .weaponReqEditor {
+    margin-top: 0;
+  }
+  .weaponReqEditor p.small {
+    margin: 0 0 6px;
+    line-height: 1.35;
+  }
+  .weaponReqMiniTable {
+    width: 100%;
+    margin-bottom: 6px;
+    table-layout: fixed;
+  }
+  .weaponReqMiniTable th,
+  .weaponReqMiniTable td {
+    padding: 3px 4px;
+  }
+  .weaponReqMiniTable th:nth-child(1),
+  .weaponReqMiniTable td:nth-child(1) {
+    width: auto;
+  }
+  .weaponReqMiniTable th:nth-child(2),
+  .weaponReqMiniTable td:nth-child(2),
+  .weaponReqMiniTable th:nth-child(3),
+  .weaponReqMiniTable td:nth-child(3) {
+    width: 62px;
+  }
+  .weaponReqMiniTable th:nth-child(4),
+  .weaponReqMiniTable td:nth-child(4) {
+    width: 28px;
+    text-align: center;
+  }
+  .weaponReqMiniTable input[type="number"] {
+    width: 58px !important;
+    max-width: 58px !important;
+    min-width: 0 !important;
+    box-sizing: border-box;
+    padding-left: 4px;
+    padding-right: 4px;
+  }
+  .weaponReqMiniTable select {
+    width: 100%;
+    min-width: 116px;
+    box-sizing: border-box;
+    font-size: 12px;
+  }
+  .weaponReqMiniTable button {
+    min-width: 24px;
+    width: 24px;
+    padding-left: 0;
+    padding-right: 0;
+  }
+  .weaponReqCurrentAuto[readonly] {
+    background: #eef3fb;
+    color: #23395d;
+    font-weight: 800;
+  }
+  @media (max-width: 980px) {
+    .weaponCalcGrid {
+      grid-template-columns: repeat(3, 66px);
+    }
+    .weaponReqPane {
+      min-width: 320px;
+    }
+  }
+  @media (max-width: 700px) {
+    .weaponCalcLayout {
+      display: grid !important;
+      grid-template-columns: 1fr;
+    }
+    .weaponCalcGrid {
+      grid-template-columns: repeat(2, minmax(64px, 1fr));
+    }
+    .weaponCalcGrid input[type="number"],
+    .weaponCalcGrid select,
+    .weaponReqMiniTable input[type="number"] {
+      width: 100% !important;
+      max-width: none !important;
+    }
+    .weaponReqPane {
+      min-width: 0;
+    }
+  }
+
+
+  .tagItem.tagWatch {
+    border-color: #d8c48a;
+    background: #fffaf0;
+    opacity: .92;
+  }
+  .tagWatchLabel {
+    display: inline-block;
+    border: 1px solid #d8c48a;
+    background: #fffaf0;
+    border-radius: 8px;
+    padding: 7px 9px;
+    color: #6d5522;
+    font-weight: 800;
+  }
+
+
+  .skillSimAutoApply {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px !important;
+    font-weight: 900;
+  }
+  .skillSimAutoApply input {
+    width: auto;
+  }
+
+
+  .damageBreakdownTooltip {
+    width: min(760px, calc(100vw - 48px));
+    right: auto;
+    left: 12px;
+  }
+  .damageBreakdownTooltip p,
+  .damageBreakdownTooltip div {
+    margin: 4px 0;
+  }
+  .metricDamage.metricHoverCard {
+    z-index: 5;
+  }
+
 </style>
 </head>
 <body>
@@ -1928,6 +2354,10 @@ MoE固有の主な仮定:
   </div>
 </section>
 
+<nav id="mainTabNav" class="mainTabNav" aria-label="機能タブ"></nav>
+<div id="mainTabPanels" class="mainTabPanels"></div>
+
+
 <!--
 <p class="small">
   アタック/ヘビー クラッシュ/手入力テク、バフ24枠、予想攻撃力、割合ステータスBuff、ステータス変換、その他バフ枠に対応。
@@ -1935,54 +2365,32 @@ MoE固有の主な仮定:
 </p>
 -->
 
-<section class="card wide">
+<section class="card wide" data-tab-target="calc">
   <h2>基本設定</h2>
   <div class="inputGrid">
     <div class="inputPanel">
-      <h3>キャラ</h3>
-      <label>種族
-        <select id="raceSelect">
-          <option value="newtar" selected>ニューター</option>
-          <option value="cognite">コグニート</option>
-          <option value="elmony">エルモニー</option>
-          <option value="pandemos">パンデモス</option>
-        </select>
-      </label>
+      <h3>キャラ補助</h3>
+      <input id="raceSelect" type="hidden" value="newtar">
       <input id="raceCoeff" type="hidden" value="0.20">
-      <label>筋力<input id="str" type="number" step="0.1" value="0"></label>
-      <label>精神力<input id="spirit" type="number" step="0.1" value="0"></label>
+      <input id="str" type="hidden" value="0">
+      <input id="spirit" type="hidden" value="0">
       <input id="magic" type="hidden" value="0">
+      <p class="small selectHelp">種族・筋力・精神力はスキルシミュレータで管理し、ここへ自動反映します。</p>
       <label>移動速度<input id="speed" type="number" step="0.1" value="100"></label>
       <label>酩酊度<input id="drunk" type="number" step="0.1" value="0"></label>
     </div>
 
-    <div class="inputPanel weaponInputPanel">
+    <div class="inputPanel weaponInputPanel weaponInputPanelMoved">
       <h3>武器</h3>
       <input id="weaponSkill" type="hidden" value="0">
       <input id="requiredSkill" type="hidden" value="0">
-      <label>武器ダメージ<input id="weaponDamage" type="number" step="0.1" value="0"></label>
-      <label>武器重量<input id="weaponWeight" type="number" step="0.1" value="0"></label>
-
-      <div class="weaponReqHeader">
-        <b>使用条件</b>
-        <span class="small">複数条件は全て8割以上が必要です。8割を満たした後は、各条件の達成分を合算した全体達成率で武器攻撃力を補正します。</span>
-      </div>
+      <input id="weaponDamage" type="hidden" value="0">
+      <input id="weaponWeight" type="hidden" value="0">
       <input id="weaponReqMode" type="hidden" value="official">
-      <p class="small selectHelp">
-        補正式: すべての条件が8割以上必要。複数条件では、各条件の達成分を合算して「全体の達成率」で補正します。
+      <p class="small">
+        武器性能は <b>装備登録タブ → 武器候補の「詳細」</b> に入力してください。
       </p>
-      <table id="weaponReqTable" class="miniTable">
-        <thead>
-          <tr>
-            <th>スキル</th>
-            <th>現在</th>
-            <th>必要</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-      <button class="miniButton" onclick="addWeaponReqRow()">使用条件を追加</button>
+      <div id="selectedWeaponCalcSummary" class="small weaponCalcSummary">-</div>
       <div id="weaponSkillModHint" class="small"></div>
     </div>
 
@@ -2037,12 +2445,16 @@ MoE固有の主な仮定:
   </div>
 </section>
 
-<section class="card wide">
+<section class="card wide" data-tab-target="calc">
   <h2>サマリー</h2>
   <div class="summaryGrid">
-    <div class="summaryPanel metricCard metricDamage">
+    <div class="summaryPanel metricCard metricDamage metricHoverCard">
       <div class="metricLabel">予想ダメージ</div>
-      <div class="result" id="finalDamage">-</div>
+      <div class="metricHoverArea" title="カーソルを合わせるとダメージ計算内訳を表示します">
+        <div class="result" id="finalDamage">-</div>
+        <div class="hoverHint">計算内訳を見る</div>
+      </div>
+      <div id="breakdown" class="metricTooltip damageBreakdownTooltip">-</div>
     </div>
 
     <div class="summaryPanel metricCard metricAttack metricHoverCard">
@@ -2081,17 +2493,12 @@ MoE固有の主な仮定:
       <p class="small">「使用ON + 枠ON」の行だけ24枠にカウント。その他バフは使用ONだけで枠カウントします。</p>
     </div>
 
-    <div class="summaryPanel summaryPanelWide">
-      <details class="breakdownDetails">
-        <summary>計算内訳</summary>
-        <div class="breakdownDetailsBody" id="breakdown"></div>
-      </details>
-    </div>
+
   </div>
 </section>
 
 
-<details class="analysisDetails">
+<details class="analysisDetails" data-tab-target="calc">
   <summary>分析 <span class="summaryNote">実測合わせ・比較・価値判断用</span></summary>
   <div class="analysisDetailsBody">
   <p class="analysisIntro small">
@@ -2138,7 +2545,7 @@ MoE固有の主な仮定:
     <div class="analysisPanel">
       <h3>種族比較</h3>
       <p class="small">
-        現在の筋力・精神力・Buff構成をそのままに、種族だけを変えた場合の予想値です。
+        スキルシミュレータから反映された筋力・精神力・Buff構成をそのままに、種族だけを変えた場合の予想値です。
       </p>
       <button onclick="renderRaceTable()">種族比較を更新</button>
       <div id="raceTable" class="scrollX"></div>
@@ -2170,12 +2577,60 @@ MoE固有の主な仮定:
   </div>
 </details>
 
-<section class="card wide">
+
+<section class="card wide skillSimSection" data-tab-target="skill">
+  <h2>スキルシミュレータ</h2>
+  <p class="small">
+    スキル合計と残りポイント、種族別の簡易ステータスを見るための独立タブです。
+    このタブの入力値は、下の反映ボタンを押した時だけ「計算」タブの基本設定や武器使用条件へ送ります。
+  </p>
+
+  <div class="skillSimControls">
+    <label>構成名<input id="skillSimName" type="text" placeholder="例: こんぼう火力構成"></label>
+    <label>種族
+      <select id="skillSimRace">
+        <option value="newtar">ニューター</option>
+        <option value="cognite">コグニート</option>
+        <option value="elmony">エルモニー</option>
+        <option value="pandemos">パンデモス</option>
+      </select>
+    </label>
+    <label>上限合計<input id="skillSimCap" type="number" step="0.1" value="850"></label>
+    <label>武器スキル参照<select id="skillSimWeaponSkill"></select></label>
+    <label class="skillSimAutoApply"><input id="skillSimAutoApply" type="checkbox" checked> 計算タブへ自動反映</label>
+    <button type="button" onclick="applySkillSimToCalc()">計算タブへ反映</button>
+    <button type="button" onclick="resetSkillSim()">スキルをリセット</button>
+  </div>
+
+  <div class="skillSimSummary">
+    <div class="metricCard">
+      <div class="metricLabel">スキル合計</div>
+      <div class="bigNum" id="skillSimTotal">0.0</div>
+      <div class="small" id="skillSimRemain">残り 850.0</div>
+    </div>
+    <div class="metricCard">
+      <div class="metricLabel">主要値</div>
+      <div id="skillSimMainStats" class="skillSimMiniGrid">-</div>
+    </div>
+    <div class="metricCard">
+      <div class="metricLabel">戦闘系</div>
+      <div id="skillSimBattleStats" class="skillSimMiniGrid">-</div>
+    </div>
+    <div class="metricCard">
+      <div class="metricLabel">反映内容</div>
+      <div id="skillSimApplyPreview" class="small">-</div>
+    </div>
+  </div>
+
+  <div id="skillSimGroups" class="skillSimGroups"></div>
+</section>
+
+<section class="card wide" data-tab-target="equipment">
   <h2>武器・防具・装飾補正</h2>
   <p class="small">
-    右手・左手・弾丸、防具7部位、装飾7部位を縦並びのブロックで用意しています。各部位に候補を追加し、使用チェックで付け外しできます。
+    右手・左手・弾丸、防具7部位、装飾7部位を部位ごとのカテゴリに分けています。各部位に候補を追加し、使用チェックで付け外しできます。
     同じ部位で使用ONにできる候補は1つだけです。候補を追加して、使うものだけチェックしてください。未装備や補正なしの部位は空欄/0のままでOKです。
-    攻撃力・魔力・速度は計算に反映し、攻撃ディレイは合計値を表示します。装備に内蔵されたBuffは「装備Buff」欄を開いて入力できます。
+    攻撃力・魔力・速度は計算に反映し、攻撃ディレイ・魔法ディレイは詳細欄で管理します。装備に内蔵されたBuffやAC/HP/命中などの追加ステータスは「詳細」欄を開いて入力できます。
   </p>
 
   <div class="equipmentLayout">
@@ -2192,8 +2647,7 @@ MoE固有の主な仮定:
                 <th>攻撃力</th>
                 <th>魔力</th>
                 <th>速度</th>
-                <th>ディレイ</th>
-                <th>装備Buff</th>
+                <th>詳細</th>
                 <th>競合グループ</th>
                 <th>メモ</th>
                 <th>操作</th>
@@ -2213,8 +2667,7 @@ MoE固有の主な仮定:
                 <th>攻撃力</th>
                 <th>魔力</th>
                 <th>速度</th>
-                <th>ディレイ</th>
-                <th>装備Buff</th>
+                <th>詳細</th>
                 <th>競合グループ</th>
                 <th>メモ</th>
                 <th>操作</th>
@@ -2234,8 +2687,7 @@ MoE固有の主な仮定:
                 <th>攻撃力</th>
                 <th>魔力</th>
                 <th>速度</th>
-                <th>ディレイ</th>
-                <th>装備Buff</th>
+                <th>詳細</th>
                 <th>競合グループ</th>
                 <th>メモ</th>
                 <th>操作</th>
@@ -2248,78 +2700,330 @@ MoE固有の主な仮定:
       </div>
     </div>
 
-    <div class="equipmentDuo">
-      <div class="equipmentPanel">
+    <div class="equipmentStackedGroups">
+<div class="equipmentPanel equipmentGroupedPanel">
         <h3>防具</h3>
-        <table class="equipmentTable">
-          <thead>
-            <tr>
-              <th>使用</th>
-              <th>部位</th>
-              <th>名前</th>
-              <th>攻撃力</th>
-              <th>魔力</th>
-              <th>速度</th>
-              <th>ディレイ</th>
-              <th>装備Buff</th>
-              <th>競合グループ</th>
-              <th>メモ</th>
-              <th>操作</th>
-            </tr>
-          </thead>
-          <tbody id="equipmentArmorBody"></tbody>
-        </table>
-        <div class="equipmentAddControls">
-          <select id="addArmorSlot">
-            <option value="防具: 頭">頭</option>
-            <option value="防具: 胴">胴</option>
-            <option value="防具: 手">手</option>
-            <option value="防具: パンツ">パンツ</option>
-            <option value="防具: 靴">靴</option>
-            <option value="防具: 肩">肩</option>
-            <option value="防具: 腰">腰</option>
-          </select>
-          <button type="button" onclick="addEquipmentCandidate(byId('addArmorSlot').value)">防具候補を追加</button>
+        <div class="equipmentSlotCategories">
+          <details class="equipmentSlotCategory" open>
+            <summary>頭</summary>
+            <div class="equipmentSlotCategoryBody">
+              <table class="equipmentTable weaponTable equipmentSlotTable">
+                <thead>
+              <tr>
+                <th>使用</th>
+                <th>名前</th>
+                <th>攻撃力</th>
+                <th>魔力</th>
+                <th>速度</th>
+                <th>詳細</th>
+                <th>競合グループ</th>
+                <th>メモ</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+                <tbody id="equipmentArmorHeadBody" data-equipment-slot-body="防具: 頭"></tbody>
+              </table>
+              <button type="button" onclick="addEquipmentCandidate('防具: 頭')">頭候補を追加</button>
+            </div>
+          </details>
+          <details class="equipmentSlotCategory" open>
+            <summary>胴</summary>
+            <div class="equipmentSlotCategoryBody">
+              <table class="equipmentTable weaponTable equipmentSlotTable">
+                <thead>
+              <tr>
+                <th>使用</th>
+                <th>名前</th>
+                <th>攻撃力</th>
+                <th>魔力</th>
+                <th>速度</th>
+                <th>詳細</th>
+                <th>競合グループ</th>
+                <th>メモ</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+                <tbody id="equipmentArmorBodyBody" data-equipment-slot-body="防具: 胴"></tbody>
+              </table>
+              <button type="button" onclick="addEquipmentCandidate('防具: 胴')">胴候補を追加</button>
+            </div>
+          </details>
+          <details class="equipmentSlotCategory" open>
+            <summary>手</summary>
+            <div class="equipmentSlotCategoryBody">
+              <table class="equipmentTable weaponTable equipmentSlotTable">
+                <thead>
+              <tr>
+                <th>使用</th>
+                <th>名前</th>
+                <th>攻撃力</th>
+                <th>魔力</th>
+                <th>速度</th>
+                <th>詳細</th>
+                <th>競合グループ</th>
+                <th>メモ</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+                <tbody id="equipmentArmorHandsBody" data-equipment-slot-body="防具: 手"></tbody>
+              </table>
+              <button type="button" onclick="addEquipmentCandidate('防具: 手')">手候補を追加</button>
+            </div>
+          </details>
+          <details class="equipmentSlotCategory" open>
+            <summary>パンツ</summary>
+            <div class="equipmentSlotCategoryBody">
+              <table class="equipmentTable weaponTable equipmentSlotTable">
+                <thead>
+              <tr>
+                <th>使用</th>
+                <th>名前</th>
+                <th>攻撃力</th>
+                <th>魔力</th>
+                <th>速度</th>
+                <th>詳細</th>
+                <th>競合グループ</th>
+                <th>メモ</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+                <tbody id="equipmentArmorPantsBody" data-equipment-slot-body="防具: パンツ"></tbody>
+              </table>
+              <button type="button" onclick="addEquipmentCandidate('防具: パンツ')">パンツ候補を追加</button>
+            </div>
+          </details>
+          <details class="equipmentSlotCategory" open>
+            <summary>靴</summary>
+            <div class="equipmentSlotCategoryBody">
+              <table class="equipmentTable weaponTable equipmentSlotTable">
+                <thead>
+              <tr>
+                <th>使用</th>
+                <th>名前</th>
+                <th>攻撃力</th>
+                <th>魔力</th>
+                <th>速度</th>
+                <th>詳細</th>
+                <th>競合グループ</th>
+                <th>メモ</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+                <tbody id="equipmentArmorShoesBody" data-equipment-slot-body="防具: 靴"></tbody>
+              </table>
+              <button type="button" onclick="addEquipmentCandidate('防具: 靴')">靴候補を追加</button>
+            </div>
+          </details>
+          <details class="equipmentSlotCategory" open>
+            <summary>肩</summary>
+            <div class="equipmentSlotCategoryBody">
+              <table class="equipmentTable weaponTable equipmentSlotTable">
+                <thead>
+              <tr>
+                <th>使用</th>
+                <th>名前</th>
+                <th>攻撃力</th>
+                <th>魔力</th>
+                <th>速度</th>
+                <th>詳細</th>
+                <th>競合グループ</th>
+                <th>メモ</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+                <tbody id="equipmentArmorShoulderBody" data-equipment-slot-body="防具: 肩"></tbody>
+              </table>
+              <button type="button" onclick="addEquipmentCandidate('防具: 肩')">肩候補を追加</button>
+            </div>
+          </details>
+          <details class="equipmentSlotCategory" open>
+            <summary>腰</summary>
+            <div class="equipmentSlotCategoryBody">
+              <table class="equipmentTable weaponTable equipmentSlotTable">
+                <thead>
+              <tr>
+                <th>使用</th>
+                <th>名前</th>
+                <th>攻撃力</th>
+                <th>魔力</th>
+                <th>速度</th>
+                <th>詳細</th>
+                <th>競合グループ</th>
+                <th>メモ</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+                <tbody id="equipmentArmorWaistBody" data-equipment-slot-body="防具: 腰"></tbody>
+              </table>
+              <button type="button" onclick="addEquipmentCandidate('防具: 腰')">腰候補を追加</button>
+            </div>
+          </details>
         </div>
       </div>
-      <div class="equipmentPanel">
+<div class="equipmentPanel equipmentGroupedPanel">
         <h3>装飾</h3>
-        <table class="equipmentTable">
-          <thead>
-            <tr>
-              <th>使用</th>
-              <th>部位</th>
-              <th>名前</th>
-              <th>攻撃力</th>
-              <th>魔力</th>
-              <th>速度</th>
-              <th>ディレイ</th>
-              <th>装備Buff</th>
-              <th>競合グループ</th>
-              <th>メモ</th>
-              <th>操作</th>
-            </tr>
-          </thead>
-          <tbody id="equipmentAccessoryBody"></tbody>
-        </table>
-        <div class="equipmentAddControls">
-          <select id="addAccessorySlot">
-            <option value="装飾: 頭">頭</option>
-            <option value="装飾: 顔">顔</option>
-            <option value="装飾: 耳">耳</option>
-            <option value="装飾: 指">指</option>
-            <option value="装飾: 胸">胸</option>
-            <option value="装飾: 背中">背中</option>
-            <option value="装飾: 腰">腰</option>
-          </select>
-          <button type="button" onclick="addEquipmentCandidate(byId('addAccessorySlot').value)">装飾候補を追加</button>
+        <div class="equipmentSlotCategories">
+          <details class="equipmentSlotCategory" open>
+            <summary>頭</summary>
+            <div class="equipmentSlotCategoryBody">
+              <table class="equipmentTable weaponTable equipmentSlotTable">
+                <thead>
+              <tr>
+                <th>使用</th>
+                <th>名前</th>
+                <th>攻撃力</th>
+                <th>魔力</th>
+                <th>速度</th>
+                <th>詳細</th>
+                <th>競合グループ</th>
+                <th>メモ</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+                <tbody id="equipmentAccessoryHeadBody" data-equipment-slot-body="装飾: 頭"></tbody>
+              </table>
+              <button type="button" onclick="addEquipmentCandidate('装飾: 頭')">頭候補を追加</button>
+            </div>
+          </details>
+          <details class="equipmentSlotCategory" open>
+            <summary>顔</summary>
+            <div class="equipmentSlotCategoryBody">
+              <table class="equipmentTable weaponTable equipmentSlotTable">
+                <thead>
+              <tr>
+                <th>使用</th>
+                <th>名前</th>
+                <th>攻撃力</th>
+                <th>魔力</th>
+                <th>速度</th>
+                <th>詳細</th>
+                <th>競合グループ</th>
+                <th>メモ</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+                <tbody id="equipmentAccessoryFaceBody" data-equipment-slot-body="装飾: 顔"></tbody>
+              </table>
+              <button type="button" onclick="addEquipmentCandidate('装飾: 顔')">顔候補を追加</button>
+            </div>
+          </details>
+          <details class="equipmentSlotCategory" open>
+            <summary>耳</summary>
+            <div class="equipmentSlotCategoryBody">
+              <table class="equipmentTable weaponTable equipmentSlotTable">
+                <thead>
+              <tr>
+                <th>使用</th>
+                <th>名前</th>
+                <th>攻撃力</th>
+                <th>魔力</th>
+                <th>速度</th>
+                <th>詳細</th>
+                <th>競合グループ</th>
+                <th>メモ</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+                <tbody id="equipmentAccessoryEarBody" data-equipment-slot-body="装飾: 耳"></tbody>
+              </table>
+              <button type="button" onclick="addEquipmentCandidate('装飾: 耳')">耳候補を追加</button>
+            </div>
+          </details>
+          <details class="equipmentSlotCategory" open>
+            <summary>指</summary>
+            <div class="equipmentSlotCategoryBody">
+              <table class="equipmentTable weaponTable equipmentSlotTable">
+                <thead>
+              <tr>
+                <th>使用</th>
+                <th>名前</th>
+                <th>攻撃力</th>
+                <th>魔力</th>
+                <th>速度</th>
+                <th>詳細</th>
+                <th>競合グループ</th>
+                <th>メモ</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+                <tbody id="equipmentAccessoryRingBody" data-equipment-slot-body="装飾: 指"></tbody>
+              </table>
+              <button type="button" onclick="addEquipmentCandidate('装飾: 指')">指候補を追加</button>
+            </div>
+          </details>
+          <details class="equipmentSlotCategory" open>
+            <summary>胸</summary>
+            <div class="equipmentSlotCategoryBody">
+              <table class="equipmentTable weaponTable equipmentSlotTable">
+                <thead>
+              <tr>
+                <th>使用</th>
+                <th>名前</th>
+                <th>攻撃力</th>
+                <th>魔力</th>
+                <th>速度</th>
+                <th>詳細</th>
+                <th>競合グループ</th>
+                <th>メモ</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+                <tbody id="equipmentAccessoryChestBody" data-equipment-slot-body="装飾: 胸"></tbody>
+              </table>
+              <button type="button" onclick="addEquipmentCandidate('装飾: 胸')">胸候補を追加</button>
+            </div>
+          </details>
+          <details class="equipmentSlotCategory" open>
+            <summary>背中</summary>
+            <div class="equipmentSlotCategoryBody">
+              <table class="equipmentTable weaponTable equipmentSlotTable">
+                <thead>
+              <tr>
+                <th>使用</th>
+                <th>名前</th>
+                <th>攻撃力</th>
+                <th>魔力</th>
+                <th>速度</th>
+                <th>詳細</th>
+                <th>競合グループ</th>
+                <th>メモ</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+                <tbody id="equipmentAccessoryBackBody" data-equipment-slot-body="装飾: 背中"></tbody>
+              </table>
+              <button type="button" onclick="addEquipmentCandidate('装飾: 背中')">背中候補を追加</button>
+            </div>
+          </details>
+          <details class="equipmentSlotCategory" open>
+            <summary>腰</summary>
+            <div class="equipmentSlotCategoryBody">
+              <table class="equipmentTable weaponTable equipmentSlotTable">
+                <thead>
+              <tr>
+                <th>使用</th>
+                <th>名前</th>
+                <th>攻撃力</th>
+                <th>魔力</th>
+                <th>速度</th>
+                <th>詳細</th>
+                <th>競合グループ</th>
+                <th>メモ</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+                <tbody id="equipmentAccessoryWaistBody" data-equipment-slot-body="装飾: 腰"></tbody>
+              </table>
+              <button type="button" onclick="addEquipmentCandidate('装飾: 腰')">腰候補を追加</button>
+            </div>
+          </details>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<section class="card wide compositeMainSection">
+<section class="card wide compositeMainSection" data-tab-target="buffs">
   <h2>装備以外のBuff</h2>
   <p class="small compositeLead">
     <b>装備に内蔵されていないBuff</b> を入力する欄です。
@@ -2335,7 +3039,7 @@ MoE固有の主な仮定:
           <th>攻撃力+</th><th>魔力+</th><th>速度+</th>
           <th>魔力→攻撃力%</th><th>速度→攻撃力%</th>
           <th>与ダメ%</th><th>特攻倍率</th>
-          <th>メモ</th><th>操作</th>
+          <th>詳細</th><th>メモ</th><th>操作</th>
         </tr>
       </thead>
       <tbody></tbody>
@@ -2344,7 +3048,7 @@ MoE固有の主な仮定:
   <button onclick="addCompositeRow('blank')">Buff行を追加</button>
 </section>
 
-<section class="card wide tagLinkSection">
+<section class="card wide tagLinkSection" data-tab-target="groups">
   <h2>競合グループ管理</h2>
   <p class="small">
     装備Buffや装備以外Buffに同じ競合グループ名を入れると、同一グループとして扱います。同じグループのBuffが複数ONの場合、計算上は代表1つだけを採用します。グループ名にスペースを含められます。複数指定時は先頭のグループを競合判定に使います。
@@ -2370,7 +3074,7 @@ MoE固有の主な仮定:
 
 
 
-<section class="card wide">
+<section class="card wide" data-tab-target="buffs">
   <h2>外枠補正：ネヤ補正・被ダメ増加・パンチングマシン補正など</h2>
   <p class="small">ここは乗算扱い。Buff枠に数えるものだけ「枠」をONにしてください。</p>
   <table id="postBuffTable" class="compactTable">
@@ -2380,7 +3084,7 @@ MoE固有の主な仮定:
   <button onclick="addRow('post')">外枠行を追加</button>
 </section>
 
-<section class="card wide">
+<section class="card wide" data-tab-target="buffs">
   <h2>その他バフ：ダメージ計算に使わないBuff</h2>
   <p class="small">ダメージ計算には一切使わず、バフ24枠カウントだけに使います。</p>
   <table id="otherBuffTable" class="compactTable">
@@ -2391,14 +3095,14 @@ MoE固有の主な仮定:
 </section>
 
 
-<section class="card wide optimizerSection">
+<section class="card wide optimizerSection" data-tab-target="calc">
   <details class="optimizerDetails">
     <summary>最適化計算 <span class="summaryNote">装備候補 + 装備以外のBuffから自動選択</span></summary>
     <div class="optimizerBody">
       <p class="small">
         このセクションでは候補の追加はしません。
-        上の「武器・防具・装飾補正」に積んだ装備候補と、「装備以外のBuff」に積んだBuff候補を使って、上位構成を探します。
-        装備Buffと競合グループも計算に反映します。その他バフは現在のON/OFF状態を固定枠として扱い、最適化対象にはしません。
+        「装備登録」タブに積んだ装備候補と、「Buff登録」タブに積んだ装備以外Buff候補を使って、上位構成を探します。
+        装備Buff、追加ステータス、競合グループも計算に反映します。競合グループが同じ装備候補は同時採用しません。その他バフは「その他バフの使用を強制する」がONの時だけ現在ON/OFF状態を固定枠として扱い、最適化対象にはしません。
       </p>
       <div class="optimizerControls">
         <label>バフ枠上限<input id="optimizerMaxSlots" type="number" min="0" step="1" value="24"></label>
@@ -2409,6 +3113,15 @@ MoE固有の主な仮定:
             <option value="damage">最大ダメージ</option>
             <option value="attack">最大攻撃力</option>
             <option value="magic">最大魔力</option>
+            <option value="extraAC">最大AC</option>
+            <option value="extraHP">最大HP</option>
+            <option value="extraST">最大ST</option>
+            <option value="extraHit">最大命中</option>
+            <option value="extraAvoid">最大回避</option>
+            <option value="extraAttackDelay">最大攻撃ディレイ</option>
+            <option value="extraMagicDelay">最大魔法ディレイ</option>
+            <option value="extraDamageReducePct">最大被ダメ軽減</option>
+            <option value="extraCritRatePct">最大クリ率</option>
           </select>
         </label>
       </div>
@@ -2416,6 +3129,7 @@ MoE固有の主な仮定:
         <label><input id="optimizerFixCurrentEquipment" type="checkbox"> 現在ONの装備を固定する</label>
         <label><input id="optimizerIncludeDisabledBuffs" type="checkbox" checked> OFFの装備以外Buffも候補に含める</label>
         <label><input id="optimizerFixCurrentBuffs" type="checkbox"> 現在ONの装備以外Buffを固定する</label>
+        <label><input id="optimizerForceOtherBuffs" type="checkbox" checked> その他バフの使用を強制する</label>
       </div>
       <div class="optimizerButtons">
         <button class="primaryButton" onclick="runIntegratedOptimizer()">最適化する</button>
@@ -2429,7 +3143,7 @@ MoE固有の主な仮定:
   </details>
 </section>
 
-<section class="card wide">
+<section class="card wide" data-tab-target="save">
   <h2>保存・読み込み</h2>
   <button onclick="exportConfig()">JSON出力</button>
   <button onclick="importConfig()">JSON読み込み</button>
@@ -2500,6 +3214,188 @@ const EQUIPMENT_SLOTS = [
  * 装備固定行の初期データを作る。
  * 防具/装飾/武器の行数を常に一定にして、保存データの欠けや旧形式を吸収しやすくする。
  */
+
+const BASE_EXTRA_STAT_DEFS = [
+  {prop:"extraAC", equipProp:"equipBuffExtraAC", label:"AC", step:"0.1"},
+  {prop:"extraHP", equipProp:"equipBuffExtraHP", label:"HP", step:"1"},
+  {prop:"extraMP", equipProp:"equipBuffExtraMP", label:"MP", step:"1"},
+  {prop:"extraST", equipProp:"equipBuffExtraST", label:"ST", step:"1"},
+  {prop:"extraHit", equipProp:"equipBuffExtraHit", label:"命中", step:"0.1"},
+  {prop:"extraAvoid", equipProp:"equipBuffExtraAvoid", label:"回避", step:"0.1"},
+  {prop:"extraAttackDelay", equipProp:"equipBuffExtraAttackDelay", label:"攻撃ディレイ", step:"0.1"},
+  {prop:"extraMagicDelay", equipProp:"equipBuffExtraMagicDelay", label:"魔法ディレイ", step:"0.1"},
+  {prop:"extraFireRes", equipProp:"equipBuffExtraFireRes", label:"火耐性", step:"0.1"},
+  {prop:"extraWaterRes", equipProp:"equipBuffExtraWaterRes", label:"水耐性", step:"0.1"},
+  {prop:"extraEarthRes", equipProp:"equipBuffExtraEarthRes", label:"地耐性", step:"0.1"},
+  {prop:"extraWindRes", equipProp:"equipBuffExtraWindRes", label:"風耐性", step:"0.1"},
+  {prop:"extraNeutralRes", equipProp:"equipBuffExtraNeutralRes", label:"無耐性", step:"0.1"}
+];
+
+const BUFF_FLAT_EXTRA_STAT_DEFS = [
+  {prop:"extraAC", equipProp:"equipBuffExtraAC", label:"AC", step:"0.1"},
+  {prop:"extraHP", equipProp:"equipBuffExtraHP", label:"HP", step:"1"},
+  {prop:"extraMP", equipProp:"equipBuffExtraMP", label:"MP", step:"1"},
+  {prop:"extraST", equipProp:"equipBuffExtraST", label:"ST", step:"1"},
+  {prop:"extraHit", equipProp:"equipBuffExtraHit", label:"命中", step:"0.1"},
+  {prop:"extraAvoid", equipProp:"equipBuffExtraAvoid", label:"回避", step:"0.1"},
+  {prop:"extraMagicDelay", equipProp:"equipBuffExtraMagicDelay", label:"魔法ディレイ", step:"0.1"},
+  {prop:"extraFireRes", equipProp:"equipBuffExtraFireRes", label:"火耐性", step:"0.1"},
+  {prop:"extraWaterRes", equipProp:"equipBuffExtraWaterRes", label:"水耐性", step:"0.1"},
+  {prop:"extraEarthRes", equipProp:"equipBuffExtraEarthRes", label:"地耐性", step:"0.1"},
+  {prop:"extraWindRes", equipProp:"equipBuffExtraWindRes", label:"風耐性", step:"0.1"},
+  {prop:"extraNeutralRes", equipProp:"equipBuffExtraNeutralRes", label:"無耐性", step:"0.1"}
+];
+
+const BUFF_PCT_EXTRA_STAT_DEFS = [
+  {prop:"extraACPct", equipProp:"equipBuffExtraACPct", label:"AC%", step:"0.1"},
+  {prop:"extraHPPct", equipProp:"equipBuffExtraHPPct", label:"HP%", step:"0.1"},
+  {prop:"extraMPPct", equipProp:"equipBuffExtraMPPct", label:"MP%", step:"0.1"},
+  {prop:"extraSTPct", equipProp:"equipBuffExtraSTPct", label:"ST%", step:"0.1"},
+  {prop:"extraHitPct", equipProp:"equipBuffExtraHitPct", label:"命中%", step:"0.1"},
+  {prop:"extraAvoidPct", equipProp:"equipBuffExtraAvoidPct", label:"回避%", step:"0.1"},
+  {prop:"extraAttackDelayPct", equipProp:"equipBuffExtraAttackDelayPct", label:"攻撃ディレイ%", step:"0.1"},
+  {prop:"extraMagicDelayPct", equipProp:"equipBuffExtraMagicDelayPct", label:"魔法ディレイ%", step:"0.1"},
+  {prop:"extraFireResPct", equipProp:"equipBuffExtraFireResPct", label:"火耐性%", step:"0.1"},
+  {prop:"extraWaterResPct", equipProp:"equipBuffExtraWaterResPct", label:"水耐性%", step:"0.1"},
+  {prop:"extraEarthResPct", equipProp:"equipBuffExtraEarthResPct", label:"地耐性%", step:"0.1"},
+  {prop:"extraWindResPct", equipProp:"equipBuffExtraWindResPct", label:"風耐性%", step:"0.1"},
+  {prop:"extraNeutralResPct", equipProp:"equipBuffExtraNeutralResPct", label:"無耐性%", step:"0.1"}
+];
+
+const BUFF_ONLY_EXTRA_STAT_DEFS = [
+  {prop:"extraDamageReducePct", equipProp:"equipBuffExtraDamageReducePct", label:"被ダメ軽減%", step:"0.1"},
+  {prop:"extraCritRatePct", equipProp:"equipBuffExtraCritRatePct", label:"クリ率%", step:"0.1"}
+];
+
+function normalizeExtraMode(mode) {
+  if (mode === true) return "equipBuff";
+  if (mode === false || mode === undefined || mode === null) return "base";
+  return mode;
+}
+
+function uniqueDefs(defs) {
+  const seen = new Set();
+  return defs.filter(d => {
+    if (seen.has(d.prop)) return false;
+    seen.add(d.prop);
+    return true;
+  });
+}
+
+function extraFieldDefsFor(mode="base") {
+  mode = normalizeExtraMode(mode);
+  if (mode === "base") return BASE_EXTRA_STAT_DEFS;
+  if (mode === "buff" || mode === "equipBuff") return BUFF_FLAT_EXTRA_STAT_DEFS.concat(BUFF_PCT_EXTRA_STAT_DEFS, BUFF_ONLY_EXTRA_STAT_DEFS);
+  if (mode === "summary") return uniqueDefs(BASE_EXTRA_STAT_DEFS.concat(BUFF_FLAT_EXTRA_STAT_DEFS, BUFF_PCT_EXTRA_STAT_DEFS, BUFF_ONLY_EXTRA_STAT_DEFS));
+  return BASE_EXTRA_STAT_DEFS;
+}
+
+function extraPropFor(def, mode) {
+  return normalizeExtraMode(mode) === "equipBuff" ? def.equipProp : def.prop;
+}
+
+function extraDefaultFields(mode="base") {
+  const out = {};
+  extraFieldDefsFor(mode).forEach(d => out[extraPropFor(d, mode)] = 0);
+  return out;
+}
+
+function emptyExtraStats() {
+  const out = {};
+  extraFieldDefsFor("summary").forEach(d => out[d.prop] = 0);
+  return out;
+}
+
+function extraStatsHasEffect(row, mode="base") {
+  mode = normalizeExtraMode(mode);
+  return extraFieldDefsFor(mode).some(d => +(row?.[extraPropFor(d, mode)] || 0));
+}
+
+function extraStatsEffectText(row, mode="base") {
+  mode = normalizeExtraMode(mode);
+  const parts = [];
+  extraFieldDefsFor(mode).forEach(d => {
+    const v = +(row?.[extraPropFor(d, mode)] || 0);
+    if (v) parts.push(`${d.label}${v > 0 ? "+" : ""}${v}`);
+  });
+  return parts.join(" / ");
+}
+
+function addExtraStatsInto(acc, row, mode="base") {
+  mode = normalizeExtraMode(mode);
+  extraFieldDefsFor(mode).forEach(d => {
+    acc[d.prop] = (acc[d.prop] || 0) + (+(row?.[extraPropFor(d, mode)] || 0));
+  });
+  return acc;
+}
+
+function normalizeExtraStatsOnRow(out, source) {
+  ["base", "buff", "equipBuff"].forEach(mode => {
+    extraFieldDefsFor(mode).forEach(d => {
+      const prop = extraPropFor(d, mode);
+      out[prop] = +(source?.[prop] || 0);
+    });
+  });
+  return out;
+}
+
+function extraStatsSummary(extra) {
+  const parts = [];
+  extraFieldDefsFor("summary").forEach(d => {
+    const v = +(extra?.[d.prop] || 0);
+    if (v) parts.push(`${d.label} ${v > 0 ? "+" : ""}${fmt(v, 2)}`);
+  });
+  return parts;
+}
+
+function extraStatNumberInput(row, def, mode="base", onUpdate=null) {
+  mode = normalizeExtraMode(mode);
+  const prop = extraPropFor(def, mode);
+  const wrap = document.createElement("label");
+  wrap.textContent = def.label;
+  const input = makeCell("input", {type:"number", step:def.step || "0.1", value: row[prop] ?? 0});
+  input.oninput = () => {
+    row[prop] = parseFloat(input.value) || 0;
+    if (onUpdate) onUpdate();
+    calc();
+  };
+  wrap.appendChild(input);
+  return wrap;
+}
+
+function makeExtraStatsEditor(row, title, mode="base", onUpdate=null) {
+  mode = normalizeExtraMode(mode);
+  const wrap = document.createElement("div");
+  wrap.className = "extraStatsEditor equipBuffWide";
+  const h = document.createElement("div");
+  h.className = "extraStatsTitle";
+  h.textContent = title;
+  wrap.appendChild(h);
+
+  const grid = document.createElement("div");
+  grid.className = "extraStatsGrid";
+  extraFieldDefsFor(mode).forEach(def => grid.appendChild(extraStatNumberInput(row, def, mode, onUpdate)));
+  wrap.appendChild(grid);
+  return wrap;
+}
+
+function extraTsvFields(mode="base") {
+  mode = normalizeExtraMode(mode);
+  return extraFieldDefsFor(mode).map(d => extraPropFor(d, mode));
+}
+
+function extraTsvExportFields(row, mode="base") {
+  const out = {};
+  extraTsvFields(mode).forEach(prop => out[prop] = row?.[prop] ?? 0);
+  return out;
+}
+
+function extraTsvParseFields(row, mode="base") {
+  const out = {};
+  extraTsvFields(mode).forEach(prop => out[prop] = cellToNum(row?.[prop]));
+  return out;
+}
+
 function defaultEquipmentCandidate(slot, enabled=true) {
   return {
     enabled,
@@ -2509,6 +3405,13 @@ function defaultEquipmentCandidate(slot, enabled=true) {
     magic: 0,
     speed: 0,
     delay: 0,
+    weaponDamage: 0,
+    weaponWeight: 0,
+    weaponAttackInterval: 0,
+    weaponRange: 0,
+    weaponDurability: 0,
+    weaponTwoHanded: "×",
+    weaponReq: [],
     tags: "",
     equipBuffEnabled: false,
     equipBuffSlot: true,
@@ -2524,6 +3427,9 @@ function defaultEquipmentCandidate(slot, enabled=true) {
     equipBuffDmgPct: 0,
     equipBuffSpecial: 1,
     equipBuffNote: "",
+    ...extraDefaultFields("base"),
+    ...extraDefaultFields("buff"),
+    ...extraDefaultFields("equipBuff"),
     note: ""
   };
 }
@@ -2540,7 +3446,7 @@ function normalizeEquipmentSlotName(slot) {
 
 function normalizeEquipmentCandidate(row, fallbackSlot) {
   const slot = normalizeEquipmentSlotName(row?.slot || fallbackSlot || "防具: 頭");
-  return {
+  const out = {
     ...defaultEquipmentCandidate(slot, true),
     ...(row || {}),
     slot,
@@ -2549,6 +3455,13 @@ function normalizeEquipmentCandidate(row, fallbackSlot) {
     magic: +(row?.magic || 0),
     speed: +(row?.speed || 0),
     delay: +(row?.delay || 0),
+    weaponDamage: +(row?.weaponDamage || 0),
+    weaponWeight: +(row?.weaponWeight || 0),
+    weaponAttackInterval: +(row?.weaponAttackInterval || row?.attackInterval || 0),
+    weaponRange: +(row?.weaponRange || row?.range || 0),
+    weaponDurability: +(row?.weaponDurability || row?.durability || 0),
+    weaponTwoHanded: (row?.weaponTwoHanded === true || row?.weaponTwoHanded === "○" || row?.weaponTwoHanded === "yes" || row?.weaponTwoHanded === "true" || row?.twoHanded === true) ? "○" : "×",
+    weaponReq: normalizeWeaponReqRowsForEquipment(row?.weaponReq || row?.weaponRequirements || []),
     equipBuffEnabled: !!row?.equipBuffEnabled,
     equipBuffSlot: row?.equipBuffSlot !== false,
     equipBuffAttackPct: +(row?.equipBuffAttackPct || 0),
@@ -2562,6 +3475,10 @@ function normalizeEquipmentCandidate(row, fallbackSlot) {
     equipBuffDmgPct: +(row?.equipBuffDmgPct || 0),
     equipBuffSpecial: row?.equipBuffSpecial === undefined || row?.equipBuffSpecial === "" ? 1 : +(row?.equipBuffSpecial || 1)
   };
+  normalizeExtraStatsOnRow(out, row || {});
+  if (+out.delay && !(+out.extraAttackDelay)) out.extraAttackDelay = +out.delay;
+  out.delay = 0;
+  return out;
 }
 
 function normalizeEquipmentRows(rows) {
@@ -2603,12 +3520,262 @@ function normalizeEquipmentRows(rows) {
 }
 
 /* 新規起動時の初期状態。検証用データは入れず、基本的に空で始める。 */
+
+const SKILL_SIM_GROUPS = [
+  ["戦闘", ["筋力", "着こなし", "攻撃回避", "生命力", "知能", "持久力", "精神力", "集中力", "呪文抵抗力", "盾"]],
+  ["武器", ["素手", "刀剣", "こんぼう", "槍", "銃器", "弓", "投げ", "牙", "キック", "罠"]],
+  ["熟練", ["戦闘技術", "酩酊", "物まね", "調教", "破壊魔法", "回復魔法", "強化魔法", "神秘魔法", "召喚魔法", "死の魔法", "魔法熟練", "自然調和", "暗黒命令", "取引", "音楽", "ダンス", "パフォーマンス"]],
+  ["基本・生産", ["採掘", "伐採", "収穫", "釣り", "料理", "醸造", "鍛冶", "木工", "裁縫", "装飾細工", "薬調合", "複製", "美容", "解読", "盗み"]]
+];
+
+const SKILL_SIM_ALL = SKILL_SIM_GROUPS.flatMap(([, list]) => list);
+const SKILL_SIM_WEAPON = ["素手", "刀剣", "こんぼう", "槍", "銃器", "弓", "投げ", "牙", "キック", "罠"];
+
+const SKILL_SIM_RACE = {
+  newtar:   {hp:3.00, mp:3.00, st:3.00, atk:0.20, def:0.20, hit:1.00, avoid:1.00, magic:1.00, resist:1.00, weight:1.50},
+  cognite:  {hp:2.85, mp:3.30, st:2.85, atk:0.19, def:0.19, hit:1.05, avoid:0.95, magic:1.10, resist:1.10, weight:1.35},
+  elmony:   {hp:2.85, mp:3.00, st:3.15, atk:0.19, def:0.19, hit:1.05, avoid:1.10, magic:0.95, resist:1.00, weight:1.50},
+  pandemos: {hp:3.15, mp:2.85, st:3.00, atk:0.21, def:0.20, hit:1.00, avoid:0.95, magic:0.90, resist:0.90, weight:1.80}
+};
+
+function defaultSkillSimState() {
+  const skills = {};
+  SKILL_SIM_ALL.forEach(name => skills[name] = 0);
+  return {
+    name: "",
+    race: "newtar",
+    cap: 850,
+    weaponSkill: "こんぼう",
+    autoApply: true,
+    skills
+  };
+}
+
+function normalizeSkillSim(raw) {
+  const base = defaultSkillSimState();
+  const incoming = raw || {};
+  const out = {
+    ...base,
+    ...incoming,
+    name: incoming.name || "",
+    race: incoming.race || "newtar",
+    cap: incoming.cap === undefined || incoming.cap === "" ? 850 : (+incoming.cap || 850),
+    weaponSkill: incoming.weaponSkill || "こんぼう",
+    autoApply: incoming.autoApply !== false,
+    skills: {...base.skills, ...(incoming.skills || {})}
+  };
+  SKILL_SIM_ALL.forEach(name => {
+    out.skills[name] = Math.max(0, Math.min(100, +(out.skills[name] || 0)));
+  });
+  return out;
+}
+
+function skillSimValue(name) {
+  state.skillSim = normalizeSkillSim(state.skillSim);
+  return +(state.skillSim.skills[name] || 0);
+}
+
+function skillSimTotal() {
+  state.skillSim = normalizeSkillSim(state.skillSim);
+  return SKILL_SIM_ALL.reduce((s, name) => s + (+(state.skillSim.skills[name] || 0)), 0);
+}
+
+function skillSimDerived() {
+  state.skillSim = normalizeSkillSim(state.skillSim);
+  const c = SKILL_SIM_RACE[state.skillSim.race] || SKILL_SIM_RACE.newtar;
+  const weapon = skillSimValue(state.skillSim.weaponSkill);
+  const total = skillSimTotal();
+  return {
+    total,
+    remain: (state.skillSim.cap || 850) - total,
+    hp: skillSimValue("生命力") * c.hp,
+    mp: skillSimValue("知能") * c.mp,
+    st: skillSimValue("持久力") * c.st,
+    weight: skillSimValue("筋力") * c.weight,
+    atk: skillSimValue("筋力") * c.atk,
+    def: skillSimValue("着こなし") * c.def,
+    hit: weapon * c.hit,
+    avoid: skillSimValue("攻撃回避") * c.avoid,
+    magic: skillSimValue("精神力") * c.magic,
+    resist: skillSimValue("呪文抵抗力") * c.resist,
+    weapon,
+    drunk: skillSimValue("酩酊")
+  };
+}
+
+function syncSkillSimToCalcInputs(force=false, updateWeaponReqName=false) {
+  if (!state || !state.skillSim) return false;
+  state.skillSim = normalizeSkillSim(state.skillSim);
+  if (!force && state.skillSim.autoApply === false) return false;
+
+  const d = skillSimDerived();
+
+  if (byId("raceSelect")) byId("raceSelect").value = state.skillSim.race || "newtar";
+  if (byId("str")) byId("str").value = fmt(skillSimValue("筋力"), 1);
+  if (byId("spirit")) byId("spirit").value = fmt(skillSimValue("精神力"), 1);
+  if (byId("drunk")) byId("drunk").value = fmt(d.drunk, 1);
+
+  // 旧形式・未統合武器用の互換データも更新しておく。
+  state.weaponReq = normalizeWeaponReqRows(state.weaponReq, collectInputs());
+  if (!state.weaponReq.length) state.weaponReq.push({name:"武器スキル", current:0, required:0});
+  state.weaponReq[0].name = state.skillSim.weaponSkill || "武器スキル";
+  state.weaponReq[0].current = d.weapon;
+
+  if (updateWeaponReqName) {
+    const weaponRow = selectedWeaponRowForEdit();
+    if (weaponRow) {
+      weaponRow.weaponReq = normalizeWeaponReqRowsForEquipment(weaponRow.weaponReq);
+      if (!weaponRow.weaponReq.length) weaponRow.weaponReq.push({name: state.skillSim.weaponSkill || "こんぼう", current:0, required:0});
+      weaponRow.weaponReq[0].name = validSkillSimSkillName(state.skillSim.weaponSkill || weaponRow.weaponReq[0].name);
+    }
+  }
+
+  return true;
+}
+
+function handleSkillSimChanged() {
+  updateSkillSimSummary();
+  syncSkillSimToCalcInputs(false, false);
+  calc();
+}
+
+
+function renderSkillSim() {
+  if (!state.skillSim) state.skillSim = defaultSkillSimState();
+  state.skillSim = normalizeSkillSim(state.skillSim);
+
+  const name = byId("skillSimName");
+  if (!name) return;
+
+  name.value = state.skillSim.name || "";
+  name.oninput = e => {
+    state.skillSim.name = e.target.value;
+    handleSkillSimChanged();
+  };
+
+  const race = byId("skillSimRace");
+  race.value = state.skillSim.race || "newtar";
+  race.onchange = e => {
+    state.skillSim.race = e.target.value;
+    handleSkillSimChanged();
+  };
+
+  const cap = byId("skillSimCap");
+  cap.value = state.skillSim.cap ?? 850;
+  cap.oninput = e => {
+    state.skillSim.cap = parseFloat(e.target.value) || 850;
+    handleSkillSimChanged();
+  };
+
+  const weapon = byId("skillSimWeaponSkill");
+  weapon.innerHTML = SKILL_SIM_WEAPON.map(n => `<option value="${escapeHtml(n)}">${escapeHtml(n)}</option>`).join("");
+  weapon.value = state.skillSim.weaponSkill || "こんぼう";
+  weapon.onchange = e => {
+    state.skillSim.weaponSkill = e.target.value;
+    handleSkillSimChanged();
+  };
+
+  const autoApply = byId("skillSimAutoApply");
+  if (autoApply) {
+    autoApply.checked = state.skillSim.autoApply !== false;
+    autoApply.onchange = e => {
+      state.skillSim.autoApply = !!e.target.checked;
+      if (state.skillSim.autoApply) syncSkillSimToCalcInputs(true, false);
+      updateSkillSimSummary();
+      calc();
+    };
+  }
+
+  const root = byId("skillSimGroups");
+  root.innerHTML = "";
+  SKILL_SIM_GROUPS.forEach(([group, list]) => {
+    const box = document.createElement("section");
+    box.className = "skillSimGroup";
+    const h = document.createElement("h3");
+    h.textContent = group;
+    box.appendChild(h);
+
+    const grid = document.createElement("div");
+    grid.className = "skillSimGrid";
+    list.forEach(skill => {
+      const label = document.createElement("label");
+      label.textContent = skill;
+      const input = makeCell("input", {
+        type: "number",
+        min: "0",
+        max: "100",
+        step: "0.1",
+        value: state.skillSim.skills[skill] ?? 0
+      });
+      input.oninput = () => {
+        state.skillSim.skills[skill] = Math.max(0, Math.min(100, parseFloat(input.value) || 0));
+        handleSkillSimChanged();
+      };
+      label.appendChild(input);
+      grid.appendChild(label);
+    });
+    box.appendChild(grid);
+    root.appendChild(box);
+  });
+
+  updateSkillSimSummary();
+}
+
+function updateSkillSimSummary() {
+  if (!byId("skillSimTotal")) return;
+  const d = skillSimDerived();
+
+  byId("skillSimTotal").textContent = fmt(d.total, 1);
+  byId("skillSimRemain").innerHTML = d.remain < 0
+    ? `<span class="bad">超過 ${fmt(Math.abs(d.remain), 1)}</span>`
+    : `残り ${fmt(d.remain, 1)}`;
+
+  byId("skillSimMainStats").innerHTML = [
+    ["HP", d.hp], ["MP", d.mp], ["ST", d.st], ["重量", d.weight]
+  ].map(([k,v]) => `<div><span>${k}</span><b>${fmt(v, 1)}</b></div>`).join("");
+
+  byId("skillSimBattleStats").innerHTML = [
+    ["攻撃力", d.atk], ["防御力", d.def], ["命中", d.hit],
+    ["回避", d.avoid], ["魔力", d.magic], ["呪文抵抗", d.resist]
+  ].map(([k,v]) => `<div><span>${k}</span><b>${fmt(v, 1)}</b></div>`).join("");
+
+  const raceLabel = byId("skillSimRace")?.selectedOptions?.[0]?.textContent || "";
+  byId("skillSimApplyPreview").innerHTML = [
+    `種族 → ${escapeHtml(raceLabel)}`,
+    `筋力 → ${fmt(skillSimValue("筋力"), 1)}`,
+    `精神力 → ${fmt(skillSimValue("精神力"), 1)}`,
+    `酩酊度 → ${fmt(d.drunk, 1)}`,
+    `${escapeHtml(state.skillSim.weaponSkill)} → 武器使用条件 ${fmt(d.weapon, 1)}`,
+    `自動反映 → ${state.skillSim.autoApply === false ? "OFF" : "ON"}`
+  ].map(x => `<div>${x}</div>`).join("");
+}
+
+function applySkillSimToCalc(silent=false) {
+  syncSkillSimToCalcInputs(true, true);
+
+  renderWeaponReqTable();
+  syncRaceCoeff();
+  syncBaseMagic();
+  calc();
+  if (!silent) alert("スキルシミュレータの値を計算タブへ反映しました。");
+}
+
+function resetSkillSim() {
+  if (!confirm("スキルシミュレータの入力値をリセットしますか？")) return;
+  state.skillSim = defaultSkillSimState();
+  renderSkillSim();
+  syncSkillSimToCalcInputs(true, false);
+  calc();
+}
+
+
 const DEFAULT_STATE = () => ({
   weaponReq: [
     {name: "武器スキル", current: 0, required: 0}
   ],
   composite: [],
   pct: [],
+  skillSim: defaultSkillSimState(),
   equipment: defaultEquipmentRows(),
   flat: [],
   conv: [],
@@ -2696,7 +3863,8 @@ function equipmentBuffHasEffect(r) {
     +r.equipBuffAttackPct || +r.equipBuffMagicPct || +r.equipBuffSpeedPct ||
     +r.equipBuffFlatAttack || +r.equipBuffFlatMagic || +r.equipBuffFlatSpeed ||
     +r.equipBuffConvMagicRate || +r.equipBuffConvSpeedRate || +r.equipBuffDmgPct ||
-    (+r.equipBuffSpecial && +r.equipBuffSpecial !== 1)
+    (+r.equipBuffSpecial && +r.equipBuffSpecial !== 1) ||
+    extraStatsHasEffect(r, "equipBuff")
   );
 }
 
@@ -2716,11 +3884,13 @@ function equipmentBuffEffectText(r) {
   if (+r.equipBuffConvSpeedRate) parts.push(`速度→攻撃力 ${r.equipBuffConvSpeedRate}%`);
   if (+r.equipBuffDmgPct) parts.push(`与ダメ+${r.equipBuffDmgPct}%`);
   if (+r.equipBuffSpecial && +r.equipBuffSpecial !== 1) parts.push(`特攻×${r.equipBuffSpecial}`);
+  const extra = extraStatsEffectText(r, "equipBuff");
+  if (extra) parts.push(extra);
   return parts.join(" / ") || "効果なし";
 }
 
 function equipmentBuffToCompositeRow(r) {
-  return {
+  const row = {
     enabled: !!r.equipBuffEnabled,
     slot: r.equipBuffSlot !== false,
     name: equipmentBuffDisplayName(r),
@@ -2737,6 +3907,10 @@ function equipmentBuffToCompositeRow(r) {
     special: +r.equipBuffSpecial || 1,
     note: r.equipBuffNote || `装備由来: ${r.name || r.slot || "装備"}`
   };
+  extraFieldDefsFor("equipBuff").forEach(d => {
+    row[d.prop] = +(r?.[d.equipProp] || 0);
+  });
+  return row;
 }
 
 /* 装備行に内蔵されたBuffを、計算時だけ装備以外Buffへ展開する。 */
@@ -2750,27 +3924,33 @@ function expandEquipmentBuffState(st) {
 }
 
 function normalizeCompositeRows(rows) {
-  return (Array.isArray(rows) ? rows : []).map(r => ({
-    enabled: !!r.enabled,
-    slot: r.slot !== false,
-    name: r.name || "装備以外Buff",
-    tags: r.tags || r.tag || "",
-    attackPct: +r.attackPct || 0,
-    magicPct: +r.magicPct || 0,
-    speedPct: +r.speedPct || 0,
-    flatAttack: +r.flatAttack || 0,
-    flatMagic: +r.flatMagic || 0,
-    flatSpeed: +r.flatSpeed || 0,
-    convMagicRate: +r.convMagicRate || 0,
-    convSpeedRate: +r.convSpeedRate || 0,
-    // 装備以外Buffの与ダメは、攻撃力%などと同じく「10%なら10」で保持する。
-    // 旧データで dmg:0.1 のような小数が来た場合は 10% として移行する。
-    dmgPct: r.dmgPct !== undefined
-      ? (+r.dmgPct || 0)
-      : ((+r.dmg || 0) > 0 && (+r.dmg || 0) <= 1 ? (+r.dmg || 0) * 100 : (+r.dmg || 0)),
-    special: +r.special || 1,
-    note: r.note || ""
-  }));
+  return (Array.isArray(rows) ? rows : []).map(r => {
+    const out = {
+      enabled: !!r.enabled,
+      slot: r.slot !== false,
+      name: r.name || "装備以外Buff",
+      tags: r.tags || r.tag || "",
+      attackPct: +r.attackPct || 0,
+      magicPct: +r.magicPct || 0,
+      speedPct: +r.speedPct || 0,
+      flatAttack: +r.flatAttack || 0,
+      flatMagic: +r.flatMagic || 0,
+      flatSpeed: +r.flatSpeed || 0,
+      convMagicRate: +r.convMagicRate || 0,
+      convSpeedRate: +r.convSpeedRate || 0,
+      // 装備以外Buffの与ダメは、攻撃力%などと同じく「10%なら10」で保持する。
+      // 旧データで dmg:0.1 のような小数が来た場合は 10% として移行する。
+      dmgPct: r.dmgPct !== undefined
+        ? (+r.dmgPct || 0)
+        : ((+r.dmg || 0) > 0 && (+r.dmg || 0) <= 1 ? (+r.dmg || 0) * 100 : (+r.dmg || 0)),
+      special: +r.special || 1,
+      note: r.note || ""
+    };
+    extraFieldDefsFor("buff").forEach(d => {
+      out[d.prop] = +(r?.[d.prop] || 0);
+    });
+    return out;
+  });
 }
 /* 装備以外Buff行が実際に何かしらの効果を持っているか判定する。 */
 function compositeHasEffect(r) {
@@ -2778,7 +3958,8 @@ function compositeHasEffect(r) {
     +r.attackPct || +r.magicPct || +r.speedPct ||
     +r.flatAttack || +r.flatMagic || +r.flatSpeed ||
     +r.convMagicRate || +r.convSpeedRate || +r.dmgPct ||
-    (+r.special && +r.special !== 1)
+    (+r.special && +r.special !== 1) ||
+    extraStatsHasEffect(r, "buff")
   );
 }
 /* バフ枠ツールチップ用に、装備以外Buffの効果を人間向けの文字列へまとめる。 */
@@ -2794,6 +3975,8 @@ function compositeEffectText(r) {
   if (+r.convSpeedRate) parts.push(`速度→攻撃力 ${r.convSpeedRate}%`);
   if (+r.dmgPct) parts.push(`与ダメ+${r.dmgPct}%`);
   if (+r.special && +r.special !== 1) parts.push(`特攻×${r.special}`);
+  const extra = extraStatsEffectText(r, false);
+  if (extra) parts.push(extra);
   return parts.join(" / ") || "効果なし";
 }
 /**
@@ -2877,6 +4060,18 @@ function compositeGroupScore(r) {
   score += (+r.convMagicRate || 0) * 45;
   score += (+r.convSpeedRate || 0) * 12;
   if (+r.special && +r.special !== 1) score += ((+r.special || 1) - 1) * 100000;
+  score += (+r.extraAC || 0) * 8 + (+r.extraACPct || 0) * 12;
+  score += (+r.extraHP || 0) * 2 + (+r.extraHPPct || 0) * 20;
+  score += (+r.extraMP || 0) * 1.5 + (+r.extraMPPct || 0) * 12;
+  score += (+r.extraST || 0) * 1.5 + (+r.extraSTPct || 0) * 12;
+  score += (+r.extraHit || 0) * 10 + (+r.extraHitPct || 0) * 16;
+  score += (+r.extraAvoid || 0) * 8 + (+r.extraAvoidPct || 0) * 14;
+  score += ((+r.extraFireRes || 0) + (+r.extraWaterRes || 0) + (+r.extraEarthRes || 0) + (+r.extraWindRes || 0) + (+r.extraNeutralRes || 0)) * 2;
+  score += ((+r.extraFireResPct || 0) + (+r.extraWaterResPct || 0) + (+r.extraEarthResPct || 0) + (+r.extraWindResPct || 0) + (+r.extraNeutralResPct || 0)) * 4;
+  score += (+r.extraAttackDelayPct || 0) * 6;
+  score += (+r.extraMagicDelay || 0) * 4 + (+r.extraMagicDelayPct || 0) * 6;
+  score += (+r.extraDamageReducePct || 0) * 120;
+  score += (+r.extraCritRatePct || 0) * 80;
   return score;
 }
 
@@ -2964,6 +4159,66 @@ function equipmentEffectText(row) {
   return parts.join(" / ");
 }
 
+
+function equipmentBuffMonitorCandidate(row, order) {
+  const c = equipmentBuffToCompositeRow(row);
+  const slot = (row.slot || "").replace(/^武器: /, "").replace(/^防具: /, "").replace(/^装飾: /, "");
+  c._groupOrder = order;
+  c._groupScore = compositeGroupScore(c);
+  c._monitorSource = "装備";
+  c._monitorActive = row.enabled !== false && !!row.equipBuffEnabled;
+  c._monitorMark = c._monitorActive ? "使用中" : "未使用装備";
+  c._monitorClass = c._monitorActive ? "ok" : "tagWatch";
+  c._monitorDetail = `${slot}${row.name ? ` / ${row.name}` : ""}`;
+  return c;
+}
+
+function buildConflictMonitorGroups() {
+  const activeExpanded = expandEquipmentBuffState(state);
+  const activeResolved = resolveCompositeRowsForGroups(activeExpanded.composite || []);
+  const map = new Map();
+
+  const ensure = group => {
+    const key = group.toLowerCase();
+    if (!map.has(key)) map.set(key, {group, candidates: [], winner: null, skipped: [], inactiveCount: 0});
+    return map.get(key);
+  };
+
+  activeResolved.groups.forEach(g => {
+    const rec = ensure(g.group);
+    rec.winner = g.winner;
+    rec.skipped = g.skipped || [];
+    g.candidates.forEach(c => {
+      const isWinner = c === g.winner || (c.name === g.winner.name && c._groupOrder === g.winner._groupOrder);
+      rec.candidates.push({
+        ...c,
+        _monitorActive: true,
+        _monitorMark: isWinner ? "採用" : "抑制",
+        _monitorClass: isWinner ? "ok" : "muted",
+        _monitorDetail: "現在ON"
+      });
+    });
+  });
+
+  let monitorOrder = 100000;
+  normalizeEquipmentRows(state.equipment).forEach(row => {
+    if (!(row.enabled === false && row.equipBuffEnabled && equipmentBuffHasEffect(row))) return;
+    const candidate = equipmentBuffMonitorCandidate(row, monitorOrder++);
+    const groups = splitTags(candidate.tags);
+    groups.forEach(group => {
+      const rec = ensure(group);
+      rec.candidates.push({...candidate, _monitorGroup: group});
+      rec.inactiveCount++;
+      if (!rec.winner) rec.winner = candidate;
+    });
+  });
+
+  return Array.from(map.values())
+    .filter(g => g.candidates.length)
+    .sort((a,b) => a.group.localeCompare(b.group, "ja"));
+}
+
+
 /**
  * 装備欄とBuff欄のタグを集計して、同じ競合グループのものを横断表示する。
  * 実際の計算には影響しない、管理・メモ用の紐づけ機能。
@@ -2972,34 +4227,46 @@ function renderTagLinkSummary() {
   const el = byId("tagLinkSummary");
   if (!el) return;
 
-  const expanded = expandEquipmentBuffState(state);
-  const resolved = resolveCompositeRowsForGroups(expanded.composite || []);
-  const groups = resolved.groups.filter(g => g.candidates.length);
+  const groups = buildConflictMonitorGroups();
 
   if (!groups.length) {
-    el.innerHTML = `<div class="tagEmpty">まだ競合グループがありません。装備Buffや装備以外Buffの「競合グループ」に同じ文字を入れると、重複しないBuffグループとして管理できます。</div>`;
+    el.innerHTML = `<div class="tagEmpty">まだ競合グループがありません。装備Buffや装備以外Buffの「競合グループ」に同じ文字を入れると、重複しないBuffグループとして管理できます。未使用の装備候補も監視対象になります。</div>`;
     return;
   }
 
   const body = groups.map(g => {
-    const candidates = g.candidates
-      .sort((a,b) => a._groupOrder - b._groupOrder)
-      .map(c => {
-        const isWinner = c === g.winner || (c.name === g.winner.name && c._groupOrder === g.winner._groupOrder);
-        const cls = isWinner ? "ok" : "muted";
-        const mark = isWinner ? "採用" : "抑制";
-        return `<div class="tagItem ${cls}"><b>${escapeHtml(mark)}</b>: ${escapeHtml(c.name || "Buff")}<br><span class="small">${escapeHtml(compositeEffectText(c))}</span></div>`;
-      }).join("");
+    const sorted = g.candidates.slice().sort((a,b) => {
+      if (!!b._monitorActive !== !!a._monitorActive) return (b._monitorActive ? 1 : 0) - (a._monitorActive ? 1 : 0);
+      return (a._groupOrder || 0) - (b._groupOrder || 0);
+    });
 
-    const status = g.skipped.length
-      ? `<span class="warn">同一グループ内で ${g.skipped.length} 件を抑制中</span>`
-      : `<span class="ok">単独</span>`;
+    const candidates = sorted.map(c => {
+      const cls = c._monitorClass || (c._monitorActive ? "ok" : "tagWatch");
+      const mark = c._monitorMark || (c._monitorActive ? "使用中" : "未使用装備");
+      const detail = [c._monitorDetail, compositeEffectText(c)].filter(Boolean).join(" / ");
+      return `<div class="tagItem ${cls}"><b>${escapeHtml(mark)}</b>: ${escapeHtml(c.name || "Buff")}<br><span class="small">${escapeHtml(detail)}</span></div>`;
+    }).join("");
+
+    const activeCount = sorted.filter(c => c._monitorActive).length;
+    const inactiveCount = sorted.length - activeCount;
+    let status;
+    if (activeCount >= 2 && (g.skipped || []).length) {
+      status = `<span class="warn">同一グループ内で ${g.skipped.length} 件を抑制中</span>`;
+    } else if (activeCount === 1 && inactiveCount) {
+      status = `<span class="ok">使用中1件 / 未使用候補${inactiveCount}件</span>`;
+    } else if (activeCount === 0 && inactiveCount) {
+      status = `<span class="tagWatchLabel">未使用候補${inactiveCount}件を監視中</span>`;
+    } else {
+      status = `<span class="ok">単独</span>`;
+    }
+
+    const score = g.winner && g.winner._monitorActive !== false ? fmt(g.winner._groupScore,0) : "-";
 
     return `<tr>
       <td>${tagPillHtml(g.group)}</td>
       <td>${candidates}</td>
       <td>${status}</td>
-      <td class="num">${fmt(g.winner._groupScore,0)}</td>
+      <td class="num">${score}</td>
     </tr>`;
   }).join("");
 
@@ -3007,7 +4274,7 @@ function renderTagLinkSummary() {
     <thead><tr><th>競合グループ</th><th>候補Buff</th><th>状態</th><th>採用スコア</th></tr></thead>
     <tbody>${body}</tbody>
   </table>
-  <p class="small">同じ競合グループのBuffが複数ONの場合、v1では効果スコアが高いものを代表として計算に反映し、それ以外は抑制します。TSV/JSON上の列名は互換性のため tags のままです。</p>`;
+  <p class="small">同じ競合グループのBuffが複数ONの場合、v1では効果スコアが高いものを代表として計算に反映し、それ以外は抑制します。未使用の装備候補に入っている装備Buffも、この管理画面では常時監視します。計算対象になるのは使用ONの装備Buffだけです。</p>`;
 }
 
 function checkboxCell(row, prop) {
@@ -3121,6 +4388,99 @@ function defaultWeaponReqFromInputs(inputs={}) {
   }];
 }
 /* 武器使用条件行を数値化し、空欄によるNaNを防ぐ。 */
+
+
+function validSkillSimSkillName(name, fallback="こんぼう") {
+  const n = String(name || "").trim();
+  return SKILL_SIM_ALL.includes(n) ? n : fallback;
+}
+
+function skillOptionsHtml(selected) {
+  const value = validSkillSimSkillName(selected);
+  return SKILL_SIM_GROUPS.map(([group, list]) => {
+    const opts = list.map(name => `<option value="${escapeHtml(name)}" ${name === value ? "selected" : ""}>${escapeHtml(name)}</option>`).join("");
+    return `<optgroup label="${escapeHtml(group)}">${opts}</optgroup>`;
+  }).join("");
+}
+
+function currentForWeaponReq(req) {
+  const name = validSkillSimSkillName(req?.name);
+  return skillSimValue(name);
+}
+
+function weaponReqRowsWithSkillSimCurrent(rows) {
+  return normalizeWeaponReqRowsForEquipment(rows).map(r => ({
+    ...r,
+    name: validSkillSimSkillName(r.name),
+    current: currentForWeaponReq(r)
+  }));
+}
+
+function updateWeaponReqAutoCurrentDisplays() {
+  document.querySelectorAll(".weaponReqCurrentAuto").forEach(el => {
+    const skill = validSkillSimSkillName(el.dataset.skill);
+    el.value = fmt(skillSimValue(skill), 1);
+  });
+}
+
+function normalizeWeaponReqRowsForEquipment(rows) {
+  return (Array.isArray(rows) ? rows : []).map(r => ({
+    name: validSkillSimSkillName(r.name || r.skill || "こんぼう"),
+    // current は旧データ互換用に保持するだけ。実計算ではスキルシミュレータの現在値を使う。
+    current: parseFloat(r.current) || 0,
+    required: parseFloat(r.required) || 0
+  })).filter(r => r.name || r.current || r.required);
+}
+
+function isWeaponEquipmentRow(row) {
+  return String(row?.slot || "").startsWith("武器:");
+}
+
+function weaponRowHasCalcData(row) {
+  return !!(
+    isWeaponEquipmentRow(row) && (
+      +row.weaponDamage || +row.weaponWeight || +row.weaponAttackInterval || +row.weaponRange || +row.weaponDurability || row.weaponTwoHanded === "○" ||
+      normalizeWeaponReqRowsForEquipment(row.weaponReq).some(r => +r.required)
+    )
+  );
+}
+
+function selectedWeaponForCalc(st) {
+  const rows = normalizeEquipmentRows(st?.equipment).filter(r => r.enabled !== false && isWeaponEquipmentRow(r));
+  const withData = rows.filter(weaponRowHasCalcData);
+  return withData.find(r => r.slot === "武器: 右手") || withData[0] || null;
+}
+
+function selectedWeaponRowForEdit() {
+  state.equipment = normalizeEquipmentRows(state.equipment);
+  return state.equipment.find(r => r.enabled !== false && r.slot === "武器: 右手")
+    || state.equipment.find(r => r.enabled !== false && isWeaponEquipmentRow(r))
+    || state.equipment.find(r => r.slot === "武器: 右手")
+    || state.equipment.find(isWeaponEquipmentRow)
+    || null;
+}
+
+function weaponReqRowsForCalc(st, inputs={}) {
+  const selected = selectedWeaponForCalc(st);
+  if (selected) return weaponReqRowsWithSkillSimCurrent(selected.weaponReq);
+  return normalizeWeaponReqRows(st?.weaponReq, inputs);
+}
+
+function serializeWeaponReqText(rows) {
+  return weaponReqRowsWithSkillSimCurrent(rows)
+    .map(r => `${String(validSkillSimSkillName(r.name)).replace(/[\\n\\r:\/]/g, " ")}:${+r.current || 0}/${+r.required || 0}`)
+    .join("\\n");
+}
+
+function parseWeaponReqText(text) {
+  return String(text || "").split(/\n+/).map(line => {
+    const m = line.match(/^(.*?):([^\/]*)\/(.*)$/);
+    if (!m) return null;
+    return {name:validSkillSimSkillName(m[1].trim()), current:parseFloat(m[2]) || 0, required:parseFloat(m[3]) || 0};
+  }).filter(Boolean);
+}
+
+
 function normalizeWeaponReqRows(rows, inputs={}) {
   if (Array.isArray(rows) && rows.length) {
     return rows.map(r => ({
@@ -3155,7 +4515,7 @@ function skillRequirementRatio(current, required) {
  *   - required超過分で他条件の不足を補填しないため、currentはrequiredで上限をかける。
  */
 function calcWeaponSkillMod(st, inputs={}) {
-  const rows = normalizeWeaponReqRows(st.weaponReq, inputs);
+  const rows = weaponReqRowsForCalc(st, inputs);
   const active = rows.filter(r => (parseFloat(r.required) || 0) > 0);
   const mode = "official";
   if (!active.length) return {mod: 1, rows, evaluated: [], limiting: null, mode, gateFailed: null, totalCurrent: 0, totalRequired: 0};
@@ -3246,6 +4606,54 @@ function compositeNumberCell(row, prop, step="0.1") {
   return td;
 }
 /* 装備以外Buff表をstate.compositeから描画する。 */
+
+function updateCompositeExtraStatus(button, row) {
+  const has = extraStatsHasEffect(row, "buff");
+  button.textContent = has ? "追加あり" : "追加なし";
+  button.classList.toggle("on", has);
+}
+
+function makeCompositeExtraDetailRow(row) {
+  const detailTr = document.createElement("tr");
+  detailTr.className = "compositeExtraDetailRow";
+  detailTr.style.display = row._compositeExtraOpen ? "" : "none";
+
+  const td = makeCell("td");
+  td.colSpan = 17;
+  td.className = "compositeExtraDetailCell";
+
+  const title = document.createElement("div");
+  title.className = "extraStatsTitle";
+  title.textContent = `${row.name || "装備以外Buff"} の追加ステータス`;
+  td.appendChild(title);
+
+  const holder = document.createElement("div");
+  holder.className = "compositeExtraEditor";
+  td.appendChild(holder);
+
+  detailTr.appendChild(td);
+  return detailTr;
+}
+
+function compositeExtraCell(row, detailTr) {
+  const td = makeCell("td");
+  td.className = "compositeExtraCell";
+  const button = makeCell("button", {type:"button", class:"equipBuffToggle compositeExtraToggle"});
+  updateCompositeExtraStatus(button, row);
+  button.onclick = () => {
+    row._compositeExtraOpen = !row._compositeExtraOpen;
+    detailTr.style.display = row._compositeExtraOpen ? "" : "none";
+    button.classList.toggle("open", !!row._compositeExtraOpen);
+  };
+  td.appendChild(button);
+
+  const holder = detailTr.querySelector(".compositeExtraEditor");
+  holder.appendChild(makeExtraStatsEditor(row, "Buffの追加ステータス（+ / % / クリ率。攻撃ディレイ固定値は装備本体側）", "buff", () => updateCompositeExtraStatus(button, row)));
+
+  return td;
+}
+
+
 function renderCompositeTable() {
   const tbody = document.querySelector("#compositeBuffTable tbody");
   if (!tbody) return;
@@ -3253,17 +4661,24 @@ function renderCompositeTable() {
   state.composite = normalizeCompositeRows(state.composite);
 
   if (!state.composite.length) {
-    renderEmptyRow(tbody, 16, "まだ装備以外Buffがありません。「Buff行を追加」から追加してください。");
+    renderEmptyRow(tbody, 17, "まだ装備以外Buffがありません。「Buff行を追加」から追加してください。");
     return;
   }
 
   state.composite.forEach((row, idx) => {
+    const frag = document.createDocumentFragment();
     const tr = document.createElement("tr");
     tr.appendChild(checkboxCell(row, "enabled"));
     tr.appendChild(checkboxCell(row, "slot"));
 
     const name = makeCell("input", {value: row.name || ""});
-    name.oninput = () => { row.name = name.value; renderTagLinkSummary(); calc(); };
+    name.oninput = () => {
+      row.name = name.value;
+      const title = tr.nextSibling?.querySelector?.(".extraStatsTitle");
+      if (title) title.textContent = `${row.name || "装備以外Buff"} の追加ステータス`;
+      renderTagLinkSummary();
+      calc();
+    };
     tr.appendChild(makeCell("td")).appendChild(name);
 
     tr.appendChild(tagInputCell(row));
@@ -3279,12 +4694,17 @@ function renderCompositeTable() {
     tr.appendChild(compositeNumberCell(row, "dmgPct", "1"));
     tr.appendChild(compositeNumberCell(row, "special", "0.01"));
 
+    const detailTr = makeCompositeExtraDetailRow(row);
+    tr.appendChild(compositeExtraCell(row, detailTr));
+
     const note = makeCell("input", {value: row.note || ""});
     note.oninput = () => { row.note = note.value; };
     tr.appendChild(makeCell("td")).appendChild(note);
 
     tr.appendChild(actionCell(state.composite, idx, renderCompositeTable));
-    tbody.appendChild(tr);
+    frag.appendChild(tr);
+    frag.appendChild(detailTr);
+    tbody.appendChild(frag);
   });
 }
 /* 空のBuff行を追加する。主要Buffが固まるまではプリセットボタンを置かない方針。 */
@@ -3295,6 +4715,7 @@ function addCompositeRow(kind="blank") {
     flatAttack:0, flatMagic:0, flatSpeed:0,
     convMagicRate:0, convSpeedRate:0,
     dmgPct:0, special:1,
+    ...extraDefaultFields("buff"),
     note:""
   };
   state.composite.push(row);
@@ -3347,6 +4768,225 @@ function addPctRow(target="attack") {
 
 
 
+
+function weaponCalcNumberInput(row, prop, label, step="0.1", statusButton=null) {
+  const wrap = document.createElement("label");
+  wrap.textContent = label;
+  const input = makeCell("input", {type:"number", step, value: row[prop] ?? 0});
+  input.oninput = () => {
+    row[prop] = parseFloat(input.value) || 0;
+    if (statusButton) updateEquipBuffStatus(statusButton, row);
+    calc();
+  };
+  wrap.appendChild(input);
+  return wrap;
+}
+
+function makeWeaponReqMiniTable(row, statusButton=null) {
+  row.weaponReq = normalizeWeaponReqRowsForEquipment(row.weaponReq);
+  const wrap = document.createElement("div");
+  wrap.className = "weaponReqEditor";
+
+  const title = document.createElement("div");
+  title.className = "extraStatsTitle";
+  title.textContent = "使用条件";
+  wrap.appendChild(title);
+
+  const help = document.createElement("p");
+  help.className = "small";
+  help.textContent = "スキルはスキルシミュレータの項目から選択します。現在値はスキルシミュレータ側の値を自動取得し、必要値だけ手入力します。";
+  wrap.appendChild(help);
+
+  const table = document.createElement("table");
+  table.className = "miniTable weaponReqMiniTable";
+  table.innerHTML = `<thead><tr><th>スキル</th><th>現在(自動)</th><th>必要</th><th></th></tr></thead><tbody></tbody>`;
+  const tbody = table.querySelector("tbody");
+
+  const redraw = () => {
+    tbody.innerHTML = "";
+    row.weaponReq = normalizeWeaponReqRowsForEquipment(row.weaponReq);
+    if (!row.weaponReq.length) {
+      const tr = document.createElement("tr");
+      const td = makeCell("td", {colspan:"4", class:"small"});
+      td.textContent = "使用条件なし。必要なら下のボタンで追加してください。";
+      tr.appendChild(td);
+      tbody.appendChild(tr);
+      return;
+    }
+
+    row.weaponReq.forEach((req, idx) => {
+      req.name = validSkillSimSkillName(req.name);
+      const tr = document.createElement("tr");
+
+      const skill = makeCell("select");
+      skill.innerHTML = skillOptionsHtml(req.name);
+      skill.value = req.name;
+      skill.onchange = () => {
+        req.name = validSkillSimSkillName(skill.value);
+        const auto = tr.querySelector(".weaponReqCurrentAuto");
+        if (auto) {
+          auto.dataset.skill = req.name;
+          auto.value = fmt(skillSimValue(req.name), 1);
+        }
+        if (statusButton) updateEquipBuffStatus(statusButton, row);
+        calc();
+      };
+      tr.appendChild(makeCell("td")).appendChild(skill);
+
+      const current = makeCell("input", {
+        type:"number",
+        step:"0.1",
+        readonly:true,
+        class:"weaponReqCurrentAuto",
+        value: fmt(skillSimValue(req.name), 1)
+      });
+      current.dataset.skill = req.name;
+      tr.appendChild(makeCell("td")).appendChild(current);
+
+      const required = makeCell("input", {type:"number", step:"0.1", value:req.required ?? 0});
+      required.oninput = () => {
+        req.required = parseFloat(required.value) || 0;
+        if (statusButton) updateEquipBuffStatus(statusButton, row);
+        calc();
+      };
+      tr.appendChild(makeCell("td")).appendChild(required);
+
+      const del = makeCell("button", {type:"button", title:"削除"}, "×");
+      del.onclick = () => {
+        row.weaponReq.splice(idx, 1);
+        redraw();
+        if (statusButton) updateEquipBuffStatus(statusButton, row);
+        calc();
+      };
+      tr.appendChild(makeCell("td")).appendChild(del);
+
+      tbody.appendChild(tr);
+    });
+  };
+
+  wrap.appendChild(table);
+
+  const add = makeCell("button", {type:"button", class:"miniButton"}, "使用条件を追加");
+  add.onclick = () => {
+    const defaultSkill = row.weaponReq.length ? "筋力" : (state.skillSim?.weaponSkill || "こんぼう");
+    row.weaponReq.push({name: validSkillSimSkillName(defaultSkill), current:0, required:0});
+    redraw();
+    if (statusButton) updateEquipBuffStatus(statusButton, row);
+    calc();
+  };
+  wrap.appendChild(add);
+
+  redraw();
+  return wrap;
+}
+
+
+
+function weaponCalcSelectInput(row, prop, label, options, statusButton=null) {
+  const wrap = document.createElement("label");
+  wrap.textContent = label;
+  const select = makeCell("select");
+  select.className = "weaponCalcSelect";
+  select.innerHTML = options.map(v => `<option value="${escapeHtml(v)}" ${String(row[prop] ?? "×") === String(v) ? "selected" : ""}>${escapeHtml(v)}</option>`).join("");
+  select.onchange = () => {
+    row[prop] = select.value;
+    if (statusButton) updateEquipBuffStatus(statusButton, row);
+    calc();
+  };
+  wrap.appendChild(select);
+  return wrap;
+}
+
+function makeWeaponCalcEditor(row, statusButton=null) {
+  const box = document.createElement("div");
+  box.className = "weaponCalcEditor equipBuffWide";
+
+  const title = document.createElement("div");
+  title.className = "extraStatsTitle";
+  title.textContent = "武器性能・使用条件（ダメージ計算に使用）";
+  box.appendChild(title);
+
+  const note = document.createElement("p");
+  note.className = "small weaponCalcNote";
+  note.textContent = "使用条件の現在値はスキルシミュレータから自動取得します。必要値だけ入力してください。";
+  box.appendChild(note);
+
+  const layout = document.createElement("div");
+  layout.className = "weaponCalcLayout";
+
+  const perf = document.createElement("div");
+  perf.className = "weaponCalcPane weaponCalcPerfPane";
+
+  const perfTitle = document.createElement("div");
+  perfTitle.className = "weaponCalcPaneTitle";
+  perfTitle.textContent = "武器性能";
+  perf.appendChild(perfTitle);
+
+  const grid = document.createElement("div");
+  grid.className = "weaponCalcGrid";
+  grid.appendChild(weaponCalcNumberInput(row, "weaponDamage", "武器ダメージ", "0.1", statusButton));
+  grid.appendChild(weaponCalcNumberInput(row, "weaponWeight", "武器重量", "0.1", statusButton));
+  grid.appendChild(weaponCalcNumberInput(row, "weaponAttackInterval", "攻撃間隔", "0.1", statusButton));
+  grid.appendChild(weaponCalcNumberInput(row, "weaponRange", "射程", "0.1", statusButton));
+  grid.appendChild(weaponCalcNumberInput(row, "weaponDurability", "耐久", "1", statusButton));
+  grid.appendChild(weaponCalcSelectInput(row, "weaponTwoHanded", "両手武器", ["×", "○"], statusButton));
+  perf.appendChild(grid);
+
+  const req = makeWeaponReqMiniTable(row, statusButton);
+  req.classList.add("weaponCalcPane", "weaponReqPane");
+
+  layout.appendChild(perf);
+  layout.appendChild(req);
+  box.appendChild(layout);
+
+  return box;
+}
+
+function weaponCalcStatusText(row) {
+  if (!isWeaponEquipmentRow(row)) return "";
+  const parts = [];
+  if (+row.weaponDamage) parts.push(`ダメージ ${row.weaponDamage}`);
+  if (+row.weaponWeight) parts.push(`重量 ${row.weaponWeight}`);
+  if (+row.weaponAttackInterval) parts.push(`間隔 ${row.weaponAttackInterval}`);
+  if (+row.weaponRange) parts.push(`射程 ${row.weaponRange}`);
+  if (+row.weaponDurability) parts.push(`耐久 ${row.weaponDurability}`);
+  if (row.weaponTwoHanded === "○") parts.push("両手");
+  const reqs = normalizeWeaponReqRowsForEquipment(row.weaponReq).filter(r => +r.required);
+  if (reqs.length) parts.push(`条件 ${reqs.length}件`);
+  return parts.join(" / ");
+}
+
+function updateSelectedWeaponCalcSummary(m=null) {
+  const el = byId("selectedWeaponCalcSummary");
+  if (!el) return;
+  const w = selectedWeaponForCalc(state);
+  if (!w) {
+    el.innerHTML = `装備登録タブの武器詳細が未設定です。武器ダメージ0 / 使用条件なしとして計算しています。`;
+    return;
+  }
+  const reqText = weaponReqRowsWithSkillSimCurrent(w.weaponReq).filter(r => +r.required)
+    .map(r => `${escapeHtml(r.name)} ${fmt(r.current,1)}/${fmt(r.required,1)}`)
+    .join(" / ") || "条件なし";
+  el.innerHTML = [
+    `<b>${escapeHtml((w.slot || "武器").replace(/^武器: /, ""))}: ${escapeHtml(w.name || "名称未入力")}</b>`,
+    `武器ダメージ ${fmt(+w.weaponDamage || 0,1)} / 武器重量 ${fmt(+w.weaponWeight || 0,1)} / 攻撃間隔 ${fmt(+w.weaponAttackInterval || 0,1)} / 射程 ${fmt(+w.weaponRange || 0,1)} / 耐久 ${fmt(+w.weaponDurability || 0,0)} / 両手 ${escapeHtml(w.weaponTwoHanded || "×")}`,
+    `使用条件: ${reqText}`
+  ].map(x => `<div>${x}</div>`).join("");
+}
+
+function syncSelectedWeaponToHiddenInputs() {
+  const w = selectedWeaponForCalc(state);
+  if (!w) return;
+  if (byId("weaponDamage")) byId("weaponDamage").value = +w.weaponDamage || 0;
+  if (byId("weaponWeight")) byId("weaponWeight").value = +w.weaponWeight || 0;
+  const reqs = weaponReqRowsWithSkillSimCurrent(w.weaponReq);
+  if (reqs[0]) {
+    if (byId("weaponSkill")) byId("weaponSkill").value = +reqs[0].current || 0;
+    if (byId("requiredSkill")) byId("requiredSkill").value = +reqs[0].required || 0;
+  }
+}
+
+
 function equipBuffStatusText(row) {
   if (!row.equipBuffEnabled) return "Buffなし";
   const name = equipmentBuffDisplayName(row);
@@ -3355,8 +4995,12 @@ function equipBuffStatusText(row) {
 }
 
 function updateEquipBuffStatus(button, row) {
-  button.textContent = row.equipBuffEnabled ? `ON: ${equipmentBuffDisplayName(row)}` : "Buffなし";
-  button.classList.toggle("on", !!row.equipBuffEnabled);
+  const baseExtra = extraStatsHasEffect(row, "base");
+  const weaponText = weaponCalcStatusText(row);
+  const buffText = row.equipBuffEnabled ? `Buff ON: ${equipmentBuffDisplayName(row)}` : "Buffなし";
+  const suffix = [weaponText, baseExtra ? "追加あり" : ""].filter(Boolean).join(" / ");
+  button.textContent = suffix ? `詳細: ${buffText} / ${suffix}` : `詳細: ${buffText}`;
+  button.classList.toggle("on", !!row.equipBuffEnabled || baseExtra || !!weaponText);
 }
 
 function equipBuffNumberInput(row, key, label, step="1") {
@@ -3374,6 +5018,10 @@ function equipBuffNumberInput(row, key, label, step="1") {
 function makeEquipmentBuffEditor(row, statusButton) {
   const grid = document.createElement("div");
   grid.className = "equipBuffGrid equipBuffGridRow";
+
+  if (isWeaponEquipmentRow(row)) {
+    grid.appendChild(makeWeaponCalcEditor(row, statusButton));
+  }
 
   const enabledLabel = document.createElement("label");
   enabledLabel.className = "equipBuffInline";
@@ -3434,9 +5082,13 @@ function makeEquipmentBuffEditor(row, statusButton) {
   grid.appendChild(equipBuffNumberInput(row, "equipBuffDmgPct", "与ダメ%", "1"));
   grid.appendChild(equipBuffNumberInput(row, "equipBuffSpecial", "特攻倍率", "0.01"));
 
+  const statusUpdater = () => updateEquipBuffStatus(statusButton, row);
+  grid.appendChild(makeExtraStatsEditor(row, "装備本体の追加ステータス（Buffではない / 攻撃・魔法ディレイ含む）", "base", statusUpdater));
+  grid.appendChild(makeExtraStatsEditor(row, "装備Buffの追加ステータス（Buff ON時だけ反映 / +と%（攻撃ディレイ固定値は本体側））", "equipBuff", statusUpdater));
+
   const help = document.createElement("div");
   help.className = "small equipBuffWide";
-  help.textContent = "%欄は10%なら10。ONかつ効果ありの場合だけ、計算とバフ枠に反映します。";
+  help.textContent = "%欄は10%なら10。装備本体の追加ステータスは装備ON時、装備Buff側はBuff ONかつ効果ありの場合だけ反映します。";
   grid.appendChild(help);
 
   return grid;
@@ -3463,13 +5115,13 @@ function makeEquipmentBuffDetailRow(row, includeSlot, statusButton) {
   detailTr.style.display = row._equipBuffOpen ? "" : "none";
 
   const td = makeCell("td");
-  td.colSpan = includeSlot ? 11 : 10;
+  td.colSpan = includeSlot ? 10 : 9;
   td.className = "equipBuffDetailCell";
 
   const title = document.createElement("div");
   title.className = "equipBuffDetailTitle";
   const slotLabel = (row.slot || "").replace(/^武器: /, "").replace(/^防具: /, "").replace(/^装飾: /, "");
-  title.textContent = `${slotLabel}${row.name ? ` / ${row.name}` : ""} の装備Buff`;
+  title.textContent = `${slotLabel}${row.name ? ` / ${row.name}` : ""} の詳細`;
   td.appendChild(title);
   td.appendChild(makeEquipmentBuffEditor(row, statusButton));
   detailTr.appendChild(td);
@@ -3575,7 +5227,7 @@ function makeEquipmentInputRow(row, includeSlot=true, idx=0) {
     const title = tr.nextSibling?.querySelector?.(".equipBuffDetailTitle");
     if (title) {
       const slotLabel = (row.slot || "").replace(/^武器: /, "").replace(/^防具: /, "").replace(/^装飾: /, "");
-      title.textContent = `${slotLabel}${row.name ? ` / ${row.name}` : ""} の装備Buff`;
+      title.textContent = `${slotLabel}${row.name ? ` / ${row.name}` : ""} の詳細`;
     }
   };
   tr.appendChild(makeCell("td")).appendChild(name);
@@ -3591,10 +5243,6 @@ function makeEquipmentInputRow(row, includeSlot=true, idx=0) {
   const speed = makeCell("input", {class:"equipNum", type:"number", step:"1", value: row.speed ?? 0});
   speed.oninput = () => { row.speed = parseFloat(speed.value) || 0; calc(); };
   tr.appendChild(makeCell("td")).appendChild(speed);
-
-  const delay = makeCell("input", {class:"equipNum", type:"number", step:"1", value: row.delay ?? 0});
-  delay.oninput = () => { row.delay = parseFloat(delay.value) || 0; calc(); };
-  tr.appendChild(makeCell("td")).appendChild(delay);
 
   const dummyButton = makeCell("button", {type:"button", class:"equipBuffToggle"});
   const detailTr = makeEquipmentBuffDetailRow(row, includeSlot, dummyButton);
@@ -3625,34 +5273,26 @@ function addEquipmentCandidate(slot) {
   calc();
 }
 
-function renderEquipmentTable() {
-  const rightBody = document.querySelector("#equipmentWeaponRightBody");
-  const leftBody = document.querySelector("#equipmentWeaponLeftBody");
-  const bulletBody = document.querySelector("#equipmentWeaponBulletBody");
-  const armorBody = document.querySelector("#equipmentArmorBody");
-  const accessoryBody = document.querySelector("#equipmentAccessoryBody");
+function equipmentSlotBodyFor(slot) {
+  if (slot === "武器: 右手") return document.querySelector("#equipmentWeaponRightBody");
+  if (slot === "武器: 左手") return document.querySelector("#equipmentWeaponLeftBody");
+  if (slot === "武器: 弾丸") return document.querySelector("#equipmentWeaponBulletBody");
+  return document.querySelector(`[data-equipment-slot-body="${CSS.escape(slot || "")}"]`);
+}
 
-  rightBody.innerHTML = "";
-  leftBody.innerHTML = "";
-  bulletBody.innerHTML = "";
-  armorBody.innerHTML = "";
-  accessoryBody.innerHTML = "";
+/* 武器/防具/装飾の候補テーブルを描画する。防具・装飾は部位ごとのカテゴリに分けて表示する。 */
+function renderEquipmentTable() {
+  document.querySelectorAll("#equipmentWeaponRightBody, #equipmentWeaponLeftBody, #equipmentWeaponBulletBody, [data-equipment-slot-body]").forEach(tbody => {
+    tbody.innerHTML = "";
+  });
+
   state.equipment = normalizeEquipmentRows(state.equipment);
 
   state.equipment.forEach((row, idx) => {
     if (row.enabled === undefined) row.enabled = true;
-
-    if (row.slot === "武器: 右手") {
-      rightBody.appendChild(makeEquipmentInputRow(row, false, idx));
-    } else if (row.slot === "武器: 左手") {
-      leftBody.appendChild(makeEquipmentInputRow(row, false, idx));
-    } else if (row.slot === "武器: 弾丸") {
-      bulletBody.appendChild(makeEquipmentInputRow(row, false, idx));
-    } else if ((row.slot || "").startsWith("装飾:")) {
-      accessoryBody.appendChild(makeEquipmentInputRow(row, true, idx));
-    } else {
-      armorBody.appendChild(makeEquipmentInputRow(row, true, idx));
-    }
+    const body = equipmentSlotBodyFor(row.slot);
+    if (!body) return;
+    body.appendChild(makeEquipmentInputRow(row, false, idx));
   });
 }
 
@@ -3845,13 +5485,15 @@ function integratedOptimizerSettings() {
     objective: byId("optimizerObjective")?.value || "damage",
     fixCurrentEquipment: !!byId("optimizerFixCurrentEquipment")?.checked,
     includeDisabledBuffs: byId("optimizerIncludeDisabledBuffs") ? !!byId("optimizerIncludeDisabledBuffs").checked : true,
-    fixCurrentBuffs: !!byId("optimizerFixCurrentBuffs")?.checked
+    fixCurrentBuffs: !!byId("optimizerFixCurrentBuffs")?.checked,
+    forceOtherBuffs: byId("optimizerForceOtherBuffs") ? !!byId("optimizerForceOtherBuffs").checked : true
   };
 }
 
 function optimizerMetricValue(m, objective) {
   if (objective === "attack") return m.atk;
   if (objective === "magic") return m.stats.magic;
+  if (String(objective || "").startsWith("extra")) return +(m.extraStats?.[objective] || 0);
   return m.finalDamage;
 }
 
@@ -3859,7 +5501,10 @@ function equipmentCandidateHasData(row) {
   return !!(
     row.enabled || row.name || row.tags || row.note ||
     +row.attack || +row.magic || +row.speed || +row.delay ||
-    row.equipBuffEnabled || equipmentBuffHasEffect(row)
+    +row.weaponDamage || +row.weaponWeight || +row.weaponAttackInterval || +row.weaponRange || +row.weaponDurability || row.weaponTwoHanded === "○" ||
+    normalizeWeaponReqRowsForEquipment(row.weaponReq).some(r => +r.required) ||
+    row.equipBuffEnabled || equipmentBuffHasEffect(row) ||
+    extraStatsHasEffect(row, "base")
   );
 }
 
@@ -3883,7 +5528,7 @@ function optimizerEquipmentGroups(settings) {
   });
 }
 
-function optimizerStateForSelection(equipmentIdxs, compositeIdxs) {
+function optimizerStateForSelection(equipmentIdxs, compositeIdxs, settings=null) {
   const st = clone(state);
   const selectedEquipment = new Set(equipmentIdxs);
   st.equipment = normalizeEquipmentRows(state.equipment).map((row, idx) => ({
@@ -3897,19 +5542,65 @@ function optimizerStateForSelection(equipmentIdxs, compositeIdxs) {
     enabled: selectedBuffs.has(idx)
   }));
 
+  if (settings && settings.forceOtherBuffs === false) {
+    st.other = (st.other || []).map(row => ({...row, enabled:false}));
+  }
+
   return st;
 }
 
+
+function optimizerEquipmentConflictKeys(row) {
+  return splitTags(row?.tags).map(x => x.toLowerCase());
+}
+
+function optimizerEquipmentWouldConflict(selectedIdxs, candidateIdx) {
+  const rows = normalizeEquipmentRows(state.equipment);
+  const cand = rows[candidateIdx];
+  const candKeys = optimizerEquipmentConflictKeys(cand);
+  if (!candKeys.length) return false;
+
+  const selectedKeys = new Set();
+  selectedIdxs.forEach(idx => {
+    optimizerEquipmentConflictKeys(rows[idx]).forEach(k => selectedKeys.add(k));
+  });
+
+  return candKeys.some(k => selectedKeys.has(k));
+}
+
+function optimizerEquipmentConflictNames(equipmentIdxs) {
+  const rows = normalizeEquipmentRows(state.equipment);
+  const seen = new Map();
+  const conflicts = new Set();
+
+  equipmentIdxs.forEach(idx => {
+    const row = rows[idx];
+    optimizerEquipmentConflictKeys(row).forEach(k => {
+      if (seen.has(k)) conflicts.add(k);
+      else seen.set(k, row);
+    });
+  });
+
+  return Array.from(conflicts);
+}
+
+
 function optimizerBuildEquipmentBeams(inputs, settings) {
   const groups = optimizerEquipmentGroups(settings);
+  settings.equipmentConflictSkipped = 0;
   let beams = [{equipmentIdxs: [], score: 0}];
 
   groups.forEach(group => {
     const next = [];
     beams.forEach(beam => {
       group.candidates.forEach(cand => {
+        if (optimizerEquipmentWouldConflict(beam.equipmentIdxs, cand.idx)) {
+          settings.equipmentConflictSkipped++;
+          return;
+        }
+
         const equipmentIdxs = beam.equipmentIdxs.concat([cand.idx]);
-        const st = optimizerStateForSelection(equipmentIdxs, []);
+        const st = optimizerStateForSelection(equipmentIdxs, [], settings);
         const m = computeMetrics(st, inputs);
         next.push({equipmentIdxs, score: optimizerMetricValue(m, settings.objective)});
       });
@@ -3935,7 +5626,7 @@ function optimizerSelectExternalBuffs(equipmentIdxs, inputs, settings) {
   const selected = fixed.map(x => x.idx);
   const selectedSet = new Set(selected);
 
-  let st = optimizerStateForSelection(equipmentIdxs, selected);
+  let st = optimizerStateForSelection(equipmentIdxs, selected, settings);
   let m = computeMetrics(st, inputs);
   let score = optimizerMetricValue(m, settings.objective);
 
@@ -3947,7 +5638,7 @@ function optimizerSelectExternalBuffs(equipmentIdxs, inputs, settings) {
     candidates.forEach(cand => {
       if (selectedSet.has(cand.idx)) return;
       const trialBuffs = selected.concat([cand.idx]);
-      const trialState = optimizerStateForSelection(equipmentIdxs, trialBuffs);
+      const trialState = optimizerStateForSelection(equipmentIdxs, trialBuffs, settings);
       const trial = computeMetrics(trialState, inputs);
       if (trial.slots.total > settings.maxSlots) return;
 
@@ -3969,18 +5660,62 @@ function optimizerSelectExternalBuffs(equipmentIdxs, inputs, settings) {
   return {compositeIdxs: selected, metrics: m, score};
 }
 
-function optimizerEquipmentSummaryByIdx(equipmentIdxs) {
+function optimizerEquipmentRowHasVisibleData(row) {
+  return !!(
+    row.name || row.tags ||
+    +row.attack || +row.magic || +row.speed || +row.delay ||
+    +row.weaponDamage || +row.weaponWeight || +row.weaponAttackInterval || +row.weaponRange || +row.weaponDurability || row.weaponTwoHanded === "○" ||
+    normalizeWeaponReqRowsForEquipment(row.weaponReq).some(r => +r.required) ||
+    row.equipBuffEnabled || equipmentBuffHasEffect(row) ||
+    extraStatsHasEffect(row, "base")
+  );
+}
+
+function optimizerEquipmentLabel(row) {
+  const slot = (row.slot || "").replace(/^武器: /, "").replace(/^防具: /, "").replace(/^装飾: /, "");
+  const group = splitTags(row.tags)[0];
+  const name = row.name || (isWeaponEquipmentRow(row) && (+row.weaponDamage || +row.weaponWeight) ? "名称未入力の武器" : "空");
+  const weaponParts = [];
+  if (isWeaponEquipmentRow(row)) {
+    if (+row.weaponDamage) weaponParts.push(`Dmg ${fmt(+row.weaponDamage || 0, 1)}`);
+    if (+row.weaponWeight) weaponParts.push(`重量 ${fmt(+row.weaponWeight || 0, 1)}`);
+    if (+row.weaponAttackInterval) weaponParts.push(`間隔 ${fmt(+row.weaponAttackInterval || 0, 1)}`);
+    if (+row.weaponRange) weaponParts.push(`射程 ${fmt(+row.weaponRange || 0, 1)}`);
+    if (+row.weaponDurability) weaponParts.push(`耐久 ${fmt(+row.weaponDurability || 0, 0)}`);
+    if (row.weaponTwoHanded === "○") weaponParts.push("両手");
+  }
+  const weapon = weaponParts.length ? ` / ${weaponParts.join(" / ")}` : "";
+  return `${slot}: ${name}${weapon}${group ? ` [${group}]` : ""}`;
+}
+
+function optimizerEquipmentSummaryByIdx(equipmentIdxs, metrics=null) {
   const selected = new Set(equipmentIdxs);
-  return normalizeEquipmentRows(state.equipment)
+  const rows = normalizeEquipmentRows(state.equipment)
     .map((row, idx) => ({row, idx}))
     .filter(x => selected.has(x.idx))
-    .filter(x => x.row.name || +x.row.attack || +x.row.magic || +x.row.speed || +x.row.delay || x.row.equipBuffEnabled)
-    .map(x => {
-      const slot = (x.row.slot || "").replace(/^武器: /, "").replace(/^防具: /, "").replace(/^装飾: /, "");
-      const group = splitTags(x.row.tags)[0];
-      return `${slot}: ${x.row.name || "空"}${group ? ` [${group}]` : ""}`;
-    })
-    .join(" / ") || "装備なし";
+    .filter(x => optimizerEquipmentRowHasVisibleData(x.row))
+    .map(x => x.row);
+
+  // 念のため、計算本体が実際に使った武器(metrics.selectedWeapon)を優先して表示する。
+  // これで同一部位の2本目以降を選んだ時も、結果表の武器名がズレにくくなる。
+  const usedWeapon = metrics?.selectedWeapon;
+  if (usedWeapon && isWeaponEquipmentRow(usedWeapon)) {
+    const sameWeaponIndex = rows.findIndex(row =>
+      isWeaponEquipmentRow(row) &&
+      row.slot === usedWeapon.slot &&
+      row.name === usedWeapon.name &&
+      (+row.weaponDamage || 0) === (+usedWeapon.weaponDamage || 0) &&
+      (+row.weaponWeight || 0) === (+usedWeapon.weaponWeight || 0)
+    );
+    if (sameWeaponIndex >= 0) {
+      const [found] = rows.splice(sameWeaponIndex, 1);
+      rows.unshift(found);
+    } else {
+      rows.unshift(usedWeapon);
+    }
+  }
+
+  return rows.map(optimizerEquipmentLabel).join(" / ") || "装備なし";
 }
 
 function optimizerBuffSummaryByIdx(compositeIdxs) {
@@ -4022,7 +5757,10 @@ function runIntegratedOptimizer() {
       equipmentIdxs: beam.equipmentIdxs,
       compositeIdxs: buff.compositeIdxs,
       metrics: buff.metrics,
-      score: buff.score
+      score: buff.score,
+      equipmentSummary: optimizerEquipmentSummaryByIdx(beam.equipmentIdxs, buff.metrics),
+      equipmentConflicts: optimizerEquipmentConflictNames(beam.equipmentIdxs),
+      forceOtherBuffs: settings.forceOtherBuffs
     };
   })
   .filter(r => r.metrics.slots.total <= settings.maxSlots)
@@ -4035,8 +5773,10 @@ function runIntegratedOptimizer() {
   if (status) {
     const equipCount = normalizeEquipmentRows(state.equipment).filter(equipmentCandidateHasData).length;
     const buffCount = optimizerCompositeCandidates(settings).length;
-    const fixedOtherSlots = (state.other || []).filter(r => r.enabled).length;
-    status.textContent = `探索完了: 装備候補 ${equipCount}件 / 装備以外Buff候補 ${buffCount}件 / その他固定枠 ${fixedOtherSlots}件 / 装備構成候補 ${equipmentBeams.length}件 / 表示 ${results.length}件 / ${elapsed}ms`;
+    const fixedOtherSlots = settings.forceOtherBuffs ? (state.other || []).filter(r => r.enabled).length : 0;
+    const otherMode = settings.forceOtherBuffs ? `${fixedOtherSlots}件` : "無視";
+    const conflictSkipText = settings.equipmentConflictSkipped ? ` / 競合装備除外 ${settings.equipmentConflictSkipped}件` : "";
+    status.textContent = `探索完了: 装備候補 ${equipCount}件 / 装備以外Buff候補 ${buffCount}件 / その他固定枠 ${otherMode}${conflictSkipText} / 装備構成候補 ${equipmentBeams.length}件 / 表示 ${results.length}件 / ${elapsed}ms`;
   }
   renderIntegratedOptimizerResults();
 }
@@ -4046,7 +5786,7 @@ function renderIntegratedOptimizerResults() {
   if (!el) return;
 
   if (!integratedOptimizerResults.length) {
-    el.innerHTML = `<p class="small">条件内に収まる結果がありません。バフ枠上限、競合グループ、候補の使用状況を見直してください。</p>`;
+    el.innerHTML = `<p class="small">条件内に収まる結果がありません。バフ枠上限、競合グループ、装備同士の競合、候補の使用状況を見直してください。</p>`;
     return;
   }
 
@@ -4058,14 +5798,15 @@ function renderIntegratedOptimizerResults() {
       <td class="num">${fmt(m.atk)}</td>
       <td class="num">${fmt(m.stats.magic)}</td>
       <td class="num">${m.slots.total}/24</td>
-      <td class="optimizerList">${escapeHtml(optimizerEquipmentSummaryByIdx(r.equipmentIdxs))}</td>
+      <td class="optimizerList">${escapeHtml(extraStatsSummary(m.extraStats || {}).join(" / ") || "-")}</td>
+      <td class="optimizerList">${escapeHtml(optimizerEquipmentSummaryByIdx(r.equipmentIdxs, m))}</td>
       <td class="optimizerList">${escapeHtml(optimizerBuffSummaryByIdx(r.compositeIdxs))}</td>
       <td><button class="optimizerApplyButton" onclick="applyIntegratedOptimizerResult(${i})">適用</button></td>
     </tr>`;
   }).join("");
 
   el.innerHTML = `<table>
-    <thead><tr><th>順位</th><th>ダメージ</th><th>攻撃力</th><th>魔力</th><th>枠</th><th>装備</th><th>装備以外Buff</th><th>適用</th></tr></thead>
+    <thead><tr><th>順位</th><th>ダメージ</th><th>攻撃力</th><th>魔力</th><th>枠</th><th>追加ステータス</th><th>装備</th><th>装備以外Buff</th><th>適用</th></tr></thead>
     <tbody>${body}</tbody>
   </table>`;
 }
@@ -4086,6 +5827,10 @@ function applyIntegratedOptimizerResult(index) {
     enabled: buffSet.has(idx)
   }));
 
+  if (r.forceOtherBuffs === false) {
+    state.other = (state.other || []).map(row => ({...row, enabled:false}));
+  }
+
   renderAll();
   calc();
 
@@ -4094,8 +5839,69 @@ function applyIntegratedOptimizerResult(index) {
 }
 
 
+
+const MAIN_TABS = [
+  {id:"calc", label:"計算", hint:"基本設定、サマリー、分析、実測差分、最適化計算をここにまとめています。"},
+  {id:"skill", label:"スキルシミュレータ", hint:"スキル合計850、残りポイント、種族別の簡易ステータスを確認します。計算側へはボタンを押した時だけ反映します。"},
+  {id:"equipment", label:"装備登録", hint:"武器・防具・装飾候補、装備Buff、AC/HP/命中などの追加ステータスを部位ごとのカテゴリで登録します。候補追加はここで行います。"},
+  {id:"buffs", label:"Buff登録", hint:"装備以外のBuff、外枠補正、その他バフを登録します。"},
+  {id:"groups", label:"競合グループ", hint:"同一グループで重複しないBuffを確認します。"},
+  {id:"save", label:"保存・読込", hint:"JSON/TSV/プリセットを扱います。これまでのJSON/TSV形式はそのまま読み込めます。"}
+];
+
+function activateMainTab(id) {
+  const valid = MAIN_TABS.some(t => t.id === id) ? id : "calc";
+  document.querySelectorAll(".mainTabButton").forEach(btn => {
+    const active = btn.dataset.tabId === valid;
+    btn.classList.toggle("active", active);
+    btn.setAttribute("aria-selected", active ? "true" : "false");
+  });
+  document.querySelectorAll(".mainTabPanel").forEach(panel => {
+    panel.hidden = panel.dataset.tabPanel !== valid;
+  });
+  localStorage.setItem("moeDamageSimActiveTab", valid);
+}
+
+function setupTabLayout() {
+  const nav = byId("mainTabNav");
+  const panelsWrap = byId("mainTabPanels");
+  if (!nav || !panelsWrap || nav.dataset.ready) return;
+
+  nav.dataset.ready = "1";
+  nav.setAttribute("role", "tablist");
+
+  MAIN_TABS.forEach(tab => {
+    const btn = makeCell("button", {type:"button", class:"mainTabButton", "data-tab-id":tab.id}, tab.label);
+    btn.setAttribute("role", "tab");
+    btn.onclick = () => activateMainTab(tab.id);
+    nav.appendChild(btn);
+
+    const panel = document.createElement("div");
+    panel.className = "mainTabPanel";
+    panel.dataset.tabPanel = tab.id;
+    panel.setAttribute("role", "tabpanel");
+
+    const hint = document.createElement("div");
+    hint.className = "tabSectionHint small";
+    hint.textContent = tab.hint;
+    panel.appendChild(hint);
+
+    panelsWrap.appendChild(panel);
+  });
+
+  document.querySelectorAll("[data-tab-target]").forEach(el => {
+    const target = el.dataset.tabTarget || "calc";
+    const panel = panelsWrap.querySelector(`[data-tab-panel="${target}"]`);
+    if (panel) panel.appendChild(el);
+  });
+
+  activateMainTab(localStorage.getItem("moeDamageSimActiveTab") || "calc");
+}
+
+
 function renderAll() {
   renderWeaponReqTable();
+  renderSkillSim();
   renderCompositeTable();
   renderEquipmentTable();
   renderNumericTable("post");
@@ -4237,6 +6043,9 @@ function computeMetrics(st, inputs) {
     speed: equipmentRows.reduce((s, r) => s + (+r.speed || 0), 0),
     delay: equipmentRows.reduce((s, r) => s + (+r.delay || 0), 0)
   };
+  const extraStats = emptyExtraStats();
+  equipmentRows.forEach(r => addExtraStatsInto(extraStats, r, "base"));
+  normalizeCompositeRows(st.composite).filter(r => r.enabled).forEach(r => addExtraStatsInto(extraStats, r, "buff"));
 
   // 実数加算。魔力/速度は%Buffや変換より前、攻撃力は上限対象側に入る。
   const flatRows = normalizeFlatRows(st).filter(r => r.enabled);
@@ -4256,8 +6065,11 @@ function computeMetrics(st, inputs) {
   const stats = pctStats.stats;
 
   // 武器性能発揮率を反映した武器攻撃力を計算する。
-  const weaponDamage = parseFloat(inputs.weaponDamage) || 0;
-  const skillModInfo = calcWeaponSkillMod(st, inputs);
+  const selectedWeapon = selectedWeaponForCalc(st);
+  const weaponDamage = selectedWeapon ? (+selectedWeapon.weaponDamage || 0) : (parseFloat(inputs.weaponDamage) || 0);
+  const weaponWeight = selectedWeapon ? (+selectedWeapon.weaponWeight || 0) : (parseFloat(inputs.weaponWeight) || 0);
+  const weaponInputs = {...inputs, weaponDamage, weaponWeight};
+  const skillModInfo = calcWeaponSkillMod(st, weaponInputs);
   const skillMod = skillModInfo.mod;
   const ac = parseFloat(inputs.targetAC) || 0;
 
@@ -4311,7 +6123,7 @@ function computeMetrics(st, inputs) {
     cappedAddBeforePct = atkCap > 0 ? Math.min(flatAtkRaw, atkCap) : flatAtkRaw;
   }
 
-  const attackMultiplier = attackMultiplierFromInputs(inputs);
+  const attackMultiplier = attackMultiplierFromInputs(weaponInputs);
   const dmgBonusSum = (st.dmg || []).filter(r => r.enabled).reduce((s, r) => s + (+r.value || 0), 0);
   const dmgMultiplier = 1 + dmgBonusSum;
   const specialMultiplier = (st.special || []).filter(r => r.enabled).reduce((p, r) => p * (+r.value || 1), 1);
@@ -4336,8 +6148,8 @@ function computeMetrics(st, inputs) {
   const slots = buffSlotCountForState(st);
 
   return {
-    stats, pctStats, conv, pctAtkCalc, spirit, magicCoeff, baseMagicFromSpirit, flatStatRaw, equipmentRaw,
-    racialAtk, weaponAtk, skillModInfo, baseNaturalAtk, conversionAtk, baseAtk, flatAtkRaw, extraRawBeforePct, cappedAddRawBeforePct, cappedAddBeforePct, atkBeforePct, atkPctMode, atkBuffRaw, atkCap, atkBuffCapped, atk,
+    stats, pctStats, conv, pctAtkCalc, spirit, magicCoeff, baseMagicFromSpirit, flatStatRaw, equipmentRaw, extraStats,
+    racialAtk, weaponAtk, weaponDamage, weaponWeight, selectedWeapon, skillModInfo, baseNaturalAtk, conversionAtk, baseAtk, flatAtkRaw, extraRawBeforePct, cappedAddRawBeforePct, cappedAddBeforePct, atkBeforePct, atkPctMode, atkBuffRaw, atkCap, atkBuffCapped, atk,
     attackMultiplier, dmgMultiplier, defenseFactor, critAvg, postMultiplier, baseNoTech,
     rawDamage, finalDamage, slots, specialMultiplier
   };
@@ -4401,9 +6213,13 @@ function updateEquipmentSummary(m) {
   const lines = [
     `攻撃力: ${m.equipmentRaw.attack.toFixed(3)}`,
     `魔力: ${m.equipmentRaw.magic.toFixed(3)}`,
-    `速度: ${m.equipmentRaw.speed.toFixed(3)}`,
-    `攻撃ディレイ: ${m.equipmentRaw.delay.toFixed(3)}`
+    `速度: ${m.equipmentRaw.speed.toFixed(3)}`
   ];
+  const extra = extraStatsSummary(m.extraStats || {});
+  if (extra.length) {
+    lines.push(`<b>追加ステータス</b>`);
+    extra.forEach(x => lines.push(x));
+  }
   byId("equipmentSummary").innerHTML = lines.map(x => `<div>${x}</div>`).join("");
 }
 
@@ -4480,6 +6296,8 @@ function updatePredictedAtkUI(m) {
  * 入力イベントのたびに呼ばれ、computeMetrics()→各UI更新→localStorage保存まで行う。
  */
 function calc() {
+  syncSkillSimToCalcInputs(false, false);
+  syncSelectedWeaponToHiddenInputs();
   syncRaceCoeff();
   syncBaseMagic();
   syncAttackTypeUI();
@@ -4496,6 +6314,8 @@ function calc() {
   byId("finalDamage").textContent = `${Math.floor(m.finalDamage).toLocaleString()} ダメージ前後`;
   updateSlotUI(m);
   updateEquipmentSummary(m);
+  updateWeaponReqAutoCurrentDisplays();
+  updateSelectedWeaponCalcSummary(m);
   updateWeaponSkillModHint(m);
   updatePredictedAtkUI(m);
 
@@ -4512,8 +6332,14 @@ function calc() {
   const lines = [];
   lines.push(`<p>実効ステータス: 筋力 ${m.stats.str.toFixed(3)} / 魔力 ${m.stats.magic.toFixed(3)} / 速度 ${m.stats.speed.toFixed(3)} / 酩酊度 ${m.stats.drunk.toFixed(3)}</p>`);
   lines.push(`<p>基礎魔力: 精神力 ${m.spirit.toFixed(3)} × 種族魔力係数 ${(RACE_MAGIC_COEFFS[inputs.raceSelect] ?? 1).toFixed(2)} = ${m.baseMagicFromSpirit.toFixed(3)}</p>`);
-  if (m.equipmentRaw.attack || m.equipmentRaw.magic || m.equipmentRaw.speed || m.equipmentRaw.delay) {
-    lines.push(`<p>武器・防具・装飾補正: 攻撃力 ${m.equipmentRaw.attack.toFixed(3)} / 魔力 ${m.equipmentRaw.magic.toFixed(3)} / 速度 ${m.equipmentRaw.speed.toFixed(3)} / 攻撃ディレイ ${m.equipmentRaw.delay.toFixed(3)}</p>`);
+  if (m.equipmentRaw.attack || m.equipmentRaw.magic || m.equipmentRaw.speed) {
+    lines.push(`<p>武器・防具・装飾補正: 攻撃力 ${m.equipmentRaw.attack.toFixed(3)} / 魔力 ${m.equipmentRaw.magic.toFixed(3)} / 速度 ${m.equipmentRaw.speed.toFixed(3)}</p>`);
+  }
+  const extraLine = extraStatsSummary(m.extraStats || {}).join(" / ");
+  if (extraLine) lines.push(`<p>構成追加ステータス: ${escapeHtml(extraLine)}</p>`);
+  if (m.selectedWeapon) {
+    const slotName = (m.selectedWeapon.slot || "武器").replace(/^武器: /, "");
+    lines.push(`<p>計算武器: ${escapeHtml(slotName)} ${escapeHtml(m.selectedWeapon.name || "名称未入力")} / 武器ダメージ ${m.weaponDamage.toFixed(3)} / 武器重量 ${m.weaponWeight.toFixed(3)}</p>`);
   }
   if (m.skillModInfo && m.skillModInfo.evaluated && m.skillModInfo.evaluated.length) {
     const reqText = m.skillModInfo.evaluated.map(r => `${escapeHtml(r.name)} ${r.current.toFixed(1)}/${r.required.toFixed(1)}${r.denom !== r.required ? `（判定分母 ${r.denom.toFixed(1)}）` : ""}=${(r.ratio * 100).toFixed(1)}%${r.meetsGate ? "" : " / 8割未満"}`).join(" / ");
@@ -4542,7 +6368,7 @@ function calc() {
   }
   byId("breakdown").innerHTML = lines.join("");
 
-  localStorage.setItem("moeDamageSimEquipBuffNameMemoLayout", JSON.stringify(collectConfig()));
+  localStorage.setItem("moeDamageSimSimplifiedBasicHoverBreakdown", JSON.stringify(collectConfig()));
   renderCompareResult();
   renderActualDiff();
   renderRaceTable();
@@ -5087,7 +6913,8 @@ function serializeConfigAsTsv(cfg) {
     }))
   ));
 
-  out.push(makeTsvSection("composite", ["enabled", "slot", "name", "tags", "attackPct", "magicPct", "speedPct", "flatAttack", "flatMagic", "flatSpeed", "convMagicRate", "convSpeedRate", "dmgPct", "special", "note"],
+  out.push(makeTsvSection("composite",
+    ["enabled", "slot", "name", "tags", "attackPct", "magicPct", "speedPct", "flatAttack", "flatMagic", "flatSpeed", "convMagicRate", "convSpeedRate", "dmgPct", "special"].concat(extraTsvFields("buff"), ["note"]),
     normalizeCompositeRows(st.composite || []).map(r => ({
       enabled: boolToCell(r.enabled),
       slot: boolToCell(r.slot),
@@ -5103,19 +6930,21 @@ function serializeConfigAsTsv(cfg) {
       convSpeedRate: r.convSpeedRate ?? 0,
       dmgPct: r.dmgPct ?? 0,
       special: r.special ?? 1,
+      ...extraTsvExportFields(r, "buff"),
       note: r.note || ""
     }))
   ));
 
-  out.push(makeTsvSection("equipment", [
-    "enabled", "slot", "name", "tags", "attack", "magic", "speed", "delay",
-    "equipBuffEnabled", "equipBuffSlot", "equipBuffName",
-    "equipBuffAttackPct", "equipBuffMagicPct", "equipBuffSpeedPct",
-    "equipBuffFlatAttack", "equipBuffFlatMagic", "equipBuffFlatSpeed",
-    "equipBuffConvMagicRate", "equipBuffConvSpeedRate",
-    "equipBuffDmgPct", "equipBuffSpecial", "equipBuffNote",
-    "note"
-  ],
+  const sim = normalizeSkillSim(st.skillSim || {});
+  out.push(makeTsvSection("skillSim", ["name", "race", "cap", "weaponSkill", "autoApply", "skill", "value"],
+    [
+      {name: sim.name || "", race: sim.race || "newtar", cap: sim.cap ?? 850, weaponSkill: sim.weaponSkill || "こんぼう", autoApply: boolToCell(sim.autoApply !== false), skill:"", value:""},
+      ...SKILL_SIM_ALL.map(skill => ({name:"", race:"", cap:"", weaponSkill:"", autoApply:"", skill, value: sim.skills[skill] ?? 0}))
+    ]
+  ));
+
+  out.push(makeTsvSection("equipment",
+    ["enabled", "slot", "name", "tags", "attack", "magic", "speed", "delay", "weaponDamage", "weaponWeight", "weaponAttackInterval", "weaponRange", "weaponDurability", "weaponTwoHanded", "weaponReqText"].concat(extraTsvFields("base"), ["equipBuffEnabled", "equipBuffSlot", "equipBuffName", "equipBuffAttackPct", "equipBuffMagicPct", "equipBuffSpeedPct", "equipBuffFlatAttack", "equipBuffFlatMagic", "equipBuffFlatSpeed", "equipBuffConvMagicRate", "equipBuffConvSpeedRate", "equipBuffDmgPct", "equipBuffSpecial"], extraTsvFields("equipBuff"), ["equipBuffNote", "note"]),
     normalizeEquipmentRows(st.equipment || []).map(r => ({
       enabled: boolToCell(r.enabled !== false),
       slot: r.slot || "",
@@ -5125,6 +6954,14 @@ function serializeConfigAsTsv(cfg) {
       magic: r.magic ?? 0,
       speed: r.speed ?? 0,
       delay: r.delay ?? 0,
+      weaponDamage: r.weaponDamage ?? 0,
+      weaponWeight: r.weaponWeight ?? 0,
+      weaponAttackInterval: r.weaponAttackInterval ?? 0,
+      weaponRange: r.weaponRange ?? 0,
+      weaponDurability: r.weaponDurability ?? 0,
+      weaponTwoHanded: r.weaponTwoHanded || "×",
+      weaponReqText: serializeWeaponReqText(r.weaponReq),
+      ...extraTsvExportFields(r, "base"),
       equipBuffEnabled: boolToCell(r.equipBuffEnabled),
       equipBuffSlot: boolToCell(r.equipBuffSlot !== false),
       equipBuffName: r.equipBuffName || "",
@@ -5138,6 +6975,7 @@ function serializeConfigAsTsv(cfg) {
       equipBuffConvSpeedRate: r.equipBuffConvSpeedRate ?? 0,
       equipBuffDmgPct: r.equipBuffDmgPct ?? 0,
       equipBuffSpecial: r.equipBuffSpecial ?? 1,
+      ...extraTsvExportFields(r, "equipBuff"),
       equipBuffNote: r.equipBuffNote || "",
       note: r.note || ""
     }))
@@ -5264,7 +7102,22 @@ function parseConfigFromTsv(text) {
 
   const stateFromDefaults = DEFAULT_STATE();
 
+  const skillSimRows = sections.skillSim?.rows || [];
+  const skillSimMeta = skillSimRows[0] || {};
+  const skillSimFromTsv = defaultSkillSimState();
+  if (skillSimRows.length) {
+    skillSimFromTsv.name = skillSimMeta.name || "";
+    skillSimFromTsv.race = skillSimMeta.race || "newtar";
+    skillSimFromTsv.cap = skillSimMeta.cap === undefined || skillSimMeta.cap === "" ? 850 : cellToNum(skillSimMeta.cap);
+    skillSimFromTsv.weaponSkill = skillSimMeta.weaponSkill || "こんぼう";
+    skillSimFromTsv.autoApply = skillSimMeta.autoApply === undefined || skillSimMeta.autoApply === "" ? true : cellToBool(skillSimMeta.autoApply);
+    skillSimRows.forEach(r => {
+      if (r.skill) skillSimFromTsv.skills[r.skill] = cellToNum(r.value);
+    });
+  }
+
   const stateOut = {
+    skillSim: normalizeSkillSim(skillSimFromTsv),
     weaponReq: (sections.weaponReq?.rows || []).map(r => ({
       name: r.name || "使用条件",
       current: cellToNum(r.current),
@@ -5287,6 +7140,7 @@ function parseConfigFromTsv(text) {
         ? cellToNum(r.dmgPct)
         : (cellToNum(r.dmg) > 0 && cellToNum(r.dmg) <= 1 ? cellToNum(r.dmg) * 100 : cellToNum(r.dmg)),
       special: r.special === undefined || r.special === "" ? 1 : cellToNum(r.special),
+      ...extraTsvParseFields(r, "buff"),
       note: r.note || ""
     })),
     equipment: (sections.equipment?.rows || []).map(r => ({
@@ -5298,6 +7152,14 @@ function parseConfigFromTsv(text) {
       magic: cellToNum(r.magic),
       speed: cellToNum(r.speed),
       delay: cellToNum(r.delay),
+      weaponDamage: cellToNum(r.weaponDamage),
+      weaponWeight: cellToNum(r.weaponWeight),
+      weaponAttackInterval: cellToNum(r.weaponAttackInterval),
+      weaponRange: cellToNum(r.weaponRange),
+      weaponDurability: cellToNum(r.weaponDurability),
+      weaponTwoHanded: (r.weaponTwoHanded === "○" || r.weaponTwoHanded === "true" || r.weaponTwoHanded === "yes") ? "○" : "×",
+      weaponReq: parseWeaponReqText(r.weaponReqText),
+      ...extraTsvParseFields(r, "base"),
       equipBuffEnabled: cellToBool(r.equipBuffEnabled),
       equipBuffSlot: r.equipBuffSlot === undefined || r.equipBuffSlot === "" ? true : cellToBool(r.equipBuffSlot),
       equipBuffName: r.equipBuffName || "",
@@ -5311,6 +7173,7 @@ function parseConfigFromTsv(text) {
       equipBuffConvSpeedRate: cellToNum(r.equipBuffConvSpeedRate),
       equipBuffDmgPct: cellToNum(r.equipBuffDmgPct),
       equipBuffSpecial: r.equipBuffSpecial === undefined || r.equipBuffSpecial === "" ? 1 : cellToNum(r.equipBuffSpecial),
+      ...extraTsvParseFields(r, "equipBuff"),
       equipBuffNote: r.equipBuffNote || "",
       note: r.note || ""
     })),
@@ -5372,6 +7235,10 @@ function parseConfigFromTsv(text) {
 
   // セクションがない場合は初期値を維持
   Object.keys(stateOut).forEach(k => {
+    if (k === "skillSim") {
+      if (!sections.skillSim) stateOut[k] = stateFromDefaults[k];
+      return;
+    }
     if (!sections[k]) stateOut[k] = stateFromDefaults[k];
   });
 
@@ -5463,7 +7330,7 @@ function importTsvConfig() {
 /* localStorageの現在構成を削除し、初期状態へ戻す。 */
 function resetConfig() {
   if (!confirm("保存済み設定をリセットして初期状態に戻しますか？")) return;
-  localStorage.removeItem("moeDamageSimEquipBuffNameMemoLayout");
+  localStorage.removeItem("moeDamageSimSimplifiedBasicHoverBreakdown");
   state = DEFAULT_STATE();
   renderAll();
   calc();
@@ -5476,6 +7343,7 @@ function applyConfig(cfg) {
   state = DEFAULT_STATE();
 
   state.weaponReq = normalizeWeaponReqRows(incoming.weaponReq, cfg.inputs || {});
+  state.skillSim = normalizeSkillSim(incoming.skillSim);
   state.composite = Array.isArray(incoming.composite) ? normalizeCompositeRows(incoming.composite) : state.composite;
   state.equipment = normalizeEquipmentRows(incoming.equipment);
 
@@ -5495,8 +7363,11 @@ function applyConfig(cfg) {
     offset: r.offset !== undefined ? (+r.offset || 0) : 0
   }));
   renderAll();
+  syncSkillSimToCalcInputs(false, false);
   calc();
 }
+
+setupTabLayout();
 
 document.querySelectorAll("input,select").forEach(el => {
   el.addEventListener("input", calc);
@@ -5504,7 +7375,7 @@ document.querySelectorAll("input,select").forEach(el => {
 });
 
 renderAll();
-const saved = localStorage.getItem("moeDamageSimEquipBuffNameMemoLayout");
+const saved = localStorage.getItem("moeDamageSimSimplifiedBasicHoverBreakdown");
 if (saved) {
   try { applyConfig(JSON.parse(saved)); }
   catch { calc(); }
