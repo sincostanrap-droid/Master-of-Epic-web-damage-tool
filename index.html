@@ -2344,6 +2344,111 @@ MoE固有の主な仮定:
     border-radius: 8px;
   }
 
+
+  .showcaseSection {
+    background:
+      radial-gradient(circle at top right, rgba(255, 210, 120, .22), transparent 34%),
+      linear-gradient(180deg, rgba(255,255,255,.98), rgba(248,251,255,.98));
+  }
+  .showcaseActions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin: 8px 0 12px;
+  }
+  .showcaseView {
+    display: grid;
+    gap: 12px;
+  }
+  .showcaseHero {
+    border: 1px solid #e3d3a2;
+    border-radius: 14px;
+    padding: 14px;
+    background: linear-gradient(135deg, #fff7df, #fff 70%);
+    box-shadow: 0 10px 22px rgba(90,70,20,.08);
+  }
+  .showcaseTitle {
+    font-size: clamp(22px, 4vw, 34px);
+    font-weight: 900;
+    color: #2b3853;
+    margin-bottom: 8px;
+  }
+  .showcaseBigStats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 8px;
+  }
+  .showcaseBigStat {
+    border: 1px solid rgba(35,57,93,.12);
+    border-radius: 12px;
+    padding: 9px 10px;
+    background: rgba(255,255,255,.82);
+  }
+  .showcaseBigStat span {
+    display: block;
+    color: #5d6879;
+    font-size: 12px;
+    font-weight: 800;
+  }
+  .showcaseBigStat b {
+    display: block;
+    color: #1f2f4d;
+    font-size: 22px;
+    margin-top: 2px;
+  }
+  .showcaseGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 12px;
+  }
+  .showcaseCard {
+    border: 1px solid #dde5f2;
+    border-radius: 12px;
+    background: #fff;
+    padding: 10px 12px;
+    min-width: 0;
+  }
+  .showcaseCard h3 {
+    margin: 0 0 8px;
+    color: #23395d;
+    font-size: 16px;
+  }
+  .showcaseList {
+    display: grid;
+    gap: 4px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .showcaseList li {
+    border-bottom: 1px dashed #e6ebf3;
+    padding: 3px 0;
+    line-height: 1.45;
+  }
+  .showcaseList li:last-child {
+    border-bottom: 0;
+  }
+  .showcasePair {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .showcasePair span {
+    color: #5d6879;
+  }
+  .showcasePair b {
+    text-align: right;
+  }
+  .showcaseTextDetails {
+    margin-top: 12px;
+  }
+  .showcaseTextDetails textarea {
+    min-height: 260px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    white-space: pre;
+  }
+
 </style>
 </head>
 <body>
@@ -3152,6 +3257,23 @@ MoE固有の主な仮定:
         <div id="optimizerResults" class="scrollX"></div>
       </div>
     </div>
+  </details>
+</section>
+
+
+<section class="card wide showcaseSection" data-tab-target="showcase">
+  <h2>見せびらかし一覧</h2>
+  <p class="small">
+    現在の構成を、スクリーンショットやコピペで見せやすい形にまとめます。計算・スキル・装備・Buffを一覧表示します。
+  </p>
+  <div class="showcaseActions">
+    <button type="button" onclick="copyShowcaseText()">一覧テキストをコピー</button>
+    <span id="showcaseCopyStatus" class="small"></span>
+  </div>
+  <div id="showcaseView" class="showcaseView">-</div>
+  <details class="showcaseTextDetails">
+    <summary>コピペ用テキスト</summary>
+    <textarea id="showcaseText" readonly></textarea>
   </details>
 </section>
 
@@ -5891,6 +6013,7 @@ const MAIN_TABS = [
   {id:"equipment", label:"装備登録", hint:"武器・防具・装飾候補、装備Buff、AC/HP/命中などの追加ステータスを部位ごとのカテゴリで登録します。候補追加はここで行います。"},
   {id:"buffs", label:"Buff登録", hint:"装備以外のBuff、外枠補正、その他バフを登録します。"},
   {id:"groups", label:"競合グループ", hint:"同一グループで重複しないBuffを確認します。"},
+  {id:"showcase", label:"見せびらかし", hint:"現在構成のダメージ、ステータス、装備、Buffを一覧表示します。"},
   {id:"save", label:"保存・読込", hint:"JSON/TSV/プリセットを扱います。これまでのJSON/TSV形式はそのまま読み込めます。"}
 ];
 
@@ -5944,6 +6067,249 @@ function setupTabLayout() {
 }
 
 
+
+function showcasePair(label, value) {
+  return `<li class="showcasePair"><span>${escapeHtml(label)}</span><b>${escapeHtml(value)}</b></li>`;
+}
+
+function showcaseList(items) {
+  return `<ul class="showcaseList">${items.length ? items.join("") : `<li class="small">なし</li>`}</ul>`;
+}
+
+function activeEquipmentForShowcase() {
+  return normalizeEquipmentRows(state.equipment)
+    .filter(r => r.enabled !== false && equipmentCandidateHasData(r));
+}
+
+function equipmentShowcaseText(row) {
+  const parts = [];
+  if (+row.attack) parts.push(`攻撃力+${fmt(+row.attack,1)}`);
+  if (+row.magic) parts.push(`魔力+${fmt(+row.magic,1)}`);
+  if (+row.speed) parts.push(`速度+${fmt(+row.speed,1)}`);
+  if (isWeaponEquipmentRow(row)) {
+    if (+row.weaponDamage) parts.push(`武器Dmg ${fmt(+row.weaponDamage,1)}`);
+    if (+row.weaponWeight) parts.push(`重量 ${fmt(+row.weaponWeight,1)}`);
+    if (+row.weaponAttackInterval) parts.push(`間隔 ${fmt(+row.weaponAttackInterval,1)}`);
+    if (+row.weaponRange) parts.push(`射程 ${fmt(+row.weaponRange,1)}`);
+    if (+row.weaponDurability) parts.push(`耐久 ${fmt(+row.weaponDurability,0)}`);
+    if (row.weaponTwoHanded === "○") parts.push("両手");
+  }
+  const extra = extraStatsSummary(row, "base");
+  if (extra.length) parts.push(extra.join(" / "));
+  return parts.join(" / ") || "補正なし";
+}
+
+function showcaseActiveBuffLines() {
+  const lines = [];
+  normalizeEquipmentRows(state.equipment)
+    .filter(r => r.enabled !== false && r.equipBuffEnabled && equipmentBuffHasEffect(r))
+    .forEach(r => lines.push(`装備Buff: ${equipmentBuffDisplayName(r)}（${equipmentBuffEffectText(r)}）`));
+
+  normalizeCompositeRows(state.composite)
+    .filter(r => r.enabled && compositeHasEffect(r))
+    .forEach(r => lines.push(`${r.name || "装備以外Buff"}（${compositeEffectText(r)}）`));
+
+  (state.other || [])
+    .filter(r => r.enabled)
+    .forEach(r => lines.push(`${r.name || "その他バフ"}${r.note ? `（${r.note}）` : ""}`));
+
+  return lines;
+}
+
+function showcaseSkillLines() {
+  state.skillSim = normalizeSkillSim(state.skillSim);
+  const rows = [];
+  SKILL_SIM_GROUPS.forEach(([group, list]) => {
+    const active = list
+      .map(name => [name, +(state.skillSim.skills[name] || 0)])
+      .filter(([,v]) => v)
+      .map(([name, v]) => `${name} ${fmt(v,1)}`);
+    if (active.length) rows.push(`${group}: ${active.join(" / ")}`);
+  });
+  return rows;
+}
+
+function showcaseTextFromMetrics(m) {
+  state.skillSim = normalizeSkillSim(state.skillSim);
+  const inputs = collectInputs();
+  const d = skillSimDerived();
+  const title = state.skillSim.name || "無題構成";
+  const race = RACE_LABELS[state.skillSim.race] || state.skillSim.race || "-";
+  const weapon = m.selectedWeapon;
+  const reqRows = (m.skillModInfo?.evaluated || []).map(r => `${r.name} ${fmt(r.current,1)}/${fmt(r.required,1)}`);
+  const equipLines = activeEquipmentForShowcase().map(r => {
+    const slot = (r.slot || "").replace(/^武器: /, "").replace(/^防具: /, "").replace(/^装飾: /, "");
+    return `- ${slot}: ${r.name || "名称未入力"} / ${equipmentShowcaseText(r)}`;
+  });
+  const buffLines = showcaseActiveBuffLines().map(x => `- ${x}`);
+  const skillLines = showcaseSkillLines().map(x => `- ${x}`);
+  const extra = extraStatsSummary(m.extraStats || {}).map(x => `- ${x}`);
+
+  return [
+    `【${title}】`,
+    `種族: ${race}`,
+    `予想ダメージ: ${fmt(Math.floor(m.finalDamage),0)} ダメージ前後`,
+    `攻撃力: ${fmt(m.atk,3)}`,
+    `魔力: ${fmt(m.stats.magic,3)}`,
+    `速度: ${fmt(m.stats.speed,3)}`,
+    `バフ枠: ${m.slots.total}/24`,
+    `攻撃種別: ${byId("attackType")?.selectedOptions?.[0]?.textContent || inputs.attackType || "-"}`,
+    `対象AC: ${inputs.targetAC || 0}`,
+    "",
+    "■スキル由来ステータス",
+    `HP ${fmt(d.hp,1)} / MP ${fmt(d.mp,1)} / ST ${fmt(d.st,1)} / 重量 ${fmt(d.weight,1)}`,
+    `命中 ${fmt(d.hit,1)} / 回避 ${fmt(d.avoid,1)} / 防御 ${fmt(d.def,1)} / 呪文抵抗 ${fmt(d.resist,1)}`,
+    "",
+    "■武器",
+    weapon
+      ? `${(weapon.slot || "武器").replace(/^武器: /, "")}: ${weapon.name || "名称未入力"} / Dmg ${fmt(+weapon.weaponDamage || 0,1)} / 重量 ${fmt(+weapon.weaponWeight || 0,1)} / 発揮率 ${fmt((m.skillModInfo?.mod || 1) * 100,1)}%${reqRows.length ? ` / 条件 ${reqRows.join(" / ")}` : ""}`
+      : "未設定",
+    "",
+    "■装備",
+    ...(equipLines.length ? equipLines : ["- なし"]),
+    "",
+    "■Buff",
+    ...(buffLines.length ? buffLines : ["- なし"]),
+    "",
+    "■追加ステータス",
+    ...(extra.length ? extra : ["- なし"]),
+    "",
+    "■スキル",
+    ...(skillLines.length ? skillLines : ["- なし"])
+  ].join("\n");
+}
+
+function renderShowcaseTab(m=null) {
+  const root = byId("showcaseView");
+  const textBox = byId("showcaseText");
+  if (!root && !textBox) return;
+
+  if (!m) {
+    syncSkillSimToCalcInputs(false, false);
+    syncSelectedWeaponToHiddenInputs();
+    syncRaceCoeff();
+    syncBaseMagic();
+    m = computeMetrics(state, collectInputs());
+  }
+
+  state.skillSim = normalizeSkillSim(state.skillSim);
+  const d = skillSimDerived();
+  const title = state.skillSim.name || "無題構成";
+  const race = RACE_LABELS[state.skillSim.race] || state.skillSim.race || "-";
+  const weapon = m.selectedWeapon;
+  const reqRows = (m.skillModInfo?.evaluated || []).map(r => `${escapeHtml(r.name)} ${fmt(r.current,1)}/${fmt(r.required,1)}`);
+  const equipRows = activeEquipmentForShowcase();
+  const buffLines = showcaseActiveBuffLines();
+  const skillLines = showcaseSkillLines();
+  const extraLines = extraStatsSummary(m.extraStats || {});
+  const inputs = collectInputs();
+
+  if (root) {
+    const equipItems = equipRows.map(r => {
+      const slot = (r.slot || "").replace(/^武器: /, "").replace(/^防具: /, "").replace(/^装飾: /, "");
+      return `<li><b>${escapeHtml(slot)}: ${escapeHtml(r.name || "名称未入力")}</b><br><span class="small">${escapeHtml(equipmentShowcaseText(r))}</span></li>`;
+    });
+    const buffItems = buffLines.map(x => `<li>${escapeHtml(x)}</li>`);
+    const skillItems = skillLines.map(x => `<li>${escapeHtml(x)}</li>`);
+    const extraItems = extraLines.map(x => `<li>${escapeHtml(x)}</li>`);
+
+    root.innerHTML = `
+      <div class="showcaseHero">
+        <div class="showcaseTitle">${escapeHtml(title)}</div>
+        <div class="showcaseBigStats">
+          <div class="showcaseBigStat"><span>予想ダメージ</span><b>${fmt(Math.floor(m.finalDamage),0)}</b></div>
+          <div class="showcaseBigStat"><span>攻撃力</span><b>${fmt(m.atk,3)}</b></div>
+          <div class="showcaseBigStat"><span>魔力</span><b>${fmt(m.stats.magic,3)}</b></div>
+          <div class="showcaseBigStat"><span>バフ枠</span><b>${m.slots.total}/24</b></div>
+        </div>
+      </div>
+
+      <div class="showcaseGrid">
+        <div class="showcaseCard">
+          <h3>基本</h3>
+          ${showcaseList([
+            showcasePair("種族", race),
+            showcasePair("攻撃種別", byId("attackType")?.selectedOptions?.[0]?.textContent || inputs.attackType || "-"),
+            showcasePair("対象AC", inputs.targetAC || 0),
+            showcasePair("筋力", fmt(skillSimValue("筋力"),1)),
+            showcasePair("精神力", fmt(skillSimValue("精神力"),1)),
+            showcasePair("酩酊度", fmt(d.drunk,1))
+          ])}
+        </div>
+
+        <div class="showcaseCard">
+          <h3>スキル由来ステータス</h3>
+          ${showcaseList([
+            showcasePair("HP", fmt(d.hp,1)),
+            showcasePair("MP", fmt(d.mp,1)),
+            showcasePair("ST", fmt(d.st,1)),
+            showcasePair("重量", fmt(d.weight,1)),
+            showcasePair("命中", fmt(d.hit,1)),
+            showcasePair("回避", fmt(d.avoid,1)),
+            showcasePair("防御", fmt(d.def,1)),
+            showcasePair("呪文抵抗", fmt(d.resist,1))
+          ])}
+        </div>
+
+        <div class="showcaseCard">
+          <h3>武器</h3>
+          ${showcaseList(weapon ? [
+            `<li><b>${escapeHtml((weapon.slot || "武器").replace(/^武器: /, ""))}: ${escapeHtml(weapon.name || "名称未入力")}</b></li>`,
+            showcasePair("武器ダメージ", fmt(+weapon.weaponDamage || 0,1)),
+            showcasePair("武器重量", fmt(+weapon.weaponWeight || 0,1)),
+            showcasePair("攻撃間隔", fmt(+weapon.weaponAttackInterval || 0,1)),
+            showcasePair("射程", fmt(+weapon.weaponRange || 0,1)),
+            showcasePair("耐久", fmt(+weapon.weaponDurability || 0,0)),
+            showcasePair("両手武器", weapon.weaponTwoHanded || "×"),
+            showcasePair("性能発揮率", `${fmt((m.skillModInfo?.mod || 1) * 100,1)}%`),
+            `<li><span>使用条件</span><br><b>${reqRows.length ? reqRows.join(" / ") : "条件なし"}</b></li>`
+          ] : [])}
+        </div>
+
+        <div class="showcaseCard">
+          <h3>追加ステータス</h3>
+          ${showcaseList(extraItems)}
+        </div>
+
+        <div class="showcaseCard">
+          <h3>装備</h3>
+          ${showcaseList(equipItems)}
+        </div>
+
+        <div class="showcaseCard">
+          <h3>Buff</h3>
+          ${showcaseList(buffItems)}
+        </div>
+
+        <div class="showcaseCard">
+          <h3>スキル</h3>
+          ${showcaseList(skillItems)}
+        </div>
+      </div>`;
+  }
+
+  if (textBox) textBox.value = showcaseTextFromMetrics(m);
+}
+
+async function copyShowcaseText() {
+  const text = byId("showcaseText")?.value || "";
+  const status = byId("showcaseCopyStatus");
+  try {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(text);
+    } else {
+      const box = byId("showcaseText");
+      box.focus();
+      box.select();
+      document.execCommand("copy");
+    }
+    if (status) status.textContent = "コピーしました。";
+  } catch (e) {
+    if (status) status.textContent = "コピーに失敗しました。テキスト欄から手動コピーしてください。";
+  }
+}
+
+
 function renderAll() {
   renderWeaponReqTable();
   renderSkillSim();
@@ -5952,6 +6318,7 @@ function renderAll() {
   renderNumericTable("post");
   renderOtherTable();
   renderTagLinkSummary();
+  renderShowcaseTab();
 }
 
 /* 種族プルダウンから攻撃力係数hidden値を同期する。 */
@@ -6363,6 +6730,7 @@ function calc() {
   updateSelectedWeaponCalcSummary(m);
   updateWeaponSkillModHint(m);
   updatePredictedAtkUI(m);
+  renderShowcaseTab(m);
 
   const pctStatLine = m.pctStats.steps.length
     ? `<p>割合ステータスBuff: ${m.pctStats.steps.map(s => `${s.name}+${s.percent}% → ${labelOf(s.key)} ${s.after.toFixed(3)}`).join(" / ")}</p>`
@@ -6413,7 +6781,7 @@ function calc() {
   }
   byId("breakdown").innerHTML = lines.join("");
 
-  localStorage.setItem("moeDamageSimSkillStatusFormulaFix", JSON.stringify(collectConfig()));
+  localStorage.setItem("moeDamageSimShowcaseTab", JSON.stringify(collectConfig()));
   renderCompareResult();
   renderActualDiff();
   renderRaceTable();
@@ -7375,7 +7743,7 @@ function importTsvConfig() {
 /* localStorageの現在構成を削除し、初期状態へ戻す。 */
 function resetConfig() {
   if (!confirm("保存済み設定をリセットして初期状態に戻しますか？")) return;
-  localStorage.removeItem("moeDamageSimSkillStatusFormulaFix");
+  localStorage.removeItem("moeDamageSimShowcaseTab");
   state = DEFAULT_STATE();
   renderAll();
   calc();
@@ -7420,7 +7788,7 @@ document.querySelectorAll("input,select").forEach(el => {
 });
 
 renderAll();
-const saved = localStorage.getItem("moeDamageSimSkillStatusFormulaFix");
+const saved = localStorage.getItem("moeDamageSimShowcaseTab");
 if (saved) {
   try { applyConfig(JSON.parse(saved)); }
   catch { calc(); }
