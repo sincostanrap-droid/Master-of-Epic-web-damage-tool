@@ -3225,7 +3225,7 @@ MoE固有の主な仮定:
       <p class="small">
         このセクションでは候補の追加はしません。
         「装備登録」タブに積んだ装備候補と、「Buff登録」タブに積んだ装備以外Buff候補を使って、上位構成を探します。
-        装備Buff、追加ステータス、競合グループも計算に反映します。競合グループが同じ装備候補は同時採用しません。Buff側の標準探索を軽量な局所改善方式にしました。必要な時だけ「深掘り」に切り替えられます。攻撃力上限などで最終値に寄与しなくなったBuffは探索後に自動で外します。その他バフは「その他バフの使用を強制する」がONの時だけ現在ON/OFF状態を固定枠として扱い、最適化対象にはしません。
+        装備Buff、追加ステータス、競合グループも計算に反映します。競合グループが同じ装備候補は同時採用しません。Buff側の標準探索を軽量な局所改善方式にしました。必要な時だけ「深掘り」に切り替えられます。攻撃力上限・各ステータス上限を超える候補は除外し、目的→第二目標の順で評価します。目標値を指定した場合は目標到達を優先し、到達後は目標値に近い構成を優先します。最大クリ率では空欄でも100%目標・+5%まで許容として扱います。最終値に寄与しなくなったBuffは探索後に自動で外します。その他バフは「その他バフの使用を強制する」がONの時だけ現在ON/OFF状態を固定枠として扱い、最適化対象にはしません。
       </p>
       <div class="optimizerControls">
         <label>バフ枠上限<input id="optimizerMaxSlots" type="number" min="0" step="1" value="24"></label>
@@ -3245,6 +3245,7 @@ MoE固有の主な仮定:
             <option value="damage">最大ダメージ</option>
             <option value="attack">最大攻撃力</option>
             <option value="magic">最大魔力</option>
+            <option value="slotsMin">枠数最小</option>
             <option value="extraAC">最大AC</option>
             <option value="extraHP">最大HP</option>
             <option value="extraST">最大ST</option>
@@ -3256,6 +3257,26 @@ MoE固有の主な仮定:
             <option value="extraCritRatePct">最大クリ率</option>
           </select>
         </label>
+        <label>第二目標
+          <select id="optimizerSecondaryObjective">
+            <option value="">なし</option>
+            <option value="damage">最大ダメージ</option>
+            <option value="attack">最大攻撃力</option>
+            <option value="magic">最大魔力</option>
+            <option value="slotsMin">枠数最小</option>
+            <option value="extraAC">最大AC</option>
+            <option value="extraHP">最大HP</option>
+            <option value="extraST">最大ST</option>
+            <option value="extraHit">最大命中</option>
+            <option value="extraAvoid">最大回避</option>
+            <option value="extraAttackDelay">最大攻撃ディレイ</option>
+            <option value="extraMagicDelay">最大魔法ディレイ</option>
+            <option value="extraDamageReducePct">最大被ダメ軽減</option>
+            <option value="extraCritRatePct">最大クリ率</option>
+          </select>
+        </label>
+        <label>目標値<input id="optimizerTargetValue" type="number" step="0.1" placeholder="任意 / クリ率は空欄で100"></label>
+        <label>超過許容<input id="optimizerTargetOver" type="number" min="0" step="0.1" placeholder="例: 5"></label>
       </div>
       <div class="optimizerChecks">
         <label><input id="optimizerFixCurrentEquipment" type="checkbox"> 現在ONの装備を固定する</label>
@@ -5831,6 +5852,9 @@ function integratedOptimizerSettings() {
     buffMode: byId("optimizerBuffMode")?.value || "local",
     buffBeamWidth: Math.max(20, parseInt(byId("optimizerBuffBeamWidth")?.value, 10) || 80),
     objective: byId("optimizerObjective")?.value || "damage",
+    secondaryObjective: byId("optimizerSecondaryObjective")?.value || "",
+    targetValueRaw: byId("optimizerTargetValue")?.value ?? "",
+    targetOverRaw: byId("optimizerTargetOver")?.value ?? "",
     fixCurrentEquipment: !!byId("optimizerFixCurrentEquipment")?.checked,
     includeDisabledBuffs: byId("optimizerIncludeDisabledBuffs") ? !!byId("optimizerIncludeDisabledBuffs").checked : true,
     fixCurrentBuffs: !!byId("optimizerFixCurrentBuffs")?.checked,
@@ -5838,12 +5862,198 @@ function integratedOptimizerSettings() {
   };
 }
 
-function optimizerMetricValue(m, objective) {
+function optimizerObjectiveRawValue(m, objective) {
   if (objective === "attack") return m.atk;
   if (objective === "magic") return m.stats.magic;
+  if (objective === "slotsMin") return m.slots?.total || 0;
   if (String(objective || "").startsWith("extra")) return +(m.extraStats?.[objective] || 0);
   return m.finalDamage;
 }
+
+function optimizerMetricValue(m, objective) {
+  if (objective === "slotsMin") return -optimizerObjectiveRawValue(m, objective);
+  return optimizerObjectiveRawValue(m, objective);
+}
+
+function optimizerObjectiveLabel(objective) {
+  return ({
+    damage:"最大ダメージ",
+    attack:"最大攻撃力",
+    magic:"最大魔力",
+    slotsMin:"枠数最小",
+    extraAC:"最大AC",
+    extraHP:"最大HP",
+    extraST:"最大ST",
+    extraHit:"最大命中",
+    extraAvoid:"最大回避",
+    extraAttackDelay:"最大攻撃ディレイ",
+    extraMagicDelay:"最大魔法ディレイ",
+    extraDamageReducePct:"最大被ダメ軽減",
+    extraCritRatePct:"最大クリ率"
+  })[objective] || "なし";
+}
+
+const OPTIMIZER_INVALID_SCORE = -1000000000000;
+
+function optimizerNumberOrNull(value) {
+  const n = parseFloat(value);
+  return Number.isFinite(n) ? n : null;
+}
+
+function optimizerPrimaryTargetSettings(settings) {
+  const objective = settings?.objective || "damage";
+  let target = optimizerNumberOrNull(settings?.targetValueRaw);
+  let over = optimizerNumberOrNull(settings?.targetOverRaw);
+
+  // クリ率最大化では、未入力でも「100%を目標、105%まで許容」として扱う。
+  // 100%未満より、100～105%の到達構成を優先する。
+  if (objective === "extraCritRatePct" && target === null) {
+    target = 100;
+    if (over === null) over = 5;
+  }
+
+  if (target === null) return null;
+  if (over !== null && over < 0) over = 0;
+  return {objective, target, over};
+}
+
+function optimizerPrimaryTargetDescription(settings) {
+  const t = optimizerPrimaryTargetSettings(settings);
+  if (!t) return "";
+  const over = t.over === null ? "" : ` / 超過許容 +${fmt(t.over, 1)}`;
+  return `${optimizerObjectiveLabel(t.objective)} 目標 ${fmt(t.target, 1)}${over}`;
+}
+
+function optimizerEffectiveTotal(base, flat, pctValue) {
+  return ((+base || 0) + (+flat || 0)) * (1 + ((+pctValue || 0) / 100));
+}
+
+function optimizerEffectiveIncrease(base, flat, pctValue) {
+  return optimizerEffectiveTotal(base, flat, pctValue) - (+base || 0);
+}
+
+function optimizerCritRateCap(settings) {
+  const t = optimizerPrimaryTargetSettings(settings);
+  if (t && t.objective === "extraCritRatePct" && t.over !== null) {
+    return t.target + t.over;
+  }
+  return 100;
+}
+
+function optimizerStatCapRows(m, settings=null) {
+  const extra = m.extraStats || {};
+  const d = skillSimDerived();
+
+  return [
+    {label:"クリ率上昇量", value: +extra.extraCritRatePct || 0, cap: optimizerCritRateCap(settings), note:"素のクリ率は上限判定から除外"},
+    {label:"命中上昇量", value: optimizerEffectiveIncrease(d.hit, +extra.extraHit || 0, +extra.extraHitPct || 0), cap:500},
+    {label:"AC", value: optimizerEffectiveTotal(0, +extra.extraAC || 0, +extra.extraACPct || 0), cap:500},
+    {label:"魔力", value: +m.stats.magic || 0, cap:500},
+    {label:"回避", value: optimizerEffectiveTotal(d.avoid, +extra.extraAvoid || 0, +extra.extraAvoidPct || 0), cap:500},
+    {label:"ST", value: optimizerEffectiveTotal(d.st, +extra.extraST || 0, +extra.extraSTPct || 0), cap:500},
+    {label:"HP", value: optimizerEffectiveTotal(d.hp, +extra.extraHP || 0, +extra.extraHPPct || 0), cap:1000},
+    {label:"MP", value: optimizerEffectiveTotal(d.mp, +extra.extraMP || 0, +extra.extraMPPct || 0), cap:1000},
+    {label:"火耐性", value: optimizerEffectiveTotal(0, +extra.extraFireRes || 0, +extra.extraFireResPct || 0), cap:180},
+    {label:"水耐性", value: optimizerEffectiveTotal(0, +extra.extraWaterRes || 0, +extra.extraWaterResPct || 0), cap:180},
+    {label:"地耐性", value: optimizerEffectiveTotal(0, +extra.extraEarthRes || 0, +extra.extraEarthResPct || 0), cap:180},
+    {label:"風耐性", value: optimizerEffectiveTotal(0, +extra.extraWindRes || 0, +extra.extraWindResPct || 0), cap:180},
+    {label:"無耐性", value: optimizerEffectiveTotal(0, +extra.extraNeutralRes || 0, +extra.extraNeutralResPct || 0), cap:180}
+  ];
+}
+
+function optimizerStatCapViolations(m, settings=null) {
+  const eps = 0.000001;
+  // 上限ちょうどは有効。クリ率目標100%なら、既定で105%までは通し、超過だけ除外する。
+  return optimizerStatCapRows(m, settings)
+    .filter(r => r.value > r.cap + eps)
+    .map(r => `${r.label} ${fmt(r.value, 2)}/${fmt(r.cap, 0)}${r.note ? `（${r.note}）` : ""}`);
+}
+
+function optimizerTargetOverViolations(m, settings) {
+  const t = optimizerPrimaryTargetSettings(settings);
+  if (!t || t.over === null) return [];
+  const value = optimizerObjectiveRawValue(m, t.objective);
+  const eps = 0.000001;
+  return value > t.target + t.over + eps
+    ? [`${optimizerObjectiveLabel(t.objective)} ${fmt(value, 2)} が目標 ${fmt(t.target, 2)} + 許容 ${fmt(t.over, 2)} を超過`]
+    : [];
+}
+
+function optimizerObjectiveList(settings) {
+  const list = [];
+  const primary = settings?.objective || "damage";
+  const secondary = settings?.secondaryObjective || "";
+  if (primary) list.push(primary);
+  if (secondary && secondary !== primary) list.push(secondary);
+  return list.length ? list : ["damage"];
+}
+
+function optimizerTargetRankForPrimary(m, settings) {
+  const t = optimizerPrimaryTargetSettings(settings);
+  if (!t) return [optimizerMetricValue(m, settings?.objective || "damage")];
+
+  const value = optimizerObjectiveRawValue(m, t.objective);
+  if (t.objective === "slotsMin") {
+    // 枠数最小だけは「目標以下なら到達」とする。
+    if (value <= t.target) return [1, -Math.abs(value - t.target)];
+    return [0, -value];
+  }
+
+  // 最大化系: 目標以上を最優先。到達後は目標値に近いほどよい。
+  // 例: クリ率目標100なら 100 > 101 > 105 > 99。
+  if (value >= t.target) return [1, -Math.abs(value - t.target)];
+  return [0, value];
+}
+
+function optimizerEvaluationFromMetrics(m, settings) {
+  const violations = optimizerStatCapViolations(m, settings).concat(optimizerTargetOverViolations(m, settings));
+  if (violations.length) return {score: OPTIMIZER_INVALID_SCORE, rank: [OPTIMIZER_INVALID_SCORE], violations};
+
+  const objectives = optimizerObjectiveList(settings);
+  let rank = [];
+  if (optimizerPrimaryTargetSettings(settings)) {
+    rank = rank.concat(optimizerTargetRankForPrimary(m, settings));
+    objectives.slice(1).forEach(obj => rank.push(optimizerMetricValue(m, obj)));
+  } else {
+    rank = objectives.map(obj => optimizerMetricValue(m, obj));
+  }
+  return {score: rank[0] ?? 0, rank, violations: []};
+}
+
+function optimizerMetricValueWithCaps(m, objective, settings=null) {
+  const s = {...(settings || {}), objective};
+  return optimizerEvaluationFromMetrics(m, s).score;
+}
+
+function optimizerCompareRankValues(a, b) {
+  const left = Array.isArray(a) ? a : [a ?? OPTIMIZER_INVALID_SCORE];
+  const right = Array.isArray(b) ? b : [b ?? OPTIMIZER_INVALID_SCORE];
+  const len = Math.max(left.length, right.length);
+  for (let i = 0; i < len; i++) {
+    const av = left[i] ?? 0;
+    const bv = right[i] ?? 0;
+    const tol = optimizerScoreTolerance(Math.max(Math.abs(av), Math.abs(bv)));
+    if (av > bv + tol) return 1;
+    if (av < bv - tol) return -1;
+  }
+  return 0;
+}
+
+function optimizerCompareEvaluations(a, b) {
+  return optimizerCompareRankValues(a?.rank || [a?.score], b?.rank || [b?.score]);
+}
+
+function optimizerSortByEvaluation(a, b) {
+  const cmp = optimizerCompareEvaluations(a, b);
+  if (cmp) return -cmp;
+  const aSlots = a?.metrics?.slots?.total ?? 9999;
+  const bSlots = b?.metrics?.slots?.total ?? 9999;
+  if (aSlots !== bSlots) return aSlots - bSlots;
+  const aBuffs = a?.compositeIdxs?.length ?? 9999;
+  const bBuffs = b?.compositeIdxs?.length ?? 9999;
+  return aBuffs - bBuffs;
+}
+
 
 function equipmentCandidateHasData(row) {
   return !!(
@@ -5950,10 +6160,11 @@ function optimizerBuildEquipmentBeams(inputs, settings) {
         const equipmentIdxs = beam.equipmentIdxs.concat([cand.idx]);
         const st = optimizerStateForSelection(equipmentIdxs, [], settings);
         const m = computeMetrics(st, inputs);
-        next.push({equipmentIdxs, score: optimizerMetricValue(m, settings.objective)});
+        const ev = optimizerEvaluationFromMetrics(m, settings);
+        next.push({equipmentIdxs, score: ev.score, rank: ev.rank, metrics: m});
       });
     });
-    next.sort((a,b) => b.score - a.score);
+    next.sort(optimizerSortByEvaluation);
     beams = next.slice(0, settings.beamWidth);
   });
 
@@ -5976,7 +6187,8 @@ function optimizerScoreTolerance(score) {
 function optimizerEvaluateBuffSelection(equipmentIdxs, compositeIdxs, inputs, settings) {
   const st = optimizerStateForSelection(equipmentIdxs, compositeIdxs, settings);
   const metrics = computeMetrics(st, inputs);
-  return {metrics, score: optimizerMetricValue(metrics, settings.objective)};
+  const ev = optimizerEvaluationFromMetrics(metrics, settings);
+  return {metrics, violations: ev.violations, score: ev.score, rank: ev.rank};
 }
 
 function optimizerPruneExternalBuffs(equipmentIdxs, selected, fixedSet, inputs, settings) {
@@ -5993,9 +6205,8 @@ function optimizerPruneExternalBuffs(equipmentIdxs, selected, fixedSet, inputs, 
 
       const trialSelected = selected.slice(0, i).concat(selected.slice(i + 1));
       const trial = optimizerEvaluateBuffSelection(equipmentIdxs, trialSelected, inputs, settings);
-      const tol = optimizerScoreTolerance(current.score);
 
-      const scoreKept = trial.score >= current.score - tol;
+      const scoreKept = optimizerCompareEvaluations(trial, current) >= 0;
       const slotsNotWorse = trial.metrics.slots.total <= current.metrics.slots.total;
       const buffCountReduced = trialSelected.length < selected.length;
 
@@ -6010,9 +6221,8 @@ function optimizerPruneExternalBuffs(equipmentIdxs, selected, fixedSet, inputs, 
   }
 
   if (settings) settings.optimizerPrunedBuffs = (settings.optimizerPrunedBuffs || 0) + prunedCount;
-  return {compositeIdxs: selected, metrics: current.metrics, score: current.score, prunedCount};
+  return {compositeIdxs: selected, metrics: current.metrics, score: current.score, rank: current.rank, prunedCount};
 }
-
 
 function optimizerSelectExternalBuffsGreedy(equipmentIdxs, inputs, settings) {
   const candidates = optimizerCompositeCandidates(settings);
@@ -6022,7 +6232,6 @@ function optimizerSelectExternalBuffsGreedy(equipmentIdxs, inputs, settings) {
   const fixedSet = new Set(selected);
 
   let evaluated = optimizerEvaluateBuffSelection(equipmentIdxs, selected, inputs, settings);
-  let score = evaluated.score;
 
   let improved = true;
   while (improved) {
@@ -6035,15 +6244,15 @@ function optimizerSelectExternalBuffsGreedy(equipmentIdxs, inputs, settings) {
       const trial = optimizerEvaluateBuffSelection(equipmentIdxs, trialBuffs, inputs, settings);
       if (trial.metrics.slots.total > settings.maxSlots) return;
 
-      if (!best || trial.score > best.score) {
-        best = {idx: cand.idx, metrics: trial.metrics, score: trial.score};
+      if (!best || optimizerCompareEvaluations(trial, best) > 0) {
+        best = {idx: cand.idx, metrics: trial.metrics, score: trial.score, rank: trial.rank};
       }
     });
 
-    if (best && best.score > score + optimizerScoreTolerance(score)) {
+    if (best && optimizerCompareEvaluations(best, evaluated) > 0) {
       selected.push(best.idx);
       selectedSet.add(best.idx);
-      score = best.score;
+      evaluated = {metrics: best.metrics, score: best.score, rank: best.rank};
       improved = true;
     }
   }
@@ -6052,8 +6261,6 @@ function optimizerSelectExternalBuffsGreedy(equipmentIdxs, inputs, settings) {
 }
 
 function optimizerSelectExternalBuffsLocal(equipmentIdxs, inputs, settings) {
-  // 高速greedyで初期解を作り、そこから「1件入れ替え」「1件追加」を少数回だけ試す。
-  // 深掘りbeamよりかなり軽く、攻撃力上限到達後の無駄Buffや入れ替え漏れを拾いやすい。
   const candidates = optimizerCompositeCandidates(settings);
   const fixed = settings.fixCurrentBuffs ? candidates.filter(x => x.row.enabled) : [];
   const fixedSet = new Set(fixed.map(x => x.idx));
@@ -6061,25 +6268,21 @@ function optimizerSelectExternalBuffsLocal(equipmentIdxs, inputs, settings) {
   let current = optimizerSelectExternalBuffsGreedy(equipmentIdxs, inputs, settings);
   let selected = current.compositeIdxs.slice();
   let selectedSet = new Set(selected);
-  let score = current.score;
-  let metrics = current.metrics;
+  let evaluated = {metrics: current.metrics, score: current.score, rank: current.rank};
 
   const maxPasses = 4;
   for (let pass = 0; pass < maxPasses; pass++) {
     let best = null;
 
-    // 追加
     candidates.forEach(add => {
       if (selectedSet.has(add.idx)) return;
       const trialIdxs = selected.concat([add.idx]);
       const trial = optimizerEvaluateBuffSelection(equipmentIdxs, trialIdxs, inputs, settings);
       if (trial.metrics.slots.total > settings.maxSlots) return;
-      if (!best || trial.score > best.score + optimizerScoreTolerance(best.score)) {
-        best = {type:"add", idxs:trialIdxs, metrics:trial.metrics, score:trial.score};
-      }
+      const candidate = {type:"add", idxs:trialIdxs, metrics:trial.metrics, score:trial.score, rank:trial.rank};
+      if (!best || optimizerCompareEvaluations(candidate, best) > 0) best = candidate;
     });
 
-    // 1件入れ替え
     selected.forEach(removeIdx => {
       if (fixedSet.has(removeIdx)) return;
       candidates.forEach(add => {
@@ -6087,28 +6290,25 @@ function optimizerSelectExternalBuffsLocal(equipmentIdxs, inputs, settings) {
         const trialIdxs = selected.filter(idx => idx !== removeIdx).concat([add.idx]);
         const trial = optimizerEvaluateBuffSelection(equipmentIdxs, trialIdxs, inputs, settings);
         if (trial.metrics.slots.total > settings.maxSlots) return;
-        if (!best || trial.score > best.score + optimizerScoreTolerance(best.score)) {
-          best = {type:"swap", idxs:trialIdxs, metrics:trial.metrics, score:trial.score};
-        }
+        const candidate = {type:"swap", idxs:trialIdxs, metrics:trial.metrics, score:trial.score, rank:trial.rank};
+        if (!best || optimizerCompareEvaluations(candidate, best) > 0) best = candidate;
       });
     });
 
-    if (!best || best.score <= score + optimizerScoreTolerance(score)) break;
+    if (!best || optimizerCompareEvaluations(best, evaluated) <= 0) break;
 
     selected = best.idxs;
     selectedSet = new Set(selected);
-    score = best.score;
-    metrics = best.metrics;
+    evaluated = {metrics: best.metrics, score: best.score, rank: best.rank};
 
     const pruned = optimizerPruneExternalBuffs(equipmentIdxs, selected, fixedSet, inputs, settings);
     selected = pruned.compositeIdxs.slice();
     selectedSet = new Set(selected);
-    score = pruned.score;
-    metrics = pruned.metrics;
+    evaluated = {metrics: pruned.metrics, score: pruned.score, rank: pruned.rank};
   }
 
   const final = optimizerPruneExternalBuffs(equipmentIdxs, selected, fixedSet, inputs, settings);
-  return {compositeIdxs: final.compositeIdxs, metrics: final.metrics, score: final.score, prunedCount: final.prunedCount || current.prunedCount || 0};
+  return {compositeIdxs: final.compositeIdxs, metrics: final.metrics, score: final.score, rank: final.rank, prunedCount: final.prunedCount || current.prunedCount || 0};
 }
 
 function optimizerSelectExternalBuffsBeam(equipmentIdxs, inputs, settings) {
@@ -6122,7 +6322,8 @@ function optimizerSelectExternalBuffsBeam(equipmentIdxs, inputs, settings) {
     compositeIdxs: fixedSelected,
     selectedSet: new Set(fixedSelected),
     metrics: initial.metrics,
-    score: initial.score
+    score: initial.score,
+    rank: initial.rank
   }];
 
   const buffBeamWidth = Math.max(1, settings.buffBeamWidth || 80);
@@ -6132,31 +6333,13 @@ function optimizerSelectExternalBuffsBeam(equipmentIdxs, inputs, settings) {
     list.forEach(b => {
       const key = b.compositeIdxs.join(",");
       const current = bestByKey.get(key);
-      if (
-        !current ||
-        b.score > current.score + optimizerScoreTolerance(current.score) ||
-        (
-          Math.abs(b.score - current.score) <= optimizerScoreTolerance(current.score) &&
-          (
-            b.metrics.slots.total < current.metrics.slots.total ||
-            (
-              b.metrics.slots.total === current.metrics.slots.total &&
-              b.compositeIdxs.length < current.compositeIdxs.length
-            )
-          )
-        )
-      ) {
+      if (!current || optimizerCompareEvaluations(b, current) > 0) {
         bestByKey.set(key, b);
       }
     });
 
     return Array.from(bestByKey.values())
-      .sort((a,b) => {
-        const scoreDiff = b.score - a.score;
-        if (Math.abs(scoreDiff) > optimizerScoreTolerance(Math.max(Math.abs(a.score), Math.abs(b.score)))) return scoreDiff;
-        if (a.metrics.slots.total !== b.metrics.slots.total) return a.metrics.slots.total - b.metrics.slots.total;
-        return a.compositeIdxs.length - b.compositeIdxs.length;
-      })
+      .sort(optimizerSortByEvaluation)
       .slice(0, buffBeamWidth);
   };
 
@@ -6169,7 +6352,13 @@ function optimizerSelectExternalBuffsBeam(equipmentIdxs, inputs, settings) {
       const compositeIdxs = beam.compositeIdxs.concat([cand.idx]);
       const evaluated = optimizerEvaluateBuffSelection(equipmentIdxs, compositeIdxs, inputs, settings);
       if (evaluated.metrics.slots.total > settings.maxSlots) return;
-      next.push({compositeIdxs, selectedSet: new Set(compositeIdxs), metrics: evaluated.metrics, score: evaluated.score});
+      next.push({
+        compositeIdxs,
+        selectedSet: new Set(compositeIdxs),
+        metrics: evaluated.metrics,
+        score: evaluated.score,
+        rank: evaluated.rank
+      });
     });
 
     beams = rankBuffBeams(next);
@@ -6178,7 +6367,8 @@ function optimizerSelectExternalBuffsBeam(equipmentIdxs, inputs, settings) {
   const best = rankBuffBeams(beams)[0] || beams[0] || {
     compositeIdxs: fixedSelected,
     metrics: initial.metrics,
-    score: initial.score
+    score: initial.score,
+    rank: initial.rank
   };
 
   return optimizerPruneExternalBuffs(equipmentIdxs, best.compositeIdxs, fixedSet, inputs, settings);
@@ -6279,6 +6469,7 @@ function runIntegratedOptimizer() {
 
   const settings = integratedOptimizerSettings();
   settings.optimizerPrunedBuffs = 0;
+  settings.optimizerCapRejected = 0;
   const startTime = performance.now();
 
   const equipmentBeams = optimizerBuildEquipmentBeams(inputs, settings);
@@ -6290,14 +6481,16 @@ function runIntegratedOptimizer() {
       compositeIdxs: buff.compositeIdxs,
       metrics: buff.metrics,
       score: buff.score,
+      rank: buff.rank,
       equipmentSummary: optimizerEquipmentSummaryByIdx(beam.equipmentIdxs, buff.metrics),
       equipmentConflicts: optimizerEquipmentConflictNames(beam.equipmentIdxs),
+      capViolations: optimizerStatCapViolations(buff.metrics, settings).concat(optimizerTargetOverViolations(buff.metrics, settings)),
       prunedCount: buff.prunedCount || 0,
       forceOtherBuffs: settings.forceOtherBuffs
     };
   })
-  .filter(r => r.metrics.slots.total <= settings.maxSlots)
-  .sort((a,b) => b.score - a.score)
+  .filter(r => r.metrics.slots.total <= settings.maxSlots && !(r.capViolations || []).length && r.score > OPTIMIZER_INVALID_SCORE / 2)
+  .sort(optimizerSortByEvaluation)
   .slice(0, settings.topN);
 
   integratedOptimizerResults = results;
@@ -6310,8 +6503,11 @@ function runIntegratedOptimizer() {
     const otherMode = settings.forceOtherBuffs ? `${fixedOtherSlots}件` : "無視";
     const conflictSkipText = settings.equipmentConflictSkipped ? ` / 競合装備除外 ${settings.equipmentConflictSkipped}件` : "";
     const pruneText = settings.optimizerPrunedBuffs ? ` / 不要Buff整理 ${settings.optimizerPrunedBuffs}件` : "";
+    const capText = settings.optimizerCapRejected ? ` / 上限超過候補 ${settings.optimizerCapRejected}件除外` : "";
     const buffModeText = settings.buffMode === "fast" ? "高速" : settings.buffMode === "beam" ? `深掘り 幅${settings.buffBeamWidth}` : "標準";
-    status.textContent = `探索完了: 装備候補 ${equipCount}件 / 装備以外Buff候補 ${buffCount}件 / Buff探索 ${buffModeText} / その他固定枠 ${otherMode}${conflictSkipText}${pruneText} / 装備構成候補 ${equipmentBeams.length}件中 ${buffEvalBeams.length}件評価 / 表示 ${results.length}件 / ${elapsed}ms`;
+    const objectiveText = `${optimizerObjectiveLabel(settings.objective)}${settings.secondaryObjective ? " > " + optimizerObjectiveLabel(settings.secondaryObjective) : ""}`;
+    const targetText = optimizerPrimaryTargetDescription(settings);
+    status.textContent = `探索完了: 目標 ${objectiveText}${targetText ? " / " + targetText : ""} / 装備候補 ${equipCount}件 / 装備以外Buff候補 ${buffCount}件 / Buff探索 ${buffModeText} / その他固定枠 ${otherMode}${conflictSkipText}${pruneText}${capText} / 装備構成候補 ${equipmentBeams.length}件中 ${buffEvalBeams.length}件評価 / 表示 ${results.length}件 / ${elapsed}ms`;
   }
   renderIntegratedOptimizerResults();
 }
@@ -6321,7 +6517,7 @@ function renderIntegratedOptimizerResults() {
   if (!el) return;
 
   if (!integratedOptimizerResults.length) {
-    el.innerHTML = `<p class="small">条件内に収まる結果がありません。バフ枠上限、競合グループ、装備同士の競合、候補の使用状況を見直してください。</p>`;
+    el.innerHTML = `<p class="small">条件内に収まる結果がありません。バフ枠上限、各ステータス上限、競合グループ、装備同士の競合、候補の使用状況を見直してください。</p>`;
     return;
   }
 
@@ -7150,7 +7346,7 @@ function calc() {
   }
   byId("breakdown").innerHTML = lines.join("");
 
-  localStorage.setItem("moeDamageSimOptimizerLocalSearchLight", JSON.stringify(collectConfig()));
+  localStorage.setItem("moeDamageSimOptimizerTargetValue", JSON.stringify(collectConfig()));
   renderCompareResult();
   renderActualDiff();
   renderRaceTable();
@@ -8116,7 +8312,7 @@ function importTsvConfig() {
 /* localStorageの現在構成を削除し、初期状態へ戻す。 */
 function resetConfig() {
   if (!confirm("保存済み設定をリセットして初期状態に戻しますか？")) return;
-  localStorage.removeItem("moeDamageSimOptimizerLocalSearchLight");
+  localStorage.removeItem("moeDamageSimOptimizerTargetValue");
   state = DEFAULT_STATE();
   renderAll();
   calc();
@@ -8161,7 +8357,7 @@ document.querySelectorAll("input,select").forEach(el => {
 });
 
 renderAll();
-const saved = localStorage.getItem("moeDamageSimOptimizerLocalSearchLight");
+const saved = localStorage.getItem("moeDamageSimOptimizerTargetValue");
 if (saved) {
   try { applyConfig(JSON.parse(saved)); }
   catch { calc(); }
