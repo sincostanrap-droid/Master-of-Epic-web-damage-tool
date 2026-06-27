@@ -1,0 +1,2662 @@
+/*
+  Master of Epic 物理ダメージ計算webツール
+  Split version: stylesheet.
+*/
+
+/* =========================================================
+     CSS: 全体の見た目とレイアウト
+     ========================================================= */
+  :root {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    color: #222;
+  }
+  body { margin: 24px; line-height: 1.5; max-width: 1380px; }
+  h1 { margin-bottom: .2rem; }
+  h2 { margin-top: 1.4rem; border-bottom: 1px solid #ddd; padding-bottom: .25rem; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(285px, 1fr)); gap: 12px; }
+  .card { border: 1px solid #ddd; border-radius: 10px; padding: 12px; background: #fff; }
+  label { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 8px; margin: 6px 0; }
+  input, select { padding: 6px; font: inherit; min-width: 0; box-sizing: border-box; }
+  input[type="number"] { width: 88px; text-align: right; font-variant-numeric: tabular-nums; }
+  label > select { width: 170px; max-width: 100%; }
+  #attackType, #heavyFormula, #atkPctMode { width: min(100%, 330px); }
+  label.stackControl {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+    gap: 4px;
+  }
+  label.stackControl > select {
+    width: 100%;
+    max-width: 100%;
+  }
+  .selectHelp {
+    margin: -2px 0 6px;
+    line-height: 1.45;
+  }
+  input[type="checkbox"] { width: 20px; height: 20px; }
+  table { border-collapse: collapse; width: 100%; margin: 8px 0; font-size: 14px; }
+  th, td { border: 1px solid #ddd; padding: 6px; vertical-align: middle; }
+  th { background: #f6f6f6; }
+  .small { font-size: 12px; color: #555; }
+  .result { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+  .bigNum { font-size: 24px; font-weight: 700; }
+  .ok { background: #eefaf0; border: 1px solid #9ad0a5; padding: 10px; border-radius: 8px; }
+  .warn { background: #fff7df; border: 1px solid #e8c866; padding: 10px; border-radius: 8px; }
+  .bad { background: #ffecec; border: 1px solid #e7a0a0; padding: 10px; border-radius: 8px; }
+  button { padding: 8px 10px; font: inherit; cursor: pointer; margin: 2px 4px 2px 0; }
+  textarea { width: 100%; min-height: 120px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  .wide { grid-column: 1 / -1; }
+  .muted { opacity: .6; }
+  .slotPanel {
+    position: relative;
+  }
+  .slotbar { height: 10px; background: #eee; border-radius: 999px; overflow: hidden; margin: 8px 0; }
+  .slotfill { height: 100%; width: 0%; background: currentColor; }
+  .slotHoverArea {
+    cursor: help;
+    border-radius: 8px;
+    padding: 2px 0;
+  }
+  .slotTooltip {
+    display: none;
+    position: absolute;
+    z-index: 20;
+    top: 72px;
+    left: 0;
+    width: min(420px, calc(100vw - 48px));
+    max-height: 360px;
+    overflow: auto;
+    padding: 10px 12px;
+    border: 1px solid #cfcfcf;
+    border-radius: 10px;
+    background: #fff;
+    box-shadow: 0 10px 24px rgba(0,0,0,.14);
+    font-size: 13px;
+    line-height: 1.45;
+  }
+  .slotHoverArea:hover + .slotTooltip,
+  .slotTooltip:hover {
+    display: block;
+  }
+  .slotTooltipTitle {
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .slotTooltipGroup {
+    margin-top: 8px;
+  }
+  .slotTooltipGroup b {
+    display: block;
+    margin-bottom: 2px;
+  }
+  .slotTooltip ul {
+    margin: 2px 0 0 1.2em;
+    padding: 0;
+  }
+  .slotTooltip li {
+    margin: 1px 0;
+  }
+  .row-actions { white-space: nowrap; }
+  .row-actions button { padding: 5px 7px; }
+  .num { text-align: right; font-variant-numeric: tabular-nums; }
+  .split { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 12px; }
+  .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  /* 分析パネル: A/B比較、実測差分、価値表示などをカード状に並べる */
+  .analysisGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+    gap: 12px;
+    align-items: start;
+  }
+  .analysisPanel {
+    border: 1px solid #e2e2e2;
+    border-radius: 10px;
+    padding: 12px;
+    background: #fcfcfc;
+    min-width: 0;
+  }
+  .analysisPanel h3 {
+    margin: 0 0 8px;
+    font-size: 18px;
+    border-bottom: 1px solid #e7e7e7;
+    padding-bottom: 4px;
+  }
+  .analysisPanelWide {
+    grid-column: 1 / -1;
+  }
+  .scrollX {
+    overflow-x: auto;
+    max-width: 100%;
+  }
+  .compactControls {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 8px;
+    align-items: end;
+  }
+  .compactControls label {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+  .inputGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(235px, 1fr));
+    gap: 12px;
+    align-items: start;
+  }
+  .inputPanel,
+  .summaryPanel {
+    border: 1px solid #e2e2e2;
+    border-radius: 10px;
+    padding: 12px;
+    background: #fcfcfc;
+    min-width: 0;
+  }
+  .inputPanel h3,
+  .summaryPanel h3 {
+    margin: 0 0 8px;
+    font-size: 18px;
+    border-bottom: 1px solid #e7e7e7;
+    padding-bottom: 4px;
+  }
+  .summaryGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 12px;
+    align-items: start;
+  }
+  .summaryPanelWide {
+    grid-column: 1 / -1;
+  }
+  .summaryPanel .bigNum,
+  .summaryPanel .result {
+    margin: 2px 0 8px;
+  }
+  details.analysisDetails {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    background: #fff;
+    margin: 12px 0;
+    padding: 0;
+  }
+  details.analysisDetails > summary {
+    cursor: pointer;
+    list-style: none;
+    padding: 12px;
+    font-size: 20px;
+    font-weight: 700;
+    border-radius: 10px;
+    user-select: none;
+  }
+  details.analysisDetails > summary::-webkit-details-marker {
+    display: none;
+  }
+  details.analysisDetails > summary::before {
+    content: "＋";
+    display: inline-block;
+    width: 1.5em;
+    font-weight: 700;
+  }
+  details.analysisDetails[open] > summary::before {
+    content: "−";
+  }
+  .analysisDetailsBody {
+    padding: 0 12px 12px;
+  }
+  details.breakdownDetails {
+    border: 1px solid #e2e2e2;
+    border-radius: 10px;
+    background: #fcfcfc;
+    padding: 0;
+  }
+  details.breakdownDetails > summary {
+    cursor: pointer;
+    list-style: none;
+    padding: 12px;
+    font-size: 18px;
+    font-weight: 700;
+    user-select: none;
+  }
+  details.breakdownDetails > summary::-webkit-details-marker {
+    display: none;
+  }
+  details.breakdownDetails > summary::before {
+    content: "＋";
+    display: inline-block;
+    width: 1.5em;
+    font-weight: 700;
+  }
+  details.breakdownDetails[open] > summary::before {
+    content: "−";
+  }
+  .breakdownDetailsBody {
+    padding: 0 12px 12px;
+  }
+  /* 武器・防具・装飾補正の固定行テーブル */
+  .equipmentLayout {
+    display: grid;
+    gap: 12px;
+  }
+  .equipmentDuo {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 520px), 1fr));
+    gap: 12px;
+    align-items: start;
+  }
+  .equipmentPanel {
+    min-width: 0;
+    overflow-x: auto;
+  }
+  .equipmentPanel h3 {
+    margin: 4px 0 6px;
+    font-size: 16px;
+  }
+  .weaponGrid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .weaponSlot {
+    min-width: 0;
+    overflow-x: auto;
+  }
+  .weaponSlot h4 {
+    margin: 0 0 4px;
+    font-size: 14px;
+  }
+  .weaponSlotBullet {
+    grid-column: auto;
+  }
+  .equipmentTable {
+    width: 100%;
+    table-layout: fixed;
+    font-size: 13px;
+  }
+  .equipmentTable th,
+  .equipmentTable td {
+    padding: 3px;
+    overflow: hidden;
+  }
+  .equipmentTable th:nth-child(1),
+  .equipmentTable td:nth-child(1) {
+    width: 38px;
+    white-space: nowrap;
+  }
+  .equipmentTable th:nth-child(2),
+  .equipmentTable td:nth-child(2) {
+    width: 34px;
+    min-width: 34px;
+    max-width: 34px;
+    white-space: nowrap;
+    text-align: center;
+  }
+  .equipmentTable th:nth-child(3),
+  .equipmentTable td:nth-child(3) {
+    width: 28%;
+  }
+  .equipmentTable th:nth-child(4),
+  .equipmentTable td:nth-child(4),
+  .equipmentTable th:nth-child(5),
+  .equipmentTable td:nth-child(5),
+  .equipmentTable th:nth-child(6),
+  .equipmentTable td:nth-child(6),
+  .equipmentTable th:nth-child(7),
+  .equipmentTable td:nth-child(7) {
+    width: 40px;
+  }
+  .equipmentTable th:nth-child(8),
+  .equipmentTable td:nth-child(8) {
+    width: 24%;
+  }
+  .weaponTable th:nth-child(1),
+  .weaponTable td:nth-child(1) {
+    width: 38px;
+  }
+  .weaponTable th:nth-child(2),
+  .weaponTable td:nth-child(2) {
+    width: 34px;
+    min-width: 34px;
+    max-width: 34px;
+    text-align: center;
+  }
+  .weaponTable th:nth-child(3),
+  .weaponTable td:nth-child(3) {
+    width: 32%;
+  }
+  .weaponTable th:nth-child(4),
+  .weaponTable td:nth-child(4),
+  .weaponTable th:nth-child(5),
+  .weaponTable td:nth-child(5),
+  .weaponTable th:nth-child(6),
+  .weaponTable td:nth-child(6),
+  .weaponTable th:nth-child(7),
+  .weaponTable td:nth-child(7) {
+    width: 42px;
+  }
+  .weaponTable th:nth-child(8),
+  .weaponTable td:nth-child(8) {
+    width: 26%;
+  }
+  .equipmentTable input {
+    box-sizing: border-box;
+    max-width: 100%;
+    font-size: 12px;
+  }
+  .equipmentTable input.equipName {
+    min-width: 0;
+    width: 100%;
+  }
+  .equipmentTable input.equipNum {
+    width: 38px;
+    min-width: 0;
+    text-align: right;
+    padding: 2px 3px;
+  }
+  .equipmentTable input.equipNote {
+    min-width: 0;
+    width: 100%;
+  }
+  @media (max-width: 720px) {
+    .equipmentTable {
+      min-width: 480px;
+    }
+  }
+
+  .compactTable {
+    table-layout: fixed;
+    font-size: 13px;
+  }
+  .compactTable th,
+  .compactTable td {
+    padding: 4px;
+    overflow: hidden;
+  }
+  .compactTable input,
+  .compactTable select {
+    max-width: 100%;
+    box-sizing: border-box;
+    font-size: 13px;
+  }
+  .compactTable input[type="text"],
+  .compactTable input:not([type]),
+  .compactTable select {
+    width: 100%;
+  }
+  .compactTable input[type="number"] {
+    width: 58px;
+    min-width: 0;
+    padding: 3px 4px;
+    text-align: right;
+  }
+  .compactTable input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+  }
+  .compactTable .row-actions {
+    width: 92px;
+  }
+  .compactTable .row-actions button {
+    padding: 4px 6px;
+    margin: 1px;
+  }
+
+  #pctBuffTable th:nth-child(1), #pctBuffTable td:nth-child(1),
+  #pctBuffTable th:nth-child(2), #pctBuffTable td:nth-child(2),
+  #flatStatTable th:nth-child(1), #flatStatTable td:nth-child(1),
+  #flatStatTable th:nth-child(2), #flatStatTable td:nth-child(2),
+  #conversionTable th:nth-child(1), #conversionTable td:nth-child(1),
+  #conversionTable th:nth-child(2), #conversionTable td:nth-child(2),
+  #dmgBuffTable th:nth-child(1), #dmgBuffTable td:nth-child(1),
+  #dmgBuffTable th:nth-child(2), #dmgBuffTable td:nth-child(2),
+  #specialBuffTable th:nth-child(1), #specialBuffTable td:nth-child(1),
+  #specialBuffTable th:nth-child(2), #specialBuffTable td:nth-child(2),
+  #postBuffTable th:nth-child(1), #postBuffTable td:nth-child(1),
+  #postBuffTable th:nth-child(2), #postBuffTable td:nth-child(2),
+  #otherBuffTable th:nth-child(1), #otherBuffTable td:nth-child(1) {
+    width: 40px;
+    text-align: center;
+  }
+
+  #pctBuffTable th:nth-child(4), #pctBuffTable td:nth-child(4),
+  #flatStatTable th:nth-child(4), #flatStatTable td:nth-child(4),
+  #conversionTable th:nth-child(4), #conversionTable td:nth-child(4),
+  #dmgBuffTable th:nth-child(5), #dmgBuffTable td:nth-child(5) {
+    width: 86px;
+  }
+
+  #pctBuffTable th:nth-child(5), #pctBuffTable td:nth-child(5),
+  #flatStatTable th:nth-child(5), #flatStatTable td:nth-child(5),
+  #conversionTable th:nth-child(5), #conversionTable td:nth-child(5),
+  #dmgBuffTable th:nth-child(4), #dmgBuffTable td:nth-child(4),
+  #specialBuffTable th:nth-child(4), #specialBuffTable td:nth-child(4),
+  #postBuffTable th:nth-child(4), #postBuffTable td:nth-child(4) {
+    width: 62px;
+  }
+
+  #pctBuffTable th:nth-child(7), #pctBuffTable td:nth-child(7) {
+    width: 92px;
+  }
+  #flatStatTable th:nth-child(6), #flatStatTable td:nth-child(6),
+  #conversionTable th:nth-child(6), #conversionTable td:nth-child(6) {
+    width: 24%;
+  }
+  #flatStatTable th:nth-child(7), #flatStatTable td:nth-child(7),
+  #conversionTable th:nth-child(7), #conversionTable td:nth-child(7) {
+    width: 126px;
+    min-width: 126px;
+  }
+  #flatStatTable .row-actions,
+  #conversionTable .row-actions {
+    display: grid;
+    grid-template-columns: 28px 28px 52px;
+    gap: 3px;
+    white-space: nowrap;
+    align-items: center;
+  }
+  #flatStatTable .row-actions button,
+  #conversionTable .row-actions button {
+    width: 100%;
+    padding: 3px 2px;
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.2;
+  }
+
+  .compactTable .row-actions,
+  #flatStatTable .row-actions,
+  #conversionTable .row-actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 2px;
+    width: auto;
+    min-width: 0;
+    white-space: nowrap;
+  }
+  .compactTable .row-actions button,
+  #flatStatTable .row-actions button,
+  #conversionTable .row-actions button {
+    width: 24px;
+    min-width: 24px;
+    height: 24px;
+    padding: 0;
+    margin: 0;
+    line-height: 1;
+    font-size: 13px;
+    text-align: center;
+  }
+  .compactTable .row-actions button.dangerMini {
+    font-weight: 700;
+  }
+  #flatStatTable th:nth-child(7), #flatStatTable td:nth-child(7),
+  #conversionTable th:nth-child(7), #conversionTable td:nth-child(7) {
+    width: 86px;
+    min-width: 86px;
+  }
+  #flatStatTable th:nth-child(6), #flatStatTable td:nth-child(6),
+  #conversionTable th:nth-child(6), #conversionTable td:nth-child(6) {
+    width: 20%;
+  }
+  #dmgBuffTable th:nth-child(7), #dmgBuffTable td:nth-child(7),
+  #specialBuffTable th:nth-child(6), #specialBuffTable td:nth-child(6),
+  #postBuffTable th:nth-child(6), #postBuffTable td:nth-child(6),
+  #otherBuffTable th:nth-child(4), #otherBuffTable td:nth-child(4) {
+    width: 36px;
+    white-space: nowrap;
+    text-align: center;
+  }
+  #pctBuffTable th:nth-child(3), #pctBuffTable td:nth-child(3),
+  #dmgBuffTable th:nth-child(3), #dmgBuffTable td:nth-child(3),
+  #specialBuffTable th:nth-child(3), #specialBuffTable td:nth-child(3),
+  #postBuffTable th:nth-child(3), #postBuffTable td:nth-child(3) {
+    width: 24%;
+  }
+  #flatStatTable th:nth-child(3), #flatStatTable td:nth-child(3),
+  #conversionTable th:nth-child(3), #conversionTable td:nth-child(3) {
+    width: 25%;
+  }
+  #otherBuffTable th:nth-child(2), #otherBuffTable td:nth-child(2) {
+    width: 34%;
+  }
+  @media (max-width: 900px) {
+    .compactTable {
+      min-width: 720px;
+    }
+    #flatStatTable.compactTable,
+    #conversionTable.compactTable {
+      min-width: 760px;
+    }
+    #otherBuffTable.compactTable {
+      min-width: 520px;
+    }
+  }
+
+  /* 操作列の最終調整: tdをflex化せず、内側だけを小ボタン横並びにする */
+  #pctBuffTable th:last-child,
+  #pctBuffTable td.actionCell,
+  #flatStatTable th:last-child,
+  #flatStatTable td.actionCell,
+  #conversionTable th:last-child,
+  #conversionTable td.actionCell {
+    width: 82px;
+    min-width: 82px;
+    max-width: 82px;
+    padding: 2px 3px;
+    text-align: center;
+    overflow: visible;
+  }
+  #flatStatTable th:nth-child(6),
+  #flatStatTable td:nth-child(6),
+  #conversionTable th:nth-child(6),
+  #conversionTable td:nth-child(6) {
+    width: 18%;
+  }
+  #flatStatTable th:nth-child(3),
+  #flatStatTable td:nth-child(3),
+  #conversionTable th:nth-child(3),
+  #conversionTable td:nth-child(3) {
+    width: 26%;
+  }
+  .actionsWrap {
+    display: inline-grid;
+    grid-template-columns: 22px 22px 22px;
+    gap: 3px;
+    align-items: center;
+    justify-content: center;
+    width: 72px;
+  }
+  .actionsWrap button {
+    width: 22px;
+    min-width: 22px;
+    height: 22px;
+    padding: 0;
+    margin: 0;
+    line-height: 1;
+    font-size: 12px;
+    text-align: center;
+    box-sizing: border-box;
+  }
+  .actionsWrap button.dangerMini {
+    font-weight: 700;
+  }
+  @media (max-width: 900px) {
+    #flatStatTable.compactTable,
+    #conversionTable.compactTable {
+      min-width: 780px;
+    }
+  }
+
+
+  /* 武器・防具・装飾補正: 数値欄のスピンボタンが数値に被らないよう微調整 */
+  .equipmentTable input.equipNum {
+    width: 46px;
+    padding: 2px 3px;
+    text-align: right;
+    -moz-appearance: textfield;
+  }
+  .equipmentTable input.equipNum::-webkit-outer-spin-button,
+  .equipmentTable input.equipNum::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  .equipmentTable th:nth-child(3),
+  .equipmentTable td:nth-child(3),
+  .equipmentTable th:nth-child(4),
+  .equipmentTable td:nth-child(4),
+  .equipmentTable th:nth-child(5),
+  .equipmentTable td:nth-child(5),
+  .equipmentTable th:nth-child(6),
+  .equipmentTable td:nth-child(6) {
+    width: 48px;
+  }
+  .weaponTable th:nth-child(2),
+  .weaponTable td:nth-child(2),
+  .weaponTable th:nth-child(3),
+  .weaponTable td:nth-child(3),
+  .weaponTable th:nth-child(4),
+  .weaponTable td:nth-child(4),
+  .weaponTable th:nth-child(5),
+  .weaponTable td:nth-child(5) {
+    width: 50px;
+  }
+
+
+  /* 複数使用条件 */
+  .weaponInputPanel {
+    overflow: hidden;
+  }
+  .weaponReqHeader {
+    margin-top: 8px;
+    display: grid;
+    gap: 2px;
+  }
+  .miniTable {
+    width: 100%;
+    table-layout: fixed;
+    font-size: 13px;
+    margin: 6px 0;
+  }
+  .miniTable th,
+  .miniTable td {
+    padding: 3px;
+  }
+  .miniTable th:nth-child(1),
+  .miniTable td:nth-child(1) {
+    width: auto;
+  }
+  .miniTable th:nth-child(2),
+  .miniTable td:nth-child(2),
+  .miniTable th:nth-child(3),
+  .miniTable td:nth-child(3) {
+    width: 58px;
+  }
+  .miniTable th:nth-child(4),
+  .miniTable td:nth-child(4) {
+    width: 30px;
+    text-align: center;
+  }
+  .miniTable input {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    font-size: 13px;
+    padding: 3px 4px;
+  }
+  .miniTable input[type="number"] {
+    width: 54px;
+    text-align: right;
+    -moz-appearance: textfield;
+  }
+  .miniTable input[type="number"]::-webkit-outer-spin-button,
+  .miniTable input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  .miniTable button {
+    width: 22px;
+    min-width: 22px;
+    height: 22px;
+    padding: 0;
+    margin: 0;
+    line-height: 1;
+  }
+  .miniButton {
+    padding: 5px 8px;
+    font-size: 13px;
+  }
+
+
+  /* ステータス変換: 参照補正列追加後の幅調整 */
+  #conversionTable th:nth-child(4),
+  #conversionTable td:nth-child(4) {
+    width: 72px;
+  }
+  #conversionTable th:nth-child(5),
+  #conversionTable td:nth-child(5),
+  #conversionTable th:nth-child(6),
+  #conversionTable td:nth-child(6) {
+    width: 56px;
+  }
+  #conversionTable th:nth-child(7),
+  #conversionTable td:nth-child(7) {
+    width: 18%;
+  }
+  #conversionTable th:last-child,
+  #conversionTable td.actionCell {
+    width: 82px;
+    min-width: 82px;
+  }
+  @media (max-width: 900px) {
+    #conversionTable.compactTable {
+      min-width: 860px;
+    }
+  }
+
+
+  /* 武器使用条件: 旧レイアウト互換 */
+  #weaponReqTable th:nth-child(2),
+  #weaponReqTable td:nth-child(2),
+  #weaponReqTable th:nth-child(3),
+  #weaponReqTable td:nth-child(3) {
+    width: 54px;
+  }
+  #weaponReqTable th:nth-child(4),
+  #weaponReqTable td:nth-child(4) {
+    width: 78px;
+  }
+  #weaponReqTable th:nth-child(5),
+  #weaponReqTable td:nth-child(5) {
+    width: 28px;
+    text-align: center;
+  }
+  #weaponReqTable select {
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 12px;
+  }
+
+
+  /* 武器使用条件: 複数条件は全条件で補正 */
+  #weaponReqTable th:nth-child(2),
+  #weaponReqTable td:nth-child(2),
+  #weaponReqTable th:nth-child(3),
+  #weaponReqTable td:nth-child(3) {
+    width: 58px;
+  }
+  #weaponReqTable th:nth-child(4),
+  #weaponReqTable td:nth-child(4) {
+    width: 30px;
+    text-align: center;
+  }
+
+
+  /* 名前付きプリセット保存/読込UI */
+  .presetControls {
+    margin: 10px 0;
+    display: grid;
+    grid-template-columns: minmax(220px, 1fr) auto minmax(220px, 1fr) auto auto;
+    gap: 8px;
+    align-items: end;
+  }
+  .presetControls label {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+  @media (max-width: 900px) {
+    .presetControls {
+      grid-template-columns: 1fr;
+    }
+  }
+  #compositeBuffTable.compactTable {
+    min-width: 1200px;
+  }
+  #compositeBuffTable th:nth-child(1),
+  #compositeBuffTable td:nth-child(1),
+  #compositeBuffTable th:nth-child(2),
+  #compositeBuffTable td:nth-child(2) {
+    width: 38px;
+    text-align: center;
+  }
+  #compositeBuffTable th:nth-child(3),
+  #compositeBuffTable td:nth-child(3) {
+    width: 160px;
+  }
+  #compositeBuffTable th:nth-child(n+4):nth-child(-n+13),
+  #compositeBuffTable td:nth-child(n+4):nth-child(-n+13) {
+    width: 64px;
+  }
+  #compositeBuffTable th:nth-child(14),
+  #compositeBuffTable td:nth-child(14) {
+    width: 220px;
+  }
+  #compositeBuffTable th:nth-child(15),
+  #compositeBuffTable td:nth-child(15) {
+    width: 82px;
+  }
+  #compositeBuffTable input[type="number"] {
+    width: 58px;
+  }
+  #valueTable table td,
+  #valueTable table th {
+    white-space: nowrap;
+  }
+
+
+  details.collapsedBuffSection {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    background: #fff;
+    margin: 12px 0;
+    padding: 0;
+  }
+  details.collapsedBuffSection > summary {
+    cursor: pointer;
+    list-style: none;
+    padding: 12px;
+    font-size: 18px;
+    font-weight: 700;
+    user-select: none;
+  }
+  details.collapsedBuffSection > summary::-webkit-details-marker {
+    display: none;
+  }
+  details.collapsedBuffSection > summary::before {
+    content: "＋";
+    display: inline-block;
+    width: 1.5em;
+    font-weight: 700;
+  }
+  details.collapsedBuffSection[open] > summary::before {
+    content: "−";
+  }
+  .collapsedBuffBody {
+    padding: 0 12px 12px;
+  }
+
+
+  details.legacyItemsSection {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    background: #fff;
+    margin: 12px 0;
+    padding: 0;
+  }
+  details.legacyItemsSection > summary {
+    cursor: pointer;
+    list-style: none;
+    padding: 12px;
+    font-size: 18px;
+    font-weight: 700;
+    user-select: none;
+  }
+  details.legacyItemsSection > summary::-webkit-details-marker {
+    display: none;
+  }
+  details.legacyItemsSection > summary::before {
+    content: "＋";
+    display: inline-block;
+    width: 1.5em;
+    font-weight: 700;
+  }
+  details.legacyItemsSection[open] > summary::before {
+    content: "−";
+  }
+  .legacyItemsBody {
+    padding: 0 12px 12px;
+    display: grid;
+    gap: 12px;
+  }
+  .legacyItemPanel {
+    border: 1px solid #e2e2e2;
+    border-radius: 10px;
+    padding: 12px;
+    background: #fcfcfc;
+    overflow-x: auto;
+  }
+  .legacyItemPanel h3 {
+    margin: 0 0 8px;
+    font-size: 17px;
+    border-bottom: 1px solid #e7e7e7;
+    padding-bottom: 4px;
+  }
+
+
+  /* =========================================================
+     見栄え改善: 公開用の視線誘導
+     - 上部説明カード
+     - サマリーカード
+     - 装備以外Buffの強調
+     - ON/OFF行の視認性
+     - 空状態メッセージ
+     ========================================================= */
+  body {
+    background:
+      radial-gradient(circle at top left, rgba(74, 115, 179, .08), transparent 34rem),
+      linear-gradient(180deg, #fbfaf6 0%, #f6f2e8 100%);
+  }
+  .heroCard {
+    border: 1px solid #d8cba9;
+    border-radius: 16px;
+    padding: 16px 18px;
+    margin: 10px 0 16px;
+    background:
+      linear-gradient(135deg, rgba(255,255,255,.96), rgba(244,238,222,.96)),
+      radial-gradient(circle at right top, rgba(74,115,179,.12), transparent 22rem);
+    box-shadow: 0 8px 22px rgba(54, 43, 24, .08);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 14px;
+    align-items: center;
+  }
+  .heroCard p {
+    margin: 6px 0 0;
+    color: #403a2f;
+  }
+  .heroBadge {
+    display: inline-flex;
+    align-items: center;
+    width: fit-content;
+    border-radius: 999px;
+    padding: 3px 10px;
+    background: #23395d;
+    color: #fff;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: .02em;
+  }
+  .heroMini {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: flex-end;
+  }
+  .heroMini span {
+    border: 1px solid #d7c69f;
+    background: rgba(255,255,255,.7);
+    color: #594b2b;
+    border-radius: 999px;
+    padding: 4px 9px;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+  @media (max-width: 760px) {
+    .heroCard {
+      grid-template-columns: 1fr;
+    }
+    .heroMini {
+      justify-content: flex-start;
+    }
+  }
+
+  .summaryGrid {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  }
+  .metricCard {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(35,57,93,.14);
+    box-shadow: 0 8px 18px rgba(29, 41, 57, .06);
+  }
+  .metricCard::after {
+    content: "";
+    position: absolute;
+    inset: auto -35px -45px auto;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.32);
+    pointer-events: none;
+  }
+  .metricLabel {
+    font-weight: 800;
+    color: #3b465a;
+    border-bottom: 1px solid rgba(0,0,0,.08);
+    padding-bottom: 4px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .metricDamage .metricLabel::before { content: "⚔"; }
+  .metricAttack .metricLabel::before { content: "💪"; }
+  .metricMagic .metricLabel::before { content: "✦"; }
+  .metricEquipment .metricLabel::before { content: "🛡"; }
+  .metricSlot .metricLabel::before { content: "枠"; font-size: 12px; background:#23395d; color:#fff; border-radius:6px; padding:1px 5px; }
+  .metricDamage {
+    background: linear-gradient(135deg, #fff7e8, #ffffff 58%);
+  }
+  .metricAttack {
+    background: linear-gradient(135deg, #eef5ff, #ffffff 58%);
+  }
+  .metricMagic {
+    background: linear-gradient(135deg, #f7efff, #ffffff 58%);
+  }
+  .metricEquipment {
+    background: linear-gradient(135deg, #eefaf5, #ffffff 58%);
+  }
+  .metricSlot {
+    background: linear-gradient(135deg, #fffbea, #ffffff 58%);
+  }
+  .metricCard .bigNum,
+  .metricCard .result {
+    color: #1f2f4d;
+    text-shadow: 0 1px 0 rgba(255,255,255,.9);
+  }
+
+  .compositeMainSection {
+    border: 2px solid #91a9d6;
+    background:
+      linear-gradient(180deg, rgba(246,249,255,.98), rgba(255,255,255,.98));
+    box-shadow: 0 10px 26px rgba(35,57,93,.10);
+  }
+  .compositeMainSection h2 {
+    border-bottom-color: #b9c8e6;
+  }
+  .compositeLead {
+    border-left: 4px solid #4267a8;
+    padding: 8px 10px;
+    background: rgba(66,103,168,.08);
+    border-radius: 8px;
+  }
+  .compositeMainSection button {
+    font-weight: 700;
+  }
+  #compositeBuffTable thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: #eaf0fb;
+  }
+  #compositeBuffTable tbody tr:has(> td:first-child input[type="checkbox"]:checked) {
+    background: #f3f8ff;
+    box-shadow: inset 4px 0 0 #4267a8;
+  }
+
+  .compactTable tbody tr:has(> td:first-child input[type="checkbox"]:checked) {
+    background-color: #f8fbff;
+  }
+  .compactTable tbody tr:has(> td:first-child input[type="checkbox"]:not(:checked)) {
+    opacity: .58;
+    background-color: #fafafa;
+  }
+  .compactTable tbody tr:has(> td:first-child input[type="checkbox"]:checked) input,
+  .compactTable tbody tr:has(> td:first-child input[type="checkbox"]:checked) select {
+    font-weight: 600;
+  }
+  .compactTable tbody tr:hover {
+    opacity: 1;
+    background-color: #fffdf3;
+  }
+  .compactTable tbody tr.emptyRow,
+  .compactTable tbody tr.emptyRow:hover {
+    opacity: 1;
+    background: #fff;
+    box-shadow: none;
+  }
+  .emptyState {
+    padding: 14px 12px;
+    text-align: center;
+    color: #6b7280;
+    background: repeating-linear-gradient(135deg, #fafafa, #fafafa 8px, #f5f5f5 8px, #f5f5f5 16px);
+    border-radius: 8px;
+    font-size: 13px;
+  }
+
+
+  /* 予想攻撃力/予想魔力の長い内訳は、バフ枠と同じくホバー時だけ表示する。 */
+  .metricHoverCard {
+    overflow: visible;
+    z-index: 2;
+  }
+  .metricHoverArea {
+    position: relative;
+    cursor: help;
+  }
+  .hoverHint {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 4px;
+    padding: 2px 8px;
+    border: 1px solid rgba(35,57,93,.18);
+    border-radius: 999px;
+    background: rgba(255,255,255,.72);
+    color: #536078;
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .hoverHint::before {
+    content: "ⓘ";
+    font-weight: 800;
+  }
+  .metricTooltip {
+    display: none;
+    position: absolute;
+    z-index: 20;
+    left: 12px;
+    right: 12px;
+    top: calc(100% - 8px);
+    max-height: 340px;
+    overflow: auto;
+    padding: 10px 12px;
+    border: 1px solid #cfcfcf;
+    border-radius: 10px;
+    background: #fff;
+    box-shadow: 0 10px 24px rgba(0,0,0,.16);
+    color: #222;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  .metricHoverArea:hover + .metricTooltip,
+  .metricTooltip:hover {
+    display: block;
+  }
+  .metricTooltip div {
+    margin: 2px 0;
+  }
+  .legacyItemsSection > summary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .summaryNote {
+    font-size: 12px;
+    font-weight: 600;
+    color: #5f6b7a;
+    background: rgba(66,103,168,.08);
+    border: 1px solid rgba(66,103,168,.18);
+    border-radius: 999px;
+    padding: 2px 9px;
+  }
+
+
+  /* 競合グループ管理: 装備とBuffを任意タグでゆるく紐づける */
+  .tagInput {
+    min-width: 0;
+    width: 100%;
+    font-size: 12px;
+  }
+  .tagLinkSection {
+    border: 1px solid #cdd8ef;
+    background: linear-gradient(180deg, rgba(248,251,255,.98), rgba(255,255,255,.98));
+  }
+  .tagPill {
+    display: inline-flex;
+    align-items: center;
+    width: fit-content;
+    max-width: 100%;
+    border: 1px solid rgba(66,103,168,.22);
+    background: rgba(66,103,168,.09);
+    color: #284978;
+    border-radius: 999px;
+    padding: 1px 8px;
+    margin: 1px 3px 1px 0;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .tagItems {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .tagItem {
+    border: 1px solid #e2e7f2;
+    background: #fff;
+    border-radius: 8px;
+    padding: 3px 7px;
+    font-size: 12px;
+    line-height: 1.35;
+  }
+  .tagItem b {
+    color: #23395d;
+  }
+  .tagEmpty {
+    padding: 12px;
+    border-radius: 10px;
+    background: #fafafa;
+    color: #6b7280;
+  }
+
+  /* タグ列追加に合わせた上書き。既存CSSより後ろに置いて優先させる。 */
+  .equipmentTable th:nth-child(7),
+  .equipmentTable td:nth-child(7) {
+    width: 70px;
+  }
+  .equipmentTable th:nth-child(8),
+  .equipmentTable td:nth-child(8) {
+    width: 22%;
+  }
+  .weaponTable th:nth-child(6),
+  .weaponTable td:nth-child(6) {
+    width: 70px;
+  }
+  .weaponTable th:nth-child(7),
+  .weaponTable td:nth-child(7) {
+    width: 24%;
+  }
+  .equipmentTable input.equipTag {
+    min-width: 0;
+    width: 100%;
+  }
+
+  #compositeBuffTable.compactTable {
+    min-width: 1280px;
+  }
+  #compositeBuffTable th:nth-child(4),
+  #compositeBuffTable td:nth-child(4) {
+    width: 86px;
+  }
+  #compositeBuffTable th:nth-child(n+5):nth-child(-n+14),
+  #compositeBuffTable td:nth-child(n+5):nth-child(-n+14) {
+    width: 64px;
+  }
+  #compositeBuffTable th:nth-child(15),
+  #compositeBuffTable td:nth-child(15) {
+    width: 220px;
+  }
+  #compositeBuffTable th:nth-child(16),
+  #compositeBuffTable td:nth-child(16) {
+    width: 82px;
+  }
+
+
+  #contributionTable h4 {
+    margin: 12px 0 6px;
+    color: #23395d;
+  }
+  #contributionTable table + h4 {
+    margin-top: 18px;
+  }
+  #contributionTable .tagPill {
+    margin-right: 4px;
+  }
+
+
+  .analysisIntro {
+    margin: 0 0 12px;
+    padding: 10px 12px;
+    border-left: 4px solid #4267a8;
+    border-radius: 8px;
+    background: rgba(66,103,168,.07);
+    color: #42526b;
+  }
+
+
+  .valueBaseLine {
+    margin: 6px 0 8px;
+    padding: 8px 10px;
+    border-left: 4px solid #4267a8;
+    background: rgba(66,103,168,.07);
+    border-radius: 8px;
+  }
+
+
+  .tagNoTag {
+    background: #f2f2f2;
+    border-color: #d8d8d8;
+    color: #666;
+  }
+  .contributionSingleRow {
+    background: rgba(248,248,248,.72);
+  }
+  .contributionDetails {
+    margin-top: 14px;
+    border: 1px solid #e0e5ef;
+    border-radius: 10px;
+    padding: 8px 10px;
+    background: rgba(255,255,255,.8);
+  }
+  .contributionDetails > summary {
+    cursor: pointer;
+    font-weight: 800;
+    color: #23395d;
+  }
+  .contributionDetails table {
+    margin-top: 8px;
+  }
+
+
+  /* バフ枠ツールチップは24枠すべて見えるように、カード外へはみ出せるようにする。 */
+  .metricSlot,
+  .slotPanel.metricCard {
+    overflow: visible;
+    z-index: 30;
+  }
+  .slotTooltip {
+    width: min(760px, calc(100vw - 48px));
+    max-height: min(72vh, 680px);
+    overflow: auto;
+    overscroll-behavior: contain;
+  }
+  .slotTooltipGroup ul {
+    column-width: 260px;
+    column-gap: 22px;
+  }
+  .slotTooltipGroup li {
+    break-inside: avoid;
+    margin-bottom: 3px;
+  }
+  .slotTooltipMeta {
+    margin-top: 6px;
+    color: #5f6b7a;
+    font-size: 12px;
+  }
+
+
+  /* 装備行に内蔵Buffを折りたたみ表示する */
+  .equipBuffCell {
+    min-width: 170px;
+  }
+  .equipBuffDetails {
+    position: relative;
+  }
+  .equipBuffDetails > summary {
+    cursor: pointer;
+    font-weight: 800;
+    color: #23395d;
+    white-space: nowrap;
+  }
+  .equipBuffDetails[open] > summary {
+    margin-bottom: 8px;
+  }
+  .equipBuffStatus {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    padding: 1px 7px;
+    font-size: 12px;
+    border: 1px solid #d8d8d8;
+    background: #f5f5f5;
+    color: #555;
+  }
+  .equipBuffStatus.on {
+    border-color: rgba(66,103,168,.30);
+    background: rgba(66,103,168,.10);
+    color: #284978;
+  }
+  .equipBuffGrid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(110px, 1fr));
+    gap: 6px 8px;
+    width: min(520px, 70vw);
+    padding: 8px;
+    border: 1px solid #e0e5ef;
+    border-radius: 10px;
+    background: rgba(255,255,255,.95);
+    box-shadow: 0 8px 18px rgba(0,0,0,.08);
+  }
+  .equipBuffGrid label {
+    grid-template-columns: 1fr;
+    gap: 3px;
+    margin: 0;
+    font-size: 12px;
+  }
+  .equipBuffGrid input[type="number"] {
+    width: 100%;
+  }
+  .equipBuffGrid .equipBuffWide {
+    grid-column: 1 / -1;
+  }
+  .equipBuffGrid .equipBuffInline {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+
+  /* 装備Buff追加後は横幅が足りないため、装備ブロックは縦並びにする。 */
+  .equipmentLayout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .equipmentDuo {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .weaponGrid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .equipmentPanel,
+  .weaponSlot {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+  }
+  .equipmentWeaponPanel {
+    display: grid;
+    gap: 10px;
+  }
+  .weaponSlotBullet {
+    grid-column: auto;
+  }
+  .equipmentTable {
+    min-width: 960px;
+  }
+  .weaponTable {
+    min-width: 900px;
+  }
+  /* 装備Buff列追加後の列幅を再調整 */
+  .equipmentTable th:nth-child(1),
+  .equipmentTable td:nth-child(1) {
+    width: 54px;
+  }
+  .equipmentTable th:nth-child(2),
+  .equipmentTable td:nth-child(2) {
+    width: 190px;
+  }
+  .equipmentTable th:nth-child(3),
+  .equipmentTable td:nth-child(3),
+  .equipmentTable th:nth-child(4),
+  .equipmentTable td:nth-child(4),
+  .equipmentTable th:nth-child(5),
+  .equipmentTable td:nth-child(5),
+  .equipmentTable th:nth-child(6),
+  .equipmentTable td:nth-child(6) {
+    width: 54px;
+  }
+  .equipmentTable th:nth-child(7),
+  .equipmentTable td:nth-child(7) {
+    width: 180px;
+  }
+  .equipmentTable th:nth-child(8),
+  .equipmentTable td:nth-child(8) {
+    width: 150px;
+  }
+  .equipmentTable th:nth-child(9),
+  .equipmentTable td:nth-child(9) {
+    width: 160px;
+  }
+  .weaponTable th:nth-child(1),
+  .weaponTable td:nth-child(1) {
+    width: 210px;
+  }
+  .weaponTable th:nth-child(2),
+  .weaponTable td:nth-child(2),
+  .weaponTable th:nth-child(3),
+  .weaponTable td:nth-child(3),
+  .weaponTable th:nth-child(4),
+  .weaponTable td:nth-child(4),
+  .weaponTable th:nth-child(5),
+  .weaponTable td:nth-child(5) {
+    width: 56px;
+  }
+  .weaponTable th:nth-child(6),
+  .weaponTable td:nth-child(6) {
+    width: 190px;
+  }
+  .weaponTable th:nth-child(7),
+  .weaponTable td:nth-child(7) {
+    width: 160px;
+  }
+  .weaponTable th:nth-child(8),
+  .weaponTable td:nth-child(8) {
+    width: 170px;
+  }
+  .equipmentTable input.equipNum {
+    width: 48px;
+  }
+
+
+  /* 装備Buffは同じ行内ではなく、ボタン押下で次の行に展開する */
+  .equipBuffCell {
+    min-width: 150px;
+  }
+  .equipBuffToggle {
+    width: 100%;
+    text-align: center;
+    border-radius: 999px;
+    padding: 4px 8px;
+    border: 1px solid #d8d8d8;
+    background: #f5f5f5;
+    color: #555;
+    font-weight: 800;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .equipBuffToggle.on {
+    border-color: rgba(66,103,168,.30);
+    background: rgba(66,103,168,.10);
+    color: #284978;
+  }
+  .equipBuffToggle.open {
+    box-shadow: inset 0 0 0 2px rgba(66,103,168,.18);
+  }
+  .equipBuffDetailRow > td {
+    background: #fbfcff;
+    border-top: 0;
+  }
+  .equipBuffDetailCell {
+    padding: 10px 12px !important;
+  }
+  .equipBuffDetailTitle {
+    font-weight: 900;
+    color: #23395d;
+    margin-bottom: 8px;
+  }
+  .equipBuffGridRow {
+    width: 100%;
+    max-width: none;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    box-shadow: none;
+    background: #fff;
+  }
+
+
+  /* 装備候補管理: 使用ON/OFFと候補追加 */
+  .equipmentOffRow {
+    opacity: .55;
+    background: #fafafa;
+  }
+  .equipmentAddControls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 8px 0 0;
+    align-items: center;
+  }
+  .equipmentAddControls select {
+    width: auto;
+  }
+  .equipmentTable {
+    min-width: 1160px;
+  }
+  .weaponTable {
+    min-width: 1060px;
+  }
+  .equipmentTable th:first-child,
+  .equipmentTable td:first-child {
+    width: 44px;
+    text-align: center;
+  }
+  .weaponTable th:first-child,
+  .weaponTable td:first-child {
+    width: 44px;
+    text-align: center;
+  }
+  .equipmentTable th:last-child,
+  .equipmentTable td:last-child,
+  .weaponTable th:last-child,
+  .weaponTable td:last-child {
+    width: 96px;
+  }
+  .equipmentTable .actionsWrap {
+    display: flex;
+    gap: 4px;
+    justify-content: center;
+  }
+  .equipmentTable .actionsWrap button {
+    padding: 3px 6px;
+    font-size: 12px;
+  }
+
+
+  /* 装備候補管理版: 使用列追加後の列幅を再調整 */
+  .equipmentTable,
+  .weaponTable {
+    table-layout: fixed;
+  }
+  .equipmentTable {
+    min-width: 1180px;
+  }
+  .weaponTable {
+    min-width: 1080px;
+  }
+
+  /* 防具/装飾: 使用 / 部位 / 名前 / 攻撃力 / 魔力 / 速度 / ディレイ / 装備Buff / 競合グループ / メモ / 操作 */
+  .equipmentTable:not(.weaponTable) th:nth-child(1),
+  .equipmentTable:not(.weaponTable) td:nth-child(1) {
+    width: 42px !important;
+    text-align: center;
+  }
+  .equipmentTable:not(.weaponTable) th:nth-child(2),
+  .equipmentTable:not(.weaponTable) td:nth-child(2) {
+    width: 42px !important;
+    white-space: nowrap;
+  }
+  .equipmentTable:not(.weaponTable) th:nth-child(3),
+  .equipmentTable:not(.weaponTable) td:nth-child(3) {
+    width: 260px !important;
+  }
+  .equipmentTable:not(.weaponTable) th:nth-child(4),
+  .equipmentTable:not(.weaponTable) td:nth-child(4),
+  .equipmentTable:not(.weaponTable) th:nth-child(5),
+  .equipmentTable:not(.weaponTable) td:nth-child(5),
+  .equipmentTable:not(.weaponTable) th:nth-child(6),
+  .equipmentTable:not(.weaponTable) td:nth-child(6) {
+    width: 50px !important;
+  }
+  .equipmentTable:not(.weaponTable) th:nth-child(7),
+  .equipmentTable:not(.weaponTable) td:nth-child(7) {
+    width: 48px !important;
+  }
+  .equipmentTable:not(.weaponTable) th:nth-child(8),
+  .equipmentTable:not(.weaponTable) td:nth-child(8) {
+    width: 170px !important;
+  }
+  .equipmentTable:not(.weaponTable) th:nth-child(9),
+  .equipmentTable:not(.weaponTable) td:nth-child(9) {
+    width: 150px !important;
+  }
+  .equipmentTable:not(.weaponTable) th:nth-child(10),
+  .equipmentTable:not(.weaponTable) td:nth-child(10) {
+    width: 190px !important;
+  }
+  .equipmentTable:not(.weaponTable) th:nth-child(11),
+  .equipmentTable:not(.weaponTable) td:nth-child(11) {
+    width: 88px !important;
+  }
+
+  /* 武器: 使用 / 名前 / 攻撃力 / 魔力 / 速度 / ディレイ / 装備Buff / 競合グループ / メモ / 操作 */
+  .weaponTable th:nth-child(1),
+  .weaponTable td:nth-child(1) {
+    width: 42px !important;
+    text-align: center;
+  }
+  .weaponTable th:nth-child(2),
+  .weaponTable td:nth-child(2) {
+    width: 280px !important;
+  }
+  .weaponTable th:nth-child(3),
+  .weaponTable td:nth-child(3),
+  .weaponTable th:nth-child(4),
+  .weaponTable td:nth-child(4),
+  .weaponTable th:nth-child(5),
+  .weaponTable td:nth-child(5) {
+    width: 50px !important;
+  }
+  .weaponTable th:nth-child(6),
+  .weaponTable td:nth-child(6) {
+    width: 48px !important;
+  }
+  .weaponTable th:nth-child(7),
+  .weaponTable td:nth-child(7) {
+    width: 170px !important;
+  }
+  .weaponTable th:nth-child(8),
+  .weaponTable td:nth-child(8) {
+    width: 150px !important;
+  }
+  .weaponTable th:nth-child(9),
+  .weaponTable td:nth-child(9) {
+    width: 190px !important;
+  }
+  .weaponTable th:nth-child(10),
+  .weaponTable td:nth-child(10) {
+    width: 88px !important;
+  }
+
+  .equipmentTable input.equipName {
+    width: 100%;
+  }
+  .equipmentTable input.equipNum {
+    width: 46px;
+    min-width: 0;
+  }
+  .equipmentTable input.equipNote,
+  .equipmentTable input.equipTag {
+    width: 100%;
+  }
+
+
+  /* 装備操作ボタンのはみ出し防止と、同一部位内ソート */
+  .equipmentActionsWrap {
+    display: grid !important;
+    grid-template-columns: repeat(4, 22px);
+    gap: 3px !important;
+    justify-content: center;
+  }
+  .equipmentActionsWrap button {
+    width: 22px;
+    min-width: 22px;
+    padding: 2px 0 !important;
+    line-height: 1.2;
+    font-size: 12px !important;
+    text-align: center;
+  }
+  .equipmentTable th:last-child,
+  .equipmentTable td:last-child,
+  .weaponTable th:last-child,
+  .weaponTable td:last-child {
+    width: 104px !important;
+  }
+
+  /* 最適化計算 */
+  .optimizerSection {
+    border-color: #ccd7eb;
+    background: linear-gradient(180deg, rgba(250,252,255,.98), rgba(255,255,255,.98));
+  }
+  .optimizerDetails > summary {
+    cursor: pointer;
+    font-weight: 900;
+    color: #23395d;
+  }
+  .optimizerBody {
+    margin-top: 10px;
+  }
+  .optimizerControls {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 10px;
+    margin: 10px 0;
+    align-items: end;
+  }
+  .optimizerControls label {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+  .optimizerChecks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 18px;
+    margin: 10px 0;
+  }
+  .optimizerChecks label {
+    display: inline-flex;
+    grid-template-columns: none;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+  }
+  .optimizerButtons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 10px 0 14px;
+  }
+  .primaryButton {
+    font-weight: 900;
+    border-color: #4267a8;
+    background: #4267a8;
+    color: #fff;
+  }
+  .optimizerResultPanel {
+    margin-top: 12px;
+    border: 1px solid #e2e7f2;
+    border-radius: 12px;
+    padding: 12px;
+    background: rgba(255,255,255,.75);
+  }
+  .optimizerRank {
+    font-weight: 900;
+    color: #23395d;
+  }
+  .optimizerList {
+    max-width: 460px;
+    white-space: normal;
+    line-height: 1.45;
+  }
+  .optimizerApplyButton {
+    white-space: nowrap;
+  }
+
+
+  /* 全体を少し横に広げる */
+  body {
+    max-width: 1760px !important;
+    margin: 20px auto !important;
+    padding: 0 18px;
+  }
+  @media (max-width: 900px) {
+    body {
+      margin: 14px !important;
+      padding: 0;
+    }
+  }
+
+  /* 広げた表示領域に合わせて装備テーブルも少し余裕を持たせる */
+  .equipmentTable {
+    min-width: 1280px !important;
+  }
+  .weaponTable {
+    min-width: 1180px !important;
+  }
+
+  /* 操作ボタンが微妙にはみ出さないように調整 */
+  .equipmentActionsWrap {
+    grid-template-columns: repeat(4, 24px) !important;
+    gap: 4px !important;
+  }
+  .equipmentActionsWrap button {
+    width: 24px !important;
+    min-width: 24px !important;
+    max-width: 24px !important;
+    overflow: hidden;
+  }
+  .equipmentTable th:last-child,
+  .equipmentTable td:last-child,
+  .weaponTable th:last-child,
+  .weaponTable td:last-child {
+    width: 122px !important;
+  }
+
+  /* 最適化結果も横幅を活かす */
+  .optimizerList {
+    max-width: 620px !important;
+  }
+
+
+  /* 武器・防具・装飾補正セクション: 操作ボタンのはみ出し修正 */
+  .equipmentTable td.actionCell {
+    width: 76px !important;
+    min-width: 76px !important;
+    max-width: 76px !important;
+    padding: 2px !important;
+    overflow: visible !important;
+  }
+  .equipmentTable th:last-child,
+  .equipmentTable td:last-child,
+  .weaponTable th:last-child,
+  .weaponTable td:last-child {
+    width: 76px !important;
+    min-width: 76px !important;
+    max-width: 76px !important;
+  }
+  .equipmentTable .equipmentActionsWrap {
+    display: grid !important;
+    grid-template-columns: 24px 24px !important;
+    grid-auto-rows: 22px !important;
+    gap: 3px !important;
+    justify-content: center !important;
+    align-items: center !important;
+    width: 54px !important;
+    min-width: 54px !important;
+    max-width: 54px !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+  .equipmentTable .equipmentActionsWrap button {
+    width: 24px !important;
+    min-width: 24px !important;
+    max-width: 24px !important;
+    height: 22px !important;
+    min-height: 22px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    line-height: 20px !important;
+    font-size: 12px !important;
+    text-align: center !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+  }
+
+
+  /* 装備Buff詳細: Buff名とメモを1行にまとめる（幅比 2:3） */
+  .equipBuffNameMemoRow {
+    display: grid !important;
+    grid-template-columns: 2fr 3fr;
+    gap: 10px;
+    align-items: end;
+  }
+  .equipBuffNameMemoRow label {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 3px;
+    margin: 0;
+    font-size: 12px;
+  }
+  .equipBuffNameMemoRow input {
+    width: 100%;
+    box-sizing: border-box;
+  }
+  @media (max-width: 760px) {
+    .equipBuffNameMemoRow {
+      grid-template-columns: 1fr;
+    }
+  }
+
+
+  /* タブUI: 機能が増えたため、計算/装備/Buff/最適化/保存を分離 */
+  .mainTabNav {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 8px 0 10px;
+    margin: 10px 0 12px;
+    background: linear-gradient(180deg, rgba(247,249,252,.98), rgba(247,249,252,.92));
+    border-bottom: 1px solid #dfe6f2;
+    backdrop-filter: blur(6px);
+  }
+  .mainTabButton {
+    appearance: none;
+    border: 1px solid #d2d9e8;
+    background: #fff;
+    color: #2d405f;
+    border-radius: 999px;
+    padding: 8px 14px;
+    font-weight: 900;
+    white-space: nowrap;
+    cursor: pointer;
+    box-shadow: 0 1px 2px rgba(0,0,0,.04);
+  }
+  .mainTabButton:hover {
+    background: #f6f8fc;
+  }
+  .mainTabButton.active {
+    border-color: #4267a8;
+    background: #4267a8;
+    color: #fff;
+  }
+  .mainTabPanel {
+    display: grid;
+    gap: 12px;
+  }
+  .mainTabPanel[hidden] {
+    display: none !important;
+  }
+  .mainTabPanels {
+    min-height: 280px;
+  }
+  .tabSectionHint {
+    margin: 0 0 8px;
+    padding: 10px 12px;
+    border: 1px solid #e0e6f0;
+    border-radius: 10px;
+    background: #fbfcff;
+    color: #556;
+  }
+
+
+  /* 装備登録タブ: 防具/装飾を部位ごとのカテゴリに分ける */
+  .equipmentStackedGroups {
+    display: grid;
+    gap: 14px;
+  }
+  .equipmentGroupedPanel {
+    display: grid;
+    gap: 8px;
+  }
+  .equipmentSlotCategories {
+    display: grid;
+    gap: 10px;
+  }
+  .equipmentSlotCategory {
+    border: 1px solid #dfe5ef;
+    border-radius: 12px;
+    background: #fbfcff;
+    overflow: hidden;
+  }
+  .equipmentSlotCategory > summary {
+    cursor: pointer;
+    padding: 8px 12px;
+    font-weight: 900;
+    color: #23395d;
+    background: #f3f6fb;
+    border-bottom: 1px solid #e2e7f2;
+  }
+  .equipmentSlotCategoryBody {
+    padding: 10px;
+    overflow-x: auto;
+  }
+  .equipmentSlotCategoryBody > button,
+  .weaponSlot > button {
+    margin-top: 6px;
+  }
+  .equipmentSlotTable {
+    min-width: 1080px !important;
+  }
+  /* 部位列がなくなったので、防具/装飾も武器と同じ列設計に寄せる */
+  .equipmentSlotTable th:nth-child(2),
+  .equipmentSlotTable td:nth-child(2),
+  .weaponTable th:nth-child(2),
+  .weaponTable td:nth-child(2) {
+    width: 280px !important;
+  }
+  .equipmentSlotTable th:nth-child(6),
+  .equipmentSlotTable td:nth-child(6),
+  .weaponTable th:nth-child(6),
+  .weaponTable td:nth-child(6) {
+    width: 48px !important;
+  }
+
+
+  /* 汎用構成シミュレーター向け追加ステータス入力 */
+  .extraStatsEditor {
+    border: 1px solid #e1e6f0;
+    border-radius: 12px;
+    background: #fbfcff;
+    padding: 10px;
+    margin-top: 4px;
+  }
+  .extraStatsTitle {
+    font-weight: 900;
+    color: #23395d;
+    margin-bottom: 8px;
+  }
+  .extraStatsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(105px, 1fr));
+    gap: 8px;
+  }
+  .extraStatsGrid label {
+    grid-template-columns: 1fr;
+    gap: 3px;
+    margin: 0;
+    font-size: 12px;
+  }
+  .extraStatsGrid input {
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .compositeExtraCell {
+    min-width: 96px;
+  }
+  .compositeExtraDetailCell {
+    padding: 10px 12px !important;
+    background: #fbfcff;
+  }
+  .compositeExtraToggle {
+    width: 100%;
+    min-width: 78px;
+  }
+
+
+  /* 装備一覧から攻撃ディレイ列を外したため、一覧側の横幅を少し圧縮 */
+  .equipmentSlotTable {
+    min-width: 1000px !important;
+  }
+  .weaponTable {
+    min-width: 1040px !important;
+  }
+
+
+  /* スキルシミュレータタブ: 計算本体とは独立 */
+  .skillSimControls {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 10px;
+    align-items: end;
+    margin: 10px 0 14px;
+  }
+  .skillSimControls label {
+    grid-template-columns: 1fr;
+    gap: 4px;
+    margin: 0;
+  }
+  .skillSimSummary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 12px;
+    margin: 10px 0 14px;
+  }
+  .skillSimMiniGrid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(84px, 1fr));
+    gap: 6px 12px;
+    font-size: 13px;
+  }
+  .skillSimMiniGrid div {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    border-bottom: 1px dotted #d6dce8;
+  }
+  .skillSimGroups {
+    display: grid;
+    gap: 12px;
+  }
+  .skillSimGroup {
+    border: 1px solid #dfe5ef;
+    border-radius: 12px;
+    background: #fbfcff;
+    padding: 10px;
+  }
+  .skillSimGroup h3 {
+    margin: 0 0 8px;
+  }
+  .skillSimGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+    gap: 8px;
+  }
+  .skillSimGrid label {
+    grid-template-columns: minmax(68px, 1fr) 74px;
+    gap: 6px;
+    margin: 0;
+    font-size: 13px;
+  }
+  .skillSimGrid input[type="number"] {
+    width: 74px;
+  }
+
+
+  /* 計算タブの武器入力は装備登録タブへ統合 */
+  .weaponInputPanelMoved {
+    background: #fbfcff;
+    border-color: #dfe6f2;
+  }
+  .weaponCalcSummary {
+    display: grid;
+    gap: 3px;
+    margin-top: 8px;
+  }
+
+  /* 武器詳細: 数値欄は3桁程度に絞り、武器性能と使用条件を本当に横並びにする */
+  .weaponCalcEditor {
+    border: 1px solid #dbe4f3;
+    border-radius: 12px;
+    background: #f8fbff;
+    padding: 8px;
+    margin-bottom: 4px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .weaponCalcEditor.equipBuffWide {
+    grid-column: 1 / -1;
+  }
+  .weaponCalcNote {
+    margin: 2px 0 7px;
+  }
+  .weaponCalcLayout {
+    display: flex !important;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: flex-start;
+    width: 100%;
+  }
+  .weaponCalcLayout .equipBuffWide {
+    grid-column: auto !important;
+  }
+  .weaponCalcPane {
+    border: 1px solid #e0e7f2;
+    border-radius: 10px;
+    background: #fff;
+    padding: 8px;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+  .weaponCalcPerfPane {
+    flex: 0 0 auto;
+    width: auto;
+  }
+  .weaponReqPane {
+    flex: 1 1 520px;
+    min-width: 420px;
+  }
+  .weaponCalcPaneTitle,
+  .weaponReqEditor .extraStatsTitle {
+    font-size: 12px;
+    font-weight: 900;
+    margin: 0 0 6px;
+  }
+  .weaponCalcGrid {
+    display: grid;
+    grid-template-columns: repeat(6, 66px);
+    gap: 6px;
+    align-items: end;
+  }
+  .weaponCalcGrid label {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 3px;
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.25;
+    min-width: 0;
+  }
+  .weaponCalcGrid input[type="number"],
+  .weaponCalcGrid select {
+    width: 62px !important;
+    max-width: 62px !important;
+    min-width: 0 !important;
+    box-sizing: border-box;
+    padding-left: 4px;
+    padding-right: 4px;
+  }
+  .weaponReqEditor {
+    margin-top: 0;
+  }
+  .weaponReqEditor p.small {
+    margin: 0 0 6px;
+    line-height: 1.35;
+  }
+  .weaponReqMiniTable {
+    width: 100%;
+    margin-bottom: 6px;
+    table-layout: fixed;
+  }
+  .weaponReqMiniTable th,
+  .weaponReqMiniTable td {
+    padding: 3px 4px;
+  }
+  .weaponReqMiniTable th:nth-child(1),
+  .weaponReqMiniTable td:nth-child(1) {
+    width: auto;
+  }
+  .weaponReqMiniTable th:nth-child(2),
+  .weaponReqMiniTable td:nth-child(2),
+  .weaponReqMiniTable th:nth-child(3),
+  .weaponReqMiniTable td:nth-child(3) {
+    width: 62px;
+  }
+  .weaponReqMiniTable th:nth-child(4),
+  .weaponReqMiniTable td:nth-child(4) {
+    width: 28px;
+    text-align: center;
+  }
+  .weaponReqMiniTable input[type="number"] {
+    width: 58px !important;
+    max-width: 58px !important;
+    min-width: 0 !important;
+    box-sizing: border-box;
+    padding-left: 4px;
+    padding-right: 4px;
+  }
+  .weaponReqMiniTable select {
+    width: 100%;
+    min-width: 116px;
+    box-sizing: border-box;
+    font-size: 12px;
+  }
+  .weaponReqMiniTable button {
+    min-width: 24px;
+    width: 24px;
+    padding-left: 0;
+    padding-right: 0;
+  }
+  .weaponReqCurrentAuto[readonly] {
+    background: #eef3fb;
+    color: #23395d;
+    font-weight: 800;
+  }
+  @media (max-width: 980px) {
+    .weaponCalcGrid {
+      grid-template-columns: repeat(3, 66px);
+    }
+    .weaponReqPane {
+      min-width: 320px;
+    }
+  }
+  @media (max-width: 700px) {
+    .weaponCalcLayout {
+      display: grid !important;
+      grid-template-columns: 1fr;
+    }
+    .weaponCalcGrid {
+      grid-template-columns: repeat(2, minmax(64px, 1fr));
+    }
+    .weaponCalcGrid input[type="number"],
+    .weaponCalcGrid select,
+    .weaponReqMiniTable input[type="number"] {
+      width: 100% !important;
+      max-width: none !important;
+    }
+    .weaponReqPane {
+      min-width: 0;
+    }
+  }
+
+
+  .tagItem.tagWatch {
+    border-color: #d8c48a;
+    background: #fffaf0;
+    opacity: .92;
+  }
+  .tagWatchLabel {
+    display: inline-block;
+    border: 1px solid #d8c48a;
+    background: #fffaf0;
+    border-radius: 8px;
+    padding: 7px 9px;
+    color: #6d5522;
+    font-weight: 800;
+  }
+
+
+  .skillSimAutoApply {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px !important;
+    font-weight: 900;
+  }
+  .skillSimAutoApply input {
+    width: auto;
+  }
+
+
+  .damageBreakdownTooltip {
+    width: min(760px, calc(100vw - 48px));
+    right: auto;
+    left: 12px;
+  }
+  .damageBreakdownTooltip p,
+  .damageBreakdownTooltip div {
+    margin: 4px 0;
+  }
+  .metricDamage.metricHoverCard {
+    z-index: 5;
+  }
+
+
+  .skillSimFormulaNote {
+    margin: 8px 0 10px;
+    padding: 8px 10px;
+    border-left: 4px solid #4267a8;
+    background: rgba(66,103,168,.07);
+    border-radius: 8px;
+  }
+
+
+  .showcaseSection {
+    background:
+      radial-gradient(circle at top right, rgba(255, 210, 120, .22), transparent 34%),
+      linear-gradient(180deg, rgba(255,255,255,.98), rgba(248,251,255,.98));
+  }
+  .showcaseActions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin: 8px 0 12px;
+  }
+  .showcaseView {
+    display: grid;
+    gap: 12px;
+  }
+  .showcaseHero {
+    border: 1px solid #e3d3a2;
+    border-radius: 14px;
+    padding: 14px;
+    background: linear-gradient(135deg, #fff7df, #fff 70%);
+    box-shadow: 0 10px 22px rgba(90,70,20,.08);
+  }
+  .showcaseTitle {
+    font-size: clamp(22px, 4vw, 34px);
+    font-weight: 900;
+    color: #2b3853;
+    margin-bottom: 8px;
+  }
+  .showcaseBigStats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 8px;
+  }
+  .showcaseBigStat {
+    border: 1px solid rgba(35,57,93,.12);
+    border-radius: 12px;
+    padding: 9px 10px;
+    background: rgba(255,255,255,.82);
+  }
+  .showcaseBigStat span {
+    display: block;
+    color: #5d6879;
+    font-size: 12px;
+    font-weight: 800;
+  }
+  .showcaseBigStat b {
+    display: block;
+    color: #1f2f4d;
+    font-size: 22px;
+    margin-top: 2px;
+  }
+  .showcaseGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 12px;
+  }
+  .showcaseCard {
+    border: 1px solid #dde5f2;
+    border-radius: 12px;
+    background: #fff;
+    padding: 10px 12px;
+    min-width: 0;
+  }
+  .showcaseCard h3 {
+    margin: 0 0 8px;
+    color: #23395d;
+    font-size: 16px;
+  }
+  .showcaseList {
+    display: grid;
+    gap: 4px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .showcaseList li {
+    border-bottom: 1px dashed #e6ebf3;
+    padding: 3px 0;
+    line-height: 1.45;
+  }
+  .showcaseList li:last-child {
+    border-bottom: 0;
+  }
+  .showcasePair {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .showcasePair span {
+    color: #5d6879;
+  }
+  .showcasePair b {
+    text-align: right;
+  }
+  .showcaseTextDetails {
+    margin-top: 12px;
+  }
+  .showcaseTextDetails textarea {
+    min-height: 260px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    white-space: pre;
+  }
+
+
+  #postBuffTable input.tagInput,
+  #otherBuffTable input.tagInput {
+    width: 100%;
+  }
+
+
+  .optimizerExcludeHeader {
+    font-size: 11px;
+    letter-spacing: 0;
+  }
+  .equipmentOptimizerExcludeCell {
+    text-align: center;
+    white-space: nowrap;
+    padding-left: 2px !important;
+    padding-right: 2px !important;
+  }
+  .equipmentOptimizerExcludeCell input {
+    width: 14px;
+    height: 14px;
+    margin: 0;
+    vertical-align: middle;
+  }
+  .equipmentOptimizerExcludedRow {
+    outline: 2px dashed rgba(164, 93, 0, .35);
+    outline-offset: -2px;
+    background: #fffaf0;
+  }
+  .equipmentOptimizerExcludedRow td {
+    background: rgba(255, 250, 240, .72);
+  }
+
+
+  /* 装備テーブル: 固定/除外列を小さく固定 */
+  .optimizerFixedHeader,
+  .optimizerExcludeHeader {
+    font-size: 11px !important;
+    letter-spacing: 0 !important;
+    text-align: center !important;
+  }
+  .equipmentOptimizerFixedCell,
+  .equipmentOptimizerExcludeCell {
+    text-align: center !important;
+    white-space: nowrap !important;
+    padding-left: 2px !important;
+    padding-right: 2px !important;
+  }
+  .equipmentOptimizerFixedCell input,
+  .equipmentOptimizerExcludeCell input {
+    width: 14px !important;
+    height: 14px !important;
+    margin: 0 !important;
+    vertical-align: middle !important;
+  }
+  .equipmentOptimizerFixedRow {
+    outline: 2px solid rgba(40, 112, 67, .35);
+    outline-offset: -2px;
+  }
+  .equipmentOptimizerFixedRow td {
+    background: rgba(233, 249, 238, .68);
+  }
+
+  .equipmentTable th:nth-child(1),
+  .equipmentTable td:nth-child(1),
+  .weaponTable th:nth-child(1),
+  .weaponTable td:nth-child(1) {
+    width: 34px !important;
+    min-width: 34px !important;
+    max-width: 34px !important;
+    text-align: center !important;
+  }
+  .equipmentTable th:nth-child(2),
+  .equipmentTable td:nth-child(2),
+  .equipmentTable th:nth-child(3),
+  .equipmentTable td:nth-child(3),
+  .weaponTable th:nth-child(2),
+  .weaponTable td:nth-child(2),
+  .weaponTable th:nth-child(3),
+  .weaponTable td:nth-child(3) {
+    width: 34px !important;
+    min-width: 34px !important;
+    max-width: 34px !important;
+    text-align: center !important;
+  }
+  .equipmentTable th:nth-child(4),
+  .equipmentTable td:nth-child(4),
+  .weaponTable th:nth-child(4),
+  .weaponTable td:nth-child(4) {
+    width: 260px !important;
+  }
+  .equipmentTable th:nth-child(5),
+  .equipmentTable td:nth-child(5),
+  .equipmentTable th:nth-child(6),
+  .equipmentTable td:nth-child(6),
+  .equipmentTable th:nth-child(7),
+  .equipmentTable td:nth-child(7),
+  .weaponTable th:nth-child(5),
+  .weaponTable td:nth-child(5),
+  .weaponTable th:nth-child(6),
+  .weaponTable td:nth-child(6),
+  .weaponTable th:nth-child(7),
+  .weaponTable td:nth-child(7) {
+    width: 50px !important;
+  }
+  .equipmentTable th:nth-child(8),
+  .equipmentTable td:nth-child(8),
+  .weaponTable th:nth-child(8),
+  .weaponTable td:nth-child(8) {
+    width: 52px !important;
+  }
+  .equipmentTable th:nth-child(9),
+  .equipmentTable td:nth-child(9),
+  .weaponTable th:nth-child(9),
+  .weaponTable td:nth-child(9) {
+    width: 180px !important;
+  }
+  .equipmentTable th:nth-child(10),
+  .equipmentTable td:nth-child(10),
+  .weaponTable th:nth-child(10),
+  .weaponTable td:nth-child(10) {
+    width: 180px !important;
+  }
+  .equipmentTable th:nth-child(11),
+  .equipmentTable td:nth-child(11),
+  .weaponTable th:nth-child(11),
+  .weaponTable td:nth-child(11) {
+    width: 76px !important;
+    min-width: 76px !important;
+    max-width: 76px !important;
+  }
+
+
+  .showcaseShareBox {
+    margin: 0 0 12px;
+  }
+  .showcaseShareBox textarea {
+    min-height: 54px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12px;
+    line-height: 1.35;
+    word-break: break-all;
+    white-space: pre-wrap;
+    resize: vertical;
+  }
+
+
+/* Worker版の最適化進捗バー */
+#optimizerProgress {
+  width: 100%;
+  height: 14px;
+  margin: 4px 0 8px;
+  display: block;
+}
+#optimizerProgress:not([value]) {
+  opacity: .75;
+}
+
+
+/* 最適化結果: 現在ON構成の比較行 */
+.optimizerSourceCell {
+  min-width: 110px;
+  font-weight: 800;
+}
+.optimizerResultReason {
+  display: inline-block;
+  margin-top: 2px;
+  color: #6a5360;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+.optimizerCurrentRow td {
+  background: rgba(232, 244, 255, .75);
+}
+.optimizerInvalidRow td {
+  background: rgba(255, 241, 235, .8);
+}
+
+
+/* タブ内一括操作 */
+.bulkActionBar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 10px 0 14px;
+  padding: 10px 12px;
+  border: 1px solid rgba(120, 110, 130, .22);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, .55);
+}
+.bulkActionBar button {
+  white-space: nowrap;
+}
+
+
+/* 最適化計算βの使い方ガイド */
+.optimizerIntro {
+  margin-bottom: 10px;
+}
+.optimizerGuide {
+  margin: 12px 0 18px;
+  padding: 14px;
+  border: 1px solid rgba(120, 110, 130, .22);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, .62);
+}
+.optimizerGuide h3 {
+  margin: 0 0 10px;
+}
+.optimizerGuideGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.optimizerGuideCard {
+  padding: 10px 12px;
+  border: 1px solid rgba(120, 110, 130, .16);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, .58);
+}
+.optimizerGuideCard h4 {
+  margin: 0 0 6px;
+}
+.optimizerGuideCard p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.55;
+}
+.optimizerGuideDetails {
+  margin-top: 8px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(248, 246, 252, .74);
+}
+.optimizerGuideDetails summary {
+  cursor: pointer;
+  font-weight: 800;
+}
+.optimizerGuideDetails ol,
+.optimizerGuideDetails ul {
+  margin: 8px 0 6px 1.4em;
+  padding: 0;
+}
+.optimizerGuideDetails li {
+  margin: 4px 0;
+  line-height: 1.55;
+}
