@@ -54,10 +54,14 @@ const EQUIPMENT_SLOTS = [
  */
 
 const BASE_EXTRA_STAT_DEFS = [
+  {prop:"attack", equipProp:"equipBuffFlatAttack", label:"攻撃力", step:"0.1"},
+  {prop:"magic", equipProp:"equipBuffFlatMagic", label:"魔力", step:"0.1"},
+  {prop:"speed", equipProp:"equipBuffFlatSpeed", label:"速度", step:"0.1"},
   {prop:"extraAC", equipProp:"equipBuffExtraAC", label:"AC", step:"0.1"},
   {prop:"extraHP", equipProp:"equipBuffExtraHP", label:"HP", step:"1"},
   {prop:"extraMP", equipProp:"equipBuffExtraMP", label:"MP", step:"1"},
   {prop:"extraST", equipProp:"equipBuffExtraST", label:"ST", step:"1"},
+  {prop:"extraMaxWeight", equipProp:"equipBuffExtraMaxWeight", label:"最大重量", step:"0.1"},
   {prop:"extraHit", equipProp:"equipBuffExtraHit", label:"命中", step:"0.1"},
   {prop:"extraAvoid", equipProp:"equipBuffExtraAvoid", label:"回避", step:"0.1"},
   {prop:"extraAttackDelay", equipProp:"equipBuffExtraAttackDelay", label:"攻撃ディレイ", step:"0.1"},
@@ -74,6 +78,7 @@ const BUFF_FLAT_EXTRA_STAT_DEFS = [
   {prop:"extraHP", equipProp:"equipBuffExtraHP", label:"HP", step:"1"},
   {prop:"extraMP", equipProp:"equipBuffExtraMP", label:"MP", step:"1"},
   {prop:"extraST", equipProp:"equipBuffExtraST", label:"ST", step:"1"},
+  {prop:"extraMaxWeight", equipProp:"equipBuffExtraMaxWeight", label:"最大重量", step:"0.1"},
   {prop:"extraHit", equipProp:"equipBuffExtraHit", label:"命中", step:"0.1"},
   {prop:"extraAvoid", equipProp:"equipBuffExtraAvoid", label:"回避", step:"0.1"},
   {prop:"extraMagicDelay", equipProp:"equipBuffExtraMagicDelay", label:"魔法ディレイ", step:"0.1"},
@@ -89,6 +94,7 @@ const BUFF_PCT_EXTRA_STAT_DEFS = [
   {prop:"extraHPPct", equipProp:"equipBuffExtraHPPct", label:"HP%", step:"0.1"},
   {prop:"extraMPPct", equipProp:"equipBuffExtraMPPct", label:"MP%", step:"0.1"},
   {prop:"extraSTPct", equipProp:"equipBuffExtraSTPct", label:"ST%", step:"0.1"},
+  {prop:"extraMaxWeightPct", equipProp:"equipBuffExtraMaxWeightPct", label:"最大重量%", step:"0.1"},
   {prop:"extraHitPct", equipProp:"equipBuffExtraHitPct", label:"命中%", step:"0.1"},
   {prop:"extraAvoidPct", equipProp:"equipBuffExtraAvoidPct", label:"回避%", step:"0.1"},
   {prop:"extraAttackDelayPct", equipProp:"equipBuffExtraAttackDelayPct", label:"攻撃ディレイ%", step:"0.1"},
@@ -186,6 +192,475 @@ function extraStatsSummary(extra) {
   return parts;
 }
 
+
+const QUICK_EFFECT_DEFS = [
+  {key:"attackFlat", label:"攻撃力+", valueLabel:"値", unit:"", scopes:["base","equipBuff","buff"], category:"基本ステータス"},
+  {key:"magicFlat", label:"魔力+", valueLabel:"値", unit:"", scopes:["base","equipBuff","buff"], category:"基本ステータス"},
+  {key:"speedFlat", label:"速度+", valueLabel:"値", unit:"", scopes:["base","equipBuff","buff"], category:"基本ステータス"},
+
+  {key:"attackPct", category:"%ステータス", label:"攻撃力%", valueLabel:"%", unit:"%", scopes:["equipBuff","buff"]},
+  {key:"magicPct", category:"%ステータス", label:"魔力%", valueLabel:"%", unit:"%", scopes:["equipBuff","buff"]},
+  {key:"speedPct", category:"%ステータス", label:"速度%", valueLabel:"%", unit:"%", scopes:["equipBuff","buff"]},
+
+  {key:"flatHP", category:"追加ステータス", label:"HP+", valueLabel:"値", unit:"", scopes:["base","equipBuff","buff"]},
+  {key:"flatMP", category:"追加ステータス", label:"MP+", valueLabel:"値", unit:"", scopes:["base","equipBuff","buff"]},
+  {key:"flatST", category:"追加ステータス", label:"ST+", valueLabel:"値", unit:"", scopes:["base","equipBuff","buff"]},
+  {key:"flatAC", category:"追加ステータス", label:"AC+", valueLabel:"値", unit:"", scopes:["base","equipBuff","buff"]},
+  {key:"flatMaxWeight", category:"追加ステータス", label:"最大重量+", valueLabel:"値", unit:"", scopes:["base","equipBuff","buff"]},
+  {key:"hitFlat", category:"追加ステータス", label:"命中+", valueLabel:"値", unit:"", scopes:["base","equipBuff","buff"]},
+  {key:"avoidFlat", category:"追加ステータス", label:"回避+", valueLabel:"値", unit:"", scopes:["base","equipBuff","buff"]},
+
+  {key:"maxWeightPct", category:"追加ステータス%", label:"最大重量%", valueLabel:"%", unit:"%", scopes:["equipBuff","buff"]},
+  {key:"critRatePct", category:"追加ステータス%", label:"クリ率%", valueLabel:"%", unit:"%", scopes:["equipBuff","buff"]},
+
+  {key:"convMagicRate", category:"ダメージ系", label:"魔力→攻撃力%", valueLabel:"%", unit:"%", scopes:["equipBuff","buff"]},
+  {key:"convSpeedRate", category:"ダメージ系", label:"速度→攻撃力%", valueLabel:"%", unit:"%", scopes:["equipBuff","buff"]},
+  {key:"dmgPct", category:"ダメージ系", label:"与ダメ%", valueLabel:"%", unit:"%", scopes:["equipBuff","buff"]},
+  {key:"specialMultiplier", category:"ダメージ系", label:"特攻倍率", valueLabel:"倍率", unit:"倍", scopes:["equipBuff","buff"]},
+
+  {key:"skillPlus", category:"表示・連携用", label:"スキル+", valueLabel:"値", unit:"", scopes:["equipBuff","buff"], targetKind:"skill"},
+  {key:"elementDamagePct", category:"表示・連携用", label:"属性ダメージ%", valueLabel:"%", unit:"%", scopes:["equipBuff","buff"], targetKind:"element"},
+  {key:"custom", category:"表示・連携用", label:"その他効果", valueLabel:"値", unit:"", scopes:["base","equipBuff","buff"], targetKind:"text", placeholder:"効果名"}
+];
+
+const QUICK_EFFECT_SCOPE_LABELS = {
+  base: "装備本体",
+  equipBuff: "装備Buff",
+  buff: "Buff"
+};
+
+const ELEMENT_DAMAGE_OPTIONS = ["火属性", "水属性", "地属性", "風属性", "無属性"];
+
+function quickEffectDef(key) {
+  return QUICK_EFFECT_DEFS.find(d => d.key === key) || QUICK_EFFECT_DEFS[0];
+}
+
+function quickEffectScopeFor(context, selectedScope=null) {
+  if (context === "equipment") return selectedScope || "base";
+  return "buff";
+}
+
+function quickEffectDefsFor(context, selectedScope=null) {
+  const scope = quickEffectScopeFor(context, selectedScope);
+  return QUICK_EFFECT_DEFS.filter(d => (d.scopes || []).includes(scope));
+}
+
+function quickEffectOptionsHtml(context, selectedScope=null) {
+  const groups = new Map();
+  quickEffectDefsFor(context, selectedScope).forEach(d => {
+    const category = d.category || "その他";
+    if (!groups.has(category)) groups.set(category, []);
+    groups.get(category).push(d);
+  });
+  return Array.from(groups.entries()).map(([category, defs]) => {
+    const options = defs.map(d => `<option value="${escapeHtml(d.key)}">${escapeHtml(d.label)}</option>`).join("");
+    return `<optgroup label="${escapeHtml(category)}">${options}</optgroup>`;
+  }).join("");
+}
+
+function quickEffectAppliedMessage(context, scope, key, value, targetName="") {
+  const def = quickEffectDef(key);
+  const v = fmt(+value || 0, 2);
+  const target = targetName ? `${targetName} ` : "";
+  if (["skillPlus", "elementDamagePct", "custom"].includes(key)) {
+    return `表示用の追加効果へ保存: ${target}${def.label} ${v}${def.unit || ""}`;
+  }
+  const where = context === "equipment"
+    ? (scope === "base" ? "装備本体の追加ステータス" : "装備Buff")
+    : "このBuff行";
+  return `${where}へ反映: ${target}${def.label} ${v}${def.unit || ""}`;
+}
+
+function normalizeAdditionalEffects(effects) {
+  if (!Array.isArray(effects)) return [];
+  return effects.map(e => ({
+    key: e?.key || "custom",
+    name: String(e?.name || ""),
+    value: +(e?.value || 0),
+    unit: e?.unit || quickEffectDef(e?.key || "custom").unit || "",
+    scope: e?.scope || "display",
+    note: e?.note || ""
+  })).filter(e => e.name || e.value || e.key !== "custom");
+}
+
+function additionalEffectLabel(effect) {
+  const def = quickEffectDef(effect?.key || "custom");
+  const name = effect?.name ? `${effect.name} ` : "";
+  const value = +(effect?.value || 0);
+  const sign = value > 0 && !String(def.label).includes("%") && !String(def.label).includes("倍率") ? "+" : "";
+  if (effect?.key === "skillPlus") return `${name}スキル${sign}${fmt(value, 2)}`;
+  if (effect?.key === "elementDamagePct") return `${name}ダメージ${value > 0 ? "+" : ""}${fmt(value, 2)}%`;
+  if (effect?.key === "custom") return `${name || "追加効果"}${value ? ` ${value > 0 ? "+" : ""}${fmt(value, 2)}${effect?.unit || ""}` : ""}`;
+  return `${name}${def.label}${value > 0 ? "+" : ""}${fmt(value, 2)}${def.unit && !String(def.label).includes(def.unit) ? def.unit : ""}`;
+}
+
+function additionalEffectsSummary(row, scope=null) {
+  const effects = normalizeAdditionalEffects(row?.extraEffects);
+  return effects
+    .filter(e => !scope || e.scope === scope || e.scope === "display")
+    .map(additionalEffectLabel);
+}
+
+function serializeAdditionalEffectsText(effects) {
+  return normalizeAdditionalEffects(effects)
+    .map(e => [e.key, e.name, e.value, e.unit, e.scope, e.note].map(v => String(v ?? "").replace(/[|;\\]/g, m => "\\" + m)).join("|"))
+    .join("; ");
+}
+
+function splitEscapedList(text, sep) {
+  const out = [];
+  let cur = "";
+  let esc = false;
+  String(text || "").split("").forEach(ch => {
+    if (esc) {
+      cur += ch;
+      esc = false;
+    } else if (ch === "\\") {
+      esc = true;
+    } else if (ch === sep) {
+      out.push(cur);
+      cur = "";
+    } else {
+      cur += ch;
+    }
+  });
+  out.push(cur);
+  return out;
+}
+
+function parseAdditionalEffectsText(text) {
+  const s = String(text || "").trim();
+  if (!s) return [];
+  if (s.startsWith("[") || s.startsWith("{")) {
+    try {
+      const parsed = JSON.parse(s);
+      return normalizeAdditionalEffects(Array.isArray(parsed) ? parsed : parsed.effects);
+    } catch {}
+  }
+  return splitEscapedList(s, ";").map(part => {
+    const cells = splitEscapedList(part.trim(), "|");
+    if (cells.length >= 3) {
+      return {
+        key: cells[0] || "custom",
+        name: cells[1] || "",
+        value: parseFloat(cells[2]) || 0,
+        unit: cells[3] || "",
+        scope: cells[4] || "display",
+        note: cells[5] || ""
+      };
+    }
+    const m = part.trim().match(/^(.+?)([+-]?\d+(?:\.\d+)?)(%|倍)?$/);
+    return {key:"custom", name:m ? m[1].trim() : part.trim(), value:m ? +(m[2] || 0) : 0, unit:m?.[3] || "", scope:"display"};
+  }).filter(e => e.name || e.value);
+}
+
+function pushDisplayEffect(row, key, value, name="", unit="", scope="display", note="") {
+  row.extraEffects = normalizeAdditionalEffects(row.extraEffects);
+  row.extraEffects.push({key, name, value:+value || 0, unit: unit || quickEffectDef(key).unit || "", scope, note});
+}
+
+function quickEffectTargetName(def, targetValue) {
+  if (def.targetKind === "element") return targetValue || "火属性";
+  if (def.targetKind === "skill") return targetValue || (SKILL_SIM_ALL && SKILL_SIM_ALL[0]) || "筋力";
+  if (def.targetKind === "text") return targetValue || def.placeholder || def.label;
+  return "";
+}
+
+function applyQuickEffectToRow(row, context, key, value, name="", scope="auto") {
+  const v = parseFloat(value);
+  if (!Number.isFinite(v)) {
+    alert("追加する数値を入力してください。");
+    return false;
+  }
+  const def = quickEffectDef(key);
+  const displayOnly = ["skillPlus", "elementDamagePct", "custom"].includes(key);
+  if (displayOnly) {
+    pushDisplayEffect(row, key, v, quickEffectTargetName(def, name), def.unit || "", "display");
+    return true;
+  }
+
+  if (context === "composite") {
+    const map = {
+      attackFlat:"flatAttack", magicFlat:"flatMagic", speedFlat:"flatSpeed",
+      attackPct:"attackPct", magicPct:"magicPct", speedPct:"speedPct",
+      convMagicRate:"convMagicRate", convSpeedRate:"convSpeedRate",
+      dmgPct:"dmgPct"
+    };
+    if (map[key]) row[map[key]] = +(row[map[key]] || 0) + v;
+    else if (key === "specialMultiplier") row.special = (+(row.special || 1) || 1) * v;
+    else if (key === "flatHP") row.extraHP = +(row.extraHP || 0) + v;
+    else if (key === "flatMP") row.extraMP = +(row.extraMP || 0) + v;
+    else if (key === "flatST") row.extraST = +(row.extraST || 0) + v;
+    else if (key === "flatAC") row.extraAC = +(row.extraAC || 0) + v;
+    else if (key === "flatMaxWeight") row.extraMaxWeight = +(row.extraMaxWeight || 0) + v;
+    else if (key === "hitFlat") row.extraHit = +(row.extraHit || 0) + v;
+    else if (key === "avoidFlat") row.extraAvoid = +(row.extraAvoid || 0) + v;
+    else if (key === "maxWeightPct") row.extraMaxWeightPct = +(row.extraMaxWeightPct || 0) + v;
+    else if (key === "critRatePct") row.extraCritRatePct = +(row.extraCritRatePct || 0) + v;
+    return true;
+  }
+
+  // equipment
+  const bodyScope = scope === "base";
+  if (bodyScope && key === "attackFlat") row.attack = +(row.attack || 0) + v;
+  else if (bodyScope && key === "magicFlat") row.magic = +(row.magic || 0) + v;
+  else if (bodyScope && key === "speedFlat") row.speed = +(row.speed || 0) + v;
+  else if (bodyScope && key === "flatHP") row.extraHP = +(row.extraHP || 0) + v;
+  else if (bodyScope && key === "flatMP") row.extraMP = +(row.extraMP || 0) + v;
+  else if (bodyScope && key === "flatST") row.extraST = +(row.extraST || 0) + v;
+  else if (bodyScope && key === "flatAC") row.extraAC = +(row.extraAC || 0) + v;
+  else if (bodyScope && key === "flatMaxWeight") row.extraMaxWeight = +(row.extraMaxWeight || 0) + v;
+  else if (bodyScope && key === "hitFlat") row.extraHit = +(row.extraHit || 0) + v;
+  else if (bodyScope && key === "avoidFlat") row.extraAvoid = +(row.extraAvoid || 0) + v;
+  else {
+    row.equipBuffEnabled = true;
+    if (!row.equipBuffName) row.equipBuffName = row.name ? `${row.name} のBuff` : "装備Buff";
+    const map = {
+      attackFlat:"equipBuffFlatAttack", magicFlat:"equipBuffFlatMagic", speedFlat:"equipBuffFlatSpeed",
+      attackPct:"equipBuffAttackPct", magicPct:"equipBuffMagicPct", speedPct:"equipBuffSpeedPct",
+      convMagicRate:"equipBuffConvMagicRate", convSpeedRate:"equipBuffConvSpeedRate",
+      dmgPct:"equipBuffDmgPct"
+    };
+    if (map[key]) row[map[key]] = +(row[map[key]] || 0) + v;
+    else if (key === "specialMultiplier") row.equipBuffSpecial = (+(row.equipBuffSpecial || 1) || 1) * v;
+    else if (key === "flatHP") row.equipBuffExtraHP = +(row.equipBuffExtraHP || 0) + v;
+    else if (key === "flatMP") row.equipBuffExtraMP = +(row.equipBuffExtraMP || 0) + v;
+    else if (key === "flatST") row.equipBuffExtraST = +(row.equipBuffExtraST || 0) + v;
+    else if (key === "flatAC") row.equipBuffExtraAC = +(row.equipBuffExtraAC || 0) + v;
+    else if (key === "flatMaxWeight") row.equipBuffExtraMaxWeight = +(row.equipBuffExtraMaxWeight || 0) + v;
+    else if (key === "hitFlat") row.equipBuffExtraHit = +(row.equipBuffExtraHit || 0) + v;
+    else if (key === "avoidFlat") row.equipBuffExtraAvoid = +(row.equipBuffExtraAvoid || 0) + v;
+    else if (key === "maxWeightPct") row.equipBuffExtraMaxWeightPct = +(row.equipBuffExtraMaxWeightPct || 0) + v;
+    else if (key === "critRatePct") row.equipBuffExtraCritRatePct = +(row.equipBuffExtraCritRatePct || 0) + v;
+  }
+  return true;
+}
+
+function makeQuickEffectAdder(row, context, statusButton=null) {
+  const wrap = document.createElement("div");
+  wrap.className = "quickEffectAdder equipBuffWide";
+
+  const title = document.createElement("div");
+  title.className = "extraStatsTitle";
+  title.textContent = "効果を追加";
+  wrap.appendChild(title);
+
+  const controls = document.createElement("div");
+  controls.className = context === "equipment" ? "quickEffectControls quickEffectControlsEquipment" : "quickEffectControls quickEffectControlsBuff";
+
+  let scope = null;
+  if (context === "equipment") {
+    scope = makeCell("select");
+    scope.className = "quickEffectScope";
+    scope.innerHTML = `<option value="base">装備本体</option><option value="equipBuff">装備Buff</option>`;
+    controls.appendChild(scope);
+  }
+
+  const effect = makeCell("select");
+  effect.className = "quickEffectType";
+  controls.appendChild(effect);
+
+  const targetWrap = document.createElement("div");
+  targetWrap.className = "quickEffectTargetWrap";
+  controls.appendChild(targetWrap);
+
+  const value = makeCell("input", {type:"number", step:"0.1", placeholder:"値"});
+  value.className = "quickEffectValue";
+  controls.appendChild(value);
+
+  const add = makeCell("button", {type:"button"}, "追加");
+  controls.appendChild(add);
+
+  let targetInput = null;
+
+  const currentScope = () => quickEffectScopeFor(context, scope ? scope.value : null);
+
+  const updateTargetInput = () => {
+    const def = quickEffectDef(effect.value);
+    targetWrap.innerHTML = "";
+    targetInput = null;
+    value.placeholder = def.valueLabel || "値";
+
+    if (def.targetKind === "skill") {
+      targetInput = makeCell("select");
+      targetInput.className = "quickEffectTarget";
+      targetInput.innerHTML = SKILL_SIM_ALL.map(name => `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`).join("");
+      targetWrap.appendChild(targetInput);
+    } else if (def.targetKind === "element") {
+      targetInput = makeCell("select");
+      targetInput.className = "quickEffectTarget";
+      targetInput.innerHTML = ELEMENT_DAMAGE_OPTIONS.map(name => `<option value="${escapeHtml(name)}">${escapeHtml(name.replace("属性", ""))}</option>`).join("");
+      targetWrap.appendChild(targetInput);
+    } else if (def.targetKind === "text") {
+      targetInput = makeCell("input", {type:"text", placeholder:def.placeholder || "対象"});
+      targetInput.className = "quickEffectTarget";
+      targetWrap.appendChild(targetInput);
+    } else {
+      const empty = document.createElement("span");
+      empty.className = "small muted";
+      empty.textContent = "対象なし";
+      targetWrap.appendChild(empty);
+    }
+  };
+
+  const rebuildEffectOptions = () => {
+    const s = currentScope();
+    effect.innerHTML = quickEffectOptionsHtml(context, s);
+    updateTargetInput();
+  };
+
+  if (scope) scope.onchange = rebuildEffectOptions;
+  effect.onchange = updateTargetInput;
+
+  add.onclick = () => {
+    const def = quickEffectDef(effect.value);
+    const targetName = targetInput ? targetInput.value : "";
+    const appliedValue = value.value;
+    const appliedScope = currentScope();
+    const ok = applyQuickEffectToRow(row, context, effect.value, appliedValue, targetName, appliedScope);
+    if (!ok) return;
+    row._lastQuickEffectMessage = quickEffectAppliedMessage(context, appliedScope, effect.value, appliedValue, targetName);
+    value.value = "";
+    if (statusButton) updateEquipBuffStatus(statusButton, row);
+    if (context === "equipment") {
+      row._equipBuffOpen = true;
+      renderEquipmentTable();
+    } else {
+      row._compositeExtraOpen = true;
+      renderCompositeTable();
+    }
+    renderTagLinkSummary();
+    renderShowcaseTab();
+    calc();
+  };
+
+  rebuildEffectOptions();
+  wrap.appendChild(controls);
+
+  if (row._lastQuickEffectMessage) {
+    const result = document.createElement("div");
+    result.className = "quickEffectResult";
+    result.textContent = row._lastQuickEffectMessage;
+    wrap.appendChild(result);
+  }
+
+  const help = document.createElement("p");
+  help.className = "small";
+  help.textContent = context === "equipment"
+    ? "追加先を選ぶと、選べる効果が切り替わります。スキル+はスキル一覧から、属性強化は火・水・地・風・無から選べます。"
+    : "このBuff行へ効果を追加します。スキル+はスキル一覧から、属性強化は火・水・地・風・無から選べます。";
+  wrap.appendChild(help);
+
+  const manual = makeAdditionalEffectsList(row, context);
+  wrap.appendChild(manual);
+  return wrap;
+}
+
+function makeAdditionalEffectsList(row, context) {
+  const box = document.createElement("div");
+  box.className = "additionalEffectsList";
+  const effects = normalizeAdditionalEffects(row.extraEffects);
+
+  const head = document.createElement("div");
+  head.className = "additionalEffectsHead";
+  head.textContent = "表示用の追加効果";
+  box.appendChild(head);
+
+  if (!effects.length) {
+    const empty = document.createElement("div");
+    empty.className = "small muted additionalEffectsEmpty";
+    empty.textContent = "スキル+や属性ダメージ%など、表示・連携用の効果はまだありません。";
+    box.appendChild(empty);
+    return box;
+  }
+
+  effects.forEach((effect, idx) => {
+    const item = document.createElement("div");
+    item.className = "additionalEffectItem";
+    item.dataset.effectKey = effect.key || "custom";
+
+    const text = document.createElement("span");
+    text.className = "additionalEffectText";
+    text.textContent = additionalEffectLabel(effect);
+    item.appendChild(text);
+
+    const edit = makeCell("button", {type:"button", class:"miniButton", title:"この表示用効果を編集"}, "編集");
+    edit.onclick = () => {
+      row.extraEffects = normalizeAdditionalEffects(row.extraEffects);
+      const current = row.extraEffects[idx] || effect;
+      const def = quickEffectDef(current.key || "custom");
+
+      let nextName = current.name || "";
+      if (def.targetKind === "skill") {
+        const message = `スキル名を入力してください。\n候補: ${SKILL_SIM_ALL.join(" / ")}`;
+        nextName = prompt(message, current.name || SKILL_SIM_ALL[0] || "");
+        if (nextName === null) return;
+        if (!SKILL_SIM_ALL.includes(nextName)) {
+          alert("スキルシミュレータに存在するスキル名を指定してください。");
+          return;
+        }
+      } else if (def.targetKind === "element") {
+        const message = "属性を入力してください。候補: 火属性 / 水属性 / 地属性 / 風属性 / 無属性";
+        nextName = prompt(message, current.name || "火属性");
+        if (nextName === null) return;
+        if (!ELEMENT_DAMAGE_OPTIONS.includes(nextName)) {
+          alert("属性は 火属性 / 水属性 / 地属性 / 風属性 / 無属性 から指定してください。");
+          return;
+        }
+      } else {
+        nextName = prompt("効果名を入力してください。", current.name || def.placeholder || def.label);
+        if (nextName === null) return;
+      }
+
+      const rawValue = prompt("値を入力してください。", current.value ?? 0);
+      if (rawValue === null) return;
+      const nextValue = parseFloat(rawValue);
+      if (!Number.isFinite(nextValue)) {
+        alert("数値を入力してください。");
+        return;
+      }
+
+      row.extraEffects[idx] = {
+        ...current,
+        name: nextName,
+        value: nextValue,
+        unit: current.unit || def.unit || "",
+        scope: current.scope || "display"
+      };
+
+      if (context === "equipment") {
+        row._equipBuffOpen = true;
+        renderEquipmentTable();
+      } else {
+        row._compositeExtraOpen = true;
+        renderCompositeTable();
+      }
+      renderShowcaseTab();
+      calc();
+    };
+    item.appendChild(edit);
+
+    const del = makeCell("button", {type:"button", class:"dangerMini", title:"この表示用効果を削除"}, "×");
+    del.onclick = () => {
+      row.extraEffects = normalizeAdditionalEffects(row.extraEffects);
+      row.extraEffects.splice(idx, 1);
+      if (context === "equipment") {
+        row._equipBuffOpen = true;
+        renderEquipmentTable();
+      } else {
+        row._compositeExtraOpen = true;
+        renderCompositeTable();
+      }
+      renderShowcaseTab();
+      calc();
+    };
+    item.appendChild(del);
+    box.appendChild(item);
+  });
+  return box;
+}
+
+
 function extraStatNumberInput(row, def, mode="base", onUpdate=null) {
   mode = normalizeExtraMode(mode);
   const prop = extraPropFor(def, mode);
@@ -201,6 +676,11 @@ function extraStatNumberInput(row, def, mode="base", onUpdate=null) {
   return wrap;
 }
 
+function extraStatHasValue(row, def, mode="base") {
+  const prop = extraPropFor(def, mode);
+  return +(row?.[prop] || 0) !== 0;
+}
+
 function makeExtraStatsEditor(row, title, mode="base", onUpdate=null) {
   mode = normalizeExtraMode(mode);
   const wrap = document.createElement("div");
@@ -210,10 +690,25 @@ function makeExtraStatsEditor(row, title, mode="base", onUpdate=null) {
   h.textContent = title;
   wrap.appendChild(h);
 
-  const grid = document.createElement("div");
-  grid.className = "extraStatsGrid";
-  extraFieldDefsFor(mode).forEach(def => grid.appendChild(extraStatNumberInput(row, def, mode, onUpdate)));
-  wrap.appendChild(grid);
+  const help = document.createElement("p");
+  help.className = "small extraStatsHelp";
+  help.textContent = "値が入っている項目だけ表示します。新しく足す時は上の「効果を追加」を使ってください。";
+  wrap.appendChild(help);
+
+  const activeDefs = extraFieldDefsFor(mode).filter(def => extraStatHasValue(row, def, mode));
+
+  const activeGrid = document.createElement("div");
+  activeGrid.className = "extraStatsGrid extraStatsActiveGrid";
+  if (activeDefs.length) {
+    activeDefs.forEach(def => activeGrid.appendChild(extraStatNumberInput(row, def, mode, onUpdate)));
+  } else {
+    const empty = document.createElement("div");
+    empty.className = "small extraStatsEmptyMessage";
+    empty.textContent = "値が入っている項目はありません。";
+    activeGrid.appendChild(empty);
+  }
+  wrap.appendChild(activeGrid);
+
   return wrap;
 }
 
@@ -270,6 +765,7 @@ function defaultEquipmentCandidate(slot, enabled=true) {
     ...extraDefaultFields("base"),
     ...extraDefaultFields("buff"),
     ...extraDefaultFields("equipBuff"),
+    extraEffects: [],
     note: ""
   };
 }
@@ -315,7 +811,8 @@ function normalizeEquipmentCandidate(row, fallbackSlot) {
     equipBuffConvMagicRate: +(row?.equipBuffConvMagicRate || 0),
     equipBuffConvSpeedRate: +(row?.equipBuffConvSpeedRate || 0),
     equipBuffDmgPct: +(row?.equipBuffDmgPct || 0),
-    equipBuffSpecial: row?.equipBuffSpecial === undefined || row?.equipBuffSpecial === "" ? 1 : +(row?.equipBuffSpecial || 1)
+    equipBuffSpecial: row?.equipBuffSpecial === undefined || row?.equipBuffSpecial === "" ? 1 : +(row?.equipBuffSpecial || 1),
+    extraEffects: normalizeAdditionalEffects(row?.extraEffects || row?.additionalEffects || [])
   };
   normalizeExtraStatsOnRow(out, row || {});
   if (+out.delay && !(+out.extraAttackDelay)) out.extraAttackDelay = +out.delay;
@@ -751,7 +1248,8 @@ function equipmentBuffHasEffect(r) {
     +r.equipBuffFlatAttack || +r.equipBuffFlatMagic || +r.equipBuffFlatSpeed ||
     +r.equipBuffConvMagicRate || +r.equipBuffConvSpeedRate || +r.equipBuffDmgPct ||
     (+r.equipBuffSpecial && +r.equipBuffSpecial !== 1) ||
-    extraStatsHasEffect(r, "equipBuff")
+    extraStatsHasEffect(r, "equipBuff") ||
+    additionalEffectsSummary(r, "display").length
   );
 }
 
@@ -773,6 +1271,8 @@ function equipmentBuffEffectText(r) {
   if (+r.equipBuffSpecial && +r.equipBuffSpecial !== 1) parts.push(`特攻×${r.equipBuffSpecial}`);
   const extra = extraStatsEffectText(r, "equipBuff");
   if (extra) parts.push(extra);
+  const displayOnly = additionalEffectsSummary(r, "display");
+  if (displayOnly.length) parts.push(...displayOnly);
   return parts.join(" / ") || "効果なし";
 }
 
@@ -792,6 +1292,7 @@ function equipmentBuffToCompositeRow(r) {
     convSpeedRate: +r.equipBuffConvSpeedRate || 0,
     dmgPct: +r.equipBuffDmgPct || 0,
     special: +r.equipBuffSpecial || 1,
+    extraEffects: normalizeAdditionalEffects(r.extraEffects),
     note: r.equipBuffNote || `装備由来: ${r.name || r.slot || "装備"}`
   };
   extraFieldDefsFor("equipBuff").forEach(d => {
@@ -831,6 +1332,7 @@ function normalizeCompositeRows(rows) {
         ? (+r.dmgPct || 0)
         : ((+r.dmg || 0) > 0 && (+r.dmg || 0) <= 1 ? (+r.dmg || 0) * 100 : (+r.dmg || 0)),
       special: +r.special || 1,
+      extraEffects: normalizeAdditionalEffects(r.extraEffects || r.additionalEffects || []),
       note: r.note || ""
     };
     extraFieldDefsFor("buff").forEach(d => {
@@ -846,7 +1348,8 @@ function compositeHasEffect(r) {
     +r.flatAttack || +r.flatMagic || +r.flatSpeed ||
     +r.convMagicRate || +r.convSpeedRate || +r.dmgPct ||
     (+r.special && +r.special !== 1) ||
-    extraStatsHasEffect(r, "buff")
+    extraStatsHasEffect(r, "buff") ||
+    additionalEffectsSummary(r, "display").length
   );
 }
 /* バフ枠ツールチップ用に、装備以外Buffの効果を人間向けの文字列へまとめる。 */
@@ -864,6 +1367,8 @@ function compositeEffectText(r) {
   if (+r.special && +r.special !== 1) parts.push(`特攻×${r.special}`);
   const extra = extraStatsEffectText(r, false);
   if (extra) parts.push(extra);
+  const displayOnly = additionalEffectsSummary(r, "display");
+  if (displayOnly.length) parts.push(...displayOnly);
   return parts.join(" / ") || "効果なし";
 }
 /**
@@ -1655,9 +2160,9 @@ function compositeNumberCell(row, prop, step="0.1") {
 /* 装備以外Buff表をstate.compositeから描画する。 */
 
 function updateCompositeExtraStatus(button, row) {
-  const has = extraStatsHasEffect(row, "buff");
+  const has = extraStatsHasEffect(row, "buff") || additionalEffectsSummary(row, "display").length;
   button.textContent = has ? "追加あり" : "追加なし";
-  button.classList.toggle("on", has);
+  button.classList.toggle("on", !!has);
 }
 
 function makeCompositeExtraDetailRow(row) {
@@ -1695,7 +2200,8 @@ function compositeExtraCell(row, detailTr) {
   td.appendChild(button);
 
   const holder = detailTr.querySelector(".compositeExtraEditor");
-  holder.appendChild(makeExtraStatsEditor(row, "Buffの追加ステータス（+ / % / クリ率。攻撃ディレイ固定値は装備本体側）", "buff", () => updateCompositeExtraStatus(button, row)));
+  holder.appendChild(makeQuickEffectAdder(row, "composite", button));
+  holder.appendChild(makeExtraStatsEditor(row, "入力済みの追加ステータス", "buff", () => updateCompositeExtraStatus(button, row)));
 
   return td;
 }
@@ -2042,7 +2548,7 @@ function equipBuffStatusText(row) {
 }
 
 function updateEquipBuffStatus(button, row) {
-  const baseExtra = extraStatsHasEffect(row, "base");
+  const baseExtra = extraStatsHasEffect(row, "base") || additionalEffectsSummary(row, "display").length;
   const weaponText = weaponCalcStatusText(row);
   const buffText = row.equipBuffEnabled ? `Buff ON: ${equipmentBuffDisplayName(row)}` : "Buffなし";
   const suffix = [weaponText, baseExtra ? "追加あり" : ""].filter(Boolean).join(" / ");
@@ -2066,9 +2572,26 @@ function makeEquipmentBuffEditor(row, statusButton) {
   const grid = document.createElement("div");
   grid.className = "equipBuffGrid equipBuffGridRow";
 
+  const statusUpdater = () => updateEquipBuffStatus(statusButton, row);
+
+  grid.appendChild(makeQuickEffectAdder(row, "equipment", statusButton));
+
   if (isWeaponEquipmentRow(row)) {
     grid.appendChild(makeWeaponCalcEditor(row, statusButton));
   }
+
+  grid.appendChild(makeExtraStatsEditor(row, "装備本体の追加ステータス", "base", statusUpdater));
+
+  const buffSection = document.createElement("div");
+  buffSection.className = "equipBuffSection equipBuffWide";
+
+  const buffTitle = document.createElement("div");
+  buffTitle.className = "extraStatsTitle";
+  buffTitle.textContent = "装備Buff";
+  buffSection.appendChild(buffTitle);
+
+  const buffTop = document.createElement("div");
+  buffTop.className = "equipBuffTopControls";
 
   const enabledLabel = document.createElement("label");
   enabledLabel.className = "equipBuffInline";
@@ -2080,7 +2603,7 @@ function makeEquipmentBuffEditor(row, statusButton) {
   };
   enabledLabel.appendChild(enabled);
   enabledLabel.appendChild(document.createTextNode("Buffあり"));
-  grid.appendChild(enabledLabel);
+  buffTop.appendChild(enabledLabel);
 
   const slotLabel = document.createElement("label");
   slotLabel.className = "equipBuffInline";
@@ -2091,10 +2614,12 @@ function makeEquipmentBuffEditor(row, statusButton) {
   };
   slotLabel.appendChild(slot);
   slotLabel.appendChild(document.createTextNode("Buff枠を使う"));
-  grid.appendChild(slotLabel);
+  buffTop.appendChild(slotLabel);
+
+  buffSection.appendChild(buffTop);
 
   const nameMemoRow = document.createElement("div");
-  nameMemoRow.className = "equipBuffNameMemoRow equipBuffWide";
+  nameMemoRow.className = "equipBuffNameMemoRow";
 
   const nameLabel = document.createElement("label");
   nameLabel.className = "equipBuffNameLabel";
@@ -2116,27 +2641,30 @@ function makeEquipmentBuffEditor(row, statusButton) {
 
   nameMemoRow.appendChild(nameLabel);
   nameMemoRow.appendChild(noteLabel);
-  grid.appendChild(nameMemoRow);
+  buffSection.appendChild(nameMemoRow);
 
-  grid.appendChild(equipBuffNumberInput(row, "equipBuffAttackPct", "攻撃力%", "1"));
-  grid.appendChild(equipBuffNumberInput(row, "equipBuffMagicPct", "魔力%", "1"));
-  grid.appendChild(equipBuffNumberInput(row, "equipBuffSpeedPct", "速度%", "1"));
-  grid.appendChild(equipBuffNumberInput(row, "equipBuffFlatAttack", "攻撃力+", "0.1"));
-  grid.appendChild(equipBuffNumberInput(row, "equipBuffFlatMagic", "魔力+", "0.1"));
-  grid.appendChild(equipBuffNumberInput(row, "equipBuffFlatSpeed", "速度+", "0.1"));
-  grid.appendChild(equipBuffNumberInput(row, "equipBuffConvMagicRate", "魔力→攻撃力%", "1"));
-  grid.appendChild(equipBuffNumberInput(row, "equipBuffConvSpeedRate", "速度→攻撃力%", "1"));
-  grid.appendChild(equipBuffNumberInput(row, "equipBuffDmgPct", "与ダメ%", "1"));
-  grid.appendChild(equipBuffNumberInput(row, "equipBuffSpecial", "特攻倍率", "0.01"));
+  const buffGrid = document.createElement("div");
+  buffGrid.className = "equipBuffDirectGrid";
+  buffGrid.appendChild(equipBuffNumberInput(row, "equipBuffAttackPct", "攻撃力%", "1"));
+  buffGrid.appendChild(equipBuffNumberInput(row, "equipBuffMagicPct", "魔力%", "1"));
+  buffGrid.appendChild(equipBuffNumberInput(row, "equipBuffSpeedPct", "速度%", "1"));
+  buffGrid.appendChild(equipBuffNumberInput(row, "equipBuffFlatAttack", "攻撃力+", "0.1"));
+  buffGrid.appendChild(equipBuffNumberInput(row, "equipBuffFlatMagic", "魔力+", "0.1"));
+  buffGrid.appendChild(equipBuffNumberInput(row, "equipBuffFlatSpeed", "速度+", "0.1"));
+  buffGrid.appendChild(equipBuffNumberInput(row, "equipBuffConvMagicRate", "魔力→攻撃力%", "1"));
+  buffGrid.appendChild(equipBuffNumberInput(row, "equipBuffConvSpeedRate", "速度→攻撃力%", "1"));
+  buffGrid.appendChild(equipBuffNumberInput(row, "equipBuffDmgPct", "与ダメ%", "1"));
+  buffGrid.appendChild(equipBuffNumberInput(row, "equipBuffSpecial", "特攻倍率", "0.01"));
+  buffSection.appendChild(buffGrid);
 
-  const statusUpdater = () => updateEquipBuffStatus(statusButton, row);
-  grid.appendChild(makeExtraStatsEditor(row, "装備本体の追加ステータス（Buffではない / 攻撃・魔法ディレイ含む）", "base", statusUpdater));
-  grid.appendChild(makeExtraStatsEditor(row, "装備Buffの追加ステータス（Buff ON時だけ反映 / +と%（攻撃ディレイ固定値は本体側））", "equipBuff", statusUpdater));
+  buffSection.appendChild(makeExtraStatsEditor(row, "装備Buffの追加ステータス", "equipBuff", statusUpdater));
 
   const help = document.createElement("div");
-  help.className = "small equipBuffWide";
-  help.textContent = "%欄は10%なら10。装備本体の追加ステータスは装備ON時、装備Buff側はBuff ONかつ効果ありの場合だけ反映します。";
-  grid.appendChild(help);
+  help.className = "small";
+  help.textContent = "%欄は10%なら10。装備本体は装備ON時、装備BuffはBuff ONかつ効果ありの場合だけ反映します。";
+  buffSection.appendChild(help);
+
+  grid.appendChild(buffSection);
 
   return grid;
 }
@@ -2162,7 +2690,7 @@ function makeEquipmentBuffDetailRow(row, includeSlot, statusButton) {
   detailTr.style.display = row._equipBuffOpen ? "" : "none";
 
   const td = makeCell("td");
-  td.colSpan = includeSlot ? 12 : 11;
+  td.colSpan = includeSlot ? 9 : 8;
   td.className = "equipBuffDetailCell";
 
   const title = document.createElement("div");
@@ -2338,17 +2866,6 @@ function makeEquipmentInputRow(row, includeSlot=true, idx=0) {
   };
   tr.appendChild(makeCell("td")).appendChild(name);
 
-  const attack = makeCell("input", {class:"equipNum", type:"number", step:"1", value: row.attack ?? 0});
-  attack.oninput = () => { row.attack = parseFloat(attack.value) || 0; calc(); };
-  tr.appendChild(makeCell("td")).appendChild(attack);
-
-  const magic = makeCell("input", {class:"equipNum", type:"number", step:"1", value: row.magic ?? 0});
-  magic.oninput = () => { row.magic = parseFloat(magic.value) || 0; calc(); };
-  tr.appendChild(makeCell("td")).appendChild(magic);
-
-  const speed = makeCell("input", {class:"equipNum", type:"number", step:"1", value: row.speed ?? 0});
-  speed.oninput = () => { row.speed = parseFloat(speed.value) || 0; calc(); };
-  tr.appendChild(makeCell("td")).appendChild(speed);
 
   const dummyButton = makeCell("button", {type:"button", class:"equipBuffToggle"});
   const detailTr = makeEquipmentBuffDetailRow(row, includeSlot, dummyButton);

@@ -77,7 +77,7 @@ function serializeConfigAsTsv(cfg) {
   ));
 
   out.push(makeTsvSection("composite",
-    ["enabled", "slot", "name", "tags", "attackPct", "magicPct", "speedPct", "flatAttack", "flatMagic", "flatSpeed", "convMagicRate", "convSpeedRate", "dmgPct", "special"].concat(extraTsvFields("buff"), ["note"]),
+    ["enabled", "slot", "name", "tags", "attackPct", "magicPct", "speedPct", "flatAttack", "flatMagic", "flatSpeed", "convMagicRate", "convSpeedRate", "dmgPct", "special"].concat(extraTsvFields("buff"), ["extraEffects", "note"]),
     normalizeCompositeRows(st.composite || []).map(r => ({
       enabled: boolToCell(r.enabled),
       slot: boolToCell(r.slot),
@@ -94,6 +94,7 @@ function serializeConfigAsTsv(cfg) {
       dmgPct: r.dmgPct ?? 0,
       special: r.special ?? 1,
       ...extraTsvExportFields(r, "buff"),
+      extraEffects: serializeAdditionalEffectsText(r.extraEffects),
       note: r.note || ""
     }))
   ));
@@ -107,7 +108,7 @@ function serializeConfigAsTsv(cfg) {
   ));
 
   out.push(makeTsvSection("equipment",
-    ["enabled", "optimizerFixed", "optimizerExcluded", "slot", "name", "tags", "attack", "magic", "speed", "delay", "weaponDamage", "weaponWeight", "weaponAttackInterval", "weaponRange", "weaponDurability", "weaponTwoHanded", "weaponReqText"].concat(extraTsvFields("base"), ["equipBuffEnabled", "equipBuffSlot", "equipBuffName", "equipBuffAttackPct", "equipBuffMagicPct", "equipBuffSpeedPct", "equipBuffFlatAttack", "equipBuffFlatMagic", "equipBuffFlatSpeed", "equipBuffConvMagicRate", "equipBuffConvSpeedRate", "equipBuffDmgPct", "equipBuffSpecial"], extraTsvFields("equipBuff"), ["equipBuffNote", "note"]),
+    ["enabled", "optimizerFixed", "optimizerExcluded", "slot", "name", "tags", "attack", "magic", "speed", "delay", "weaponDamage", "weaponWeight", "weaponAttackInterval", "weaponRange", "weaponDurability", "weaponTwoHanded", "weaponReqText"].concat(extraTsvFields("base"), ["equipBuffEnabled", "equipBuffSlot", "equipBuffName", "equipBuffAttackPct", "equipBuffMagicPct", "equipBuffSpeedPct", "equipBuffFlatAttack", "equipBuffFlatMagic", "equipBuffFlatSpeed", "equipBuffConvMagicRate", "equipBuffConvSpeedRate", "equipBuffDmgPct", "equipBuffSpecial"], extraTsvFields("equipBuff"), ["equipBuffNote", "extraEffects", "note"]),
     normalizeEquipmentRows(st.equipment || []).map(r => ({
       enabled: boolToCell(r.enabled !== false),
       optimizerFixed: boolToCell(r.optimizerFixed),
@@ -142,6 +143,7 @@ function serializeConfigAsTsv(cfg) {
       equipBuffSpecial: r.equipBuffSpecial ?? 1,
       ...extraTsvExportFields(r, "equipBuff"),
       equipBuffNote: r.equipBuffNote || "",
+      extraEffects: serializeAdditionalEffectsText(r.extraEffects),
       note: r.note || ""
     }))
   ));
@@ -308,6 +310,7 @@ function parseConfigFromTsv(text) {
         : (cellToNum(r.dmg) > 0 && cellToNum(r.dmg) <= 1 ? cellToNum(r.dmg) * 100 : cellToNum(r.dmg)),
       special: r.special === undefined || r.special === "" ? 1 : cellToNum(r.special),
       ...extraTsvParseFields(r, "buff"),
+      extraEffects: parseAdditionalEffectsText(r.extraEffects || r.additionalEffects || ""),
       note: r.note || ""
     })),
     equipment: (sections.equipment?.rows || []).map(r => ({
@@ -344,6 +347,7 @@ function parseConfigFromTsv(text) {
       equipBuffSpecial: r.equipBuffSpecial === undefined || r.equipBuffSpecial === "" ? 1 : cellToNum(r.equipBuffSpecial),
       ...extraTsvParseFields(r, "equipBuff"),
       equipBuffNote: r.equipBuffNote || "",
+      extraEffects: parseAdditionalEffectsText(r.extraEffects || r.additionalEffects || ""),
       note: r.note || ""
     })),
     pct: (sections.pct?.rows || []).map(r => ({
@@ -498,6 +502,298 @@ function importTsvConfig() {
     alert("TSVの読み込みに失敗: " + e.message);
   }
 }
+
+
+function equipmentOnlyHeaders() {
+  return ["enabled", "optimizerFixed", "optimizerExcluded", "slot", "name", "tags", "attack", "magic", "speed", "weaponDamage", "weaponWeight", "weaponAttackInterval", "weaponRange", "weaponDurability", "weaponTwoHanded", "weaponReqText"]
+    .concat(extraTsvFields("base"), ["equipBuffEnabled", "equipBuffSlot", "equipBuffName", "equipBuffAttackPct", "equipBuffMagicPct", "equipBuffSpeedPct", "equipBuffFlatAttack", "equipBuffFlatMagic", "equipBuffFlatSpeed", "equipBuffConvMagicRate", "equipBuffConvSpeedRate", "equipBuffDmgPct", "equipBuffSpecial"], extraTsvFields("equipBuff"), ["equipBuffNote", "extraEffects", "note"]);
+}
+
+function equipmentOnlyRows(rows=null) {
+  return normalizeEquipmentRows(rows || state.equipment).map(r => ({
+    enabled: boolToCell(r.enabled !== false),
+    optimizerFixed: boolToCell(r.optimizerFixed),
+    optimizerExcluded: boolToCell(r.optimizerExcluded),
+    slot: r.slot || "",
+    name: r.name || "",
+    tags: r.tags || "",
+    attack: r.attack ?? 0,
+    magic: r.magic ?? 0,
+    speed: r.speed ?? 0,
+    weaponDamage: r.weaponDamage ?? 0,
+    weaponWeight: r.weaponWeight ?? 0,
+    weaponAttackInterval: r.weaponAttackInterval ?? 0,
+    weaponRange: r.weaponRange ?? 0,
+    weaponDurability: r.weaponDurability ?? 0,
+    weaponTwoHanded: r.weaponTwoHanded || "×",
+    weaponReqText: serializeWeaponReqText(r.weaponReq),
+    ...extraTsvExportFields(r, "base"),
+    equipBuffEnabled: boolToCell(r.equipBuffEnabled),
+    equipBuffSlot: boolToCell(r.equipBuffSlot !== false),
+    equipBuffName: r.equipBuffName || "",
+    equipBuffAttackPct: r.equipBuffAttackPct ?? 0,
+    equipBuffMagicPct: r.equipBuffMagicPct ?? 0,
+    equipBuffSpeedPct: r.equipBuffSpeedPct ?? 0,
+    equipBuffFlatAttack: r.equipBuffFlatAttack ?? 0,
+    equipBuffFlatMagic: r.equipBuffFlatMagic ?? 0,
+    equipBuffFlatSpeed: r.equipBuffFlatSpeed ?? 0,
+    equipBuffConvMagicRate: r.equipBuffConvMagicRate ?? 0,
+    equipBuffConvSpeedRate: r.equipBuffConvSpeedRate ?? 0,
+    equipBuffDmgPct: r.equipBuffDmgPct ?? 0,
+    equipBuffSpecial: r.equipBuffSpecial ?? 1,
+    ...extraTsvExportFields(r, "equipBuff"),
+    equipBuffNote: r.equipBuffNote || "",
+    extraEffects: serializeAdditionalEffectsText(r.extraEffects),
+    note: r.note || ""
+  }));
+}
+
+function equipmentFromTsvRows(rows) {
+  return rows.map(r => ({
+    enabled: r.enabled === undefined || r.enabled === "" ? true : cellToBool(r.enabled),
+    optimizerFixed: cellToBool(r.optimizerFixed || r.optimizerFix || r.fixedInOptimizer || r.searchFixed),
+    optimizerExcluded: cellToBool(r.optimizerExcluded || r.optimizerExclude || r.excludeFromOptimizer || r.searchExcluded),
+    slot: r.slot || "",
+    name: r.name || "",
+    tags: r.tags || r.tag || "",
+    attack: cellToNum(r.attack),
+    magic: cellToNum(r.magic),
+    speed: cellToNum(r.speed),
+    weaponDamage: cellToNum(r.weaponDamage),
+    weaponWeight: cellToNum(r.weaponWeight),
+    weaponAttackInterval: cellToNum(r.weaponAttackInterval),
+    weaponRange: cellToNum(r.weaponRange),
+    weaponDurability: cellToNum(r.weaponDurability),
+    weaponTwoHanded: (r.weaponTwoHanded === "○" || r.weaponTwoHanded === "true" || r.weaponTwoHanded === "yes") ? "○" : "×",
+    weaponReq: parseWeaponReqText(r.weaponReqText),
+    ...extraTsvParseFields(r, "base"),
+    equipBuffEnabled: cellToBool(r.equipBuffEnabled),
+    equipBuffSlot: r.equipBuffSlot === undefined || r.equipBuffSlot === "" ? true : cellToBool(r.equipBuffSlot),
+    equipBuffName: r.equipBuffName || "",
+    equipBuffAttackPct: cellToNum(r.equipBuffAttackPct),
+    equipBuffMagicPct: cellToNum(r.equipBuffMagicPct),
+    equipBuffSpeedPct: cellToNum(r.equipBuffSpeedPct),
+    equipBuffFlatAttack: cellToNum(r.equipBuffFlatAttack),
+    equipBuffFlatMagic: cellToNum(r.equipBuffFlatMagic),
+    equipBuffFlatSpeed: cellToNum(r.equipBuffFlatSpeed),
+    equipBuffConvMagicRate: cellToNum(r.equipBuffConvMagicRate),
+    equipBuffConvSpeedRate: cellToNum(r.equipBuffConvSpeedRate),
+    equipBuffDmgPct: cellToNum(r.equipBuffDmgPct),
+    equipBuffSpecial: r.equipBuffSpecial === undefined || r.equipBuffSpecial === "" ? 1 : cellToNum(r.equipBuffSpecial),
+    ...extraTsvParseFields(r, "equipBuff"),
+    equipBuffNote: r.equipBuffNote || "",
+    extraEffects: parseAdditionalEffectsText(r.extraEffects || r.additionalEffects || ""),
+    note: r.note || ""
+  }));
+}
+
+function parsePlainTsvRows(text) {
+  const lines = String(text || "").split(/\r?\n/).filter(line => line.trim() && !line.trim().startsWith("#"));
+  if (lines[0] && /^\[[^\]]+\]$/.test(lines[0].trim())) return null;
+  if (lines.length < 2) return [];
+  const headers = lines[0].split("\t").map(tsvUnescape);
+  return lines.slice(1).map(line => {
+    const cells = line.split("\t").map(tsvUnescape);
+    const obj = {};
+    headers.forEach((h, i) => obj[h] = cells[i] ?? "");
+    return obj;
+  });
+}
+
+function exportEquipmentOnlyTsv() {
+  byId("equipmentImportExportBox").value = makeTsvSection("equipment", equipmentOnlyHeaders(), equipmentOnlyRows());
+}
+
+function exportEquipmentOnlyJson() {
+  byId("equipmentImportExportBox").value = JSON.stringify({equipment: normalizeEquipmentRows(state.equipment)}, null, 2);
+}
+
+function exportEquipmentTemplateTsv() {
+  const sample = [{
+    enabled:"1", optimizerFixed:"0", optimizerExcluded:"0", slot:"武器: 右手", name:"サンプル武器", tags:"",
+    attack:0, magic:0, speed:0, weaponDamage:100, weaponWeight:15, weaponAttackInterval:250, weaponRange:4.5, weaponDurability:32,
+    weaponTwoHanded:"○", weaponReqText:"こんぼう:100;筋力:100",
+    equipBuffEnabled:"1", equipBuffSlot:"1", equipBuffName:"サンプル装備Buff", equipBuffAttackPct:0, equipBuffMagicPct:0, equipBuffSpeedPct:0,
+    equipBuffFlatAttack:0, equipBuffFlatMagic:0, equipBuffFlatSpeed:0, equipBuffConvMagicRate:0, equipBuffConvSpeedRate:0, equipBuffDmgPct:10, equipBuffSpecial:1,
+    equipBuffNote:"", extraEffects:"skillPlus|こんぼう|3||display|; elementDamagePct|火属性|10|%|display|", note:""
+  }];
+  const rows = sample.map(r => ({...Object.fromEntries(equipmentOnlyHeaders().map(h => [h, ""])), ...r}));
+  byId("equipmentImportExportBox").value = [
+    "# 装備登録だけを読み込むTSVテンプレート",
+    "# 使い方: このTSVを表計算ソフトに貼り付け、行を増やしてからこの欄に戻して「装備を読み込み」します。",
+    "# slot例: 武器: 右手 / 武器: 左手 / 武器: 弾丸 / 防具: 頭 / 防具: 胴 / 装飾: 指",
+    "# 攻撃力・魔力・速度は attack / magic / speed に入ります。ツール上では詳細内の装備本体ステータスとして表示されます。",
+    "# 表示用追加効果 extraEffects 例: skillPlus|こんぼう|3||display|; elementDamagePct|火属性|10|%|display|",
+    "# extraEffectsのkey例: skillPlus / elementDamagePct / custom",
+    makeTsvSection("equipment", equipmentOnlyHeaders(), rows)
+  ].join("\n");
+}
+
+function importEquipmentOnly() {
+  const text = byId("equipmentImportExportBox").value;
+  try {
+    let rows;
+    const trimmed = String(text || "").trim();
+    if (!trimmed) return alert("読み込む装備データを貼り付けてください。");
+    if (trimmed.startsWith("{") || trimmed.startsWith("[")) {
+      const parsed = JSON.parse(trimmed);
+      rows = Array.isArray(parsed) ? parsed : parsed.equipment;
+    } else {
+      const plain = parsePlainTsvRows(text);
+      rows = plain || (parseTsvSections(text).equipment?.rows || []);
+      rows = equipmentFromTsvRows(rows);
+    }
+    if (!Array.isArray(rows)) throw new Error("equipment配列または[equipment]セクションが見つかりません。");
+    if (!confirm("現在の装備登録を、貼り付けた装備データで置き換えます。よろしいですか？")) return;
+    state.equipment = normalizeEquipmentRows(rows);
+    renderEquipmentTable();
+    renderTagLinkSummary();
+    renderShowcaseTab();
+    calc();
+  } catch (e) {
+    alert("装備データの読み込みに失敗: " + e.message);
+  }
+}
+
+function compositeOnlyHeaders() {
+  return ["enabled", "slot", "name", "tags", "attackPct", "magicPct", "speedPct", "flatAttack", "flatMagic", "flatSpeed", "convMagicRate", "convSpeedRate", "dmgPct", "special"]
+    .concat(extraTsvFields("buff"), ["extraEffects", "note"]);
+}
+
+function compositeOnlyRows(rows=null) {
+  return normalizeCompositeRows(rows || state.composite).map(r => ({
+    enabled: boolToCell(r.enabled),
+    slot: boolToCell(r.slot),
+    name: r.name || "",
+    tags: r.tags || "",
+    attackPct: r.attackPct ?? 0,
+    magicPct: r.magicPct ?? 0,
+    speedPct: r.speedPct ?? 0,
+    flatAttack: r.flatAttack ?? 0,
+    flatMagic: r.flatMagic ?? 0,
+    flatSpeed: r.flatSpeed ?? 0,
+    convMagicRate: r.convMagicRate ?? 0,
+    convSpeedRate: r.convSpeedRate ?? 0,
+    dmgPct: r.dmgPct ?? 0,
+    special: r.special ?? 1,
+    ...extraTsvExportFields(r, "buff"),
+    extraEffects: serializeAdditionalEffectsText(r.extraEffects),
+    note: r.note || ""
+  }));
+}
+
+function compositeFromTsvRows(rows) {
+  return rows.map(r => ({
+    enabled: r.enabled === undefined || r.enabled === "" ? true : cellToBool(r.enabled),
+    slot: r.slot === undefined || r.slot === "" ? true : cellToBool(r.slot),
+    name: r.name || "装備以外Buff",
+    tags: r.tags || r.tag || "",
+    attackPct: cellToNum(r.attackPct),
+    magicPct: cellToNum(r.magicPct),
+    speedPct: cellToNum(r.speedPct),
+    flatAttack: cellToNum(r.flatAttack),
+    flatMagic: cellToNum(r.flatMagic),
+    flatSpeed: cellToNum(r.flatSpeed),
+    convMagicRate: cellToNum(r.convMagicRate),
+    convSpeedRate: cellToNum(r.convSpeedRate),
+    dmgPct: cellToNum(r.dmgPct),
+    special: r.special === undefined || r.special === "" ? 1 : cellToNum(r.special),
+    ...extraTsvParseFields(r, "buff"),
+    extraEffects: parseAdditionalEffectsText(r.extraEffects || r.additionalEffects || ""),
+    note: r.note || ""
+  }));
+}
+
+function exportBuffOnlyTsv() {
+  byId("buffImportExportBox").value = [
+    makeTsvSection("composite", compositeOnlyHeaders(), compositeOnlyRows()),
+    makeTsvSection("post", ["enabled", "slot", "name", "tags", "value", "note"], (state.post || []).map(r => ({
+      enabled: boolToCell(r.enabled), slot: boolToCell(r.slot), name:r.name || "", tags:r.tags || "", value:r.value ?? 1, note:r.note || ""
+    }))),
+    makeTsvSection("other", ["enabled", "name", "tags", "note"], (state.other || []).map(r => ({
+      enabled: boolToCell(r.enabled), name:r.name || "", tags:r.tags || "", note:r.note || ""
+    })))
+  ].join("\n");
+}
+
+function exportBuffOnlyJson() {
+  byId("buffImportExportBox").value = JSON.stringify({
+    composite: normalizeCompositeRows(state.composite),
+    post: state.post || [],
+    other: state.other || []
+  }, null, 2);
+}
+
+function exportBuffTemplateTsv() {
+  const sampleComposite = [{
+    enabled:"1", slot:"1", name:"サンプルBuff", tags:"", attackPct:15, magicPct:0, speedPct:0, flatAttack:0, flatMagic:0, flatSpeed:0,
+    convMagicRate:0, convSpeedRate:0, dmgPct:10, special:1, extraEffects:"skillPlus|こんぼう|3||display|; elementDamagePct|火属性|10|%|display|", note:""
+  }];
+  const rows = sampleComposite.map(r => ({...Object.fromEntries(compositeOnlyHeaders().map(h => [h, ""])), ...r}));
+  byId("buffImportExportBox").value = [
+    "# Buff登録だけを読み込むTSVテンプレート",
+    "# 使い方: composite=通常Buff / post=外枠補正 / other=枠だけ数えるBuff",
+    "# %欄は10%なら10。specialは倍率なので1.1倍なら1.1。",
+    "# 表示用追加効果 extraEffects 例: skillPlus|戦闘技術|3||display|; elementDamagePct|火属性|10|%|display|",
+    "# extraEffectsのkey例: skillPlus / elementDamagePct / custom",
+    makeTsvSection("composite", compositeOnlyHeaders(), rows),
+    makeTsvSection("post", ["enabled", "slot", "name", "tags", "value", "note"], [
+      {enabled:"1", slot:"0", name:"サンプル外枠補正", tags:"", value:1.1, note:"最後に1.1倍"}
+    ]),
+    makeTsvSection("other", ["enabled", "name", "tags", "note"], [
+      {enabled:"1", name:"サンプルその他バフ", tags:"", note:"枠だけ数える"}
+    ])
+  ].join("\n");
+}
+
+function importBuffOnly() {
+  const text = byId("buffImportExportBox").value;
+  try {
+    const trimmed = String(text || "").trim();
+    if (!trimmed) return alert("読み込むBuffデータを貼り付けてください。");
+    let composite, post, other;
+    if (trimmed.startsWith("{") || trimmed.startsWith("[")) {
+      const parsed = JSON.parse(trimmed);
+      if (Array.isArray(parsed)) composite = parsed;
+      else {
+        composite = parsed.composite;
+        post = parsed.post;
+        other = parsed.other;
+      }
+    } else {
+      const plain = parsePlainTsvRows(text);
+      if (plain) {
+        composite = compositeFromTsvRows(plain);
+      } else {
+        const sections = parseTsvSections(text);
+        composite = compositeFromTsvRows(sections.composite?.rows || []);
+        post = (sections.post?.rows || []).map(r => ({
+          enabled: r.enabled === undefined || r.enabled === "" ? true : cellToBool(r.enabled),
+          slot: r.slot === undefined || r.slot === "" ? true : cellToBool(r.slot),
+          name: r.name || "", tags: r.tags || r.tag || "", value: cellToNum(r.value) || 1, note: r.note || ""
+        }));
+        other = (sections.other?.rows || []).map(r => ({
+          enabled: r.enabled === undefined || r.enabled === "" ? true : cellToBool(r.enabled),
+          name: r.name || "", tags: r.tags || r.tag || "", note: r.note || ""
+        }));
+      }
+    }
+    if (!Array.isArray(composite)) throw new Error("composite配列または[composite]セクションが見つかりません。");
+    if (!confirm("現在のBuff登録を、貼り付けたBuffデータで置き換えます。よろしいですか？")) return;
+    state.composite = normalizeCompositeRows(composite);
+    if (Array.isArray(post)) state.post = post;
+    if (Array.isArray(other)) state.other = other;
+    renderCompositeTable();
+    renderNumericTable("post");
+    renderOtherTable();
+    renderTagLinkSummary();
+    renderShowcaseTab();
+    calc();
+  } catch (e) {
+    alert("Buffデータの読み込みに失敗: " + e.message);
+  }
+}
+
 /* localStorageの現在構成を削除し、初期状態へ戻す。 */
 function resetConfig() {
   if (!confirm("保存済み設定をリセットして初期状態に戻しますか？")) return;

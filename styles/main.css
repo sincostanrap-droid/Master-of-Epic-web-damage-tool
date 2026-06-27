@@ -2660,3 +2660,194 @@
   margin: 4px 0;
   line-height: 1.55;
 }
+
+
+/* 効果追加UI・部分インポート */
+.quickEffectAdder {
+  margin: 10px 0;
+  padding: 10px;
+  border: 1px solid rgba(120, 110, 130, .20);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, .58);
+}
+.quickEffectControls {
+  display: grid;
+  grid-template-columns: minmax(150px, 1.2fr) minmax(140px, 1fr) minmax(90px, .6fr) minmax(120px, .8fr) auto;
+  gap: 8px;
+  align-items: center;
+}
+.compositeExtraEditor .quickEffectControls {
+  grid-template-columns: minmax(150px, 1.2fr) minmax(140px, 1fr) minmax(90px, .6fr) auto;
+}
+.quickEffectControls input,
+.quickEffectControls select {
+  width: 100%;
+}
+.additionalEffectsList {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+.additionalEffectItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 7px;
+  border-radius: 999px;
+  background: rgba(238, 244, 255, .9);
+  border: 1px solid rgba(120, 145, 200, .25);
+  font-size: 12px;
+}
+.sectionImportExportBox {
+  margin: 14px 0 4px;
+  padding: 12px;
+  border: 1px solid rgba(120, 110, 130, .22);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, .62);
+}
+.sectionImportExportBox h3 {
+  margin: 0 0 6px;
+}
+.partialImportActions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 8px 0;
+}
+.partialImportBox {
+  width: 100%;
+  min-height: 130px;
+  box-sizing: border-box;
+  font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+  font-size: 12px;
+}
+@media (max-width: 760px) {
+  .quickEffectControls,
+  .compositeExtraEditor .quickEffectControls {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* v1.13: 追加ステータス欄は値が入っている項目だけを先に見せる */
+.extraStatsHelp {
+  margin: 4px 0 8px;
+}
+.extraStatsActiveGrid {
+  margin-bottom: 8px;
+}
+.extraStatsEmptyMessage {
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(248, 248, 250, .9);
+  color: #666;
+}
+.extraStatsAllFields {
+  margin-top: 8px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(250, 248, 252, .8);
+  border: 1px solid rgba(120, 110, 130, .16);
+}
+.extraStatsAllFields summary {
+  cursor: pointer;
+  font-weight: 800;
+}
+.extraStatsAllFields .extraStatsGrid {
+  margin-top: 8px;
+}
+
+
+/* v1.14: 追加先に応じて効果リストを切り替えるUI */
+.quickEffectControlsEquipment {
+  grid-template-columns: minmax(120px, .8fr) minmax(160px, 1.1fr) minmax(140px, .9fr) minmax(90px, .6fr) auto;
+}
+.quickEffectControlsBuff {
+  grid-template-columns: minmax(170px, 1.2fr) minmax(140px, .9fr) minmax(90px, .6fr) auto;
+}
+.quickEffectTargetWrap {
+  min-width: 0;
+}
+.quickEffectScope,
+.quickEffectType,
+.quickEffectTarget {
+  width: 100%;
+}
+@media (max-width: 760px) {
+  .quickEffectControlsEquipment,
+  .quickEffectControlsBuff {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* v1.15: 装備詳細のレイアウト整理 */
+.equipBuffSection {
+  margin-top: 12px;
+  padding: 12px;
+  border: 1px solid rgba(120, 110, 130, .20);
+  border-radius: 14px;
+  background: rgba(250, 248, 252, .78);
+}
+.equipBuffTopControls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 6px 0 8px;
+}
+.equipBuffDirectGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 8px;
+  margin: 8px 0;
+}
+.equipBuffDirectGrid label {
+  min-width: 0;
+}
+
+
+/* v1.16: 効果追加UIの仕上げ */
+.quickEffectResult {
+  margin-top: 8px;
+  padding: 7px 9px;
+  border-radius: 10px;
+  background: rgba(232, 246, 238, .95);
+  border: 1px solid rgba(80, 150, 100, .25);
+  font-size: 12px;
+  font-weight: 700;
+}
+.additionalEffectsList {
+  display: block;
+}
+.additionalEffectsHead {
+  font-size: 12px;
+  font-weight: 800;
+  margin: 8px 0 6px;
+}
+.additionalEffectsEmpty {
+  padding: 6px 8px;
+  border-radius: 10px;
+  background: rgba(248, 248, 250, .85);
+}
+.additionalEffectItem {
+  display: grid;
+  grid-template-columns: minmax(160px, 1fr) auto auto;
+  align-items: center;
+  gap: 6px;
+  margin: 5px 0;
+  padding: 6px 7px;
+  border-radius: 10px;
+}
+.additionalEffectText {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-weight: 700;
+}
+.miniButton {
+  padding: 3px 7px;
+  font-size: 12px;
+}
+.quickEffectType optgroup {
+  font-weight: 800;
+}
