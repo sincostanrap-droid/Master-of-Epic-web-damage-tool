@@ -2500,6 +2500,119 @@ MoE固有の主な仮定:
     background: rgba(255, 250, 240, .72);
   }
 
+
+  /* 装備テーブル: 固定/除外列を小さく固定 */
+  .optimizerFixedHeader,
+  .optimizerExcludeHeader {
+    font-size: 11px !important;
+    letter-spacing: 0 !important;
+    text-align: center !important;
+  }
+  .equipmentOptimizerFixedCell,
+  .equipmentOptimizerExcludeCell {
+    text-align: center !important;
+    white-space: nowrap !important;
+    padding-left: 2px !important;
+    padding-right: 2px !important;
+  }
+  .equipmentOptimizerFixedCell input,
+  .equipmentOptimizerExcludeCell input {
+    width: 14px !important;
+    height: 14px !important;
+    margin: 0 !important;
+    vertical-align: middle !important;
+  }
+  .equipmentOptimizerFixedRow {
+    outline: 2px solid rgba(40, 112, 67, .35);
+    outline-offset: -2px;
+  }
+  .equipmentOptimizerFixedRow td {
+    background: rgba(233, 249, 238, .68);
+  }
+
+  .equipmentTable th:nth-child(1),
+  .equipmentTable td:nth-child(1),
+  .weaponTable th:nth-child(1),
+  .weaponTable td:nth-child(1) {
+    width: 34px !important;
+    min-width: 34px !important;
+    max-width: 34px !important;
+    text-align: center !important;
+  }
+  .equipmentTable th:nth-child(2),
+  .equipmentTable td:nth-child(2),
+  .equipmentTable th:nth-child(3),
+  .equipmentTable td:nth-child(3),
+  .weaponTable th:nth-child(2),
+  .weaponTable td:nth-child(2),
+  .weaponTable th:nth-child(3),
+  .weaponTable td:nth-child(3) {
+    width: 34px !important;
+    min-width: 34px !important;
+    max-width: 34px !important;
+    text-align: center !important;
+  }
+  .equipmentTable th:nth-child(4),
+  .equipmentTable td:nth-child(4),
+  .weaponTable th:nth-child(4),
+  .weaponTable td:nth-child(4) {
+    width: 260px !important;
+  }
+  .equipmentTable th:nth-child(5),
+  .equipmentTable td:nth-child(5),
+  .equipmentTable th:nth-child(6),
+  .equipmentTable td:nth-child(6),
+  .equipmentTable th:nth-child(7),
+  .equipmentTable td:nth-child(7),
+  .weaponTable th:nth-child(5),
+  .weaponTable td:nth-child(5),
+  .weaponTable th:nth-child(6),
+  .weaponTable td:nth-child(6),
+  .weaponTable th:nth-child(7),
+  .weaponTable td:nth-child(7) {
+    width: 50px !important;
+  }
+  .equipmentTable th:nth-child(8),
+  .equipmentTable td:nth-child(8),
+  .weaponTable th:nth-child(8),
+  .weaponTable td:nth-child(8) {
+    width: 52px !important;
+  }
+  .equipmentTable th:nth-child(9),
+  .equipmentTable td:nth-child(9),
+  .weaponTable th:nth-child(9),
+  .weaponTable td:nth-child(9) {
+    width: 180px !important;
+  }
+  .equipmentTable th:nth-child(10),
+  .equipmentTable td:nth-child(10),
+  .weaponTable th:nth-child(10),
+  .weaponTable td:nth-child(10) {
+    width: 180px !important;
+  }
+  .equipmentTable th:nth-child(11),
+  .equipmentTable td:nth-child(11),
+  .weaponTable th:nth-child(11),
+  .weaponTable td:nth-child(11) {
+    width: 76px !important;
+    min-width: 76px !important;
+    max-width: 76px !important;
+  }
+
+
+  .showcaseShareBox {
+    margin: 0 0 12px;
+  }
+  .showcaseShareBox textarea {
+    min-height: 54px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12px;
+    line-height: 1.35;
+    word-break: break-all;
+    white-space: pre-wrap;
+    resize: vertical;
+  }
+
 </style>
 </head>
 <body>
@@ -2811,6 +2924,7 @@ MoE固有の主な仮定:
             <thead>
               <tr>
                 <th>使用</th>
+                <th class="optimizerFixedHeader" title="最適化検索でこの装備候補を固定">固定</th>
                 <th class="optimizerExcludeHeader" title="最適化検索から除外">除外</th>
                 <th>名前</th>
                 <th>攻撃力</th>
@@ -2832,6 +2946,7 @@ MoE固有の主な仮定:
             <thead>
               <tr>
                 <th>使用</th>
+                <th class="optimizerFixedHeader" title="最適化検索でこの装備候補を固定">固定</th>
                 <th class="optimizerExcludeHeader" title="最適化検索から除外">除外</th>
                 <th>名前</th>
                 <th>攻撃力</th>
@@ -2853,6 +2968,7 @@ MoE固有の主な仮定:
             <thead>
               <tr>
                 <th>使用</th>
+                <th class="optimizerFixedHeader" title="最適化検索でこの装備候補を固定">固定</th>
                 <th class="optimizerExcludeHeader" title="最適化検索から除外">除外</th>
                 <th>名前</th>
                 <th>攻撃力</th>
@@ -2882,6 +2998,7 @@ MoE固有の主な仮定:
                 <thead>
               <tr>
                 <th>使用</th>
+                <th class="optimizerFixedHeader" title="最適化検索でこの装備候補を固定">固定</th>
                 <th class="optimizerExcludeHeader" title="最適化検索から除外">除外</th>
                 <th>名前</th>
                 <th>攻撃力</th>
@@ -2905,6 +3022,7 @@ MoE固有の主な仮定:
                 <thead>
               <tr>
                 <th>使用</th>
+                <th class="optimizerFixedHeader" title="最適化検索でこの装備候補を固定">固定</th>
                 <th class="optimizerExcludeHeader" title="最適化検索から除外">除外</th>
                 <th>名前</th>
                 <th>攻撃力</th>
@@ -2928,6 +3046,7 @@ MoE固有の主な仮定:
                 <thead>
               <tr>
                 <th>使用</th>
+                <th class="optimizerFixedHeader" title="最適化検索でこの装備候補を固定">固定</th>
                 <th class="optimizerExcludeHeader" title="最適化検索から除外">除外</th>
                 <th>名前</th>
                 <th>攻撃力</th>
@@ -2951,6 +3070,7 @@ MoE固有の主な仮定:
                 <thead>
               <tr>
                 <th>使用</th>
+                <th class="optimizerFixedHeader" title="最適化検索でこの装備候補を固定">固定</th>
                 <th class="optimizerExcludeHeader" title="最適化検索から除外">除外</th>
                 <th>名前</th>
                 <th>攻撃力</th>
@@ -2974,6 +3094,7 @@ MoE固有の主な仮定:
                 <thead>
               <tr>
                 <th>使用</th>
+                <th class="optimizerFixedHeader" title="最適化検索でこの装備候補を固定">固定</th>
                 <th class="optimizerExcludeHeader" title="最適化検索から除外">除外</th>
                 <th>名前</th>
                 <th>攻撃力</th>
@@ -2997,6 +3118,7 @@ MoE固有の主な仮定:
                 <thead>
               <tr>
                 <th>使用</th>
+                <th class="optimizerFixedHeader" title="最適化検索でこの装備候補を固定">固定</th>
                 <th class="optimizerExcludeHeader" title="最適化検索から除外">除外</th>
                 <th>名前</th>
                 <th>攻撃力</th>
@@ -3020,6 +3142,7 @@ MoE固有の主な仮定:
                 <thead>
               <tr>
                 <th>使用</th>
+                <th class="optimizerFixedHeader" title="最適化検索でこの装備候補を固定">固定</th>
                 <th class="optimizerExcludeHeader" title="最適化検索から除外">除外</th>
                 <th>名前</th>
                 <th>攻撃力</th>
@@ -3048,6 +3171,7 @@ MoE固有の主な仮定:
                 <thead>
               <tr>
                 <th>使用</th>
+                <th class="optimizerFixedHeader" title="最適化検索でこの装備候補を固定">固定</th>
                 <th class="optimizerExcludeHeader" title="最適化検索から除外">除外</th>
                 <th>名前</th>
                 <th>攻撃力</th>
@@ -3071,6 +3195,7 @@ MoE固有の主な仮定:
                 <thead>
               <tr>
                 <th>使用</th>
+                <th class="optimizerFixedHeader" title="最適化検索でこの装備候補を固定">固定</th>
                 <th class="optimizerExcludeHeader" title="最適化検索から除外">除外</th>
                 <th>名前</th>
                 <th>攻撃力</th>
@@ -3094,6 +3219,7 @@ MoE固有の主な仮定:
                 <thead>
               <tr>
                 <th>使用</th>
+                <th class="optimizerFixedHeader" title="最適化検索でこの装備候補を固定">固定</th>
                 <th class="optimizerExcludeHeader" title="最適化検索から除外">除外</th>
                 <th>名前</th>
                 <th>攻撃力</th>
@@ -3117,6 +3243,7 @@ MoE固有の主な仮定:
                 <thead>
               <tr>
                 <th>使用</th>
+                <th class="optimizerFixedHeader" title="最適化検索でこの装備候補を固定">固定</th>
                 <th class="optimizerExcludeHeader" title="最適化検索から除外">除外</th>
                 <th>名前</th>
                 <th>攻撃力</th>
@@ -3140,6 +3267,7 @@ MoE固有の主な仮定:
                 <thead>
               <tr>
                 <th>使用</th>
+                <th class="optimizerFixedHeader" title="最適化検索でこの装備候補を固定">固定</th>
                 <th class="optimizerExcludeHeader" title="最適化検索から除外">除外</th>
                 <th>名前</th>
                 <th>攻撃力</th>
@@ -3163,6 +3291,7 @@ MoE固有の主な仮定:
                 <thead>
               <tr>
                 <th>使用</th>
+                <th class="optimizerFixedHeader" title="最適化検索でこの装備候補を固定">固定</th>
                 <th class="optimizerExcludeHeader" title="最適化検索から除外">除外</th>
                 <th>名前</th>
                 <th>攻撃力</th>
@@ -3186,6 +3315,7 @@ MoE固有の主な仮定:
                 <thead>
               <tr>
                 <th>使用</th>
+                <th class="optimizerFixedHeader" title="最適化検索でこの装備候補を固定">固定</th>
                 <th class="optimizerExcludeHeader" title="最適化検索から除外">除外</th>
                 <th>名前</th>
                 <th>攻撃力</th>
@@ -3282,12 +3412,12 @@ MoE固有の主な仮定:
 
 <section class="card wide optimizerSection" data-tab-target="calc">
   <details class="optimizerDetails">
-    <summary>最適化計算 <span class="summaryNote">装備候補 + 装備以外のBuffから自動選択</span></summary>
+    <summary>最適化計算 β <span class="summaryNote">調整中 / 装備候補 + 装備以外のBuffから自動選択</span></summary>
     <div class="optimizerBody">
       <p class="small">
-        このセクションでは候補の追加はしません。
+        このセクションは調整中のβ機能です。このセクションでは候補の追加はしません。
         「装備登録」タブに積んだ装備候補と、「Buff登録」タブに積んだ装備以外Buff候補を使って、上位構成を探します。
-        装備Buff、追加ステータス、競合グループも計算に反映します。競合グループが同じ装備候補は同時採用しません。Buff側の標準探索を軽量な局所改善方式にしました。必要な時だけ「深掘り」に切り替えられます。攻撃力上限・各ステータス上限を超える候補は除外し、目的→第二目標の順で評価します。目標値を指定した場合は目標到達を優先し、到達後は目標値に近い構成を優先します。最大クリ率では空欄でも100%目標・+5%まで許容として扱います。最適化中は候補の再計算をキャッシュして軽量化します。候補数が精密装備探索上限以内なら、装備側をbeamで間引かず総当たりしてからBuffを選ぶため、Buff前提で強い装備構成を取り逃がしにくくなります。その他バフは「その他バフの使用を強制する」がONの時だけ現在ON/OFF状態を固定枠として扱い、最適化対象にはしません。
+        装備Buff、追加ステータス、競合グループも計算に反映します。競合グループが同じ装備候補は同時採用しません。Buff側の標準探索を軽量な局所改善方式にしました。必要な時だけ「深掘り」に切り替えられます。攻撃力上限・各ステータス上限を超える候補は除外し、目的→第二目標の順で評価します。目標値を指定した場合は目標到達を優先し、到達後は目標値に近い構成を優先します。最大クリ率では空欄でも100%目標・+5%まで許容として扱います。最適化中は候補の再計算をキャッシュして軽量化します。候補数が精密装備探索上限以内なら、装備側をbeamで間引かず総当たりしてからBuffを選ぶため、Buff前提で強い装備構成を取り逃がしにくくなります。装備を固定したい場合は、装備登録タブの各候補にある「固定」をONにしてください。その他バフは「その他バフの使用を強制する」がONの時だけ現在ON/OFF状態を固定枠として扱い、最適化対象にはしません。
       </p>
       <div class="optimizerControls">
         <label>バフ枠上限<input id="optimizerMaxSlots" type="number" min="0" step="1" value="24"></label>
@@ -3350,7 +3480,6 @@ MoE固有の主な仮定:
         <label>超過許容<input id="optimizerTargetOver" type="number" min="0" step="0.1" placeholder="例: 5"></label>
       </div>
       <div class="optimizerChecks">
-        <label><input id="optimizerFixCurrentEquipment" type="checkbox"> 現在ONの装備を固定する</label>
         <label><input id="optimizerIncludeDisabledBuffs" type="checkbox" checked> OFFの装備以外Buffも候補に含める</label>
         <label><input id="optimizerFixCurrentBuffs" type="checkbox"> 現在ONの装備以外Buffを固定する</label>
         <label><input id="optimizerForceOtherBuffs" type="checkbox" checked> その他バフの使用を強制する</label>
@@ -3375,7 +3504,12 @@ MoE固有の主な仮定:
   </p>
   <div class="showcaseActions">
     <button type="button" onclick="copyShowcaseText()">一覧テキストをコピー</button>
+    <button type="button" onclick="generateShowcaseShareUrl()">共有URLを発行</button>
     <span id="showcaseCopyStatus" class="small"></span>
+    <span id="showcaseShareStatus" class="small"></span>
+  </div>
+  <div class="showcaseShareBox">
+    <textarea id="showcaseShareUrl" readonly placeholder="共有URLを発行するとここに表示されます。URLには現在の構成データが含まれます。"></textarea>
   </div>
   <div id="showcaseView" class="showcaseView">-</div>
   <details class="showcaseTextDetails">
@@ -3654,6 +3788,7 @@ function defaultEquipmentCandidate(slot, enabled=true) {
     weaponTwoHanded: "×",
     weaponReq: [],
     tags: "",
+    optimizerFixed: false,
     optimizerExcluded: false,
     equipBuffEnabled: false,
     equipBuffSlot: true,
@@ -3693,6 +3828,7 @@ function normalizeEquipmentCandidate(row, fallbackSlot) {
     ...(row || {}),
     slot,
     enabled: row && row.enabled !== undefined ? !!row.enabled : true,
+    optimizerFixed: !!(row?.optimizerFixed || row?.optimizerFix || row?.fixedInOptimizer || row?.searchFixed),
     optimizerExcluded: !!(row?.optimizerExcluded || row?.optimizerExclude || row?.excludeFromOptimizer || row?.searchExcluded),
     attack: +(row?.attack || 0),
     magic: +(row?.magic || 0),
@@ -3756,6 +3892,18 @@ function normalizeEquipmentRows(rows) {
     if (row.enabled !== false) {
       if (seenEnabled.has(row.slot)) row.enabled = false;
       else seenEnabled.add(row.slot);
+    }
+  });
+
+  // 最適化固定も同じ部位につき1つだけ。固定は除外より優先する。
+  const seenFixed = new Set();
+  result.forEach(row => {
+    if (row.optimizerFixed) {
+      if (seenFixed.has(row.slot)) row.optimizerFixed = false;
+      else {
+        seenFixed.add(row.slot);
+        row.optimizerExcluded = false;
+      }
     }
   });
 
@@ -5547,7 +5695,7 @@ function makeEquipmentBuffDetailRow(row, includeSlot, statusButton) {
   detailTr.style.display = row._equipBuffOpen ? "" : "none";
 
   const td = makeCell("td");
-  td.colSpan = includeSlot ? 11 : 10;
+  td.colSpan = includeSlot ? 12 : 11;
   td.className = "equipBuffDetailCell";
 
   const title = document.createElement("div");
@@ -5587,6 +5735,37 @@ function equipmentUseCell(row, idx) {
 }
 
 
+function equipmentOptimizerFixedCell(row, idx) {
+  const cb = makeCell("input", {
+    type:"checkbox",
+    checked: !!row.optimizerFixed,
+    title:"ONにすると、最適化検索でこの装備候補を必ず使います。使用ON/OFFとは別設定です。"
+  });
+  cb.onchange = () => {
+    state.equipment = normalizeEquipmentRows(state.equipment);
+    const target = state.equipment[idx];
+    if (!target) return;
+
+    if (cb.checked) {
+      state.equipment.forEach((r, i) => {
+        if (i !== idx && r.slot === target.slot) r.optimizerFixed = false;
+      });
+      target.optimizerFixed = true;
+      target.optimizerExcluded = false;
+    } else {
+      target.optimizerFixed = false;
+    }
+
+    renderEquipmentTable();
+    calc();
+  };
+
+  const td = makeCell("td", {class:"equipmentOptimizerFixedCell"});
+  td.title = "最適化検索で固定";
+  td.appendChild(cb);
+  return td;
+}
+
 function equipmentOptimizerExcludeCell(row, idx) {
   const cb = makeCell("input", {
     type:"checkbox",
@@ -5598,6 +5777,7 @@ function equipmentOptimizerExcludeCell(row, idx) {
     const target = state.equipment[idx];
     if (!target) return;
     target.optimizerExcluded = cb.checked;
+    if (cb.checked) target.optimizerFixed = false;
     renderEquipmentTable();
     calc();
   };
@@ -5667,9 +5847,11 @@ function makeEquipmentInputRow(row, includeSlot=true, idx=0) {
   const tr = document.createElement("tr");
   tr.className = "equipmentMainRow";
   if (row.enabled === false) tr.classList.add("equipmentOffRow");
+  if (row.optimizerFixed) tr.classList.add("equipmentOptimizerFixedRow");
   if (row.optimizerExcluded) tr.classList.add("equipmentOptimizerExcludedRow");
 
   tr.appendChild(equipmentUseCell(row, idx));
+  tr.appendChild(equipmentOptimizerFixedCell(row, idx));
   tr.appendChild(equipmentOptimizerExcludeCell(row, idx));
 
   if (includeSlot) {
@@ -5942,7 +6124,7 @@ function addOtherRow() {
 let integratedOptimizerResults = [];
 
 function integratedOptimizerSettings() {
-  return {
+  const settings = {
     maxSlots: Math.max(0, parseInt(byId("optimizerMaxSlots")?.value, 10) || 24),
     topN: Math.max(1, parseInt(byId("optimizerTopN")?.value, 10) || 10),
     accuracyPreset: byId("optimizerAccuracyPreset")?.value || "balanced",
@@ -5956,7 +6138,6 @@ function integratedOptimizerSettings() {
     secondaryObjective: byId("optimizerSecondaryObjective")?.value || "",
     targetValueRaw: byId("optimizerTargetValue")?.value ?? "",
     targetOverRaw: byId("optimizerTargetOver")?.value ?? "",
-    fixCurrentEquipment: !!byId("optimizerFixCurrentEquipment")?.checked,
     includeDisabledBuffs: byId("optimizerIncludeDisabledBuffs") ? !!byId("optimizerIncludeDisabledBuffs").checked : true,
     fixCurrentBuffs: !!byId("optimizerFixCurrentBuffs")?.checked,
     forceOtherBuffs: byId("optimizerForceOtherBuffs") ? !!byId("optimizerForceOtherBuffs").checked : true
@@ -6177,7 +6358,7 @@ function optimizerSortByEvaluation(a, b) {
 
 function equipmentCandidateHasData(row) {
   return !!(
-    row.enabled || row.name || row.tags || row.note ||
+    row.enabled || row.optimizerFixed || row.optimizerExcluded || row.name || row.tags || row.note ||
     +row.attack || +row.magic || +row.speed || +row.delay ||
     +row.weaponDamage || +row.weaponWeight || +row.weaponAttackInterval || +row.weaponRange || +row.weaponDurability || row.weaponTwoHanded === "○" ||
     normalizeWeaponReqRowsForEquipment(row.weaponReq).some(r => +r.required) ||
@@ -6266,11 +6447,13 @@ function optimizerEquipmentGroups(settings) {
   return EQUIPMENT_SLOTS.map(({slot}) => {
     let candidates = rows
       .map((row, idx) => ({row, idx}))
-      .filter(x => x.row.slot === slot && !x.row.optimizerExcluded && equipmentCandidateHasData(x.row));
+      .filter(x => x.row.slot === slot && equipmentCandidateHasData(x.row));
 
-    if (settings.fixCurrentEquipment) {
-      const fixed = candidates.filter(x => x.row.enabled !== false);
-      candidates = fixed.length ? fixed : candidates.slice(0, 1);
+    const fixed = candidates.filter(x => x.row.optimizerFixed && !x.row.optimizerExcluded);
+    if (fixed.length) {
+      candidates = fixed.slice(0, 1);
+    } else {
+      candidates = candidates.filter(x => !x.row.optimizerExcluded);
     }
 
     if (!candidates.length) {
@@ -6832,9 +7015,11 @@ function runIntegratedOptimizer() {
     const equipmentRowsForStatus = optimizerEquipmentRows(settings);
     const equipCount = equipmentRowsForStatus.filter(equipmentCandidateHasData).length;
     const equipExcludedCount = equipmentRowsForStatus.filter(r => r.optimizerExcluded && equipmentCandidateHasData(r)).length;
+    const equipFixedCount = equipmentRowsForStatus.filter(r => r.optimizerFixed && equipmentCandidateHasData(r)).length;
     const buffCount = optimizerCompositeCandidates(settings).length;
     const fixedOtherSlots = settings.forceOtherBuffs ? (state.other || []).filter(r => r.enabled).length : 0;
     const otherMode = settings.forceOtherBuffs ? `${fixedOtherSlots}件` : "無視";
+    const optimizerFixedText = equipFixedCount ? ` / 固定装備 ${equipFixedCount}件` : "";
     const optimizerExcludeText = equipExcludedCount ? ` / 検索除外装備 ${equipExcludedCount}件` : "";
     const conflictSkipText = settings.equipmentConflictSkipped ? ` / 競合装備除外 ${settings.equipmentConflictSkipped}件` : "";
     const pruneText = settings.optimizerPrunedBuffs ? ` / 不要Buff整理 ${settings.optimizerPrunedBuffs}件` : "";
@@ -6848,7 +7033,7 @@ function runIntegratedOptimizer() {
     const buffModeText = settings.buffMode === "fast" ? "高速" : settings.buffMode === "beam" ? `深掘り 幅${settings.buffBeamWidth}` : `標準 改善${settings.localPasses}回`;
     const objectiveText = `${optimizerObjectiveLabel(settings.objective)}${settings.secondaryObjective ? " > " + optimizerObjectiveLabel(settings.secondaryObjective) : ""}`;
     const targetText = optimizerPrimaryTargetDescription(settings);
-    status.textContent = `探索完了: 精度 ${accuracyText} / 目標 ${objectiveText}${targetText ? " / " + targetText : ""} / 装備候補 ${equipCount}件${optimizerExcludeText} / 装備以外Buff候補 ${buffCount}件 / ${equipmentModeText} / Buff探索 ${buffModeText} / その他固定枠 ${otherMode}${conflictSkipText}${pruneText}${capText}${duplicateText}${cacheText} / 装備構成候補 ${equipmentBeams.length}件中 ${buffEvalBeams.length}件評価 / 表示 ${results.length}件 / ${elapsed}ms`;
+    status.textContent = `探索完了: 精度 ${accuracyText} / 目標 ${objectiveText}${targetText ? " / " + targetText : ""} / 装備候補 ${equipCount}件${optimizerFixedText}${optimizerExcludeText} / 装備以外Buff候補 ${buffCount}件 / ${equipmentModeText} / Buff探索 ${buffModeText} / その他固定枠 ${otherMode}${conflictSkipText}${pruneText}${capText}${duplicateText}${cacheText} / 装備構成候補 ${equipmentBeams.length}件中 ${buffEvalBeams.length}件評価 / 表示 ${results.length}件 / ${elapsed}ms`;
   }
   renderIntegratedOptimizerResults();
 }
@@ -7196,6 +7381,7 @@ function renderShowcaseTab(m=null) {
   if (textBox) textBox.value = showcaseTextFromMetrics(m);
 }
 
+
 async function copyShowcaseText() {
   const text = byId("showcaseText")?.value || "";
   const status = byId("showcaseCopyStatus");
@@ -7211,6 +7397,132 @@ async function copyShowcaseText() {
     if (status) status.textContent = "コピーしました。";
   } catch (e) {
     if (status) status.textContent = "コピーに失敗しました。テキスト欄から手動コピーしてください。";
+  }
+}
+
+function bytesToBase64Url(bytes) {
+  let binary = "";
+  const chunk = 0x8000;
+  for (let i = 0; i < bytes.length; i += chunk) {
+    binary += String.fromCharCode(...bytes.subarray(i, i + chunk));
+  }
+  return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+}
+
+function base64UrlToBytes(value) {
+  const b64 = String(value || "").replace(/-/g, "+").replace(/_/g, "/");
+  const padded = b64 + "=".repeat((4 - b64.length % 4) % 4);
+  const binary = atob(padded);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return bytes;
+}
+
+function utf8ToBase64Url(text) {
+  return bytesToBase64Url(new TextEncoder().encode(text));
+}
+
+function base64UrlToUtf8(data) {
+  return new TextDecoder().decode(base64UrlToBytes(data));
+}
+
+async function encodeSharePayload(text) {
+  if ("CompressionStream" in window) {
+    try {
+      const stream = new Blob([text], {type:"application/json"}).stream().pipeThrough(new CompressionStream("gzip"));
+      const buffer = await new Response(stream).arrayBuffer();
+      return "g." + bytesToBase64Url(new Uint8Array(buffer));
+    } catch (e) {
+      // 圧縮に失敗した環境では非圧縮へフォールバック。
+    }
+  }
+  return "j." + utf8ToBase64Url(text);
+}
+
+async function decodeSharePayload(data) {
+  const raw = String(data || "");
+  if (raw.startsWith("g.")) {
+    if (!("DecompressionStream" in window)) {
+      throw new Error("このブラウザは圧縮共有URLの読み込みに対応していません。");
+    }
+    const bytes = base64UrlToBytes(raw.slice(2));
+    const stream = new Blob([bytes], {type:"application/gzip"}).stream().pipeThrough(new DecompressionStream("gzip"));
+    return await new Response(stream).text();
+  }
+  if (raw.startsWith("j.")) return base64UrlToUtf8(raw.slice(2));
+
+  // 旧/手動用: prefixなしbase64urlも一応読む。
+  return base64UrlToUtf8(raw);
+}
+
+function shareHashData() {
+  const hash = String(location.hash || "");
+  const match = hash.match(/(?:^#|&)moeShare=([^&]+)/);
+  return match ? decodeURIComponent(match[1]) : "";
+}
+
+async function generateShowcaseShareUrl() {
+  const status = byId("showcaseShareStatus");
+  const box = byId("showcaseShareUrl");
+  if (status) status.textContent = "共有URLを作成中...";
+  try {
+    syncSkillSimToCalcInputs(false, false);
+    syncSelectedWeaponToHiddenInputs();
+    const payload = {
+      v: 1,
+      app: "Master of Epic 物理ダメージ計算webツール",
+      savedAt: new Date().toISOString(),
+      config: collectConfig()
+    };
+    const encoded = await encodeSharePayload(JSON.stringify(payload));
+    const baseUrl = location.href.split("#")[0];
+    const url = `${baseUrl}#moeShare=${encodeURIComponent(encoded)}`;
+
+    if (box) {
+      box.value = url;
+      box.focus();
+      box.select();
+    }
+
+    let copied = false;
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(url);
+        copied = true;
+      } else if (box) {
+        document.execCommand("copy");
+        copied = true;
+      }
+    } catch (e) {
+      copied = false;
+    }
+
+    const lengthNote = url.length > 60000
+      ? ` URLがかなり長いです（${url.length.toLocaleString()}文字）。共有先で開けない場合はJSON共有を使ってください。`
+      : ` ${url.length.toLocaleString()}文字。`;
+    if (status) status.textContent = copied ? `共有URLをコピーしました。${lengthNote}` : `共有URLを発行しました。手動でコピーしてください。${lengthNote}`;
+  } catch (e) {
+    if (status) status.textContent = "共有URLの発行に失敗しました: " + e.message;
+  }
+}
+
+async function loadConfigFromShareHash() {
+  const data = shareHashData();
+  if (!data) return false;
+  const status = byId("showcaseShareStatus");
+  try {
+    const text = await decodeSharePayload(data);
+    const payload = JSON.parse(text);
+    const cfg = payload.config || payload.cfg || payload;
+    applyConfig(cfg);
+    const box = byId("showcaseShareUrl");
+    if (box) box.value = location.href;
+    if (status) status.textContent = "共有URLから構成を読み込みました。";
+    activateMainTab("showcase");
+    return true;
+  } catch (e) {
+    if (status) status.textContent = "共有URLの読み込みに失敗しました: " + e.message;
+    return false;
   }
 }
 
@@ -7687,7 +7999,7 @@ function calc() {
   }
   byId("breakdown").innerHTML = lines.join("");
 
-  localStorage.setItem("moeDamageSimOptimizerCompactExclude", JSON.stringify(collectConfig()));
+  localStorage.setItem("moeDamageSimShareUrlShowcase", JSON.stringify(collectConfig()));
   renderCompareResult();
   renderActualDiff();
   renderRaceTable();
@@ -8263,9 +8575,10 @@ function serializeConfigAsTsv(cfg) {
   ));
 
   out.push(makeTsvSection("equipment",
-    ["enabled", "optimizerExcluded", "slot", "name", "tags", "attack", "magic", "speed", "delay", "weaponDamage", "weaponWeight", "weaponAttackInterval", "weaponRange", "weaponDurability", "weaponTwoHanded", "weaponReqText"].concat(extraTsvFields("base"), ["equipBuffEnabled", "equipBuffSlot", "equipBuffName", "equipBuffAttackPct", "equipBuffMagicPct", "equipBuffSpeedPct", "equipBuffFlatAttack", "equipBuffFlatMagic", "equipBuffFlatSpeed", "equipBuffConvMagicRate", "equipBuffConvSpeedRate", "equipBuffDmgPct", "equipBuffSpecial"], extraTsvFields("equipBuff"), ["equipBuffNote", "note"]),
+    ["enabled", "optimizerFixed", "optimizerExcluded", "slot", "name", "tags", "attack", "magic", "speed", "delay", "weaponDamage", "weaponWeight", "weaponAttackInterval", "weaponRange", "weaponDurability", "weaponTwoHanded", "weaponReqText"].concat(extraTsvFields("base"), ["equipBuffEnabled", "equipBuffSlot", "equipBuffName", "equipBuffAttackPct", "equipBuffMagicPct", "equipBuffSpeedPct", "equipBuffFlatAttack", "equipBuffFlatMagic", "equipBuffFlatSpeed", "equipBuffConvMagicRate", "equipBuffConvSpeedRate", "equipBuffDmgPct", "equipBuffSpecial"], extraTsvFields("equipBuff"), ["equipBuffNote", "note"]),
     normalizeEquipmentRows(st.equipment || []).map(r => ({
       enabled: boolToCell(r.enabled !== false),
+      optimizerFixed: boolToCell(r.optimizerFixed),
       optimizerExcluded: boolToCell(r.optimizerExcluded),
       slot: r.slot || "",
       name: r.name || "",
@@ -8467,6 +8780,7 @@ function parseConfigFromTsv(text) {
     })),
     equipment: (sections.equipment?.rows || []).map(r => ({
       enabled: r.enabled === undefined || r.enabled === "" ? true : cellToBool(r.enabled),
+      optimizerFixed: cellToBool(r.optimizerFixed || r.optimizerFix || r.fixedInOptimizer || r.searchFixed),
       optimizerExcluded: cellToBool(r.optimizerExcluded || r.optimizerExclude || r.excludeFromOptimizer || r.searchExcluded),
       slot: r.slot || "",
       name: r.name || "",
@@ -8655,7 +8969,7 @@ function importTsvConfig() {
 /* localStorageの現在構成を削除し、初期状態へ戻す。 */
 function resetConfig() {
   if (!confirm("保存済み設定をリセットして初期状態に戻しますか？")) return;
-  localStorage.removeItem("moeDamageSimOptimizerCompactExclude");
+  localStorage.removeItem("moeDamageSimShareUrlShowcase");
   state = DEFAULT_STATE();
   renderAll();
   calc();
@@ -8700,7 +9014,7 @@ document.querySelectorAll("input,select").forEach(el => {
 });
 
 renderAll();
-const saved = localStorage.getItem("moeDamageSimOptimizerCompactExclude");
+const saved = localStorage.getItem("moeDamageSimShareUrlShowcase");
 if (saved) {
   try { applyConfig(JSON.parse(saved)); }
   catch { calc(); }
@@ -8727,6 +9041,7 @@ renderACTable();
 renderRaceTable();
 renderValueTable();
 renderTagLinkSummary();
+loadConfigFromShareHash();
 </script>
 </body>
 </html>
