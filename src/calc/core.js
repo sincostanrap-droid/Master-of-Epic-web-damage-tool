@@ -108,9 +108,9 @@ function computeMetrics(st, inputs) {
   }
 
   const attackMultiplier = attackMultiplierFromInputs(weaponInputs);
-  const dmgBonusSum = (st.dmg || []).filter(r => r.enabled).reduce((s, r) => s + (+r.value || 0), 0);
+  const dmgBonusSum = (st.dmg || []).filter(r => r.enabled && !r.excluded).reduce((s, r) => s + (+r.value || 0), 0);
   const dmgMultiplier = 1 + dmgBonusSum;
-  const specialMultiplier = (st.special || []).filter(r => r.enabled).reduce((p, r) => p * (+r.value || 1), 1);
+  const specialMultiplier = (st.special || []).filter(r => r.enabled && !r.excluded).reduce((p, r) => p * (+r.value || 1), 1);
 
   let defenseFactor = 1;
   if (ac > 0) {
@@ -124,7 +124,7 @@ function computeMetrics(st, inputs) {
     critAvg = 1 + rate * ((parseFloat(inputs.critMultiplier) || 1.5) - 1);
   }
 
-  const postMultiplier = (st.post || []).filter(r => r.enabled).reduce((p, r) => p * (+r.value || 1), 1);
+  const postMultiplier = (st.post || []).filter(r => r.enabled && !r.excluded).reduce((p, r) => p * (+r.value || 1), 1);
   const baseNoTech = atk * 0.8;
   const rawDamage = baseNoTech * attackMultiplier * dmgMultiplier * specialMultiplier * defenseFactor * critAvg * postMultiplier;
   const finalCap = parseFloat(inputs.finalCap) || 0;
@@ -147,14 +147,14 @@ function slotRowName(row, fallback) {
 /* バフ24枠の使用数を数える。装備以外Buffは効果が複数あっても1行=1枠。 */
 function buffSlotCountForState(st) {
   const details = [
-    ["装備外", normalizeCompositeRows(st.composite).filter(r => r.enabled && r.slot && compositeHasEffect(r)).map(r => `${slotRowName(r, "装備以外Buff")}（${compositeEffectText(r)}）`)],
-    ["割合", (st.pct || []).filter(r => r.enabled && r.slot).map(r => slotRowName(r, "割合Buff"))],
-    ["実数", normalizeFlatRows(st).filter(r => r.enabled && r.slot).map(r => slotRowName(r, "実数加算"))],
-    ["変換", (st.conv || []).filter(r => r.enabled && r.slot).map(r => slotRowName(r, "ステータス変換"))],
-    ["与ダメ", (st.dmg || []).filter(r => r.enabled && r.slot).map(r => slotRowName(r, "与ダメBuff"))],
-    ["特攻", (st.special || []).filter(r => r.enabled && r.slot).map(r => slotRowName(r, "特攻"))],
-    ["外枠", (st.post || []).filter(r => r.enabled && r.slot).map(r => slotRowName(r, "外枠補正"))],
-    ["その他", (st.other || []).filter(r => r.enabled).map(r => slotRowName(r, "その他バフ"))]
+    ["装備外", normalizeCompositeRows(st.composite).filter(r => r.enabled && !r.excluded && r.slot && compositeHasEffect(r)).map(r => `${slotRowName(r, "装備以外Buff")}（${compositeEffectText(r)}）`)],
+    ["割合", (st.pct || []).filter(r => r.enabled && !r.excluded && r.slot).map(r => slotRowName(r, "割合Buff"))],
+    ["実数", normalizeFlatRows(st).filter(r => r.enabled && !r.excluded && r.slot).map(r => slotRowName(r, "実数加算"))],
+    ["変換", (st.conv || []).filter(r => r.enabled && !r.excluded && r.slot).map(r => slotRowName(r, "ステータス変換"))],
+    ["与ダメ", (st.dmg || []).filter(r => r.enabled && !r.excluded && r.slot).map(r => slotRowName(r, "与ダメBuff"))],
+    ["特攻", (st.special || []).filter(r => r.enabled && !r.excluded && r.slot).map(r => slotRowName(r, "特攻"))],
+    ["外枠", (st.post || []).filter(r => r.enabled && !r.excluded && r.slot).map(r => slotRowName(r, "外枠補正"))],
+    ["その他", (st.other || []).filter(r => r.enabled && !r.excluded).map(r => slotRowName(r, "その他バフ"))]
   ];
   const groups = details.map(([name, items]) => [name, items.length]);
   return {total: groups.reduce((s, [,n]) => s+n, 0), groups, details};

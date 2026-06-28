@@ -3558,3 +3558,11 @@
 .presetStatus.warn {
   font-weight: 600;
 }
+
+
+/* v1.21.8: Buff除外チェック */
+.excludeCell { text-align: center; }
+.excludedRow { opacity: .55; }
+.excludedRow input,
+.excludedRow select,
+.excludedRow button { filter: grayscale(.25); }

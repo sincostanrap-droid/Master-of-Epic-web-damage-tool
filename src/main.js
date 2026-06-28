@@ -3665,6 +3665,7 @@ function normalizeCompositeRows(rows) {
   return (Array.isArray(rows) ? rows : []).map(r => {
     const out = {
       enabled: !!r.enabled,
+      excluded: !!r.excluded,
       slot: r.slot !== false,
       name: r.name || "装備以外Buff",
       tags: r.tags || r.tag || "",
@@ -3742,7 +3743,7 @@ function expandCompositeState(st) {
   out.special = Array.isArray(out.special) ? out.special : [];
   out.post = Array.isArray(out.post) ? out.post : [];
 
-  normalizeCompositeRows((st || {}).composite).filter(r => r.enabled).forEach(r => {
+  normalizeCompositeRows((st || {}).composite).filter(r => r.enabled && !r.excluded).forEach(r => {
     const baseName = r.name || "装備以外Buff";
     const note = r.note || "";
     if (+r.attackPct) out.pct.push({enabled:true, slot:false, name:`${baseName} 攻撃力%`, target:"attack", percent:+r.attackPct, note});
@@ -3822,7 +3823,7 @@ function resolveCompositeRowsForGroups(rows) {
   const byGroup = new Map();
 
   normalizeCompositeRows(rows).forEach((row, order) => {
-    if (!(row.enabled && compositeHasEffect(row))) {
+    if (!(row.enabled && !row.excluded && compositeHasEffect(row))) {
       kept.push(row);
       return;
     }
@@ -4056,7 +4057,7 @@ function buildConflictMonitorGroups() {
   });
 
   normalizeCompositeRows(state.composite).forEach((row, idx) => {
-    if (row.enabled || !compositeHasEffect(row)) return;
+    if (row.enabled || row.excluded || !compositeHasEffect(row)) return;
     splitTags(row.tags).forEach(group => {
       const rec = ensure(group);
       rec.candidates.push({
@@ -4075,7 +4076,7 @@ function buildConflictMonitorGroups() {
   });
 
   (state.post || []).forEach((row, idx) => {
-    if (row.enabled) return;
+    if (row.enabled || row.excluded) return;
     splitTags(row.tags).forEach(group => {
       const rec = ensure(group);
       rec.candidates.push({
@@ -4094,7 +4095,7 @@ function buildConflictMonitorGroups() {
   });
 
   (state.other || []).forEach((row, idx) => {
-    if (row.enabled) return;
+    if (row.enabled || row.excluded) return;
     splitTags(row.tags).forEach(group => {
       const rec = ensure(group);
       rec.candidates.push({
@@ -4177,11 +4178,35 @@ function renderTagLinkSummary() {
 
 function checkboxCell(row, prop) {
   const cb = makeCell("input", {type:"checkbox", checked: !!row[prop]});
-  cb.onchange = () => { row[prop] = cb.checked; calc(); };
+  cb.onchange = () => {
+    row[prop] = cb.checked;
+    if (prop === "enabled" && cb.checked && row.excluded) row.excluded = false;
+    renderTagLinkSummary();
+    calc();
+  };
   const td = makeCell("td");
   td.appendChild(cb);
   return td;
 }
+
+function excludeCheckboxCell(row, renderFn=null) {
+  const cb = makeCell("input", {
+    type:"checkbox",
+    checked: !!row.excluded,
+    title:"登録は残して、計算・最適化から外します"
+  });
+  cb.onchange = () => {
+    row.excluded = cb.checked;
+    if (cb.checked) row.enabled = false;
+    if (renderFn) renderFn();
+    renderTagLinkSummary();
+    calc();
+  };
+  const td = makeCell("td", {class:"excludeCell"});
+  td.appendChild(cb);
+  return td;
+}
+
 /* 行の上下移動/削除ボタン。Buffの適用順序を調整できるようにする。 */
 function actionCell(arr, idx, renderFn) {
   const td = makeCell("td", {class:"actionCell"});
@@ -4573,28 +4598,23 @@ function renderCompositeTable() {
   state.composite = normalizeCompositeRows(state.composite);
 
   if (!state.composite.length) {
-    renderEmptyRow(tbody, 17, "まだ装備以外Buffがありません。「Buff行を追加」から追加してください。");
+    renderEmptyRow(tbody, 18, "まだ装備以外Buffがありません。「Buff行を追加」から追加してください。");
     return;
   }
 
   state.composite.forEach((row, idx) => {
     const frag = document.createDocumentFragment();
     const tr = document.createElement("tr");
+    if (row.excluded) tr.classList.add("excludedRow");
     tr.appendChild(checkboxCell(row, "enabled"));
     tr.appendChild(checkboxCell(row, "slot"));
+    tr.appendChild(excludeCheckboxCell(row, renderCompositeTable));
 
     const name = makeCell("input", {value: row.name || ""});
-    name.oninput = () => {
-      row.name = name.value;
-      const title = tr.nextSibling?.querySelector?.(".extraStatsTitle");
-      if (title) title.textContent = `${row.name || "装備以外Buff"} の追加ステータス`;
-      renderTagLinkSummary();
-      calc();
-    };
+    name.oninput = () => { row.name = name.value; renderTagLinkSummary(); calc(); };
     tr.appendChild(makeCell("td")).appendChild(name);
 
     tr.appendChild(tagInputCell(row));
-
     tr.appendChild(compositeNumberCell(row, "attackPct", "1"));
     tr.appendChild(compositeNumberCell(row, "magicPct", "1"));
     tr.appendChild(compositeNumberCell(row, "speedPct", "1"));
@@ -4607,22 +4627,23 @@ function renderCompositeTable() {
     tr.appendChild(compositeNumberCell(row, "special", "0.01"));
 
     const detailTr = makeCompositeExtraDetailRow(row);
+    if (row.excluded) detailTr.classList.add("excludedRow");
     tr.appendChild(compositeExtraCell(row, detailTr));
 
     const note = makeCell("input", {value: row.note || ""});
     note.oninput = () => { row.note = note.value; };
     tr.appendChild(makeCell("td")).appendChild(note);
-
     tr.appendChild(actionCell(state.composite, idx, renderCompositeTable));
+
     frag.appendChild(tr);
     frag.appendChild(detailTr);
     tbody.appendChild(frag);
   });
 }
-/* 空のBuff行を追加する。主要Buffが固まるまではプリセットボタンを置かない方針。 */
+
 function addCompositeRow(kind="blank") {
   const row = {
-    enabled:true, slot:true, name:"装備以外Buff", tags:"",
+    enabled:true, slot:true, excluded:false, name:"装備以外Buff", tags:"",
     attackPct:0, magicPct:0, speedPct:0,
     flatAttack:0, flatMagic:0, flatSpeed:0,
     convMagicRate:0, convSpeedRate:0,
@@ -5532,26 +5553,27 @@ function addConversionRow(source="magic") {
 function renderNumericTable(type) {
   const tableId = type === "magicFlat" ? "magicBuffTable" : type === "atk" ? "atkBuffTable" : type === "dmg" ? "dmgBuffTable" : type === "special" ? "specialBuffTable" : "postBuffTable";
   const tbody = document.querySelector(`#${tableId} tbody`);
+  if (!tbody) return;
   tbody.innerHTML = "";
   if (!state[type].length) {
     const label = type === "dmg" ? "与ダメ行" : type === "special" ? "特攻行" : "外枠補正行";
-    const colspan = type === "dmg" ? 7 : type === "post" ? 7 : 6;
+    const colspan = type === "dmg" ? 8 : type === "post" ? 8 : 7;
     renderEmptyRow(tbody, colspan, `${label}はありません。必要な場合だけ行を追加してください。`);
     return;
   }
 
   state[type].forEach((row, idx) => {
     const tr = document.createElement("tr");
+    if (row.excluded) tr.classList.add("excludedRow");
     tr.appendChild(checkboxCell(row, "enabled"));
     tr.appendChild(checkboxCell(row, "slot"));
+    tr.appendChild(excludeCheckboxCell(row, () => renderNumericTable(type)));
 
     const name = makeCell("input", {value: row.name || ""});
     name.oninput = () => { row.name = name.value; renderTagLinkSummary(); };
     tr.appendChild(makeCell("td")).appendChild(name);
 
-    if (type === "post") {
-      tr.appendChild(tagInputCell(row));
-    }
+    if (type === "post") tr.appendChild(tagInputCell(row));
 
     const value = makeCell("input", {type:"number", step:"0.1", value: row.value ?? 0});
     value.oninput = () => { row.value = parseFloat(value.value) || 0; calc(); };
@@ -5570,17 +5592,16 @@ function renderNumericTable(type) {
     const del = makeCell("button", {type:"button", title:"削除", class:"dangerMini"}, "×");
     del.onclick = () => { state[type].splice(idx, 1); renderAll(); calc(); };
     tr.appendChild(makeCell("td")).appendChild(del);
-
     tbody.appendChild(tr);
   });
 }
-/* 与ダメ/特攻/外枠などの行を追加する共通関数。 */
+
 function addRow(type) {
   if (type === "magicFlat") state.magicFlat.push({enabled:true, slot:true, name:"新規魔力", value:0, note:""});
   if (type === "atk") state.atk.push({enabled:true, slot:true, name:"新規攻撃力", value:0, note:""});
   if (type === "dmg") state.dmg.push({enabled:true, slot:true, name:"新規与ダメ", value:0, category:"", note:""});
-  if (type === "special") state.special.push({enabled:true, slot:false, name:"新規特攻", value:1.5, note:""});
-  if (type === "post") state.post.push({enabled:true, slot:false, name:"新規外枠", tags:"", value:1, note:""});
+  if (type === "special") state.special.push({enabled:true, slot:false, excluded:false, name:"新規特攻", value:1.5, note:""});
+  if (type === "post") state.post.push({enabled:true, slot:false, excluded:false, name:"新規外枠", tags:"", value:1, note:""});
   renderAll();
   calc();
 }
@@ -5588,23 +5609,29 @@ function addRow(type) {
 /* その他バフ表を描画する。ここはダメージ計算せずバフ枠だけに使う。 */
 function renderOtherTable() {
   const tbody = document.querySelector("#otherBuffTable tbody");
+  if (!tbody) return;
   tbody.innerHTML = "";
   if (!state.other.length) {
-    renderEmptyRow(tbody, 5, "その他バフ行はありません。バフ枠だけ数えたいものがある場合に追加してください。");
+    renderEmptyRow(tbody, 6, "その他バフ行はありません。バフ枠だけ数えたいものがある場合に追加してください。");
     return;
   }
 
   state.other.forEach((row, idx) => {
     const tr = document.createElement("tr");
+    if (row.excluded) tr.classList.add("excludedRow");
 
     const enabled = makeCell("input", {type:"checkbox", checked: !!row.enabled});
-    enabled.onchange = () => { row.enabled = enabled.checked; calc(); };
+    enabled.onchange = () => {
+      row.enabled = enabled.checked;
+      if (enabled.checked && row.excluded) row.excluded = false;
+      renderOtherTable(); renderTagLinkSummary(); calc();
+    };
     tr.appendChild(makeCell("td")).appendChild(enabled);
+    tr.appendChild(excludeCheckboxCell(row, renderOtherTable));
 
     const name = makeCell("input", {value: row.name || ""});
     name.oninput = () => { row.name = name.value; renderTagLinkSummary(); };
     tr.appendChild(makeCell("td")).appendChild(name);
-
     tr.appendChild(tagInputCell(row));
 
     const note = makeCell("input", {value: row.note || ""});
@@ -5617,9 +5644,9 @@ function renderOtherTable() {
     tbody.appendChild(tr);
   });
 }
-/* その他バフ行を追加する。 */
+
 function addOtherRow() {
-  state.other.push({enabled:true, name:"その他バフ", tags:"", note:""});
+  state.other.push({enabled:true, excluded:false, name:"その他バフ", tags:"", note:""});
   renderOtherTable();
   calc();
 }
@@ -8903,7 +8930,7 @@ function statValue(stats, source) {
 function applyPercentStats(st, baseStats) {
   const stats = {...baseStats};
   const steps = [];
-  (st.pct || []).filter(r => r.enabled && r.target !== "attack").forEach(r => {
+  (st.pct || []).filter(r => r.enabled && !r.excluded && r.target !== "attack").forEach(r => {
     const key = r.target;
     const before = stats[key] ?? 0;
     const add = before * ((+r.percent || 0) / 100);
@@ -8917,7 +8944,7 @@ function calcConversions(st, stats) {
   let capped = 0;
   let uncapped = 0;
   const steps = [];
-  (st.conv || []).filter(r => r.enabled).forEach(r => {
+  (st.conv || []).filter(r => r.enabled && !r.excluded).forEach(r => {
     const base = statValue(stats, r.source);
     const baseOffset = +r.baseOffset || 0;
     const adjustedBase = base + baseOffset;
@@ -8935,7 +8962,7 @@ function calcPctAttack(st, baseAtk) {
   let atk = baseAtk;
   let added = 0;
   const steps = [];
-  (st.pct || []).filter(r => r.enabled && r.target === "attack").forEach(r => {
+  (st.pct || []).filter(r => r.enabled && !r.excluded && r.target === "attack").forEach(r => {
     const before = atk;
     const add = before * ((+r.percent || 0) / 100);
     atk = before + add;
