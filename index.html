@@ -762,6 +762,12 @@ MoE固有の主な仮定:
         <button type="button" onclick="fetchIdbUrlViaWorker()">URLから取得して解析</button>
       </div>
       <div id="idbWorkerStatus" class="small muted">Worker URLは固定です。公式DBの個別アイテムURLだけ取得します。</div>
+      <div class="idbImportBuffLimitNotice small">
+        <b>装備Buffについて:</b>
+        公式DBから取得できるのはBuff名と説明文までです。
+        攻撃力%・属性ダメージ%・ST自然回復量などの実際の効果値は取得できません。
+        必要な効果値は、候補追加後に装備詳細またはBuff登録で手入力してください。
+      </div>
       <div class="idbImportNotice small">
         公式DBから自動取得できるのは、装備名・部位・基本性能・追加ステータス・装備Buff名/説明文までです。
         装備Buffによる実際の攻撃力%・属性ダメージ%・自然回復量などの効果値はDB仕様上取得できないため、必要ならBuff登録または装備詳細で手入力してください。

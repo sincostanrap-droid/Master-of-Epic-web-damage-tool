@@ -3076,3 +3076,17 @@
   opacity: .72;
   margin-top: 4px;
 }
+
+
+/* v1.18.14: 公式DB取り込みBuff注意を常時表示 */
+.idbImportBuffLimitNotice {
+  margin-top: 8px;
+  padding: 9px 11px;
+  border-radius: 10px;
+  background: rgba(255, 247, 225, .95);
+  border: 1px solid rgba(220, 170, 70, .45);
+  line-height: 1.6;
+}
+.idbImportBuffLimitNotice b {
+  margin-right: .25em;
+}

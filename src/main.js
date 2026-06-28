@@ -4892,29 +4892,39 @@ function idbLooksLikeItemName(s) {
   return true;
 }
 
-function idbMapSlot(partText) {
-  const s = String(partText || "").replace(/\s+/g, "");
-  if (/弾|矢|銃弾|弾丸/.test(s)) return "武器: 弾丸";
+function idbMapSlot(part) {
+  const raw = String(part || "").trim();
+  const s = raw.replace(/\s+/g, " ");
+
+  // 武器は右手優先。
+  // 公式DBで「右手 左手」と出る片手武器は、初期候補スロットを右手にする。
+  if (/右手/.test(s)) return "武器: 右手";
   if (/左手/.test(s)) return "武器: 左手";
-  if (/右手|1HAND|2HAND|片手|両手|武器/.test(s)) return "武器: 右手";
+  if (/弾|矢|銃弾|投げ/.test(s) && !/[頭顔耳指胸背腰胴手肩靴パンツ]/.test(s)) return "武器: 弾丸";
 
-  // 公式DBの「腰（装）」「背中（装）」などを装飾として最優先で判定する。
-  if (/頭(?:装飾|[（(［\[]装[）)］\]]|アクセ|飾)|装飾頭|頭装飾|ヘア|ウィッグ/.test(s)) return "装飾: 頭";
-  if (/顔(?:装飾|[（(［\[]装[）)］\]]|アクセ|飾)|装飾顔|顔装飾/.test(s)) return "装飾: 顔";
-  if (/耳(?:装飾|[（(［\[]装[）)］\]]|アクセ|飾)|装飾耳|耳装飾|イヤリング|イヤー/.test(s)) return "装飾: 耳";
-  if (/指(?:装飾|[（(［\[]装[）)］\]]|アクセ|飾)|装飾指|指装飾|リング/.test(s)) return "装飾: 指";
-  if (/胸(?:装飾|[（(［\[]装[）)］\]]|アクセ|飾)|装飾胸|胸装飾|ネックレス|ペンダント/.test(s)) return "装飾: 胸";
-  if (/背中(?:装飾|[（(［\[]装[）)］\]]|アクセ|飾)|装飾背中|背中装飾|背負|バック/.test(s)) return "装飾: 背中";
-  if (/腰(?:装飾|[（(［\[]装[）)］\]]|アクセ|飾)|装飾腰|腰装飾/.test(s)) return "装飾: 腰";
+  const normalized = s
+    .replace(/[（）]/g, m => m === "（" ? "(" : ")")
+    .replace(/装飾/g, "装")
+    .replace(/防具/g, "防");
 
-  if (/頭/.test(s)) return "防具: 頭";
-  if (/胴|胸当|鎧|服/.test(s)) return "防具: 胴";
-  if (/手|腕|グローブ|ガントレット/.test(s)) return "防具: 手";
-  if (/パンツ|腰巻|スカート|ズボン|下半身/.test(s)) return "防具: パンツ";
-  if (/靴|足|ブーツ/.test(s)) return "防具: 靴";
-  if (/肩|マント|ショルダー/.test(s)) return "防具: 肩";
-  if (/腰|ベルト/.test(s)) return "防具: 腰";
-  return "防具: 頭";
+  const accessoryHint = /装|\(装\)|（装）/.test(raw);
+  const armorHint = /防|\(防\)|（防）/.test(raw);
+
+  if (/頭/.test(normalized)) return accessoryHint && !armorHint ? "装飾: 頭" : "防具: 頭";
+  if (/顔/.test(normalized)) return "装飾: 顔";
+  if (/耳/.test(normalized)) return "装飾: 耳";
+  if (/指/.test(normalized)) return "装飾: 指";
+  if (/胸/.test(normalized)) return "装飾: 胸";
+  if (/背中|背/.test(normalized)) return "装飾: 背中";
+  if (/腰/.test(normalized)) return accessoryHint && !armorHint ? "装飾: 腰" : "防具: 腰";
+
+  if (/胴|胸当|鎧|よろい|アーマー/.test(normalized)) return "防具: 胴";
+  if (/パンツ|ズボン|下半身/.test(normalized)) return "防具: パンツ";
+  if (/靴|足/.test(normalized)) return "防具: 靴";
+  if (/肩/.test(normalized)) return "防具: 肩";
+  if (/手|腕|グローブ/.test(normalized)) return "防具: 手";
+
+  return "";
 }
 
 function idbExtractEquipPart(lines, text, name="") {
@@ -5981,7 +5991,7 @@ function idbPreviewWarnings(parsed) {
     if (!(+r.weaponDamage > 0)) warnings.push("武器なのに武器ダメージが未取得です。");
     if (!(+r.weaponAttackInterval > 0)) warnings.push("武器なのに攻撃間隔が未取得です。");
     if (!(+r.weaponRange > 0)) warnings.push("武器なのに射程/有効レンジが未取得です。");
-    if (idbPreviewEquipAllowsBothHands(parsed)) warnings.push("公式DB上は右手/左手の両対応です。初期スロットが意図通りか確認してください。");
+    if (idbPreviewEquipAllowsBothHands(parsed)) warnings.push("公式DB上は右手/左手の両対応です。このツールでは初期スロットを右手優先にしています。左手で使う場合は候補追加後に変更してください。");
   }
 
   if (r.equipBuffEnabled || r.equipBuffName || r.equipBuffNote) {
@@ -6004,7 +6014,7 @@ function idbPreviewSection(title, body, extraClass="") {
 function idbPreviewNoticeHtml() {
   return `<div class="idbPreviewInfo">
     公式DBから取れる装備Buff情報は「Buff名」と「説明文」までです。
-    攻撃力%・属性ダメージ%・自然回復量などの実効果値は取得できないため、必要ならBuff登録または装備詳細で手入力してください。
+    装備Buffの攻撃力%・属性ダメージ%・ST自然回復量などの実効果値はDB仕様上取得できません。必要なら候補追加後に装備詳細またはBuff登録で手入力してください。
   </div>`;
 }
 
