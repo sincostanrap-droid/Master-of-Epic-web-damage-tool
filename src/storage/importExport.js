@@ -665,8 +665,10 @@ function exportConfig() {
 /* テキストエリアのJSONを読み込む。 */
 function importConfig() {
   try {
-    applyConfig(JSON.parse(byId("configBox").value));
+    const ok = applyConfig(JSON.parse(byId("configBox").value));
+    if (!ok) return;
   } catch (e) {
+    setImportStatus("JSONの読み込みに失敗しました: " + e.message, "warn");
     alert("JSONの読み込みに失敗: " + e.message);
   }
 }
@@ -677,8 +679,10 @@ function exportTsvConfig() {
 /* テキストエリアのTSVを読み込む。 */
 function importTsvConfig() {
   try {
-    applyConfig(parseConfigFromTsv(byId("configBox").value));
+    const ok = applyConfig(parseConfigFromTsv(byId("configBox").value));
+    if (!ok) return;
   } catch (e) {
+    setImportStatus("TSVの読み込みに失敗しました: " + e.message, "warn");
     alert("TSVの読み込みに失敗: " + e.message);
   }
 }
@@ -975,41 +979,94 @@ function importBuffOnly() {
 }
 
 /* localStorageの現在構成を削除し、初期状態へ戻す。 */
+function setImportStatus(message, type="") {
+  const el = byId("importStatus");
+  if (!el) return;
+  el.textContent = message || "";
+  el.className = `small importStatus ${type}`.trim();
+}
+
 function resetConfig() {
   if (!confirm("現在の入力内容を初期状態に戻しますか？保存済みプリセットは削除しません。")) return;
   localStorage.removeItem("moeDamageSimShortShareUrlShowcase");
   state = DEFAULT_STATE();
   renderAll();
   calc();
+  setImportStatus("入力内容を初期状態に戻しました。保存済みプリセットは残っています。", "ok");
 }
+
+// stateだけのJSONにも対応します。
+function normalizeImportedConfig(raw) {
+  if (!raw || typeof raw !== "object") return null;
+
+  if (raw.config && raw.config.inputs && raw.config.state) return raw.config;
+  if (raw.preset && raw.preset.inputs && raw.preset.state) return raw.preset;
+  if (raw.value && raw.value.inputs && raw.value.state) return raw.value;
+
+  if (raw.inputs && raw.state) return raw;
+
+  const stateLikeKeys = ["weaponReq", "skillSim", "equipment", "composite", "pct", "flat", "conv", "dmg", "special", "post", "other"];
+  if (stateLikeKeys.some(k => raw[k] !== undefined)) {
+    return {inputs: collectInputs(), state: raw};
+  }
+
+  if (raw.namedPresets && typeof raw.namedPresets === "object") {
+    const first = Object.values(raw.namedPresets).find(presetConfigLooksUsable);
+    if (first) return first.config || first;
+  }
+
+  return null;
+}
+
+function sanitizeImportedRows(rows) {
+  return Array.isArray(rows)
+    ? rows.filter(r => r && typeof r === "object" && r.source !== "skillSimMastery")
+    : [];
+}
+
 /* JSON/TSV/プリセットから復元したconfigを画面とstateへ適用する。 */
 function applyConfig(cfg) {
-  if (!cfg || !cfg.inputs || !cfg.state) return;
-  setInputs(cfg.inputs);
-  const incoming = cfg.state || {};
-  state = DEFAULT_STATE();
+  const normalized = normalizeImportedConfig(cfg);
+  if (!normalized || !normalized.inputs || !normalized.state) {
+    setImportStatus("読み込める設定データが見つかりませんでした。JSON/TSVの内容を確認してください。", "warn");
+    return false;
+  }
 
-  state.weaponReq = normalizeWeaponReqRows(incoming.weaponReq, cfg.inputs || {});
-  state.skillSim = normalizeSkillSim(incoming.skillSim);
-  state.composite = Array.isArray(incoming.composite) ? normalizeCompositeRows(incoming.composite) : state.composite;
-  state.equipment = normalizeEquipmentRows(incoming.equipment);
+  try {
+    setInputs(normalized.inputs || {});
+    const incoming = normalized.state || {};
+    state = DEFAULT_STATE();
 
-  // 旧項目UIは廃止したため、旧形式の pct/flat/conv/dmg/special は非表示で効かないよう破棄する。
-  state.pct = [];
-  state.flat = [];
-  state.conv = [];
-  state.dmg = [];
-  state.special = [];
+    state.weaponReq = normalizeWeaponReqRows(incoming.weaponReq, normalized.inputs || {});
+    state.skillSim = normalizeSkillSim(incoming.skillSim);
+    state.composite = Array.isArray(incoming.composite) ? normalizeCompositeRows(incoming.composite) : state.composite;
+    state.equipment = normalizeEquipmentRows(incoming.equipment);
 
-  ["post","other"].forEach(k => {
-    state[k] = Array.isArray(incoming[k]) ? incoming[k] : [];
-  });
-  state.conv = (state.conv || []).map(r => ({
-    ...r,
-    baseOffset: r.baseOffset !== undefined ? (+r.baseOffset || 0) : (r.offset !== undefined ? 0 : inferConversionBaseOffset(r)),
-    offset: r.offset !== undefined ? (+r.offset || 0) : 0
-  }));
-  renderAll();
-  syncSkillSimToCalcInputs(false, false);
-  calc();
+    // 旧形式のBuff/補正も捨てずに保持します。
+    // UIが非表示の行でも、古いJSON/TSVやプリセットの計算再現性を優先します。
+    state.pct = sanitizeImportedRows(incoming.pct);
+    state.flat = sanitizeImportedRows(incoming.flat);
+    state.conv = sanitizeImportedRows(incoming.conv);
+    state.dmg = sanitizeImportedRows(incoming.dmg);
+    state.special = sanitizeImportedRows(incoming.special);
+    state.post = sanitizeImportedRows(incoming.post);
+    state.other = sanitizeImportedRows(incoming.other);
+
+    state.conv = (state.conv || []).map(r => ({
+      ...r,
+      baseOffset: r.baseOffset !== undefined ? (+r.baseOffset || 0) : (r.offset !== undefined ? 0 : inferConversionBaseOffset(r)),
+      offset: r.offset !== undefined ? (+r.offset || 0) : 0
+    }));
+
+    renderAll();
+    syncSkillSimToCalcInputs(false, false);
+    calc();
+    setImportStatus("設定を読み込みました。", "ok");
+    return true;
+  } catch (e) {
+    console.error(e);
+    setImportStatus("設定の読み込み中にエラーが出ました: " + (e?.message || e), "warn");
+    alert("設定の読み込み中にエラーが出ました: " + (e?.message || e));
+    return false;
+  }
 }

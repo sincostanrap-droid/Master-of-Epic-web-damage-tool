@@ -3540,3 +3540,15 @@
 .presetStatus.warn {
   color: #8a5a00;
 }
+
+
+/* v1.21.4: 読み込み状態表示 */
+.importStatus {
+  margin: 8px 0 4px;
+}
+.importStatus.ok {
+  color: #236b2e;
+}
+.importStatus.warn {
+  color: #8a5a00;
+}
