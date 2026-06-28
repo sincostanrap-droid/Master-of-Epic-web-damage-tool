@@ -1882,7 +1882,7 @@ const SKILL_KNOWLEDGE_FALLBACK_MASTERIES = [
         "min": 40
       }
     ],
-    "effect": "料理と醸造の合成成功率が上昇する\n料理と醸造のヒットゾーン+1",
+    "effect": "料理と醸造の合成成功率の目安が上昇する\n料理と醸造のヒットゾーン+1",
     "shipEquipment": "厨房師へのオーダー",
     "acquisition": "【皿洗い】への注文",
     "transfer": "×",
@@ -2511,7 +2511,7 @@ const SKILL_KNOWLEDGE_FALLBACK_MASTERIES = [
         "min": 40
       }
     ],
-    "effect": "裁縫合成の成功率が上昇\n裁縫の滑り減少、ヒットゾーン+5",
+    "effect": "裁縫合成の成功率の目安が上昇\n裁縫の滑り減少、ヒットゾーン+5",
     "shipEquipment": "仕える心は、[ハウスキーパー]の証",
     "acquisition": "ウォーター ウンディーネ\nステンノ\n忍者\n宝箱",
     "transfer": "×",
@@ -2718,7 +2718,7 @@ const SKILL_KNOWLEDGE_FALLBACK_MASTERIES = [
         "min": 40
       }
     ],
-    "effect": "複製スキルの合成成功率が上昇する\n複製ヒットゾーン+5、グレードゾーン+1",
+    "effect": "複製スキルの合成成功率の目安が上昇する\n複製ヒットゾーン+5、グレードゾーン+1",
     "shipEquipment": "未実装",
     "acquisition": "ウォーター ウンディーネ\n御庭番\nステンノ　宝箱",
     "transfer": "×",
@@ -2941,7 +2941,7 @@ function skillKnowledgeData() {
     masteries,
     techniques: Array.isArray(src.techniques) ? src.techniques : [],
     magic: Array.isArray(src.magic) ? src.magic : [],
-    source: src.source || {masteries: "内蔵フォールバック"}
+    source: src.source || {masteries: "内蔵データ"}
   };
 }
 
@@ -3189,7 +3189,7 @@ function skillKnowledgeItemHtml(ev, type) {
     : "条件なし";
 
   const success = ev.success
-    ? `<div class="skillKnowledgeSuccess">成功率${ev.success.estimated ? "（推定）" : ""}: ${fmt(ev.success.rate, 1)}% <span class="mutedText">(${escapeHtml(ev.success.skill)} ${fmt(ev.success.current, 1)}/${fmt(ev.success.required, 1)})</span></div>`
+    ? `<div class="skillKnowledgeSuccess">成功率の目安${ev.success.estimated ? "（推定）" : ""}: ${fmt(ev.success.rate, 1)}% <span class="mutedText">(${escapeHtml(ev.success.skill)} ${fmt(ev.success.current, 1)}/${fmt(ev.success.required, 1)})</span></div>`
     : "";
 
   const tierInfo = ev.tierInfo;
@@ -3198,10 +3198,10 @@ function skillKnowledgeItemHtml(ev, type) {
     if (tierInfo.achieved) {
       const nextText = tierInfo.next
         ? ` / 次: ${escapeHtml(tierInfo.next.name || "")}`
-        : " / 最高ランク";
-      tierHtml = `<div class="skillKnowledgeTier">発動: <b>${escapeHtml(tierInfo.achieved.name || "")}</b> (${fmt(tierInfo.achieved.min, 0)}〜)${nextText}</div>`;
+        : " / 最上位";
+      tierHtml = `<div class="skillKnowledgeTier">発動： <b>${escapeHtml(tierInfo.achieved.name || "")}</b> (${fmt(tierInfo.achieved.min, 0)}〜)${nextText}</div>`;
     } else if (tierInfo.next) {
-      tierHtml = `<div class="skillKnowledgeTier">未発動: ${escapeHtml(tierInfo.next.name || "")}</div>`;
+      tierHtml = `<div class="skillKnowledgeTier">未発動： ${escapeHtml(tierInfo.next.name || "")}</div>`;
     }
   }
 
@@ -3221,7 +3221,7 @@ function skillKnowledgeItemHtml(ev, type) {
   if (item.effect) extra.push(String(item.effect).replace(/\n+/g, " / "));
   const extraHtml = extra.length ? `<div class="skillKnowledgeExtra">${escapeHtml(extra.join(" / "))}</div>` : "";
   const prereq = Array.isArray(item.prerequisiteTechniques) && item.prerequisiteTechniques.length
-    ? `<div class="skillKnowledgeNote">前提テク: ${escapeHtml(item.prerequisiteTechniques.join(" / "))}</div>`
+    ? `<div class="skillKnowledgeNote">必要テク： ${escapeHtml(item.prerequisiteTechniques.join(" / "))}</div>`
     : "";
   const desc = item.description ? `<div class="skillKnowledgeNote">${escapeHtml(String(item.description).replace(/\n+/g, " / "))}</div>` : "";
   const note = item.note ? `<div class="skillKnowledgeNote">${escapeHtml(item.note)}</div>` : "";
@@ -3270,10 +3270,10 @@ function renderSkillKnowledge() {
 
     let html = visible.length
       ? visible.map(ev => skillKnowledgeItemHtml(ev, label)).join("")
-      : `<p class="small">該当なし</p>`;
+      : `<p class="small">表示できるものはありません</p>`;
 
     if (key === "masteries" && (data.masteries || []).length < 30) {
-      html = `<div class="warn">マスタリーデータが ${(data.masteries || []).length}件しか読み込めていません。v1.20.6のindex.html/main.jsが反映されているか、ブラウザキャッシュを確認してください。</div>` + html;
+      html = `<div class="warn">マスタリーデータが ${(data.masteries || []).length}件しか読み込めていません。v1.20.6のページ本体が反映されているか、古いページデータを確認してください。</div>` + html;
     }
 
     const countId = key === "masteries" ? "skillMasteryCount" : key === "techniques" ? "skillTechniqueCount" : "skillMagicCount";
@@ -3284,9 +3284,9 @@ function renderSkillKnowledge() {
   const summary = byId("skillKnowledgeSummary");
   if (summary) {
     const dataSource = data.source?.masteries || "不明";
-    const usingFallback = dataSource === "内蔵フォールバック";
+    const usingFallback = dataSource === "内蔵データ";
     const sampleNote = `<span class="skillKnowledgeSampleNote">${usingFallback ? "内蔵マスタリー使用" : "マスタリー実データ"} / テク・魔法はサンプル</span>`;
-    summary.innerHTML = `${shown}/${total}件表示 / 使用可能 ${okCount}件 ${sampleNote}<br><span class="small mutedText">Build v1.20.9 / マスタリー ${data.masteries.length}件 / テク ${data.techniques.length}件 / 魔法 ${data.magic.length}件 / ソース: ${escapeHtml(dataSource)}</span>`;
+    summary.innerHTML = `${shown}/${total}件表示 / 使用可能 ${okCount}件 ${sampleNote}<br><span class="small mutedText">Build v1.20.9 / マスタリー ${data.masteries.length}件 / テク ${data.techniques.length}件 / 魔法 ${data.magic.length}件 / 参照元： ${escapeHtml(dataSource)}</span>`;
   }
 }
 
@@ -3475,7 +3475,7 @@ function updateSkillSimSummary() {
   const masterySlots = activeMasteries.reduce((s, m) => s + +(m.buffSlotCost || 1), 0);
   const masteryText = activeMasteries.length ? activeMasteries.map(m => m.name).join(" / ") : "なし";
   if (summaryEl) {
-    summaryEl.innerHTML += `<br>発動マスタリー: ${escapeHtml(masteryText)} / Buff枠 ${fmt(masterySlots, 0)}`;
+    summaryEl.innerHTML += `<br>発動中のマスタリー： ${escapeHtml(masteryText)} / Buff枠 ${fmt(masterySlots, 0)}`;
   }
 
 }

@@ -3522,3 +3522,9 @@
       "mastery";
   }
 }
+
+
+/* v1.21.2: ユーザー向け文言整理 */
+.appBuildStamp {
+  opacity: .75;
+}

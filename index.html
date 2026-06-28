@@ -64,7 +64,7 @@ MoE固有の主な仮定:
 </head>
 <body>
 <h1>Master of Epic 物理ダメージ計算webツール</h1>
-<p id="appBuildStamp" class="small appBuildStamp">Build: v1.21.1 / 魔法全件統合版</p>
+<p id="appBuildStamp" class="small appBuildStamp">スキルシミュレータ拡張版 v1.21.2</p>
 <section class="heroCard">
   <div>
     <div class="heroBadge">MoE / Physical Damage Calculator</div>
@@ -359,25 +359,25 @@ MoE固有の主な仮定:
         <div>
           <h3>マスタリー / テクニック / 魔法</h3>
           <p class="small">
-            発動中の複合シップや使用可能なテクニック・魔法を確認します。マスタリーは常時全件表示し、発動中のものはBuff枠として計算へ反映します。テクニック/魔法は件数が多いため初期表示は「使用可能/あと少し」です。
+            スキル値に応じて、複合シップ・使える技・使える魔法を確認できます。マスタリーは一覧から1次/2次/3次を選んで、必要スキルをまとめて入力できます。技と魔法は数が多いため、最初は「使える/あと少し」だけを表示します。
           </p>
         </div>
         <div id="skillKnowledgeSummary" class="small">-</div>
       </div>
       <div class="skillKnowledgeControls">
         <label>検索
-          <input id="skillKnowledgeSearch" type="search" placeholder="名前・カテゴリ・必要スキルで検索">
+          <input id="skillKnowledgeSearch" type="search" placeholder="名前・種類・必要スキルで検索">
         </label>
         <label>カテゴリ
           <select id="skillKnowledgeCategory"></select>
         </label>
         <label>状態
           <select id="skillKnowledgeStatus">
-            <option value="relevant" selected>使用可能/あと少し</option>
+            <option value="relevant" selected>使える/あと少し</option>
           <option value="all">すべて</option>
-          <option value="available">使用可能/発動中</option>
+          <option value="available">使える/発動中</option>
           <option value="near">あと少し</option>
-          <option value="missing">条件不足</option>
+          <option value="missing">まだ遠い</option>
           </select>
         </label>
         <button type="button" onclick="clearSkillKnowledgeFilters()">解除</button>
@@ -1211,11 +1211,11 @@ MoE固有の主な仮定:
   <textarea id="configBox" placeholder="JSONまたはTSVをここに貼り付けて読み込み可能"></textarea>
 </section>
 
-<script src="./src/storage/shareUrl.js?v=1.21.1" defer></script>
-<script src="./src/storage/importExport.js?v=1.21.1" defer></script>
-<script src="./src/calc/core.js?v=1.21.1" defer></script>
-<script src="./src/data/skillSimKnowledge.js?v=1.21.1" defer></script>
-<script src="./src/main.js?v=1.21.1" defer></script>
-<script src="./src/optimizer/core.js?v=1.21.1" defer></script>
+<script src="./src/storage/shareUrl.js?v=1.21.2" defer></script>
+<script src="./src/storage/importExport.js?v=1.21.2" defer></script>
+<script src="./src/calc/core.js?v=1.21.2" defer></script>
+<script src="./src/data/skillSimKnowledge.js?v=1.21.2" defer></script>
+<script src="./src/main.js?v=1.21.2" defer></script>
+<script src="./src/optimizer/core.js?v=1.21.2" defer></script>
 </body>
 </html>
