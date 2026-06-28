@@ -3048,6 +3048,14 @@ function activeSkillSimMasteries() {
     }));
 }
 
+function skillSimMasterySummaryText() {
+  const activeMasteries = activeSkillSimMasteries();
+  const masterySlots = activeMasteries.reduce((s, m) => s + +(m.buffSlotCost || 1), 0);
+  const masteryText = activeMasteries.length ? activeMasteries.map(m => m.name).join(" / ") : "なし";
+  return `発動中のマスタリー：${escapeHtml(masteryText)} / Buff枠 ${fmt(masterySlots, 0)}`;
+}
+
+
 function skillSimMasteryBuffRows() {
   return activeSkillSimMasteries()
     .filter(m => m.usesBuffSlot)
@@ -3469,15 +3477,11 @@ function updateSkillSimSummary() {
     `自動反映 → ${state.skillSim.autoApply === false ? "OFF" : "ON"}`
   ].map(x => `<div>${x}</div>`).join("");
 
-  renderSkillKnowledge();
-
-  const activeMasteries = activeSkillSimMasteries();
-  const masterySlots = activeMasteries.reduce((s, m) => s + +(m.buffSlotCost || 1), 0);
-  const masteryText = activeMasteries.length ? activeMasteries.map(m => m.name).join(" / ") : "なし";
-  if (summaryEl) {
-    summaryEl.innerHTML += `<br>発動中のマスタリー： ${escapeHtml(masteryText)} / Buff枠 ${fmt(masterySlots, 0)}`;
+  const masterySummaryEl = byId("skillSimSummary");
+  if (masterySummaryEl && typeof skillSimMasterySummaryText === "function") {
+    masterySummaryEl.innerHTML += `<br>${skillSimMasterySummaryText()}`;
   }
-
+  renderSkillKnowledge();
 }
 
 function applySkillSimToCalc(silent=false) {

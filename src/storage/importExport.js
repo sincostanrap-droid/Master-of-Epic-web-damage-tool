@@ -665,8 +665,7 @@ function exportConfig() {
 /* テキストエリアのJSONを読み込む。 */
 function importConfig() {
   try {
-    const ok = applyConfig(JSON.parse(byId("configBox").value));
-    if (!ok) return;
+    applyConfig(JSON.parse(byId("configBox").value));
   } catch (e) {
     setImportStatus("JSONの読み込みに失敗しました: " + e.message, "warn");
     alert("JSONの読み込みに失敗: " + e.message);
@@ -679,8 +678,7 @@ function exportTsvConfig() {
 /* テキストエリアのTSVを読み込む。 */
 function importTsvConfig() {
   try {
-    const ok = applyConfig(parseConfigFromTsv(byId("configBox").value));
-    if (!ok) return;
+    applyConfig(parseConfigFromTsv(byId("configBox").value));
   } catch (e) {
     setImportStatus("TSVの読み込みに失敗しました: " + e.message, "warn");
     alert("TSVの読み込みに失敗: " + e.message);
@@ -1043,7 +1041,6 @@ function applyConfig(cfg) {
     state.equipment = normalizeEquipmentRows(incoming.equipment);
 
     // 旧形式のBuff/補正も捨てずに保持します。
-    // UIが非表示の行でも、古いJSON/TSVやプリセットの計算再現性を優先します。
     state.pct = sanitizeImportedRows(incoming.pct);
     state.flat = sanitizeImportedRows(incoming.flat);
     state.conv = sanitizeImportedRows(incoming.conv);
