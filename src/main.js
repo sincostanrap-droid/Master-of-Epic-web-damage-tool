@@ -3162,9 +3162,15 @@ function renderSkillKnowledge() {
     const visible = evaluated.filter(ev => skillKnowledgeMatches(ev, filter));
     shown += visible.length;
 
-    byId(id).innerHTML = visible.length
+    let html = visible.length
       ? visible.map(ev => skillKnowledgeItemHtml(ev, label)).join("")
       : `<p class="small">該当なし</p>`;
+
+    if (key === "masteries" && (data.masteries || []).length < 30) {
+      html = `<div class="warn">マスタリーデータが ${(data.masteries || []).length}件しか読み込めていません。v1.20.3のindex.html/main.jsが反映されているか、ブラウザキャッシュを確認してください。</div>` + html;
+    }
+
+    byId(id).innerHTML = html;
   });
 
   const summary = byId("skillKnowledgeSummary");
@@ -3172,7 +3178,7 @@ function renderSkillKnowledge() {
     const dataSource = data.source?.masteries || "不明";
     const usingFallback = dataSource === "内蔵フォールバック";
     const sampleNote = `<span class="skillKnowledgeSampleNote">${usingFallback ? "内蔵マスタリー使用" : "マスタリー実データ"} / テク・魔法はサンプル</span>`;
-    summary.innerHTML = `${shown}/${total}件表示 / 使用可能 ${okCount}件 ${sampleNote}<br><span class="small mutedText">マスタリー: ${escapeHtml(dataSource)} / ${data.masteries.length}件</span>`;
+    summary.innerHTML = `${shown}/${total}件表示 / 使用可能 ${okCount}件 ${sampleNote}<br><span class="small mutedText">Build v1.20.3 / マスタリー ${data.masteries.length}件 / テク ${data.techniques.length}件 / 魔法 ${data.magic.length}件 / ソース: ${escapeHtml(dataSource)}</span>`;
   }
 }
 

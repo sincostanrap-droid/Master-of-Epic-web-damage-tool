@@ -3303,3 +3303,10 @@
 #skillKnowledgeSummary .mutedText {
   opacity: .75;
 }
+
+
+/* v1.20.3: ビルド表示 */
+.appBuildStamp {
+  margin-top: -6px;
+  opacity: .78;
+}
