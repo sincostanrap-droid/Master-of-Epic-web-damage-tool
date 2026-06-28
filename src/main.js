@@ -3280,6 +3280,8 @@ function addOtherRow() {
 /* state全体を画面へ再描画する。applyConfig後やリセット後に呼ぶ。 */
 
 let integratedOptimizerResults = [];
+let optimizerLastSummary = null;
+let optimizerLastPayload = null;
 
 function integratedOptimizerSettings() {
   const settings = {
@@ -4160,6 +4162,8 @@ function runOptimizerOnMainThread(payload, reason="") {
     });
 
     integratedOptimizerResults = out.results || [];
+    optimizerLastSummary = out.summary || null;
+    optimizerLastPayload = payload || null;
     if (progress) {
       progress.max = out.summary?.evaluated || 100;
       progress.value = out.summary?.evaluated || progress.max;
@@ -4213,6 +4217,8 @@ function ensureOptimizerWorker() {
 
     if (msg.type === "result") {
       integratedOptimizerResults = msg.results || [];
+      optimizerLastSummary = msg.summary || null;
+      optimizerLastPayload = optimizerFallbackPayload || null;
       if (progress) {
         progress.max = msg.summary?.evaluated || 100;
         progress.value = msg.summary?.evaluated || progress.max;
@@ -4316,12 +4322,114 @@ function cancelIntegratedOptimizer() {
   if (progress) progress.value = 0;
 }
 
+
+function optimizerApproximationDiagnosticsHtml() {
+  const summary = optimizerLastSummary || {};
+  const payload = optimizerLastPayload || optimizerFallbackPayload || {};
+  const settings = payload.settings || integratedOptimizerSettings();
+  const results = integratedOptimizerResults || [];
+  const lines = [];
+
+  const modeText = summary.statusText || "";
+  const exactTotal = settings.optimizerEquipmentExactTotal || summary.optimizerEquipmentExactTotal || settings.exactEquipmentLimit || 0;
+  const searchMode =
+    settings.optimizerEquipmentSearchMode ||
+    (/装備を全通り確認/.test(modeText) ? "exact" : (/装備候補を一部確認/.test(modeText) ? "beam" : ""));
+
+  if (searchMode === "beam" || /装備候補を一部確認/.test(modeText)) {
+    lines.push(`装備候補が多いため、装備は近似探索です。全通り確認ではありません。精度重視にするか、不要候補を「除外」または候補フィルタで整理してください。`);
+  } else if (searchMode === "exact" || /装備を全通り確認/.test(modeText)) {
+    lines.push(`装備は全通り確認です。結果精度は高めです。`);
+  }
+
+  if ((settings.optimizerEquipmentExactTotal || 0) > (settings.exactEquipmentLimit || 0) && settings.exactEquipmentLimit > 0) {
+    lines.push(`装備組み合わせ候補 ${settings.optimizerEquipmentExactTotal} 通りが、全探索上限 ${settings.exactEquipmentLimit} を超えています。`);
+  }
+
+  if (settings.accuracyPreset !== "accurate") {
+    lines.push(`現在の検索精度は「${settings.accuracyPreset === "fast" ? "高速" : "標準"}」です。精度が怪しい時は「精度重視」を試してください。`);
+  }
+
+  if ((settings.beamWidth || 0) < 120 && searchMode === "beam") {
+    lines.push(`検索の広さが ${settings.beamWidth} です。候補が多い場合は 200 以上に上げると改善することがあります。`);
+  }
+
+  if ((settings.equipmentEvalLimit || 0) < 100 && searchMode === "beam") {
+    lines.push(`装備候補の確認数が ${settings.equipmentEvalLimit} です。候補が多い場合は 100〜300 へ上げると取りこぼしが減ります。`);
+  }
+
+  const hasCurrent = results.some(r => r.currentConfig || r.baselineReference);
+  if (!hasCurrent && settings.includeCurrentConfig) {
+    lines.push(`現在ON構成が条件外または表示外です。現在構成より弱い結果に見える場合は、上限・バフ枠・競合設定を確認してください。`);
+  }
+
+  if (!lines.length) {
+    lines.push(`近似探索の警告はありません。結果がおかしい場合は、固定/除外、右手武器、必要スキル、装備Buff手入力を確認してください。`);
+  }
+
+  const level = lines.some(x => /近似|超え|高速|上げる|表示外|怪しい/.test(x)) ? "warn" : "ok";
+  return `<div class="optimizerDiagnostics ${level}">
+    <b>最適化チェック</b>
+    <ul>${lines.map(x => `<li>${escapeHtml(x)}</li>`).join("")}</ul>
+    <div class="small">状態: ${escapeHtml(modeText || "検索状態未取得")}</div>
+  </div>`;
+}
+
+function damageAuditHtml(m, inputs) {
+  const warnings = [];
+  const infos = [];
+
+  const isWeaponAttack = inputs.attackType === "attack" || inputs.attackType === "heavy";
+  if (isWeaponAttack && !m.selectedWeapon) warnings.push("計算に使う武器が見つかりません。右手武器の使用ONを確認してください。");
+  if (m.selectedWeapon && !(+m.weaponDamage > 0)) warnings.push("選択武器の武器ダメージが0です。公式DB取り込み値か手入力値を確認してください。");
+
+  if (m.skillModInfo?.evaluated?.length) {
+    if ((+m.skillModInfo.mod || 0) <= 0) warnings.push("武器性能発揮率が0%です。必要スキルが8割未満の条件があります。");
+    else if ((+m.skillModInfo.mod || 0) < 1) warnings.push(`武器性能発揮率が ${(m.skillModInfo.mod * 100).toFixed(1)}% です。必要スキル不足でダメージが下がっています。`);
+  }
+
+  if (m.selectedWeapon && (m.selectedWeapon.equipBuffName || m.selectedWeapon.equipBuffNote) && !equipmentBuffHasEffect(m.selectedWeapon)) {
+    infos.push("装備Buff名/説明文はありますが、実効果値は未入力です。攻撃力%・属性ダメージ%などは必要に応じて手入力してください。");
+  }
+
+  if (m.selectedWeapon && /左手/.test(m.selectedWeapon.slot || "")) {
+    infos.push("左手武器が計算対象です。右手武器がONなら右手が優先されます。想定武器か確認してください。");
+  }
+
+  const formula = [
+    `攻撃力 ${fmt(m.atk, 3)}`,
+    `×0.8`,
+    `×攻撃/テク ${fmt(m.attackMultiplier, 4)}`,
+    `×与ダメ ${fmt(m.dmgMultiplier, 3)}`,
+    `×特攻 ${fmt(m.specialMultiplier, 3)}`,
+    `×防御 ${fmt(m.defenseFactor, 6)}`,
+    `×クリ ${fmt(m.critAvg, 3)}`,
+    `×外枠 ${fmt(m.postMultiplier, 3)}`
+  ].join(" ");
+
+  const weapon = m.selectedWeapon
+    ? `${escapeHtml((m.selectedWeapon.slot || "武器").replace(/^武器: /, ""))} ${escapeHtml(m.selectedWeapon.name || "名称未入力")} / Dmg ${fmt(m.weaponDamage, 1)} / 性能 ${(m.skillModInfo?.mod * 100 || 100).toFixed(1)}%`
+    : "なし";
+
+  const messages = warnings.length
+    ? `<div class="damageAuditWarnings">${warnings.map(x => `⚠ ${escapeHtml(x)}`).join("<br>")}</div>`
+    : `<div class="damageAuditOk">計算に使う武器・必要スキルに大きな警告はありません。</div>`;
+
+  const infoHtml = infos.length ? `<div class="damageAuditInfo">${infos.map(x => `※ ${escapeHtml(x)}`).join("<br>")}</div>` : "";
+
+  return `${messages}${infoHtml}
+    <div class="damageAuditFormula"><b>計算武器:</b> ${weapon}<br><b>式:</b> ${escapeHtml(formula)}<br><b>丸め前:</b> ${fmt(Math.floor(m.rawDamage), 0)} / <b>表示:</b> ${fmt(Math.floor(m.finalDamage), 0)}</div>`;
+}
+
+
 function renderIntegratedOptimizerResults() {
   const el = byId("optimizerResults");
   if (!el) return;
 
+  const diagnostics = optimizerApproximationDiagnosticsHtml();
+
   if (!integratedOptimizerResults.length) {
-    el.innerHTML = `<p class="small">条件内に収まる結果がありません。バフ枠上限、各ステータス上限、競合グループ、装備同士の競合、候補の使用状況を見直してください。</p>`;
+    el.innerHTML = `${diagnostics}<p class="small">条件内に収まる結果がありません。バフ枠上限、各ステータス上限、競合グループ、装備同士の競合、候補の使用状況を見直してください。</p>`;
     return;
   }
 
@@ -4353,7 +4461,7 @@ function renderIntegratedOptimizerResults() {
     </tr>`;
   }).join("");
 
-  el.innerHTML = `<table>
+  el.innerHTML = `${diagnostics}<table>
     <thead><tr><th>順位</th><th>種別</th><th>ダメージ</th><th>攻撃力</th><th>魔力</th><th>枠</th><th>追加ステータス</th><th>装備</th><th>装備以外Buff</th><th>適用</th></tr></thead>
     <tbody>${body}</tbody>
   </table>`;
@@ -6656,6 +6764,7 @@ function calc() {
   if (inputs.attackType === "heavy") byId("techMultiplier").value = m.attackMultiplier.toFixed(4);
 
   byId("finalDamage").textContent = `${Math.floor(m.finalDamage).toLocaleString()} ダメージ前後`;
+  if (byId("damageAudit")) byId("damageAudit").innerHTML = damageAuditHtml(m, inputs);
   updateSlotUI(m);
   updateEquipmentSummary(m);
   updateWeaponReqAutoCurrentDisplays();

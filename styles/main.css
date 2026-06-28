@@ -3131,3 +3131,50 @@
     grid-template-columns: 1fr;
   }
 }
+
+
+/* v1.19.1: 最適化/ダメージ診断 */
+.optimizerDiagnostics {
+  margin: 10px 0 12px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(120, 110, 130, .18);
+  background: rgba(255, 255, 255, .72);
+}
+.optimizerDiagnostics ul {
+  margin: 6px 0;
+  padding-left: 1.4em;
+}
+.optimizerDiagnostics.warn {
+  background: rgba(255, 247, 223, .96);
+  border-color: rgba(220, 170, 70, .55);
+}
+.optimizerDiagnostics.ok {
+  background: rgba(238, 250, 240, .92);
+  border-color: rgba(120, 190, 135, .45);
+}
+.damageAudit {
+  margin-top: 8px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(120, 110, 130, .18);
+  background: rgba(255, 255, 255, .66);
+  font-size: 12px;
+  line-height: 1.5;
+}
+.damageAuditWarnings {
+  color: #7a4b00;
+  font-weight: 700;
+}
+.damageAuditOk {
+  color: #245c32;
+  font-weight: 700;
+}
+.damageAuditInfo {
+  margin-top: 4px;
+  color: #555;
+}
+.damageAuditFormula {
+  margin-top: 5px;
+  opacity: .86;
+}
