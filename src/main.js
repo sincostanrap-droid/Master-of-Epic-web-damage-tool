@@ -1024,6 +1024,197 @@ function handleSkillSimChanged() {
 }
 
 
+
+function skillKnowledgeData() {
+  const src = (typeof window !== "undefined" && window.MOE_SKILL_SIM_KNOWLEDGE) || {};
+  return {
+    masteries: Array.isArray(src.masteries) ? src.masteries : [],
+    techniques: Array.isArray(src.techniques) ? src.techniques : [],
+    magic: Array.isArray(src.magic) ? src.magic : []
+  };
+}
+
+function skillKnowledgeCurrentValue(skill) {
+  return skillSimValue(skill);
+}
+
+function skillKnowledgeRequirementText(req) {
+  const skill = req.skill || req.name || "条件";
+  if (req.max !== undefined && req.min !== undefined) return `${skill} ${fmt(req.min, 1)}〜${fmt(req.max, 1)}`;
+  if (req.max !== undefined) return `${skill} ${fmt(req.max, 1)}以下`;
+  return `${skill} ${fmt(req.min || req.required || 0, 1)}以上`;
+}
+
+function skillKnowledgeEvaluateRequirement(req) {
+  const skill = req.skill || req.name || "";
+  const current = skillKnowledgeCurrentValue(skill);
+  const min = req.min !== undefined ? +req.min : +(req.required || 0);
+  const max = req.max !== undefined ? +req.max : null;
+  let ok = true;
+  let shortage = 0;
+  if (Number.isFinite(min) && min > 0 && current < min) {
+    ok = false;
+    shortage = Math.max(shortage, min - current);
+  }
+  if (max !== null && Number.isFinite(max) && current > max) {
+    ok = false;
+    shortage = Math.max(shortage, current - max);
+  }
+  return {skill, current, min, max, ok, shortage};
+}
+
+function skillKnowledgeEvaluate(item) {
+  const reqs = Array.isArray(item.requirements) ? item.requirements : [];
+  const evaluated = reqs.map(skillKnowledgeEvaluateRequirement);
+  const missing = evaluated.filter(r => !r.ok);
+  const totalShortage = missing.reduce((s, r) => s + (+r.shortage || 0), 0);
+  const available = missing.length === 0;
+
+  let success = null;
+  if (item.successSkill || item.successRequired) {
+    const skill = item.successSkill || (reqs[0]?.skill || "");
+    const current = skillKnowledgeCurrentValue(skill);
+    const required = Math.max(0.000001, +(item.successRequired || reqs[0]?.min || reqs[0]?.required || 0));
+    const rate = required <= 0 ? 100 : Math.max(0, Math.min(100, (current / required) * 100));
+    success = {skill, current, required, rate, estimated:true};
+  }
+
+  const status = available ? "available" : (totalShortage <= 10 ? "near" : "missing");
+  return {item, evaluated, missing, totalShortage, available, success, status};
+}
+
+function skillKnowledgeCategories() {
+  const data = skillKnowledgeData();
+  const cats = new Set(["all"]);
+  [...data.masteries, ...data.techniques, ...data.magic].forEach(x => {
+    if (x.category) cats.add(x.category);
+  });
+  return Array.from(cats);
+}
+
+function setupSkillKnowledgeControls() {
+  const cat = byId("skillKnowledgeCategory");
+  if (cat && cat.dataset.ready !== "1") {
+    cat.innerHTML = skillKnowledgeCategories().map(c => `<option value="${escapeHtml(c)}">${c === "all" ? "全カテゴリ" : escapeHtml(c)}</option>`).join("");
+    cat.dataset.ready = "1";
+  }
+
+  ["skillKnowledgeSearch", "skillKnowledgeCategory", "skillKnowledgeStatus"].forEach(id => {
+    const el = byId(id);
+    if (!el || el.dataset.skillKnowledgeReady === "1") return;
+    el.addEventListener(id === "skillKnowledgeSearch" ? "input" : "change", renderSkillKnowledge);
+    el.dataset.skillKnowledgeReady = "1";
+  });
+}
+
+function clearSkillKnowledgeFilters() {
+  if (byId("skillKnowledgeSearch")) byId("skillKnowledgeSearch").value = "";
+  if (byId("skillKnowledgeCategory")) byId("skillKnowledgeCategory").value = "all";
+  if (byId("skillKnowledgeStatus")) byId("skillKnowledgeStatus").value = "all";
+  renderSkillKnowledge();
+}
+
+function skillKnowledgeFilterState() {
+  return {
+    text: (byId("skillKnowledgeSearch")?.value || "").trim().toLowerCase(),
+    category: byId("skillKnowledgeCategory")?.value || "all",
+    status: byId("skillKnowledgeStatus")?.value || "all"
+  };
+}
+
+function skillKnowledgeSearchText(ev) {
+  const item = ev.item || {};
+  return [
+    item.name, item.category, item.kind, item.note, item.reagent,
+    ...(Array.isArray(item.requirements) ? item.requirements.map(skillKnowledgeRequirementText) : [])
+  ].filter(Boolean).join(" ").toLowerCase();
+}
+
+function skillKnowledgeMatches(ev, filter) {
+  const item = ev.item || {};
+  if (filter.category !== "all" && item.category !== filter.category) return false;
+  if (filter.status !== "all" && ev.status !== filter.status) return false;
+  if (filter.text) {
+    const terms = filter.text.split(/\s+/).filter(Boolean);
+    const hay = skillKnowledgeSearchText(ev);
+    if (!terms.every(t => hay.includes(t))) return false;
+  }
+  return true;
+}
+
+function skillKnowledgeStatusLabel(status) {
+  return status === "available" ? "OK" : status === "near" ? "あと少し" : "不足";
+}
+
+function skillKnowledgeStatusClass(status) {
+  return status === "available" ? "ok" : status === "near" ? "warn" : "bad";
+}
+
+function skillKnowledgeItemHtml(ev, type) {
+  const item = ev.item || {};
+  const reqText = ev.evaluated.length
+    ? ev.evaluated.map(r => `${escapeHtml(r.skill)} ${fmt(r.current, 1)}/${r.max !== null ? "≤" + fmt(r.max, 1) : fmt(r.min, 1)}${r.ok ? "" : ` <b class="bad">不足${fmt(r.shortage, 1)}</b>`}`).join(" / ")
+    : "条件なし";
+
+  const success = ev.success
+    ? `<div class="skillKnowledgeSuccess">成功率${ev.success.estimated ? "（推定）" : ""}: ${fmt(ev.success.rate, 1)}% <span class="mutedText">(${escapeHtml(ev.success.skill)} ${fmt(ev.success.current, 1)}/${fmt(ev.success.required, 1)})</span></div>`
+    : "";
+
+  const extra = [];
+  if (item.mp !== undefined) extra.push(`MP ${item.mp}`);
+  if (item.reagent) extra.push(`触媒 ${item.reagent}`);
+  const extraHtml = extra.length ? `<div class="skillKnowledgeExtra">${escapeHtml(extra.join(" / "))}</div>` : "";
+  const note = item.note ? `<div class="skillKnowledgeNote">${escapeHtml(item.note)}</div>` : "";
+
+  return `<article class="skillKnowledgeItem ${skillKnowledgeStatusClass(ev.status)}">
+    <div class="skillKnowledgeItemHeader">
+      <b>${escapeHtml(item.name || "名称未入力")}</b>
+      <span>${skillKnowledgeStatusLabel(ev.status)}</span>
+    </div>
+    <div class="skillKnowledgeMeta">${escapeHtml(item.category || type)} / ${escapeHtml(item.kind || type)}</div>
+    <div class="skillKnowledgeReq">${reqText}</div>
+    ${success}
+    ${extraHtml}
+    ${note}
+  </article>`;
+}
+
+function renderSkillKnowledge() {
+  if (!byId("skillMasteryList")) return;
+  setupSkillKnowledgeControls();
+  const data = skillKnowledgeData();
+  const filter = skillKnowledgeFilterState();
+
+  const groups = [
+    ["masteries", "マスタリー", "skillMasteryList"],
+    ["techniques", "テクニック", "skillTechniqueList"],
+    ["magic", "魔法", "skillMagicList"]
+  ];
+
+  let total = 0;
+  let shown = 0;
+  let okCount = 0;
+
+  groups.forEach(([key, label, id]) => {
+    const evaluated = (data[key] || []).map(skillKnowledgeEvaluate);
+    total += evaluated.length;
+    okCount += evaluated.filter(x => x.available).length;
+    const visible = evaluated.filter(ev => skillKnowledgeMatches(ev, filter));
+    shown += visible.length;
+
+    byId(id).innerHTML = visible.length
+      ? visible.map(ev => skillKnowledgeItemHtml(ev, label)).join("")
+      : `<p class="small">該当なし</p>`;
+  });
+
+  const summary = byId("skillKnowledgeSummary");
+  if (summary) {
+    const sampleNote = `<span class="skillKnowledgeSampleNote">v1.20はサンプルデータです</span>`;
+    summary.innerHTML = `${shown}/${total}件表示 / 使用可能 ${okCount}件 ${sampleNote}`;
+  }
+}
+
+
 function renderSkillSim() {
   if (!state.skillSim) state.skillSim = defaultSkillSimState();
   state.skillSim = normalizeSkillSim(state.skillSim);
@@ -1102,6 +1293,7 @@ function renderSkillSim() {
     root.appendChild(box);
   });
 
+  setupSkillKnowledgeControls();
   updateSkillSimSummary();
 }
 
@@ -1132,6 +1324,8 @@ function updateSkillSimSummary() {
     `${escapeHtml(state.skillSim.weaponSkill)} → 武器使用条件 ${fmt(d.weapon, 1)}`,
     `自動反映 → ${state.skillSim.autoApply === false ? "OFF" : "ON"}`
   ].map(x => `<div>${x}</div>`).join("");
+
+  renderSkillKnowledge();
 }
 
 function applySkillSimToCalc(silent=false) {

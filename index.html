@@ -349,6 +349,52 @@ MoE固有の主な仮定:
     </div>
   </div>
 
+
+  <div class="skillKnowledgePanel">
+    <div class="skillKnowledgeHeader">
+      <div>
+        <h3>マスタリー / テクニック / 魔法</h3>
+        <p class="small">
+          現在のスキル構成で発動・使用できるものを確認します。v1.20では表示基盤とサンプルデータを入れています。
+        </p>
+      </div>
+      <div id="skillKnowledgeSummary" class="small">-</div>
+    </div>
+    <div class="skillKnowledgeControls">
+      <label>検索
+        <input id="skillKnowledgeSearch" type="search" placeholder="名前・カテゴリ・必要スキルで検索">
+      </label>
+      <label>カテゴリ
+        <select id="skillKnowledgeCategory"></select>
+      </label>
+      <label>状態
+        <select id="skillKnowledgeStatus">
+          <option value="all">すべて</option>
+          <option value="available">使用可能/発動中</option>
+          <option value="near">あと少し</option>
+          <option value="missing">条件不足</option>
+        </select>
+      </label>
+      <button type="button" onclick="clearSkillKnowledgeFilters()">解除</button>
+    </div>
+
+    <div class="skillKnowledgeGrid">
+      <section class="skillKnowledgeList">
+        <h4>マスタリー</h4>
+        <div id="skillMasteryList" class="skillKnowledgeItems">-</div>
+      </section>
+      <section class="skillKnowledgeList">
+        <h4>テクニック</h4>
+        <div id="skillTechniqueList" class="skillKnowledgeItems">-</div>
+      </section>
+      <section class="skillKnowledgeList">
+        <h4>魔法</h4>
+        <div id="skillMagicList" class="skillKnowledgeItems">-</div>
+      </section>
+    </div>
+  </div>
+
+
   <div id="skillSimGroups" class="skillSimGroups"></div>
 </section>
 
@@ -1165,6 +1211,7 @@ MoE固有の主な仮定:
 <script src="./src/storage/shareUrl.js" defer></script>
 <script src="./src/storage/importExport.js" defer></script>
 <script src="./src/calc/core.js" defer></script>
+<script src="./src/data/skillSimKnowledge.js" defer></script>
 <script src="./src/main.js" defer></script>
 <script src="./src/optimizer/core.js" defer></script>
 </body>

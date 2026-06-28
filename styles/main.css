@@ -3178,3 +3178,113 @@
   margin-top: 5px;
   opacity: .86;
 }
+
+
+/* v1.20: スキルシミュレータ知識表示 */
+.skillKnowledgePanel {
+  margin: 14px 0;
+  padding: 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(120, 110, 130, .18);
+  background: rgba(255, 255, 255, .70);
+}
+.skillKnowledgeHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+}
+.skillKnowledgeHeader h3 {
+  margin: 0 0 4px;
+}
+.skillKnowledgeControls {
+  display: grid;
+  grid-template-columns: minmax(220px, 1.4fr) minmax(160px, .8fr) minmax(150px, .8fr) auto;
+  gap: 8px;
+  align-items: end;
+  margin: 10px 0 12px;
+}
+.skillKnowledgeControls label {
+  display: grid;
+  gap: 3px;
+  font-size: 12px;
+}
+.skillKnowledgeControls input,
+.skillKnowledgeControls select {
+  width: 100%;
+}
+.skillKnowledgeGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+.skillKnowledgeList {
+  border-radius: 12px;
+  border: 1px solid rgba(120, 110, 130, .15);
+  background: rgba(255, 255, 255, .58);
+  padding: 10px;
+}
+.skillKnowledgeList h4 {
+  margin: 0 0 8px;
+}
+.skillKnowledgeItems {
+  display: grid;
+  gap: 8px;
+  max-height: 440px;
+  overflow: auto;
+}
+.skillKnowledgeItem {
+  padding: 8px 9px;
+  border-radius: 10px;
+  border: 1px solid rgba(120, 110, 130, .18);
+  background: rgba(255, 255, 255, .84);
+  line-height: 1.45;
+}
+.skillKnowledgeItem.ok {
+  border-color: rgba(100, 180, 120, .45);
+  background: rgba(238, 250, 240, .92);
+}
+.skillKnowledgeItem.warn {
+  border-color: rgba(220, 170, 70, .45);
+  background: rgba(255, 247, 223, .94);
+}
+.skillKnowledgeItem.bad {
+  opacity: .78;
+}
+.skillKnowledgeItemHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+.skillKnowledgeItemHeader span {
+  white-space: nowrap;
+  font-size: 12px;
+}
+.skillKnowledgeMeta,
+.skillKnowledgeExtra,
+.skillKnowledgeNote,
+.skillKnowledgeSuccess {
+  font-size: 12px;
+  opacity: .85;
+}
+.skillKnowledgeReq {
+  margin-top: 3px;
+  font-size: 12px;
+}
+.skillKnowledgeSampleNote {
+  display: inline-block;
+  margin-left: .5em;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: rgba(255, 247, 223, .96);
+  border: 1px solid rgba(220, 170, 70, .45);
+}
+@media (max-width: 980px) {
+  .skillKnowledgeGrid,
+  .skillKnowledgeControls {
+    grid-template-columns: 1fr;
+  }
+  .skillKnowledgeHeader {
+    display: block;
+  }
+}
