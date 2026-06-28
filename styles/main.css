@@ -3296,3 +3296,10 @@
   font-size: 12px;
   font-weight: 600;
 }
+
+
+/* v1.20.2: データ読み込み状態表示 */
+.skillKnowledgeHeader .mutedText,
+#skillKnowledgeSummary .mutedText {
+  opacity: .75;
+}
