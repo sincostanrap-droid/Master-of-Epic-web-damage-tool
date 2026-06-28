@@ -551,3 +551,17 @@ Cloudflare Workerで取得した公式DB HTMLは、画面本文ではなく `#ap
 - v1.18.7追補: 必要スキルの重複表示をスキル名単位で除去。同じスキルが複数回出た場合は大きい必要値を採用。
 
 - v1.18.7追補2: normalizeWeaponReqRowsForEquipment重複除去も追加し、表示・保存前の重複を抑制。
+
+
+## Worker v1.18.8 SGKウェポン系の番号付き必要スキル修正
+
+修正:
+- `requiredSkill1` / `need_level1`
+- `requiredSkill2` / `need_level2`
+- `requiredSkill3` / `need_level3`
+のような番号付きフィールドを取得。
+
+追加:
+- `data-page` の `props.weapon` だけでなく、関連する必要スキル配列やJSON文字列も補助解析
+- `need_level1 100` のようなラベル末尾数字をインデックスとして扱い、値の `100` を必要値として取得
+- SGKウェポン相当のセルフテストを追加

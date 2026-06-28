@@ -5329,7 +5329,7 @@ function idbFlattenPrimitiveText(value, out=[], seen=new WeakSet(), depth=0, pat
 function idbWeaponReqsFromText(text, defaultLevel=0) {
   const source = idbDecodeHtmlEntities(idbDecodeJsonEscapes(String(text || "")))
     .replace(/[{}\[\]",]/g, " ")
-    .replace(/[：:]/g, " ")
+    .replace(/[：:=]/g, " ")
     .replace(/\s+/g, " ")
     .trim();
 
@@ -5344,19 +5344,19 @@ function idbWeaponReqsFromText(text, defaultLevel=0) {
   };
 
   const skills = SKILL_SIM_ALL.slice().sort((a, b) => b.length - a.length);
+  const levelLabel = "(?:value|level|required|need|need_level|needLevel|required_level|requiredLevel|requiredSkillLevel|required_skill_level|require_skill_value|skill_level|skillLevel|point|points)";
+
   skills.forEach(skill => {
     const s = idbEscapeRegExp(skill);
-    // こんぼう 50.0 / こんぼう:50.0 / こんぼう","need_level":50 に近い形
-    const pairRe = new RegExp(`${s}\\s*(?:Lv\\.?|level|必要|required|need)?\\s*([0-9]+(?:\\.\\d+)?)`, "g");
     let m;
+
+    const pairRe = new RegExp(`${s}\\s*(?:Lv\\.?|level|必要|required|need)?\\s*([0-9]+(?:\\.\\d+)?)`, "g");
     while ((m = pairRe.exec(source)) !== null) add(skill, m[1]);
 
-    // {"name":"こんぼう","pivot":{"value":50}} のように間に語がある形
-    const nearRe = new RegExp(`${s}[\\s\\S]{0,80}?(?:value|level|required|need_level|skill_level)\\s*([0-9]+(?:\\.\\d+)?)`, "g");
+    const nearRe = new RegExp(`${s}[\\s\\S]{0,160}?${levelLabel}\\d*\\s*([0-9]+(?:\\.\\d+)?)`, "g");
     while ((m = nearRe.exec(source)) !== null) add(skill, m[1]);
 
-    // 逆順: value 50 name こんぼう
-    const revRe = new RegExp(`(?:value|level|required|need_level|skill_level)\\s*([0-9]+(?:\\.\\d+)?)[\\s\\S]{0,80}?${s}`, "g");
+    const revRe = new RegExp(`${levelLabel}\\d*\\s*([0-9]+(?:\\.\\d+)?)[\\s\\S]{0,160}?${s}`, "g");
     while ((m = revRe.exec(source)) !== null) add(skill, m[1]);
   });
 
@@ -5380,14 +5380,18 @@ function idbNumericValueFromTextLabels(text, labels) {
   return 0;
 }
 
-function idbSupplementStructuredWeapon(row, item, raw) {
+function idbSupplementStructuredWeapon(row, item, raw, page=null) {
   if (!row || !isWeaponEquipmentRow(row)) return row;
 
   const itemText = idbFlattenPrimitiveText(item).join("\n");
+  const pageText = [
+    idbFlattenPrimitiveText(page?.props?.weapon || {}).join("\n"),
+    idbPagePropsCompactText(page)
+  ].filter(Boolean).join("\n");
   const looseText = (() => {
     try { return idbTextFromPaste(raw); } catch { return ""; }
   })();
-  const combined = [itemText, looseText].filter(Boolean).join("\n");
+  const combined = [itemText, pageText, looseText].filter(Boolean).join("\n");
 
   const directLevel =
     idbNumberFromAny(item?.need_level) ||
@@ -5404,12 +5408,12 @@ function idbSupplementStructuredWeapon(row, item, raw) {
 
   if (!(row.weaponAttackInterval > 0)) {
     row.weaponAttackInterval =
-      idbNumericValueFromTextLabels(combined, ["攻撃間隔", "攻撃ディレイ", "attack_interval", "attackInterval", "delay", "interval"]) || row.weaponAttackInterval || 0;
+      idbNumericValueFromTextLabels(combined, ["攻撃間隔", "攻撃ディレイ", "attack_interval", "attackInterval", "attackSpeed", "attack_speed", "delay", "interval"]) || row.weaponAttackInterval || 0;
   }
 
   if (!(row.weaponRange > 0)) {
     row.weaponRange =
-      idbNumericValueFromTextLabels(combined, ["有効レンジ", "攻撃射程", "射程", "レンジ", "effective_range", "effectiveRange", "valid_range", "attack_range", "range"]) || row.weaponRange || 0;
+      idbNumericValueFromTextLabels(combined, ["有効レンジ", "攻撃射程", "射程", "レンジ", "effective_range", "effectiveRange", "valid_range", "validRange", "attack_range", "attackRange", "range"]) || row.weaponRange || 0;
   }
 
   if (!(row.weaponDamage > 0)) {
@@ -5613,7 +5617,96 @@ function idbStructuredWeaponInterval(item) {
 }
 
 
-function idbStructuredWeaponRequirements(item) {
+function idbIndexedWeaponRequirements(item) {
+  const out = [];
+  if (!item || typeof item !== "object") return out;
+
+  const entries = Object.entries(item);
+
+  const findLevelForIndex = idx => {
+    const idxText = String(idx || "");
+    const keyPatterns = [
+      new RegExp(`(?:need|need_level|needLevel|required|required_level|requiredLevel|requiredSkillLevel|required_skill_level|skill_level|skillLevel|value|level)${idxText}$`, "i"),
+      new RegExp(`${idxText}(?:need|need_level|needLevel|required|required_level|requiredLevel|requiredSkillLevel|required_skill_level|skill_level|skillLevel|value|level)$`, "i"),
+      new RegExp(`(?:need|need_level|needLevel|required|required_level|requiredLevel|requiredSkillLevel|required_skill_level|skill_level|skillLevel|value|level)[_-]?${idxText}$`, "i")
+    ];
+
+    for (const [key, val] of entries) {
+      if (/id$/i.test(key)) continue;
+      if (keyPatterns.some(re => re.test(key))) {
+        const n = idbNumberFromAny(val);
+        if (n) return n;
+      }
+    }
+    return 0;
+  };
+
+  entries.forEach(([key, val]) => {
+    if (/id$/i.test(key)) return;
+    const skillKey = /(?:requiredSkill|required_skill|requireSkill|require_skill|weaponSkill|weapon_skill|skill|skill_name)[_-]?(\d+)$/i.exec(key);
+    if (!skillKey) return;
+
+    const idx = skillKey[1];
+    const name = idbSkillNameFromAny(val);
+    if (!name) return;
+
+    const level =
+      idbSkillLevelFromAny(val) ||
+      findLevelForIndex(idx) ||
+      idbNumberFromAny(item.need_level) ||
+      idbNumberFromAny(item.required_level) ||
+      idbNumberFromAny(item.requiredSkillLevel) ||
+      idbNumberFromAny(item.required_skill_level) ||
+      idbNumberFromAny(item.skill_level);
+
+    idbAddStructuredRequirement(out, name, level);
+  });
+
+  return idbDedupeWeaponRequirements(out);
+}
+
+function idbExternalPageWeaponRequirements(page) {
+  const props = page?.props || {};
+  const out = [];
+  const keys = [
+    "requiredSkills", "required_skills",
+    "requirements", "requires",
+    "requireSkills", "require_skills",
+    "weaponRequirements", "weapon_requirements",
+    "skillRequirements", "skill_requirements",
+    "itemSkillRequirements", "item_skill_requirements"
+  ];
+
+  keys.forEach(key => {
+    const val = props[key];
+    if (Array.isArray(val)) idbDeepCollectSkillRequirements(val, out);
+  });
+
+  return idbDedupeWeaponRequirements(out);
+}
+
+function idbPagePropsCompactText(page) {
+  const props = page?.props || {};
+  const picked = {};
+  [
+    "weapon",
+    "requiredSkills", "required_skills",
+    "requirements", "requires",
+    "requireSkills", "require_skills",
+    "weaponRequirements", "weapon_requirements",
+    "skillRequirements", "skill_requirements",
+    "itemSkillRequirements", "item_skill_requirements"
+  ].forEach(key => {
+    if (props[key] != null) picked[key] = props[key];
+  });
+  try {
+    return JSON.stringify(picked);
+  } catch {
+    return "";
+  }
+}
+
+function idbStructuredWeaponRequirements(item, page=null) {
   const out = [];
 
   const directName = item?.requiredSkill ?? item?.required_skill ?? item?.required_skill_name ?? item?.skill_name ?? item?.weapon_skill_name ?? "";
@@ -5622,11 +5715,13 @@ function idbStructuredWeaponRequirements(item) {
     item?.need_level ?? item?.skill_level ?? item?.required_skill_value ??
     item?.require_skill_value ?? item?.skill_value ?? item?.level ?? 0;
 
-  // directName が「こんぼう 素手」や「こんぼう 50.0 素手 50.0」のような文字列でも拾う。
   idbWeaponReqsFromText(String(directName || ""), idbNumberFromAny(directLevel)).forEach(req => {
     idbAddStructuredRequirement(out, req.name, req.required);
   });
   idbAddStructuredRequirement(out, directName, directLevel);
+
+  idbIndexedWeaponRequirements(item).forEach(req => idbAddStructuredRequirement(out, req.name, req.required));
+  idbExternalPageWeaponRequirements(page).forEach(req => idbAddStructuredRequirement(out, req.name, req.required));
 
   const objects = [
     item?.requiredSkill,
@@ -5680,14 +5775,17 @@ function idbStructuredWeaponRequirements(item) {
     idbAddStructuredRequirement(out, name, level);
   });
 
-  // ここがv1.18.6の主修正:
-  // 実際の公式DBでは、前提スキルが複数ある武器で配列/ネストの名前が固定でない可能性があるため、
-  // weaponオブジェクト内を深掘りして「skill名 + 必要値」らしい組を全部拾う。
   idbDeepCollectSkillRequirements(item, out);
+
+  idbWeaponReqsFromText(idbFlattenPrimitiveText(item).join("\n"), idbNumberFromAny(directLevel)).forEach(req => {
+    idbAddStructuredRequirement(out, req.name, req.required);
+  });
+  idbWeaponReqsFromText(idbPagePropsCompactText(page), idbNumberFromAny(directLevel)).forEach(req => {
+    idbAddStructuredRequirement(out, req.name, req.required);
+  });
 
   return idbDedupeWeaponRequirements(out);
 }
-
 
 function idbRowFromStructuredItem(item, page=null, raw="") {
   if (!item || typeof item !== "object") return null;
@@ -5717,7 +5815,7 @@ function idbRowFromStructuredItem(item, page=null, raw="") {
   if (rangeValue) row.weaponRange = rangeValue;
   if (durabilityValue != null) row.weaponDurability = parseFloat(durabilityValue) || 0;
 
-  const weaponReqs = idbStructuredWeaponRequirements(item);
+  const weaponReqs = idbStructuredWeaponRequirements(item, page);
   if (hasWeaponData && weaponReqs.length) {
     row.weaponReq = weaponReqs;
   }
@@ -5732,7 +5830,7 @@ function idbRowFromStructuredItem(item, page=null, raw="") {
     addStatuses.forEach(st => idbApplyStructuredStatus(row, st.name, idbStatusValue(st)));
   }
 
-  idbSupplementStructuredWeapon(row, item, raw);
+  idbSupplementStructuredWeapon(row, item, raw, page);
 
   return {
     row: normalizeEquipmentCandidate(row),
@@ -5839,7 +5937,7 @@ function idbParserSelfTest() {
 
   const weaponPageMulti2 = `<div id="app" data-page="{&quot;component&quot;:&quot;Public/Items/Weapons/Show&quot;,&quot;props&quot;:{&quot;weapon&quot;:{&quot;id&quot;:7135,&quot;name&quot;:&quot;炎の珠&quot;,&quot;equip&quot;:&quot;右手 1HAND&quot;,&quot;damage&quot;:30,&quot;requiredSkill&quot;:&quot;こんぼう 素手&quot;,&quot;need_level&quot;:50,&quot;description&quot;:&quot;必要スキル こんぼう 50.0 素手 50.0 ダメージ: 30.0 攻撃間隔: 120 有効レンジ: 3.4&quot;}}}"></div>`;
 
-  const weaponPageMulti3 = `<div id="app" data-page="{&quot;component&quot;:&quot;Public/Items/Weapons/Show&quot;,&quot;props&quot;:{&quot;weapon&quot;:{&quot;id&quot;:4856,&quot;name&quot;:&quot;複合武器テスト3&quot;,&quot;equip&quot;:&quot;右手 2HAND&quot;,&quot;power&quot;:88,&quot;description&quot;:&quot;必要スキル 刀剣 71.0 槍 71.0 こんぼう 71.0 攻撃間隔: 400 有効レンジ: 5.1&quot;}}}"></div>`;
+  const weaponPageMulti3 = `<div id="app" data-page="{&quot;component&quot;:&quot;Public/Items/Weapons/Show&quot;,&quot;props&quot;:{&quot;weapon&quot;:{&quot;id&quot;:4856,&quot;name&quot;:&quot;SGK ウェポン&quot;,&quot;equip&quot;:&quot;右手 2HAND&quot;,&quot;damage&quot;:97.9,&quot;attack_interval&quot;:690,&quot;effective_range&quot;:7.1,&quot;requiredSkill1&quot;:&quot;刀剣&quot;,&quot;need_level1&quot;:100,&quot;requiredSkill2&quot;:&quot;素手&quot;,&quot;need_level2&quot;:100,&quot;requiredSkill3&quot;:&quot;槍&quot;,&quot;need_level3&quot;:100}}}"></div>`;
 
   const samples = [
 `ジャイアント ドラゴンフライ
