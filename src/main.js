@@ -4235,18 +4235,12 @@ function setInputs(inputs) {
 }
 /* JSON/TSV/プリセット保存用に、inputsとstateを1つのオブジェクトへまとめる。 */
 function collectConfig() {
-  const st = clone(state);
-  // 発動中マスタリー由来の自動Buff行は、読み込み時に再生成するため保存データからは除外します。
-  // これを保存してしまうと、JSON/TSV読み込み時に重複や形式違いの原因になります。
-  st.other = (Array.isArray(st.other) ? st.other : []).filter(r => r.source !== "skillSimMastery");
+  const st = clone(state || DEFAULT_STATE());
+  // 発動中マスタリー由来の自動Buff行は読み込み時に再生成するため、保存データからは除外します。
+  st.other = (Array.isArray(st.other) ? st.other : []).filter(r => r && r.source !== "skillSimMastery");
   return {inputs: collectInputs(), state: st};
 }
 
-/* 共有URL用の軽量構成生成は src/storage/shareUrl.js へ分離しました。 */
-
-
-
-/* 割合Buffの対象selectを生成する。 */
 function targetOptions(value) {
   const labels = {attack:"攻撃力%", magic:"魔力%", speed:"速度%"};
   return Object.entries(labels).map(([k,v]) => `<option value="${k}" ${k===value?'selected':''}>${v}</option>`).join("");
