@@ -602,3 +602,58 @@ SGKウェポン想定:
 期待:
 - `weapons/282` カッパー ナイフ: 刀剣 1
 - `weapons/4856` SGKウェポン: 刀剣 100 / 素手 100 / 槍 100
+
+
+## v1.18.13 公式DB取り込みプレビュー改善 / Worker手順整理
+
+### 取り込みプレビュー
+
+変更:
+- 公式DB取り込み結果の表示をカード形式に整理
+- 重要項目を強調表示
+  - 必要スキル
+  - 武器ダメージ
+  - 攻撃間隔
+  - 射程/有効レンジ
+- 重要項目が空なら警告表示
+- 右手/左手両対応武器は注意表示
+- 解析方式 `data-page` / HTML本文系を表示
+- `Worker接続テスト` ボタンは引き続き非表示
+
+### 装備Buffについて
+
+公式DBから取得できる装備Buff情報は、基本的に以下までです。
+
+- 装備Buff名
+- 説明文
+
+攻撃力%・属性ダメージ%・ST自然回復量など、実際のBuff効果値は公式DBの個別装備ページからは機械的に取得できません。  
+必要な効果値は、Buff登録または装備詳細の追加効果で手入力してください。
+
+### Cloudflare Worker 手順
+
+1. Cloudflare WorkersでWorkerを作成
+2. `worker/moe-idb-proxy-worker.js` の内容を貼り付け
+3. Save and deploy
+4. GitHub Pagesへツール本体を配置
+5. 装備登録タブで公式DB個別URLを入力して取得
+
+このツールではWorker URLを以下に固定しています。
+
+```text
+https://divine-grass-1b84.sincostanrap.workers.dev
+```
+
+Worker側の許可Originは以下です。
+
+```text
+https://sincostanrap-droid.github.io
+```
+
+注意:
+- GitHub PagesのOriginはパスを含みません。
+  - 例: `https://sincostanrap-droid.github.io/Master-of-Epic-web-damage-tool/`
+  - Origin: `https://sincostanrap-droid.github.io`
+- ローカル `file://` からはWorkerが403になります。
+- 取得できるのは `https://idb.moepic.com/items/<カテゴリ>/<ID>` の個別アイテムURLのみです。
+- 検索ページや一覧ページはWorker側で拒否します。

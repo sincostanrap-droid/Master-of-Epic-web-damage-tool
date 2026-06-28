@@ -5952,23 +5952,128 @@ function idbApplyManualCorrections(parsed) {
   return parsed;
 }
 
+function idbPreviewValue(value, unit="") {
+  if (value == null || value === "" || Number.isNaN(+value)) return "未取得";
+  const n = +value;
+  if (!n) return "未取得";
+  return `${fmt(n, Number.isInteger(n) ? 0 : 1)}${unit}`;
+}
+
+function idbPreviewIsWeapon(row) {
+  return isWeaponEquipmentRow(row) || /^武器:/.test(String(row?.slot || ""));
+}
+
+function idbPreviewEquipAllowsBothHands(parsed) {
+  const raw = `${parsed?.equipPart || ""} ${parsed?.row?.rawEquipPart || ""}`;
+  return /右手/.test(raw) && /左手/.test(raw);
+}
+
+function idbPreviewWarnings(parsed) {
+  const r = parsed?.row || {};
+  const warnings = [];
+  const isWeapon = idbPreviewIsWeapon(r);
+
+  if (!r.name) warnings.push("装備名が未取得です。");
+  if (!r.slot) warnings.push("装備部位が未取得です。手動補正欄で選んでください。");
+
+  if (isWeapon) {
+    if (!Array.isArray(r.weaponReq) || !r.weaponReq.length) warnings.push("武器なのに必要スキルが未取得です。");
+    if (!(+r.weaponDamage > 0)) warnings.push("武器なのに武器ダメージが未取得です。");
+    if (!(+r.weaponAttackInterval > 0)) warnings.push("武器なのに攻撃間隔が未取得です。");
+    if (!(+r.weaponRange > 0)) warnings.push("武器なのに射程/有効レンジが未取得です。");
+    if (idbPreviewEquipAllowsBothHands(parsed)) warnings.push("公式DB上は右手/左手の両対応です。初期スロットが意図通りか確認してください。");
+  }
+
+  if (r.equipBuffEnabled || r.equipBuffName || r.equipBuffNote) {
+    warnings.push("装備Buffは名称と説明文のみ取得できます。実際の効果値はDB仕様上取得できないため、必要なら手入力してください。");
+  }
+
+  return warnings;
+}
+
+function idbPreviewField(label, value, important=false, missing=false) {
+  const cls = ["idbPreviewField", important ? "important" : "", missing ? "missing" : ""].filter(Boolean).join(" ");
+  return `<div class="${cls}"><span>${escapeHtml(label)}</span><b>${escapeHtml(value || "-")}</b></div>`;
+}
+
+function idbPreviewSection(title, body, extraClass="") {
+  if (!body) return "";
+  return `<div class="idbPreviewSection ${extraClass}"><h5>${escapeHtml(title)}</h5>${body}</div>`;
+}
+
+function idbPreviewNoticeHtml() {
+  return `<div class="idbPreviewInfo">
+    公式DBから取れる装備Buff情報は「Buff名」と「説明文」までです。
+    攻撃力%・属性ダメージ%・自然回復量などの実効果値は取得できないため、必要ならBuff登録または装備詳細で手入力してください。
+  </div>`;
+}
+
+
 function idbEquipmentPreviewHtml(parsed) {
   const r = parsed.row;
-  const parts = [
-    `<b>${escapeHtml(r.name || "名称未取得")}</b>`,
-    `推定部位: ${escapeHtml(r.slot || "-")}`,
-    parsed.equipPart ? `公式DB上の装備部位: ${escapeHtml(parsed.equipPart)}` : "",
-    +r.weaponDamage ? `武器ダメージ: ${fmt(+r.weaponDamage, 1)}` : "",
-    +r.weaponAttackInterval ? `攻撃間隔: ${fmt(+r.weaponAttackInterval, 1)}` : "",
-    +r.weaponRange ? `射程: ${fmt(+r.weaponRange, 1)}` : "",
-    r.weaponTwoHanded === "○" ? "両手武器: ○" : "",
-    r.weaponReq?.length ? `必要スキル: ${escapeHtml(r.weaponReq.map(x => `${x.name} ${x.required}`).join(" / "))}` : "",
-    extraStatsEffectText(r, "base") ? `装備本体: ${escapeHtml(extraStatsEffectText(r, "base"))}` : "",
-    r.equipBuffEnabled ? `装備Buff: ${escapeHtml(r.equipBuffName || "Buff")} ${r.equipBuffNote ? " / " + escapeHtml(r.equipBuffNote) : ""}` : "",
-    additionalEffectsSummary(r).length ? `表示用効果: ${escapeHtml(additionalEffectsSummary(r).join(" / "))}` : "",
-    parsed.effectLines?.length ? `読み取った追加効果行: ${escapeHtml(parsed.effectLines.join(" / "))}` : ""
-  ].filter(Boolean);
-  return parts.map(x => `<div>${x}</div>`).join("");
+  const isWeapon = idbPreviewIsWeapon(r);
+  const warnings = idbPreviewWarnings(parsed);
+
+  const sourceText = parsed.source
+    ? `解析方式: ${parsed.source}`
+    : "解析方式: 手動貼り付け/HTML本文";
+
+  const reqText = Array.isArray(r.weaponReq) && r.weaponReq.length
+    ? r.weaponReq.map(x => `${x.name} ${x.required}`).join(" / ")
+    : "未取得";
+
+  const mainFields = [
+    idbPreviewField("推定部位", r.slot || "-", true, !r.slot),
+    parsed.equipPart ? idbPreviewField("公式DB上の装備部位", parsed.equipPart, false, false) : "",
+    isWeapon ? idbPreviewField("必要スキル", reqText, true, !r.weaponReq?.length) : "",
+    isWeapon ? idbPreviewField("武器ダメージ", idbPreviewValue(r.weaponDamage), true, !(+r.weaponDamage > 0)) : "",
+    isWeapon ? idbPreviewField("攻撃間隔", idbPreviewValue(r.weaponAttackInterval), true, !(+r.weaponAttackInterval > 0)) : "",
+    isWeapon ? idbPreviewField("射程/有効レンジ", idbPreviewValue(r.weaponRange), true, !(+r.weaponRange > 0)) : "",
+    isWeapon && r.weaponTwoHanded === "○" ? idbPreviewField("両手武器", "○", false, false) : ""
+  ].filter(Boolean).join("");
+
+  const warningHtml = warnings.length
+    ? `<div class="idbPreviewWarnings">${warnings.map(w => `<div>⚠ ${escapeHtml(w)}</div>`).join("")}</div>`
+    : `<div class="idbPreviewOk">重要項目の未取得警告はありません。候補追加前に数値だけ確認してください。</div>`;
+
+  const baseText = extraStatsEffectText(r, "base");
+  const baseSection = baseText
+    ? idbPreviewSection("装備本体の追加ステータス", `<div>${escapeHtml(baseText)}</div>`)
+    : "";
+
+  const buffSection = (r.equipBuffEnabled || r.equipBuffName || r.equipBuffNote)
+    ? idbPreviewSection(
+        "装備Buff",
+        `<div><b>${escapeHtml(r.equipBuffName || "Buff名未取得")}</b>${r.equipBuffNote ? `<div class="mutedText">${escapeHtml(r.equipBuffNote)}</div>` : ""}</div>
+         <div class="idbPreviewInfo mini">Buffの実効果値は公式DBから取得できません。必要な攻撃力%・属性ダメージ%などは手入力してください。</div>`,
+        "buff"
+      )
+    : "";
+
+  const displayEffects = additionalEffectsSummary(r);
+  const displaySection = displayEffects.length
+    ? idbPreviewSection("表示用効果", `<div>${escapeHtml(displayEffects.join(" / "))}</div>`)
+    : "";
+
+  const readLinesSection = parsed.effectLines?.length
+    ? idbPreviewSection("読み取った追加効果行", `<div>${escapeHtml(parsed.effectLines.join(" / "))}</div>`)
+    : "";
+
+  return `
+    <div class="idbPreviewHeader">
+      <div>
+        <b>${escapeHtml(r.name || "名称未取得")}</b>
+        <span>${escapeHtml(sourceText)}</span>
+      </div>
+    </div>
+    ${idbPreviewNoticeHtml()}
+    ${warningHtml}
+    <div class="idbPreviewGrid">${mainFields}</div>
+    ${baseSection}
+    ${buffSection}
+    ${displaySection}
+    ${readLinesSection}
+  `;
 }
 
 
@@ -6079,7 +6184,7 @@ function addIdbEquipmentCandidate() {
   const el = byId("idbImportPreview");
   if (el) {
     el.classList.remove("bad");
-    el.innerHTML = idbEquipmentPreviewHtml(parsed) + `<div class="okText">装備候補へ追加しました。使用する場合は該当部位の候補で「使用」をONにしてください。</div>`;
+    el.innerHTML = idbEquipmentPreviewHtml(parsed) + `<div class="okText">装備候補へ追加しました。使用する場合は該当部位の候補で「使用」をONにしてください。装備Buffの実効果値は必要に応じて手入力してください。</div>`;
   }
 }
 

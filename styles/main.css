@@ -2977,3 +2977,102 @@
     grid-template-columns: 1fr;
   }
 }
+
+
+/* v1.18.13: 公式DB取り込みプレビュー改善 */
+.idbImportNotice {
+  margin-top: 8px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(255, 250, 230, .82);
+  border: 1px solid rgba(218, 178, 80, .35);
+  line-height: 1.6;
+}
+.idbPreviewHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+.idbPreviewHeader b {
+  display: block;
+  font-size: 15px;
+}
+.idbPreviewHeader span {
+  display: block;
+  margin-top: 2px;
+  opacity: .72;
+}
+.idbPreviewInfo {
+  margin: 8px 0;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(245, 248, 255, .9);
+  border: 1px solid rgba(110, 130, 180, .24);
+}
+.idbPreviewInfo.mini {
+  margin-top: 8px;
+  font-size: 12px;
+}
+.idbPreviewWarnings {
+  margin: 8px 0;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(255, 247, 223, .95);
+  border: 1px solid rgba(232, 200, 102, .65);
+  font-weight: 700;
+}
+.idbPreviewOk {
+  margin: 8px 0;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(238, 250, 240, .92);
+  border: 1px solid rgba(120, 190, 135, .45);
+  font-weight: 700;
+}
+.idbPreviewGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 8px;
+  margin: 8px 0;
+}
+.idbPreviewField {
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(120, 110, 130, .18);
+  background: rgba(255, 255, 255, .76);
+}
+.idbPreviewField span {
+  display: block;
+  font-size: 11px;
+  opacity: .72;
+}
+.idbPreviewField b {
+  display: block;
+  margin-top: 2px;
+  font-size: 14px;
+}
+.idbPreviewField.important {
+  border-color: rgba(75, 120, 190, .35);
+  background: rgba(242, 247, 255, .9);
+}
+.idbPreviewField.missing {
+  border-color: rgba(190, 120, 80, .45);
+  background: rgba(255, 245, 235, .94);
+}
+.idbPreviewSection {
+  margin-top: 8px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, .72);
+  border: 1px solid rgba(120, 110, 130, .16);
+}
+.idbPreviewSection h5 {
+  margin: 0 0 4px;
+  font-size: 12px;
+}
+.mutedText {
+  opacity: .72;
+  margin-top: 4px;
+}
