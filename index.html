@@ -363,6 +363,38 @@ MoE固有の主な仮定:
     <span class="small">登録した候補は残して、いま装備中のチェックだけ外します。</span>
   </div>
 
+  <div class="equipmentFilterPanel">
+    <div class="equipmentFilterHeader">
+      <b>候補フィルタ</b>
+      <span id="equipmentFilterSummary" class="small">-</span>
+    </div>
+    <div class="equipmentFilterControls">
+      <label>検索
+        <input id="equipmentFilterText" type="search" placeholder="名前・メモ・タグ・Buff名・必要スキルで検索">
+      </label>
+      <label>スロット
+        <select id="equipmentFilterSlot"></select>
+      </label>
+      <label>状態
+        <select id="equipmentFilterStatus">
+          <option value="all">すべて</option>
+          <option value="enabled">使用中</option>
+          <option value="disabled">未使用</option>
+          <option value="fixed">固定</option>
+          <option value="excluded">除外</option>
+          <option value="buff">装備Buffあり</option>
+          <option value="idb">公式DB取り込み</option>
+        </select>
+      </label>
+      <button type="button" onclick="clearEquipmentFilters()">解除</button>
+      <button type="button" class="dangerMini" onclick="deleteFilteredEquipmentCandidates()">表示中の未使用候補を削除</button>
+    </div>
+    <p class="small equipmentFilterHelp">
+      フィルタは候補の表示だけを絞ります。削除ボタンは表示中かつ未使用の候補だけを対象にします。
+    </p>
+  </div>
+
+
   <div class="equipmentLayout">
     <div class="equipmentPanel equipmentWeaponPanel">
       <h3>武器</h3>
@@ -767,10 +799,6 @@ MoE固有の主な仮定:
         公式DBから取得できるのはBuff名と説明文までです。
         攻撃力%・属性ダメージ%・ST自然回復量などの実際の効果値は取得できません。
         必要な効果値は、候補追加後に装備詳細またはBuff登録で手入力してください。
-      </div>
-      <div class="idbImportNotice small">
-        公式DBから自動取得できるのは、装備名・部位・基本性能・追加ステータス・装備Buff名/説明文までです。
-        装備Buffによる実際の攻撃力%・属性ダメージ%・自然回復量などの効果値はDB仕様上取得できないため、必要ならBuff登録または装備詳細で手入力してください。
       </div>
     </div>
 

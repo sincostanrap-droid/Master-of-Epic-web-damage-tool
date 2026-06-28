@@ -2915,20 +2915,182 @@ function equipmentSlotBodyFor(slot) {
   return document.querySelector(`[data-equipment-slot-body="${CSS.escape(slot || "")}"]`);
 }
 
+
+const EQUIPMENT_FILTER_DEFAULT = {text:"", slot:"all", status:"all"};
+
+function equipmentFilterState() {
+  return {
+    text: (byId("equipmentFilterText")?.value || "").trim().toLowerCase(),
+    slot: byId("equipmentFilterSlot")?.value || "all",
+    status: byId("equipmentFilterStatus")?.value || "all"
+  };
+}
+
+function populateEquipmentFilterSlotOptions() {
+  const select = byId("equipmentFilterSlot");
+  if (!select || select.dataset.ready === "1") return;
+
+  const groups = [
+    ["全スロット", ["all"]],
+    ["武器", EQUIPMENT_SLOTS.filter(x => x.slot.startsWith("武器: ")).map(x => x.slot)],
+    ["防具", EQUIPMENT_SLOTS.filter(x => x.slot.startsWith("防具: ")).map(x => x.slot)],
+    ["装飾", EQUIPMENT_SLOTS.filter(x => x.slot.startsWith("装飾: ")).map(x => x.slot)]
+  ];
+
+  select.innerHTML = "";
+  groups.forEach(([label, slots]) => {
+    if (label === "全スロット") {
+      const opt = document.createElement("option");
+      opt.value = "all";
+      opt.textContent = "全スロット";
+      select.appendChild(opt);
+      return;
+    }
+
+    const group = document.createElement("optgroup");
+    group.label = label;
+    slots.forEach(slot => {
+      const opt = document.createElement("option");
+      opt.value = slot;
+      opt.textContent = slot.replace(/^武器: /, "").replace(/^防具: /, "").replace(/^装飾: /, "");
+      group.appendChild(opt);
+    });
+    select.appendChild(group);
+  });
+  select.dataset.ready = "1";
+}
+
+function setupEquipmentFilterControls() {
+  populateEquipmentFilterSlotOptions();
+  ["equipmentFilterText", "equipmentFilterSlot", "equipmentFilterStatus"].forEach(id => {
+    const el = byId(id);
+    if (!el || el.dataset.equipmentFilterReady === "1") return;
+    const handler = () => renderEquipmentTable();
+    el.addEventListener(id === "equipmentFilterText" ? "input" : "change", handler);
+    el.dataset.equipmentFilterReady = "1";
+  });
+}
+
+function clearEquipmentFilters() {
+  if (byId("equipmentFilterText")) byId("equipmentFilterText").value = "";
+  if (byId("equipmentFilterSlot")) byId("equipmentFilterSlot").value = "all";
+  if (byId("equipmentFilterStatus")) byId("equipmentFilterStatus").value = "all";
+  renderEquipmentTable();
+}
+
+function equipmentCandidateSearchText(row) {
+  const effects = Array.isArray(row.extraEffects)
+    ? row.extraEffects.map(e => `${e.type || ""} ${e.target || ""} ${e.value || ""} ${e.unit || ""} ${e.label || ""}`).join(" ")
+    : "";
+  const reqs = Array.isArray(row.weaponReq)
+    ? row.weaponReq.map(r => `${r.name || ""} ${r.required || ""}`).join(" ")
+    : "";
+  return [
+    row.slot, row.name, row.note, row.tags,
+    row.equipBuffName, row.equipBuffNote,
+    row.importUrl, row.importSource,
+    effects, reqs,
+    additionalEffectsSummary(row).join(" "),
+    extraStatsEffectText(row, "base"),
+    extraStatsEffectText(row, "equipBuff")
+  ].filter(Boolean).join(" ").toLowerCase();
+}
+
+function equipmentCandidateMatchesFilter(row, filter=equipmentFilterState()) {
+  if (filter.slot !== "all" && row.slot !== filter.slot) return false;
+
+  if (filter.text) {
+    const terms = filter.text.split(/\s+/).filter(Boolean);
+    const haystack = equipmentCandidateSearchText(row);
+    if (!terms.every(term => haystack.includes(term))) return false;
+  }
+
+  switch (filter.status) {
+    case "enabled": return row.enabled !== false;
+    case "disabled": return row.enabled === false;
+    case "fixed": return !!row.optimizerFixed;
+    case "excluded": return !!row.optimizerExcluded;
+    case "buff": return !!(row.equipBuffEnabled || row.equipBuffName || row.equipBuffNote || equipmentBuffHasEffect(row));
+    case "idb": return !!(row.importedFromIdb || row.importSource === "officialDB" || /idb\.moepic\.com/i.test(row.importUrl || ""));
+    default: return true;
+  }
+}
+
+function updateEquipmentFilterSummary(total, visible) {
+  const el = byId("equipmentFilterSummary");
+  if (!el) return;
+  const f = equipmentFilterState();
+  const active = [
+    f.text ? `検索「${f.text}」` : "",
+    f.slot !== "all" ? f.slot : "",
+    f.status !== "all" ? byId("equipmentFilterStatus")?.selectedOptions?.[0]?.textContent || f.status : ""
+  ].filter(Boolean);
+  el.textContent = active.length
+    ? `${visible} / ${total}件を表示中（${active.join(" / ")}）`
+    : `${total}件`;
+}
+
+function equipmentCandidateHasUserContent(row) {
+  return !!(
+    row.name || row.note || row.tags || row.importedFromIdb || row.importSource ||
+    equipmentEffectText(row) !== "補正なし" ||
+    equipmentBuffHasEffect(row) ||
+    row.equipBuffName || row.equipBuffNote
+  );
+}
+
+function deleteFilteredEquipmentCandidates() {
+  state.equipment = normalizeEquipmentRows(state.equipment);
+  const filter = equipmentFilterState();
+  const targets = state.equipment.filter(row =>
+    row.enabled === false &&
+    equipmentCandidateMatchesFilter(row, filter) &&
+    equipmentCandidateHasUserContent(row)
+  );
+
+  if (!targets.length) {
+    alert("削除対象の未使用候補がありません。使用中の候補と空の初期候補は削除しません。");
+    return;
+  }
+
+  if (!confirm(`表示中の未使用候補 ${targets.length} 件を削除します。よろしいですか？`)) return;
+
+  const deleteSet = new Set(targets);
+  state.equipment = state.equipment.filter(row => !deleteSet.has(row));
+  renderEquipmentTable();
+  renderTagLinkSummary();
+  renderShowcaseTab();
+  calc();
+}
+
+
 /* 武器/防具/装飾の候補テーブルを描画する。防具・装飾は部位ごとのカテゴリに分けて表示する。 */
 function renderEquipmentTable() {
+  setupEquipmentFilterControls();
+
   document.querySelectorAll("#equipmentWeaponRightBody, #equipmentWeaponLeftBody, #equipmentWeaponBulletBody, [data-equipment-slot-body]").forEach(tbody => {
     tbody.innerHTML = "";
   });
 
   state.equipment = normalizeEquipmentRows(state.equipment);
+  const filter = equipmentFilterState();
+
+  let total = 0;
+  let visible = 0;
 
   state.equipment.forEach((row, idx) => {
     if (row.enabled === undefined) row.enabled = true;
+    total += 1;
+
+    if (!equipmentCandidateMatchesFilter(row, filter)) return;
+
     const body = equipmentSlotBodyFor(row.slot);
     if (!body) return;
     body.appendChild(makeEquipmentInputRow(row, false, idx));
+    visible += 1;
   });
+
+  updateEquipmentFilterSummary(total, visible);
 }
 
 /* 旧項目: 実数ステータス加算表を描画する。 */
@@ -6185,6 +6347,10 @@ function addIdbEquipmentCandidate() {
   state.equipment = normalizeEquipmentRows(state.equipment);
   const row = parsed.row;
   row.enabled = false;
+  row.importSource = "officialDB";
+  row.importedFromIdb = true;
+  const url = (byId("idbItemUrl")?.value || "").trim();
+  if (url) row.importUrl = url;
   state.equipment.push(normalizeEquipmentCandidate(row));
   renderEquipmentTable();
   renderTagLinkSummary();
@@ -7033,6 +7199,7 @@ function initializeBrowserApp() {
   loadIdbWorkerEndpoint();
 
   setupTabLayout();
+  setupEquipmentFilterControls();
 
   document.querySelectorAll("input,select").forEach(el => {
     el.addEventListener("input", calc);

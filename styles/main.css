@@ -3090,3 +3090,44 @@
 .idbImportBuffLimitNotice b {
   margin-right: .25em;
 }
+
+
+/* v1.19: 装備候補フィルタ */
+.equipmentFilterPanel {
+  margin: 10px 0 14px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(120, 110, 130, .18);
+  background: rgba(255, 255, 255, .72);
+}
+.equipmentFilterHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.equipmentFilterControls {
+  display: grid;
+  grid-template-columns: minmax(240px, 1.4fr) minmax(160px, .8fr) minmax(140px, .8fr) auto auto;
+  gap: 8px;
+  align-items: end;
+}
+.equipmentFilterControls label {
+  display: grid;
+  gap: 3px;
+  font-size: 12px;
+}
+.equipmentFilterControls input,
+.equipmentFilterControls select {
+  width: 100%;
+}
+.equipmentFilterHelp {
+  margin: 8px 0 0;
+  opacity: .75;
+}
+@media (max-width: 920px) {
+  .equipmentFilterControls {
+    grid-template-columns: 1fr;
+  }
+}
