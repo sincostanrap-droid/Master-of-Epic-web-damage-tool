@@ -2977,9 +2977,3 @@
     grid-template-columns: 1fr;
   }
 }
-
-
-/* v1.18.10 debug */
-.idbWorkerRowFixed button {
-  min-width: 9em;
-}
