@@ -3404,3 +3404,75 @@
     grid-template-columns: 6.5em minmax(100px, 1fr) 4.5em;
   }
 }
+
+
+/* v1.20.6: スキル入力2列 + 右ペイン知識表示 = 3列感のあるレイアウト */
+.skillSimWorkbench {
+  display: grid;
+  grid-template-columns: minmax(640px, 2fr) minmax(320px, .9fr);
+  gap: 12px;
+  align-items: start;
+}
+.skillSimWorkbench .skillSimGroups {
+  grid-template-columns: repeat(2, minmax(300px, 1fr));
+}
+.skillSimWorkbench .skillKnowledgePanel {
+  margin: 0;
+  position: sticky;
+  top: 8px;
+  max-height: calc(100vh - 16px);
+  overflow: auto;
+}
+.skillKnowledgeControls {
+  grid-template-columns: 1fr;
+}
+.skillKnowledgeStack {
+  display: grid;
+  gap: 8px;
+}
+.skillKnowledgeFold {
+  border-radius: 12px;
+  border: 1px solid rgba(120, 110, 130, .16);
+  background: rgba(255, 255, 255, .62);
+  overflow: hidden;
+}
+.skillKnowledgeFold summary {
+  cursor: pointer;
+  padding: 8px 10px;
+  font-weight: 700;
+  user-select: none;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: center;
+  background: rgba(255, 255, 255, .62);
+}
+.skillKnowledgeFold[open] summary {
+  border-bottom: 1px solid rgba(120, 110, 130, .14);
+}
+.skillKnowledgeFold .skillKnowledgeItems {
+  padding: 8px;
+  max-height: 330px;
+}
+.skillKnowledgeGrid {
+  display: block;
+}
+.skillKnowledgeList {
+  padding: 0;
+  border: none;
+  background: transparent;
+}
+@media (max-width: 1180px) {
+  .skillSimWorkbench {
+    grid-template-columns: 1fr;
+  }
+  .skillSimWorkbench .skillKnowledgePanel {
+    position: static;
+    max-height: none;
+  }
+}
+@media (max-width: 900px) {
+  .skillSimWorkbench .skillSimGroups {
+    grid-template-columns: 1fr;
+  }
+}

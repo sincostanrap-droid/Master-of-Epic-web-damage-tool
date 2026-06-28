@@ -64,7 +64,7 @@ MoE固有の主な仮定:
 </head>
 <body>
 <h1>Master of Epic 物理ダメージ計算webツール</h1>
-<p id="appBuildStamp" class="small appBuildStamp">Build: v1.20.5 / スキル2列バーUI版</p>
+<p id="appBuildStamp" class="small appBuildStamp">Build: v1.20.6 / スキル3列レイアウト版</p>
 <section class="heroCard">
   <div>
     <div class="heroBadge">MoE / Physical Damage Calculator</div>
@@ -351,52 +351,53 @@ MoE固有の主な仮定:
   </div>
 
 
-  <div class="skillKnowledgePanel">
-    <div class="skillKnowledgeHeader">
-      <div>
-        <h3>マスタリー / テクニック / 魔法</h3>
-        <p class="small">
-          現在のスキル構成で発動中の複合シップ/マスタリー、使用できるテクニック・魔法を確認します。マスタリーは1次/2次/3次ボタンで必要スキル値を自動投入できます。
-        </p>
+  <div class="skillSimWorkbench">
+    <div id="skillSimGroups" class="skillSimGroups"></div>
+
+    <aside class="skillKnowledgePanel">
+      <div class="skillKnowledgeHeader">
+        <div>
+          <h3>マスタリー / テクニック / 魔法</h3>
+          <p class="small">
+            発動中の複合シップや使用可能なテクニック・魔法を確認します。マスタリーは1次/2次/3次ボタンで必要スキル値を自動投入できます。
+          </p>
+        </div>
+        <div id="skillKnowledgeSummary" class="small">-</div>
       </div>
-      <div id="skillKnowledgeSummary" class="small">-</div>
-    </div>
-    <div class="skillKnowledgeControls">
-      <label>検索
-        <input id="skillKnowledgeSearch" type="search" placeholder="名前・カテゴリ・必要スキルで検索">
-      </label>
-      <label>カテゴリ
-        <select id="skillKnowledgeCategory"></select>
-      </label>
-      <label>状態
-        <select id="skillKnowledgeStatus">
-          <option value="all">すべて</option>
-          <option value="available">使用可能/発動中</option>
-          <option value="near">あと少し</option>
-          <option value="missing">条件不足</option>
-        </select>
-      </label>
-      <button type="button" onclick="clearSkillKnowledgeFilters()">解除</button>
-    </div>
+      <div class="skillKnowledgeControls">
+        <label>検索
+          <input id="skillKnowledgeSearch" type="search" placeholder="名前・カテゴリ・必要スキルで検索">
+        </label>
+        <label>カテゴリ
+          <select id="skillKnowledgeCategory"></select>
+        </label>
+        <label>状態
+          <select id="skillKnowledgeStatus">
+            <option value="all">すべて</option>
+            <option value="available">使用可能/発動中</option>
+            <option value="near">あと少し</option>
+            <option value="missing">条件不足</option>
+          </select>
+        </label>
+        <button type="button" onclick="clearSkillKnowledgeFilters()">解除</button>
+      </div>
 
-    <div class="skillKnowledgeGrid">
-      <section class="skillKnowledgeList">
-        <h4>マスタリー</h4>
-        <div id="skillMasteryList" class="skillKnowledgeItems">-</div>
-      </section>
-      <section class="skillKnowledgeList">
-        <h4>テクニック</h4>
-        <div id="skillTechniqueList" class="skillKnowledgeItems">-</div>
-      </section>
-      <section class="skillKnowledgeList">
-        <h4>魔法</h4>
-        <div id="skillMagicList" class="skillKnowledgeItems">-</div>
-      </section>
-    </div>
+      <div class="skillKnowledgeStack">
+        <details class="skillKnowledgeFold" open>
+          <summary>マスタリー <span id="skillMasteryCount" class="small"></span></summary>
+          <div id="skillMasteryList" class="skillKnowledgeItems">-</div>
+        </details>
+        <details class="skillKnowledgeFold">
+          <summary>テクニック <span id="skillTechniqueCount" class="small"></span></summary>
+          <div id="skillTechniqueList" class="skillKnowledgeItems">-</div>
+        </details>
+        <details class="skillKnowledgeFold">
+          <summary>魔法 <span id="skillMagicCount" class="small"></span></summary>
+          <div id="skillMagicList" class="skillKnowledgeItems">-</div>
+        </details>
+      </div>
+    </aside>
   </div>
-
-
-  <div id="skillSimGroups" class="skillSimGroups"></div>
 </section>
 
 <section class="card wide" data-tab-target="equipment">
@@ -1209,11 +1210,11 @@ MoE固有の主な仮定:
   <textarea id="configBox" placeholder="JSONまたはTSVをここに貼り付けて読み込み可能"></textarea>
 </section>
 
-<script src="./src/storage/shareUrl.js?v=1.20.5" defer></script>
-<script src="./src/storage/importExport.js?v=1.20.5" defer></script>
-<script src="./src/calc/core.js?v=1.20.5" defer></script>
-<script src="./src/data/skillSimKnowledge.js?v=1.20.5" defer></script>
-<script src="./src/main.js?v=1.20.5" defer></script>
-<script src="./src/optimizer/core.js?v=1.20.5" defer></script>
+<script src="./src/storage/shareUrl.js?v=1.20.6" defer></script>
+<script src="./src/storage/importExport.js?v=1.20.6" defer></script>
+<script src="./src/calc/core.js?v=1.20.6" defer></script>
+<script src="./src/data/skillSimKnowledge.js?v=1.20.6" defer></script>
+<script src="./src/main.js?v=1.20.6" defer></script>
+<script src="./src/optimizer/core.js?v=1.20.6" defer></script>
 </body>
 </html>
