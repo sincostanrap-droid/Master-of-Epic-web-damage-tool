@@ -874,9 +874,9 @@ function normalizeEquipmentRows(rows) {
 
 const SKILL_SIM_GROUPS = [
   ["戦闘", ["筋力", "着こなし", "攻撃回避", "生命力", "知能", "持久力", "精神力", "集中力", "呪文抵抗力", "盾"]],
-  ["武器", ["素手", "刀剣", "こんぼう", "槍", "銃器", "弓", "投げ", "牙", "キック", "罠"]],
-  ["熟練", ["戦闘技術", "酩酊", "物まね", "調教", "破壊魔法", "回復魔法", "強化魔法", "神秘魔法", "召喚魔法", "死の魔法", "魔法熟練", "自然調和", "暗黒命令", "取引", "音楽", "ダンス", "パフォーマンス"]],
-  ["基本・生産", ["採掘", "伐採", "収穫", "釣り", "料理", "醸造", "鍛冶", "木工", "裁縫", "装飾細工", "薬調合", "複製", "美容", "解読", "盗み"]]
+  ["基本", ["落下耐性", "水泳", "死体回収", "包帯", "自然回復", "採掘", "伐採", "収穫", "釣り"]],
+  ["生産", ["料理", "醸造", "鍛冶", "木工", "裁縫", "薬調合", "装飾細工", "複製", "栽培", "美容"]],
+  ["熟練", ["素手", "刀剣", "こんぼう", "槍", "銃器", "弓", "投げ", "牙", "キック", "罠", "戦闘技術", "酩酊", "物まね", "調教", "破壊魔法", "回復魔法", "強化魔法", "神秘魔法", "召喚魔法", "死の魔法", "魔法熟練", "自然調和", "暗黒命令", "取引", "音楽", "ダンス", "パフォーマンス"]]
 ];
 
 const SKILL_SIM_ALL = SKILL_SIM_GROUPS.flatMap(([, list]) => list);
@@ -948,6 +948,17 @@ function normalizeSkillSim(raw) {
     autoApply: incoming.autoApply !== false,
     skills: {...base.skills, ...(incoming.skills || {})}
   };
+  // 旧版・外部データ互換。内部名が異なるものを現行UIのスキル名へ寄せる。
+  const aliases = {
+    "解読": "複製",
+    "盗み": "物まね"
+  };
+  Object.entries(aliases).forEach(([from, to]) => {
+    if (incoming.skills && incoming.skills[from] !== undefined && out.skills[to] !== undefined) {
+      out.skills[to] = Math.max(+(out.skills[to] || 0), +(incoming.skills[from] || 0));
+    }
+  });
+
   SKILL_SIM_ALL.forEach(name => {
     out.skills[name] = Math.max(0, Math.min(100, +(out.skills[name] || 0)));
   });
@@ -3055,6 +3066,44 @@ function clearSkillKnowledgeFilters() {
   renderSkillKnowledge();
 }
 
+
+function skillKnowledgeFindMastery(id) {
+  const data = skillKnowledgeData();
+  return (data.masteries || []).find(x => String(x.id) === String(id)) || null;
+}
+
+function applySkillKnowledgeMasteryTier(id, minValue) {
+  const item = skillKnowledgeFindMastery(id);
+  if (!item) {
+    alert("マスタリーデータが見つかりません。");
+    return;
+  }
+
+  const value = Math.max(0, Math.min(100, parseFloat(minValue) || 0));
+  state.skillSim = normalizeSkillSim(state.skillSim);
+  const reqs = Array.isArray(item.requirements) ? item.requirements : [];
+  reqs.forEach(req => {
+    const skill = req.skill || req.name;
+    if (!skill) return;
+    state.skillSim.skills[skill] = Math.max(+(state.skillSim.skills[skill] || 0), value);
+  });
+
+  renderSkillSim();
+  syncSkillSimToCalcInputs(false, false);
+  calc();
+}
+
+function skillKnowledgeMasteryTierButtons(item) {
+  if (!Array.isArray(item.tiers) || !item.tiers.length) return "";
+  const buttons = item.tiers.map((tier, idx) => {
+    const label = idx === 0 ? "1次" : idx === 1 ? "2次" : idx === 2 ? "3次" : `${idx + 1}段階`;
+    const title = `${label}: ${tier.name || ""} (${tier.min || 0}〜)`;
+    return `<button type="button" class="skillKnowledgeTierButton" onclick="applySkillKnowledgeMasteryTier('${escapeHtml(String(item.id || ""))}', ${+tier.min || 0})">${escapeHtml(title)}</button>`;
+  }).join("");
+  return `<div class="skillKnowledgeTierButtons">${buttons}</div>`;
+}
+
+
 function skillKnowledgeFilterState() {
   return {
     text: (byId("skillKnowledgeSearch")?.value || "").trim().toLowerCase(),
@@ -3094,7 +3143,7 @@ function skillKnowledgeStatusClass(status) {
 function skillKnowledgeItemHtml(ev, type) {
   const item = ev.item || {};
   const reqText = ev.evaluated.length
-    ? ev.evaluated.map(r => `${escapeHtml(r.skill)} ${fmt(r.current, 1)}/${r.max !== null ? "≤" + fmt(r.max, 1) : fmt(r.min, 1)}${r.ok ? "" : ` <b class="bad">不足${fmt(r.shortage, 1)}</b>`}`).join(" / ")
+    ? ev.evaluated.map(r => `${escapeHtml(r.skill)} ${fmt(r.current, 1)}/${r.max !== null ? "≤" + fmt(r.max, 1) : fmt(r.min, 1)}`).join(" / ")
     : "条件なし";
 
   const success = ev.success
@@ -3106,13 +3155,15 @@ function skillKnowledgeItemHtml(ev, type) {
   if (tierInfo) {
     if (tierInfo.achieved) {
       const nextText = tierInfo.next
-        ? ` / 次: ${escapeHtml(tierInfo.next.name || "")} まで ${fmt(tierInfo.nextShortage, 1)}`
+        ? ` / 次: ${escapeHtml(tierInfo.next.name || "")}`
         : " / 最高ランク";
       tierHtml = `<div class="skillKnowledgeTier">発動: <b>${escapeHtml(tierInfo.achieved.name || "")}</b> (${fmt(tierInfo.achieved.min, 0)}〜)${nextText}</div>`;
     } else if (tierInfo.next) {
-      tierHtml = `<div class="skillKnowledgeTier">未発動: ${escapeHtml(tierInfo.next.name || "")} まで ${fmt(tierInfo.nextShortage, 1)}</div>`;
+      tierHtml = `<div class="skillKnowledgeTier">未発動: ${escapeHtml(tierInfo.next.name || "")}</div>`;
     }
   }
+
+  const tierButtons = item.kind === "マスタリー" ? skillKnowledgeMasteryTierButtons(item) : "";
 
   const extra = [];
   if (item.mp !== undefined) extra.push(`MP ${item.mp}`);
@@ -3131,6 +3182,7 @@ function skillKnowledgeItemHtml(ev, type) {
     </div>
     <div class="skillKnowledgeMeta">${escapeHtml(item.category || type)} / ${escapeHtml(item.kind || type)}${item.code ? ` / ${escapeHtml(item.code)}` : ""}</div>
     ${tierHtml}
+    ${tierButtons}
     <div class="skillKnowledgeReq">${reqText}</div>
     ${success}
     ${extraHtml}
@@ -3178,8 +3230,89 @@ function renderSkillKnowledge() {
     const dataSource = data.source?.masteries || "不明";
     const usingFallback = dataSource === "内蔵フォールバック";
     const sampleNote = `<span class="skillKnowledgeSampleNote">${usingFallback ? "内蔵マスタリー使用" : "マスタリー実データ"} / テク・魔法はサンプル</span>`;
-    summary.innerHTML = `${shown}/${total}件表示 / 使用可能 ${okCount}件 ${sampleNote}<br><span class="small mutedText">Build v1.20.3 / マスタリー ${data.masteries.length}件 / テク ${data.techniques.length}件 / 魔法 ${data.magic.length}件 / ソース: ${escapeHtml(dataSource)}</span>`;
+    summary.innerHTML = `${shown}/${total}件表示 / 使用可能 ${okCount}件 ${sampleNote}<br><span class="small mutedText">Build v1.20.4 / マスタリー ${data.masteries.length}件 / テク ${data.techniques.length}件 / 魔法 ${data.magic.length}件 / ソース: ${escapeHtml(dataSource)}</span>`;
   }
+}
+
+
+
+function setSkillSimSkillValue(skill, value) {
+  state.skillSim = normalizeSkillSim(state.skillSim);
+  if (!SKILL_SIM_ALL.includes(skill)) return;
+  const v = Math.max(0, Math.min(100, Math.round((parseFloat(value) || 0) * 10) / 10));
+  state.skillSim.skills[skill] = v;
+}
+
+function makeSkillBarRow(skill) {
+  const row = document.createElement("div");
+  row.className = "skillBarRow";
+
+  const name = document.createElement("div");
+  name.className = "skillBarName";
+  name.textContent = skill;
+  row.appendChild(name);
+
+  const barWrap = document.createElement("div");
+  barWrap.className = "skillBarWrap";
+
+  const range = makeCell("input", {
+    type: "range",
+    min: "0",
+    max: "100",
+    step: "0.1",
+    value: state.skillSim.skills[skill] ?? 0
+  });
+  range.className = "skillBarRange";
+  range.title = "ドラッグで変更。クリックでもその位置へ変更できます。";
+
+  const fill = document.createElement("div");
+  fill.className = "skillBarFill";
+
+  const value = makeCell("input", {
+    type: "number",
+    min: "0",
+    max: "100",
+    step: "0.1",
+    value: state.skillSim.skills[skill] ?? 0
+  });
+  value.className = "skillBarValue";
+  value.title = "クリックして直接入力できます。";
+
+  const updateVisual = () => {
+    const v = Math.max(0, Math.min(100, parseFloat(value.value) || 0));
+    fill.style.width = `${v}%`;
+    range.value = String(v);
+    value.value = fmt(v, 1);
+  };
+
+  const apply = v => {
+    setSkillSimSkillValue(skill, v);
+    const next = state.skillSim.skills[skill] ?? 0;
+    range.value = String(next);
+    value.value = fmt(next, 1);
+    fill.style.width = `${next}%`;
+    handleSkillSimChanged();
+  };
+
+  range.oninput = () => apply(range.value);
+  value.oninput = () => apply(value.value);
+
+  // ホイール操作。Shift中は0.1、通常は1.0刻み。
+  row.addEventListener("wheel", e => {
+    if (document.activeElement && ["INPUT", "SELECT", "TEXTAREA"].includes(document.activeElement.tagName) && document.activeElement !== value && document.activeElement !== range) return;
+    e.preventDefault();
+    const step = e.shiftKey ? 0.1 : 1;
+    const dir = e.deltaY < 0 ? step : -step;
+    apply((state.skillSim.skills[skill] || 0) + dir);
+  }, {passive:false});
+
+  barWrap.appendChild(fill);
+  barWrap.appendChild(range);
+  row.appendChild(barWrap);
+  row.appendChild(value);
+
+  updateVisual();
+  return row;
 }
 
 
@@ -3233,29 +3366,15 @@ function renderSkillSim() {
   root.innerHTML = "";
   SKILL_SIM_GROUPS.forEach(([group, list]) => {
     const box = document.createElement("section");
-    box.className = "skillSimGroup";
+    box.className = "skillSimGroup skillSimGroupBar";
     const h = document.createElement("h3");
     h.textContent = group;
     box.appendChild(h);
 
     const grid = document.createElement("div");
-    grid.className = "skillSimGrid";
+    grid.className = "skillSimBarGrid";
     list.forEach(skill => {
-      const label = document.createElement("label");
-      label.textContent = skill;
-      const input = makeCell("input", {
-        type: "number",
-        min: "0",
-        max: "100",
-        step: "0.1",
-        value: state.skillSim.skills[skill] ?? 0
-      });
-      input.oninput = () => {
-        state.skillSim.skills[skill] = Math.max(0, Math.min(100, parseFloat(input.value) || 0));
-        handleSkillSimChanged();
-      };
-      label.appendChild(input);
-      grid.appendChild(label);
+      grid.appendChild(makeSkillBarRow(skill));
     });
     box.appendChild(grid);
     root.appendChild(box);

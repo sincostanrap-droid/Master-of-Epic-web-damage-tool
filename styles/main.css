@@ -3310,3 +3310,97 @@
   margin-top: -6px;
   opacity: .78;
 }
+
+
+/* v1.20.4: マスタリー段階投入ボタン */
+.skillKnowledgeTierButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 6px;
+}
+.skillKnowledgeTierButton {
+  padding: 4px 7px;
+  border-radius: 999px;
+  font-size: 11px;
+  line-height: 1.2;
+}
+.skillKnowledgeTierButton:hover {
+  filter: brightness(1.03);
+}
+
+
+/* v1.20.5: ぽん/uniuni系に寄せた2列バーUI */
+.skillSimGroups {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(320px, 1fr));
+  gap: 12px;
+  align-items: start;
+}
+.skillSimGroupBar {
+  padding: 10px;
+  border-radius: 14px;
+  border: 1px solid rgba(120, 110, 130, .18);
+  background: rgba(255, 255, 255, .68);
+}
+.skillSimGroupBar h3 {
+  margin: 0 0 8px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid rgba(120, 110, 130, .14);
+}
+.skillSimBarGrid {
+  display: grid;
+  gap: 5px;
+}
+.skillBarRow {
+  display: grid;
+  grid-template-columns: 6.5em minmax(130px, 1fr) 4.7em;
+  gap: 7px;
+  align-items: center;
+  min-height: 28px;
+}
+.skillBarName {
+  font-size: 13px;
+  white-space: nowrap;
+}
+.skillBarWrap {
+  position: relative;
+  height: 16px;
+  border-radius: 999px;
+  overflow: hidden;
+  border: 1px solid rgba(120, 110, 130, .28);
+  background: rgba(255, 255, 255, .75);
+}
+.skillBarFill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 0%;
+  background: linear-gradient(90deg, rgba(93, 139, 210, .45), rgba(93, 139, 210, .78));
+  pointer-events: none;
+}
+.skillBarRange {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 16px;
+  opacity: .02;
+  cursor: pointer;
+}
+.skillBarValue {
+  width: 100%;
+  min-width: 0;
+  padding: 3px 5px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.skillBarRow:hover .skillBarWrap {
+  border-color: rgba(80, 120, 190, .55);
+}
+@media (max-width: 900px) {
+  .skillSimGroups {
+    grid-template-columns: 1fr;
+  }
+  .skillBarRow {
+    grid-template-columns: 6.5em minmax(100px, 1fr) 4.5em;
+  }
+}
