@@ -64,7 +64,7 @@ MoE固有の主な仮定:
 </head>
 <body>
 <h1>Master of Epic 物理ダメージ計算webツール</h1>
-<p id="appBuildStamp" class="small appBuildStamp">Build: v1.20.7 / 表内テクニック実データ版</p>
+<p id="appBuildStamp" class="small appBuildStamp">Build: v1.20.9 / 技データ全投入版</p>
 <section class="heroCard">
   <div>
     <div class="heroBadge">MoE / Physical Damage Calculator</div>
@@ -359,7 +359,7 @@ MoE固有の主な仮定:
         <div>
           <h3>マスタリー / テクニック / 魔法</h3>
           <p class="small">
-            発動中の複合シップや使用可能なテクニック・魔法を確認します。マスタリーは1次/2次/3次ボタンで必要スキル値を自動投入できます。
+            発動中の複合シップや使用可能なテクニック・魔法を確認します。件数が多いため初期表示は「使用可能/あと少し」です。マスタリーは1次/2次/3次ボタンで必要スキル値を自動投入できます。
           </p>
         </div>
         <div id="skillKnowledgeSummary" class="small">-</div>
@@ -373,10 +373,11 @@ MoE固有の主な仮定:
         </label>
         <label>状態
           <select id="skillKnowledgeStatus">
-            <option value="all">すべて</option>
-            <option value="available">使用可能/発動中</option>
-            <option value="near">あと少し</option>
-            <option value="missing">条件不足</option>
+            <option value="relevant" selected>使用可能/あと少し</option>
+          <option value="all">すべて</option>
+          <option value="available">使用可能/発動中</option>
+          <option value="near">あと少し</option>
+          <option value="missing">条件不足</option>
           </select>
         </label>
         <button type="button" onclick="clearSkillKnowledgeFilters()">解除</button>
@@ -1210,11 +1211,11 @@ MoE固有の主な仮定:
   <textarea id="configBox" placeholder="JSONまたはTSVをここに貼り付けて読み込み可能"></textarea>
 </section>
 
-<script src="./src/storage/shareUrl.js?v=1.20.7" defer></script>
-<script src="./src/storage/importExport.js?v=1.20.7" defer></script>
-<script src="./src/calc/core.js?v=1.20.7" defer></script>
-<script src="./src/data/skillSimKnowledge.js?v=1.20.7" defer></script>
-<script src="./src/main.js?v=1.20.7" defer></script>
-<script src="./src/optimizer/core.js?v=1.20.7" defer></script>
+<script src="./src/storage/shareUrl.js?v=1.20.9" defer></script>
+<script src="./src/storage/importExport.js?v=1.20.9" defer></script>
+<script src="./src/calc/core.js?v=1.20.9" defer></script>
+<script src="./src/data/skillSimKnowledge.js?v=1.20.9" defer></script>
+<script src="./src/main.js?v=1.20.9" defer></script>
+<script src="./src/optimizer/core.js?v=1.20.9" defer></script>
 </body>
 </html>

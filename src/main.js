@@ -876,7 +876,7 @@ const SKILL_SIM_GROUPS = [
   ["戦闘", ["筋力", "着こなし", "攻撃回避", "生命力", "知能", "持久力", "精神力", "集中力", "呪文抵抗力", "盾"]],
   ["基本", ["落下耐性", "水泳", "死体回収", "包帯", "自然回復", "採掘", "伐採", "収穫", "釣り"]],
   ["生産", ["料理", "醸造", "鍛冶", "木工", "裁縫", "薬調合", "装飾細工", "複製", "栽培", "美容"]],
-  ["熟練", ["素手", "刀剣", "こんぼう", "槍", "銃器", "弓", "投げ", "牙", "キック", "罠", "戦闘技術", "酩酊", "物まね", "調教", "破壊魔法", "回復魔法", "強化魔法", "神秘魔法", "召喚魔法", "死の魔法", "魔法熟練", "自然調和", "暗黒命令", "取引", "音楽", "ダンス", "パフォーマンス"]]
+  ["熟練", ["素手", "刀剣", "こんぼう", "槍", "銃器", "弓", "投げ", "牙", "キック", "罠", "戦闘技術", "酩酊", "物まね", "調教", "破壊魔法", "回復魔法", "強化魔法", "神秘魔法", "召喚魔法", "死の魔法", "魔法熟練", "自然調和", "暗黒命令", "取引", "音楽", "シャウト", "ダンス", "パフォーマンス", "盗み"]]
 ];
 
 const SKILL_SIM_ALL = SKILL_SIM_GROUPS.flatMap(([, list]) => list);
@@ -950,8 +950,7 @@ function normalizeSkillSim(raw) {
   };
   // 旧版・外部データ互換。内部名が異なるものを現行UIのスキル名へ寄せる。
   const aliases = {
-    "解読": "複製",
-    "盗み": "物まね"
+    "解読": "複製"
   };
   Object.entries(aliases).forEach(([from, to]) => {
     if (incoming.skills && incoming.skills[from] !== undefined && out.skills[to] !== undefined) {
@@ -3062,7 +3061,7 @@ function setupSkillKnowledgeControls() {
 function clearSkillKnowledgeFilters() {
   if (byId("skillKnowledgeSearch")) byId("skillKnowledgeSearch").value = "";
   if (byId("skillKnowledgeCategory")) byId("skillKnowledgeCategory").value = "all";
-  if (byId("skillKnowledgeStatus")) byId("skillKnowledgeStatus").value = "all";
+  if (byId("skillKnowledgeStatus")) byId("skillKnowledgeStatus").value = "relevant";
   renderSkillKnowledge();
 }
 
@@ -3108,7 +3107,7 @@ function skillKnowledgeFilterState() {
   return {
     text: (byId("skillKnowledgeSearch")?.value || "").trim().toLowerCase(),
     category: byId("skillKnowledgeCategory")?.value || "all",
-    status: byId("skillKnowledgeStatus")?.value || "all"
+    status: byId("skillKnowledgeStatus")?.value || "relevant"
   };
 }
 
@@ -3123,7 +3122,8 @@ function skillKnowledgeSearchText(ev) {
 function skillKnowledgeMatches(ev, filter) {
   const item = ev.item || {};
   if (filter.category !== "all" && item.category !== filter.category) return false;
-  if (filter.status !== "all" && ev.status !== filter.status) return false;
+  if (filter.status === "relevant" && !(ev.status === "available" || ev.status === "near")) return false;
+  if (filter.status !== "all" && filter.status !== "relevant" && ev.status !== filter.status) return false;
   if (filter.text) {
     const terms = filter.text.split(/\s+/).filter(Boolean);
     const hay = skillKnowledgeSearchText(ev);
@@ -3241,7 +3241,7 @@ function renderSkillKnowledge() {
     const dataSource = data.source?.masteries || "不明";
     const usingFallback = dataSource === "内蔵フォールバック";
     const sampleNote = `<span class="skillKnowledgeSampleNote">${usingFallback ? "内蔵マスタリー使用" : "マスタリー実データ"} / テク・魔法はサンプル</span>`;
-    summary.innerHTML = `${shown}/${total}件表示 / 使用可能 ${okCount}件 ${sampleNote}<br><span class="small mutedText">Build v1.20.7 / マスタリー ${data.masteries.length}件 / テク ${data.techniques.length}件 / 魔法 ${data.magic.length}件 / ソース: ${escapeHtml(dataSource)}</span>`;
+    summary.innerHTML = `${shown}/${total}件表示 / 使用可能 ${okCount}件 ${sampleNote}<br><span class="small mutedText">Build v1.20.9 / マスタリー ${data.masteries.length}件 / テク ${data.techniques.length}件 / 魔法 ${data.magic.length}件 / ソース: ${escapeHtml(dataSource)}</span>`;
   }
 }
 
