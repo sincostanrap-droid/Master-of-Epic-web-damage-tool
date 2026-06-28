@@ -425,13 +425,35 @@ function presetConfigLooksUsable(value) {
   return !!(cfg && typeof cfg === "object" && cfg.inputs && cfg.state);
 }
 
-function presetConfigFingerprint(value) {
-  const cfg = value?.config || value;
-  if (!presetConfigLooksUsable(cfg)) return "";
-  try { return JSON.stringify(cfg); } catch { return ""; }
+function setPresetStatus(message, type="") {
+  const el = byId("presetStatus");
+  if (!el) return;
+  el.textContent = message || "";
+  el.className = `small presetStatus ${type}`.trim();
 }
 
-function normalizeNamedPresetMap(raw, sourceLabel="") {
+function removeEmptyImportedArrays(st) {
+  if (!st || typeof st !== "object") return st;
+  ["pct","flat","conv","dmg","special","post","other","equipment","composite","weaponReq"].forEach(k => {
+    if (Array.isArray(st[k]) && st[k].length === 0) delete st[k];
+  });
+  return st;
+}
+
+function compactPresetConfig(config) {
+  const cfg = {
+    inputs: config?.inputs || {},
+    state: clone(config?.state || {})
+  };
+
+  // 自動生成行や空配列を保存しない。これだけで保存サイズをかなり減らせます。
+  cfg.state.other = (Array.isArray(cfg.state.other) ? cfg.state.other : []).filter(r => r && r.source !== "skillSimMastery");
+  removeEmptyImportedArrays(cfg.state);
+
+  return cfg;
+}
+
+function normalizeNamedPresetMap(raw) {
   const out = {};
   if (!raw || typeof raw !== "object") return out;
 
@@ -442,130 +464,76 @@ function normalizeNamedPresetMap(raw, sourceLabel="") {
     }
   });
 
-  if (Array.isArray(raw.presets)) {
-    raw.presets.forEach((entry, idx) => {
-      const name = entry?.name || entry?.title || `復旧プリセット${idx + 1}`;
-      const value = entry?.preset || entry?.value || entry;
-      if (presetConfigLooksUsable(value)) {
-        out[name] = value.config ? value : {savedAt: value.savedAt || "", config: value};
-      }
-    });
-  }
-
+  // v1.21.3/v1.21.6のバックアップJSONを貼って読んだ場合だけ互換対応。
   if (raw.namedPresets && typeof raw.namedPresets === "object") {
-    Object.assign(out, normalizeNamedPresetMap(raw.namedPresets, sourceLabel));
-  }
-
-  if (raw.config && presetConfigLooksUsable(raw.config)) {
-    const name = raw.name || raw.title || sourceLabel || "復旧プリセット";
-    out[name] = {savedAt: raw.savedAt || "", config: raw.config};
+    Object.assign(out, normalizeNamedPresetMap(raw.namedPresets));
   }
 
   return out;
 }
 
-function mergeNamedPresets(found, preferExisting=true) {
-  let added = 0;
-  let skipped = 0;
-  const existingFingerprints = new Set(Object.values(namedPresets || {}).map(presetConfigFingerprint).filter(Boolean));
-
-  Object.entries(found || {}).forEach(([name, preset]) => {
-    if (!presetConfigLooksUsable(preset)) return;
-    const fp = presetConfigFingerprint(preset);
-    if (fp && existingFingerprints.has(fp)) {
-      skipped++;
-      return;
-    }
-    let finalName = name || "復旧プリセット";
-    if (namedPresets[finalName] && preferExisting) {
-      let i = 2;
-      while (namedPresets[`${finalName} (${i})`]) i++;
-      finalName = `${finalName} (${i})`;
-    }
-    namedPresets[finalName] = preset;
-    if (fp) existingFingerprints.add(fp);
-    added++;
-  });
-
-  return {added, skipped};
-}
-
-function scanLocalStorageForPresets() {
-  const found = {};
-  const keys = [];
+function cleanupPresetStorageNoise() {
+  // 前版の救助用自動バックアップで容量を食っていたキーを削除。
+  // 現在のプリセット本体 NAMED_PRESET_KEY は消さない。
+  const removed = [];
   try {
+    const keys = [];
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
       if (key) keys.push(key);
     }
-  } catch {
-    return {found, scanned: 0};
-  }
-
-  keys.forEach(key => {
-    let parsed = null;
-    const raw = localStorage.getItem(key);
-    if (!raw || !/moe|damage|preset|share|config|snapshot/i.test(key + " " + raw.slice(0, 200))) return;
-    try { parsed = JSON.parse(raw); } catch { return; }
-
-    const fromMap = normalizeNamedPresetMap(parsed, key);
-    Object.entries(fromMap).forEach(([name, preset]) => {
-      const label = key === NAMED_PRESET_KEY ? name : `${name}［${key}］`;
-      found[label] = preset;
+    keys.forEach(key => {
+      if (
+        key !== NAMED_PRESET_KEY &&
+        (
+          key.startsWith(NAMED_PRESET_KEY + "_backup_") ||
+          key.startsWith(NAMED_PRESET_KEY + "_before_delete_") ||
+          key.includes("preset_recovery") ||
+          key.includes("NamedPresets_backup")
+        )
+      ) {
+        localStorage.removeItem(key);
+        removed.push(key);
+      }
     });
-
-    if (presetConfigLooksUsable(parsed)) {
-      found[`保存構成［${key}］`] = {savedAt: parsed.savedAt || "", config: parsed.config || parsed};
-    }
-    if (parsed?.state && parsed?.inputs) {
-      found[`保存構成［${key}］`] = {savedAt: parsed.savedAt || "", config: parsed};
-    }
-  });
-
-  return {found, scanned: keys.length};
-}
-
-function setPresetStatus(message, type="") {
-  const el = byId("presetStatus");
-  if (!el) return;
-  el.textContent = message || "";
-  el.className = `small presetStatus ${type}`.trim();
-}
-
-function safeLoadNamedPresetRaw() {
-  try {
-    return JSON.parse(localStorage.getItem(NAMED_PRESET_KEY) || "{}") || {};
-  } catch {
-    return {};
-  }
+  } catch {}
+  return removed;
 }
 
 /* 名前付きプリセットをlocalStorageから読む。 */
 function loadNamedPresetsFromStorage() {
-  namedPresets = normalizeNamedPresetMap(safeLoadNamedPresetRaw(), NAMED_PRESET_KEY);
-
-  if (!Object.keys(namedPresets).length) {
-    const scan = scanLocalStorageForPresets();
-    const candidates = normalizeNamedPresetMap(scan.found, "自動検出");
-    if (Object.keys(candidates).length) {
-      mergeNamedPresets(candidates, true);
-      setPresetStatus(`保存済みプリセットが見つかりました。${Object.keys(namedPresets).length}件を表示しています。`, "ok");
-      return;
-    }
+  cleanupPresetStorageNoise();
+  try {
+    namedPresets = normalizeNamedPresetMap(JSON.parse(localStorage.getItem(NAMED_PRESET_KEY) || "{}")) || {};
+  } catch {
+    namedPresets = {};
   }
-
-  const count = Object.keys(namedPresets).length;
-  setPresetStatus(count ? `保存済みプリセット: ${count}件` : "保存済みプリセットはまだありません。以前の保存が見えない場合は「保存データを探す」を押してください。", count ? "ok" : "");
+  const count = Object.keys(namedPresets || {}).length;
+  setPresetStatus(count ? `保存済みプリセット: ${count}件` : "保存済みプリセットはまだありません。", count ? "ok" : "");
 }
 
 /* 名前付きプリセットをlocalStorageへ保存する。 */
 function saveNamedPresetsToStorage() {
-  const json = JSON.stringify(namedPresets || {});
+  cleanupPresetStorageNoise();
+  const compact = {};
+  Object.entries(namedPresets || {}).forEach(([name, preset]) => {
+    if (!presetConfigLooksUsable(preset)) return;
+    compact[name] = {
+      savedAt: preset.savedAt || new Date().toISOString(),
+      config: compactPresetConfig(preset.config || preset)
+    };
+  });
+
+  const json = JSON.stringify(compact);
   try {
-    localStorage.setItem(NAMED_PRESET_KEY + "_backup_" + new Date().toISOString().slice(0,10), json);
-  } catch {}
-  localStorage.setItem(NAMED_PRESET_KEY, json);
-  setPresetStatus(`保存済みプリセット: ${Object.keys(namedPresets || {}).length}件`, "ok");
+    localStorage.setItem(NAMED_PRESET_KEY, json);
+    namedPresets = compact;
+    setPresetStatus(`保存済みプリセット: ${Object.keys(namedPresets).length}件`, "ok");
+    return true;
+  } catch (e) {
+    setPresetStatus("プリセット保存に失敗しました。ブラウザの保存容量が足りない可能性があります。JSON/TSV出力で退避してください。", "warn");
+    throw e;
+  }
 }
 
 /* 保存済みプリセットselectを更新する。 */
@@ -579,71 +547,12 @@ function renderPresetSelect() {
   setPresetStatus(names.length ? `保存済みプリセット: ${names.length}件` : "保存済みプリセットはまだありません。", names.length ? "ok" : "");
 }
 
-function recoverNamedPresets() {
-  const scan = scanLocalStorageForPresets();
-  const candidates = normalizeNamedPresetMap(scan.found, "手動復旧");
-  const result = mergeNamedPresets(candidates, true);
-  if (result.added > 0) {
-    saveNamedPresetsToStorage();
-    renderPresetSelect();
-    setPresetStatus(`保存データから ${result.added}件 復旧しました。`, "ok");
-  } else {
-    setPresetStatus(`復旧できる追加プリセットは見つかりませんでした。確認した保存データ: ${scan.scanned}件`, "warn");
-  }
-}
-
-function exportNamedPresets() {
-  const payload = {
-    type: "moeDamageNamedPresetsBackup",
-    version: 1,
-    exportedAt: new Date().toISOString(),
-    namedPresets: namedPresets || {}
-  };
-  byId("configBox").value = JSON.stringify(payload, null, 2);
-  setPresetStatus("プリセットのバックアップを下の欄に出力しました。コピーして保存してください。", "ok");
-}
-
-function importNamedPresets() {
-  try {
-    const parsed = JSON.parse(byId("configBox").value || "{}");
-    const found = normalizeNamedPresetMap(parsed, "バックアップ");
-    if (!Object.keys(found).length) {
-      alert("読み込めるプリセットが見つかりません。");
-      return;
-    }
-    const result = mergeNamedPresets(found, true);
-    saveNamedPresetsToStorage();
-    renderPresetSelect();
-    setPresetStatus(`バックアップから ${result.added}件 追加しました。`, "ok");
-  } catch (e) {
-    alert("プリセットバックアップの読み込みに失敗: " + e.message);
-  }
-}
-
-function saveNamedPresetsToStorage() {
-  try {
-    localStorage.setItem(NAMED_PRESET_KEY + "_backup_" + new Date().toISOString().slice(0,10), JSON.stringify(namedPresets));
-  } catch {}
-  localStorage.setItem(NAMED_PRESET_KEY, JSON.stringify(namedPresets));
-  setPresetStatus(`保存済みプリセット: ${Object.keys(namedPresets).length}件`, "ok");
-}
-/* 保存済みプリセットselectを更新する。 */
-function renderPresetSelect() {
-  const sel = byId("presetSelect");
-  if (!sel) return;
-  const names = Object.keys(namedPresets).sort((a,b) => a.localeCompare(b, "ja"));
-  sel.innerHTML = names.length
-    ? names.map(name => `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`).join("")
-    : `<option value="">保存済みなし</option>`;
-  setPresetStatus(names.length ? `保存済みプリセット: ${names.length}件` : "保存済みプリセットはまだありません。", names.length ? "ok" : "");
-}
-/* 現在構成を名前付きプリセットとして保存する。 */
 function saveNamedPreset() {
   const name = (byId("presetName")?.value || "").trim() || prompt("プリセット名を入力してください");
   if (!name) return;
 
   try {
-    const config = collectConfig();
+    const config = compactPresetConfig(collectConfig());
     if (!config || !config.inputs || !config.state) {
       throw new Error("保存する設定を取得できませんでした。");
     }
@@ -661,7 +570,7 @@ function saveNamedPreset() {
     setPresetStatus(`「${name}」を保存しました。`, "ok");
   } catch (e) {
     console.error(e);
-    setPresetStatus("プリセット保存に失敗しました: " + (e?.message || e), "warn");
+    setPresetStatus("プリセット保存に失敗しました: ブラウザの保存容量が足りない可能性があります。JSON/TSV出力で退避してください。", "warn");
     alert("プリセット保存に失敗しました: " + (e?.message || e));
   }
 }
@@ -683,58 +592,28 @@ function deleteNamedPreset() {
   const name = byId("presetSelect")?.value;
   if (!name || !namedPresets?.[name]) return;
   if (!confirm(`「${name}」を削除しますか？`)) return;
-  try {
-    localStorage.setItem(NAMED_PRESET_KEY + "_before_delete_" + new Date().toISOString(), JSON.stringify(namedPresets));
-  } catch {}
   delete namedPresets[name];
-  saveNamedPresetsToStorage();
-  renderPresetSelect();
-  setPresetStatus(`「${name}」を削除しました。`, "warn");
+  try {
+    saveNamedPresetsToStorage();
+    renderPresetSelect();
+    setPresetStatus(`「${name}」を削除しました。`, "warn");
+  } catch (e) {
+    alert("削除後の保存に失敗しました: " + (e?.message || e));
+  }
 }
 
 function recoverNamedPresets() {
-  const scan = scanLocalStorageForPresets();
-  const candidates = normalizeNamedPresetMap(scan.found, "手動復旧");
-  const result = mergeNamedPresets(candidates, true);
-  if (result.added > 0) {
-    saveNamedPresetsToStorage();
-    renderPresetSelect();
-    setPresetStatus(`保存データから ${result.added}件 復旧しました。`, "ok");
-  } else {
-    setPresetStatus(`復旧できる追加プリセットは見つかりませんでした。確認した保存データ: ${scan.scanned}件`, "warn");
-  }
+  setPresetStatus("この復旧機能は削除されました。JSON/TSV出力を使って保存してください。", "warn");
 }
 
 function exportNamedPresets() {
-  const payload = {
-    type: "moeDamageNamedPresetsBackup",
-    version: 1,
-    exportedAt: new Date().toISOString(),
-    namedPresets
-  };
-  byId("configBox").value = JSON.stringify(payload, null, 2);
-  setPresetStatus("プリセットのバックアップを下の欄に出力しました。コピーして保存してください。", "ok");
+  setPresetStatus("この復旧機能は削除されました。JSON/TSV出力を使って保存してください。", "warn");
 }
 
 function importNamedPresets() {
-  try {
-    const parsed = JSON.parse(byId("configBox").value || "{}");
-    const found = normalizeNamedPresetMap(parsed, "バックアップ");
-    const result = mergeNamedPresets(found, true);
-    if (!Object.keys(found).length) {
-      alert("読み込めるプリセットが見つかりません。");
-      return;
-    }
-    saveNamedPresetsToStorage();
-    renderPresetSelect();
-    setPresetStatus(`バックアップから ${result.added}件 追加しました。`, "ok");
-  } catch (e) {
-    alert("プリセットバックアップの読み込みに失敗: " + e.message);
-  }
+  setPresetStatus("この復旧機能は削除されました。JSON/TSV出力を使って保存してください。", "warn");
 }
 
-
-/* JSON形式で現在構成をテキストエリアへ出力する。 */
 function exportConfig() {
   byId("configBox").value = JSON.stringify(collectConfig(), null, 2);
 }

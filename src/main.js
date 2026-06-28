@@ -4236,7 +4236,6 @@ function setInputs(inputs) {
 /* JSON/TSV/プリセット保存用に、inputsとstateを1つのオブジェクトへまとめる。 */
 function collectConfig() {
   const st = clone(state || DEFAULT_STATE());
-  // 発動中マスタリー由来の自動Buff行は読み込み時に再生成するため、保存データからは除外します。
   st.other = (Array.isArray(st.other) ? st.other : []).filter(r => r && r.source !== "skillSimMastery");
   return {inputs: collectInputs(), state: st};
 }

@@ -3552,3 +3552,9 @@
 .importStatus.warn {
   color: #8a5a00;
 }
+
+
+/* v1.21.7: プリセット保存軽量化 */
+.presetStatus.warn {
+  font-weight: 600;
+}
