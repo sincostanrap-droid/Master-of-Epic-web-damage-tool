@@ -2851,3 +2851,129 @@
 .quickEffectType optgroup {
   font-weight: 800;
 }
+
+
+/* v1.17: 公式DB貼り付け取り込み */
+.idbImportBox {
+  background: rgba(250, 252, 255, .72);
+}
+.idbSearchRow {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) auto auto;
+  gap: 8px;
+  align-items: center;
+  margin: 8px 0;
+}
+.idbSearchRow input {
+  width: 100%;
+}
+.idbImportPreview {
+  margin-top: 8px;
+  padding: 10px;
+  border: 1px solid rgba(120, 110, 130, .18);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, .72);
+  line-height: 1.6;
+}
+.idbImportPreview.bad {
+  border-color: rgba(190, 80, 80, .35);
+  background: rgba(255, 240, 240, .88);
+}
+.okText {
+  margin-top: 8px;
+  font-weight: 800;
+  color: #276b38;
+}
+@media (max-width: 760px) {
+  .idbSearchRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* v1.17.1: 公式DB解析結果の手動補正欄 */
+.idbManualRow {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) minmax(180px, .7fr);
+  gap: 8px;
+  margin: 8px 0;
+}
+.idbManualRow label {
+  display: grid;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 800;
+}
+.idbManualRow input,
+.idbManualRow select {
+  width: 100%;
+}
+@media (max-width: 760px) {
+  .idbManualRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* v1.18: Cloudflare Worker URL取り込み */
+.idbWorkerImportBox {
+  margin: 10px 0;
+  padding: 10px;
+  border: 1px solid rgba(120, 110, 130, .18);
+  border-radius: 12px;
+  background: rgba(248, 250, 255, .78);
+}
+.idbWorkerImportBox h4 {
+  margin: 0 0 4px;
+}
+.idbWorkerRow {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) minmax(240px, 1.25fr) auto;
+  gap: 8px;
+  align-items: end;
+}
+.idbWorkerRow label {
+  display: grid;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 800;
+}
+.idbWorkerRow input {
+  width: 100%;
+}
+#idbWorkerStatus.bad {
+  color: #a23b3b;
+  font-weight: 800;
+}
+@media (max-width: 860px) {
+  .idbWorkerRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* v1.18.1 */
+.idbWorkerRow button {
+  white-space: nowrap;
+}
+
+
+/* v1.18.4: 固定Worker URL */
+.idbWorkerFixedNotice {
+  margin: 6px 0 8px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, .7);
+  border: 1px solid rgba(120, 110, 130, .16);
+}
+.idbWorkerFixedNotice code {
+  word-break: break-all;
+}
+.idbWorkerRowFixed {
+  grid-template-columns: minmax(260px, 1fr) auto auto;
+}
+@media (max-width: 860px) {
+  .idbWorkerRowFixed {
+    grid-template-columns: 1fr;
+  }
+}

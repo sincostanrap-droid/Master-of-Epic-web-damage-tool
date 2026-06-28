@@ -4521,6 +4521,1108 @@ async function copyShowcaseText() {
 
 
 
+const IDB_BASE_URL = "https://idb.moepic.com/";
+
+function openIdbTop() {
+  window.open(IDB_BASE_URL, "_blank", "noopener");
+}
+
+function openIdbSearch() {
+  const name = byId("idbSearchName")?.value?.trim() || "";
+  const url = name
+    ? `${IDB_BASE_URL}items/search?name=${encodeURIComponent(name)}`
+    : `${IDB_BASE_URL}items/search`;
+  window.open(url, "_blank", "noopener");
+}
+
+function clearIdbImportBox() {
+  if (byId("idbPasteBox")) byId("idbPasteBox").value = "";
+  if (byId("idbImportPreview")) byId("idbImportPreview").textContent = "まだ解析していません。";
+}
+
+const IDB_WORKER_ENDPOINT = "https://divine-grass-1b84.sincostanrap.workers.dev";
+
+function normalizeIdbWorkerEndpoint() {
+  return IDB_WORKER_ENDPOINT;
+}
+
+function normalizeIdbItemUrl(url) {
+  const s = String(url || "").trim();
+  if (!s) return "";
+  try {
+    const u = new URL(s);
+    if (u.protocol !== "https:" || u.hostname !== "idb.moepic.com" || !u.pathname.startsWith("/items/")) return "";
+    u.hash = "";
+    return u.toString();
+  } catch {
+    return "";
+  }
+}
+
+function loadIdbWorkerEndpoint() {
+  // v1.18.4: Worker URL is fixed and not user-editable.
+}
+
+function saveIdbWorkerEndpoint(endpoint) {
+  // v1.18.4: Worker URL is fixed and not user-editable.
+}
+
+function setIdbWorkerStatus(message, isError=false) {
+  const el = byId("idbWorkerStatus");
+  if (!el) return;
+  el.textContent = message;
+  el.classList.toggle("bad", !!isError);
+}
+
+async function testIdbWorkerConnection() {
+  const endpoint = normalizeIdbWorkerEndpoint();
+  if (!endpoint) {
+    setIdbWorkerStatus("固定Worker URLの設定が正しくありません。", true);
+    return;
+  }
+  saveIdbWorkerEndpoint(endpoint);
+  setIdbWorkerStatus("Worker接続テスト中...");
+  try {
+    const res = await fetch(endpoint, {method:"GET", cache:"no-store"});
+    const text = await res.text();
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${text.slice(0, 160)}`);
+    setIdbWorkerStatus(`Worker接続OK: ${text.slice(0, 120)}`);
+  } catch (e) {
+    setIdbWorkerStatus(`Worker接続失敗: ${e.message || e}`, true);
+  }
+}
+
+async function fetchIdbUrlViaWorker() {
+  const endpoint = normalizeIdbWorkerEndpoint();
+  const itemUrl = normalizeIdbItemUrl(byId("idbItemUrl")?.value || "");
+  if (!endpoint) {
+    setIdbWorkerStatus("固定Worker URLの設定が正しくありません。", true);
+    return;
+  }
+  if (!itemUrl) {
+    setIdbWorkerStatus("公式DBの個別アイテムURLを入力してください。例: https://idb.moepic.com/items/defences/22761", true);
+    return;
+  }
+
+  saveIdbWorkerEndpoint(endpoint);
+  setIdbWorkerStatus("取得中...");
+
+  try {
+    const url = `${endpoint}?url=${encodeURIComponent(itemUrl)}`;
+    const res = await fetch(url, {method:"GET"});
+    if (!res.ok) {
+      const msg = await res.text().catch(() => "");
+      throw new Error(`Worker取得失敗: HTTP ${res.status}${msg ? " / " + msg.slice(0, 120) : ""}`);
+    }
+    const html = await res.text();
+    if (!html || html.length < 100) throw new Error("取得したHTMLが短すぎます。URLやWorker設定を確認してください。");
+
+    const paste = byId("idbPasteBox");
+    if (paste) paste.value = html;
+
+    setIdbWorkerStatus("取得しました。貼り付け欄へHTMLを入れて解析しました。");
+    previewIdbEquipmentImport();
+  } catch (e) {
+    const msg = e.message || String(e) || "取得に失敗しました。";
+    setIdbWorkerStatus(`${msg} / GitHub Pages上から実行しているか、Worker側の許可Origin設定を確認してください。`, true);
+  }
+}
+
+
+function idbHtmlHints(raw) {
+  const s = String(raw || "");
+  if (!/<(?:html|head|body|title|meta|h1|h2|table|div)\b/i.test(s)) return [];
+  try {
+    const doc = new DOMParser().parseFromString(s, "text/html");
+    const hints = [];
+    const push = v => {
+      const t = String(v || "").replace(/\s+/g, " ").trim();
+      if (t && !hints.includes(t)) hints.push(t);
+    };
+    push(doc.title);
+    ["meta[property='og:title']", "meta[name='twitter:title']", "meta[name='description']", "meta[property='og:description']"].forEach(sel => {
+      push(doc.querySelector(sel)?.getAttribute("content"));
+    });
+    doc.querySelectorAll("h1, h2, h3, [class*='title'], [class*='name']").forEach(el => push(el.textContent));
+    doc.querySelectorAll("img[alt]").forEach(img => push(img.getAttribute("alt")));
+    return hints.slice(0, 20);
+  } catch {
+    return [];
+  }
+}
+
+function idbDecodeHtmlEntities(text) {
+  let s = String(text || "");
+  try {
+    if (typeof document !== "undefined") {
+      const ta = document.createElement("textarea");
+      ta.innerHTML = s;
+      s = ta.value;
+    }
+  } catch {}
+  return s
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, "\"")
+    .replace(/&#39;/g, "'");
+}
+
+function idbDecodeJsonEscapes(text) {
+  let s = String(text || "");
+  s = s
+    .replace(/\\u003c/gi, "<")
+    .replace(/\\u003e/gi, ">")
+    .replace(/\\u0026/gi, "&")
+    .replace(/\\u002f/gi, "/")
+    .replace(/\\n/g, "\n")
+    .replace(/\\r/g, "\n")
+    .replace(/\\t/g, " ")
+    .replace(/\\"/g, "\"");
+  try {
+    s = s.replace(/\\u([0-9a-fA-F]{4})/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)));
+  } catch {}
+  return s;
+}
+
+function idbHtmlToLooseText(html) {
+  let s = idbDecodeJsonEscapes(String(html || ""));
+  s = s
+    .replace(/<script\b[\s\S]*?<\/script>/gi, "\n")
+    .replace(/<style\b[\s\S]*?<\/style>/gi, "\n")
+    .replace(/<noscript\b[\s\S]*?<\/noscript>/gi, "\n")
+    .replace(/<(?:br|hr)\b[^>]*>/gi, "\n")
+    .replace(/<\/(?:p|div|section|article|header|footer|nav|main|table|thead|tbody|tr|th|td|dl|dt|dd|li|ul|ol|h1|h2|h3|h4|h5|h6)>/gi, "\n")
+    .replace(/<(?:p|div|section|article|header|footer|nav|main|table|thead|tbody|tr|th|td|dl|dt|dd|li|ul|ol|h1|h2|h3|h4|h5|h6)\b[^>]*>/gi, "\n")
+    .replace(/<[^>]+>/g, " ");
+  return idbDecodeHtmlEntities(s);
+}
+
+function idbUsefulScriptTextFromHtml(html) {
+  const raw = String(html || "");
+  const out = [];
+  const re = /<script\b[^>]*>([\s\S]*?)<\/script>/gi;
+  let m;
+  while ((m = re.exec(raw)) !== null) {
+    let s = idbDecodeJsonEscapes(m[1] || "");
+    if (!/(装備部位|必要スキル|アーマークラス|付加効果|追加効果|回避|最大重量|移動速度|攻撃力|耐火属性|defences|weapons|items)/.test(s)) continue;
+    s = s
+      .replace(/[{},[\]]/g, "\n")
+      .replace(/["']/g, "")
+      .replace(/:/g, " ")
+      .replace(/,/g, "\n");
+    out.push(idbDecodeHtmlEntities(s));
+  }
+  return out.join("\n");
+}
+
+function idbCleanText(text) {
+  return String(text || "")
+    .replace(/\r/g, "\n")
+    .replace(/[ \t\u00a0]+/g, " ")
+    .replace(/\n[ \t]+/g, "\n")
+    .replace(/[ \t]+\n/g, "\n")
+    .replace(/[：:]\s*\n/g, ":\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
+function idbLabelPattern(labels) {
+  return (Array.isArray(labels) ? labels : [labels])
+    .map(x => String(x).replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+    .join("|");
+}
+
+function idbCompactFieldText(text, labels, stopLabels=[]) {
+  const source = idbCleanText(text).replace(/\n+/g, " ");
+  const label = idbLabelPattern(labels);
+  const stops = stopLabels?.length ? idbLabelPattern(stopLabels) : "$^";
+  const re = new RegExp(`(?:${label})\\s*[:：]?\\s*([\\s\\S]*?)(?=\\s*(?:${stops})\\s*[:：]?|$)`, "i");
+  const m = source.match(re);
+  return m ? idbCleanText(m[1] || "") : "";
+}
+
+
+function idbTextFromPaste(raw) {
+  const original = String(raw || "");
+  let s = original;
+  const hints = idbHtmlHints(s);
+  const scriptUseful = idbUsefulScriptTextFromHtml(s);
+
+  if (/<(?:html|body|div|table|thead|tbody|tr|th|td|dt|dd|p|br|li|h1|h2|h3|span|a|script)\b/i.test(s)) {
+    try {
+      const doc = new DOMParser().parseFromString(s, "text/html");
+      doc.querySelectorAll("script, style, noscript, svg, canvas, iframe").forEach(el => el.remove());
+      doc.querySelectorAll("br, p, div, tr, li, h1, h2, h3, h4, dt, dd, th, td, caption, section, article").forEach(el => {
+        el.appendChild(doc.createTextNode("\n"));
+      });
+      const body = doc.body?.textContent || "";
+      const loose = idbHtmlToLooseText(original);
+      s = [hints.join("\n"), body, loose, scriptUseful].filter(Boolean).join("\n");
+    } catch {
+      s = [hints.join("\n"), idbHtmlToLooseText(original), scriptUseful].filter(Boolean).join("\n");
+    }
+  } else if (hints.length || scriptUseful) {
+    s = [hints.join("\n"), s, scriptUseful].filter(Boolean).join("\n");
+  }
+
+  return idbCleanText(idbDecodeHtmlEntities(idbDecodeJsonEscapes(s)));
+}
+
+function idbLines(text) {
+  const cleaned = idbTextFromPaste(text);
+  const withBreaks = cleaned.replace(/\s+(?=(?:説明|アイテム画像|装備部位|必要スキル|アーマークラス|カラー|使用可能性別|使用可能種族|使用可能シップ|付加効果|追加効果|特殊条件|消耗度|重さ|素材)\b)/g, "\n");
+  return withBreaks
+    .split(/\n+/)
+    .map(x => x.trim())
+    .filter(Boolean);
+}
+
+function idbFirstMatch(text, patterns) {
+  for (const p of patterns) {
+    const m = text.match(p);
+    if (m) return m[1] ?? m[0];
+  }
+  return "";
+}
+
+function idbValueAfterLabels(lines, labels, opts={}) {
+  const escapedLabels = Array.isArray(labels) ? labels.map(x => String(x).replace(/[.*+?^${}()|[\]\\]/g, "\\$&")) : [String(labels)];
+  const labelPattern = escapedLabels.join("|");
+  const joined = lines.join("\n");
+
+  const inlineRe = new RegExp(`(?:${labelPattern})\\s*[:：]?\\s*([+-]?\\d+(?:\\.\\d+)?)`, "i");
+  const inline = joined.match(inlineRe);
+  if (inline) return parseFloat(inline[1]);
+
+  for (let i = 0; i < lines.length; i++) {
+    if (!new RegExp(`^(?:${labelPattern})\\s*[:：]?$`, "i").test(lines[i])) continue;
+    for (let j = i + 1; j < Math.min(lines.length, i + 4); j++) {
+      const m = lines[j].match(/([+-]?\d+(?:\.\d+)?)/);
+      if (m) return parseFloat(m[1]);
+      if (/^(装備部位|必要スキル|付加効果|追加効果|説明|特殊条件|レアアイテム|素材|検索|アイテム画像)/.test(lines[j])) break;
+    }
+  }
+
+  const compact = idbCompactFieldText(joined, Array.isArray(labels) ? labels : [labels], ["装備部位", "必要スキル", "アーマークラス", "カラー", "使用可能性別", "使用可能種族", "使用可能シップ", "付加効果", "追加効果", "特殊条件", "消耗度", "重さ", "素材"]);
+  const cm = compact.match(/([+-]?\d+(?:\.\d+)?)/);
+  if (cm) return parseFloat(cm[1]);
+
+  if (opts.fallbackRegex) {
+    const m = joined.match(opts.fallbackRegex);
+    if (m) return parseFloat(m[1]);
+  }
+  return 0;
+}
+
+function idbNormalizeTitleName(s) {
+  return String(s || "")
+    .replace(/\s+-\s+(?:防具装飾|武器|防具|装飾|盾|アイテム|食品|素材).*/, "")
+    .replace(/\s+\|\s+Master of Epic.*/, "")
+    .replace(/\s+-\s+Master of Epic.*/, "")
+    .replace(/^アイテム名\s*[:：]?/, "")
+    .replace(/^名称\s*[:：]?/, "")
+    .replace(/^Name\s*[:：]?/i, "")
+    .trim();
+}
+
+function idbGuessName(lines, text) {
+  const itemType = "(?:防具装飾|武器|防具|装飾|盾|アイテム|食品|素材)";
+  const direct = idbFirstMatch(text, [
+    new RegExp(`^(.+?)\\s+-\\s+${itemType}\\s+-\\s+Master of Epic`, "m"),
+    new RegExp(`<title>\\s*([^<]+?)\\s+-\\s+${itemType}\\s+-\\s+Master of Epic`, "i"),
+    new RegExp(`(?:og:title|twitter:title)["'][^>]*content=["']([^"']+?)\\s+-\\s+${itemType}\\s+-`, "i"),
+    /(?:アイテム名|名称|Name)\s*[:：]\s*([^\n]+)/i
+  ]);
+  if (direct) return idbNormalizeTitleName(direct);
+
+  for (let i = 0; i < lines.length; i++) {
+    if (/^(アイテム名|名称|Name)\s*[:：]?$/.test(lines[i]) && lines[i + 1]) {
+      const n = idbNormalizeTitleName(lines[i + 1]);
+      if (idbLooksLikeItemName(n)) return n;
+    }
+  }
+
+  // 「ジャイアント ドラゴンフライ 説明 ...」のように1行に詰まった本文から先頭名を取る。
+  const compactHead = idbCompactFieldText(`__NAME__ ${text}`, ["__NAME__"], ["説明", "アイテム画像", "装備部位", "必要スキル", "アーマークラス", "付加効果", "追加効果"]);
+  const compactName = idbNormalizeTitleName(compactHead).trim();
+  if (idbLooksLikeItemName(compactName) && compactName.length <= 40) return compactName;
+
+  const skip = /^(Master of Epic|公式データベース|MoE|アイテム画像|画像|説明|装備部位|使用可能|必要スキル|付加効果|追加効果|特殊条件|レアアイテム|検索|トップ|一覧|Tweet|シェア|NO IMAGE|武器|防具|防具装飾|装飾|盾|アイテム|ダメージ|攻撃間隔|有効レンジ|アーマークラス|消耗度|重さ|素材|戻る|HOME|ログイン|ALL|NG|OK)$/i;
+
+  const scored = lines
+    .map((line, idx) => ({line: idbNormalizeTitleName(line), idx}))
+    .filter(x => idbLooksLikeItemName(x.line) && !skip.test(x.line))
+    .map(x => {
+      let score = 0;
+      if (/[ぁ-んァ-ヶ一-龠A-Za-z]/.test(x.line)) score += 3;
+      if (x.idx < 10) score += 2;
+      if (/(?:防具装飾|武器|防具|装飾|盾)\s+-\s+Master/.test(lines[x.idx] || "")) score += 5;
+      if (/^[\[\【].+[\]\】]$/.test(x.line)) score += 1;
+      if (/\s{2,}/.test(x.line)) score -= 1;
+      if (x.line.length > 32) score -= 2;
+      return {...x, score};
+    })
+    .sort((a, b) => b.score - a.score || a.idx - b.idx);
+
+  return scored[0]?.line || "公式DB取り込み装備";
+}
+
+function idbLooksLikeItemName(s) {
+  const t = String(s || "").trim();
+  if (!t || t.length > 60) return false;
+  if (/^https?:/.test(t)) return false;
+  if (/^[+-]?\d+(?:\.\d+)?$/.test(t)) return false;
+  if (/[：:]/.test(t)) return false;
+  if (/^(?:[+-]?\d+(?:\.\d+)?\s*)+(?:%|倍)?$/.test(t)) return false;
+  if (/^(右手|左手|頭|胴|手|パンツ|靴|肩|腰|顔|耳|指|胸|背中|弾丸|2HAND|1HAND)$/i.test(t)) return false;
+  return true;
+}
+
+function idbMapSlot(partText) {
+  const s = String(partText || "").replace(/\s+/g, "");
+  if (/弾|矢|銃弾|弾丸/.test(s)) return "武器: 弾丸";
+  if (/左手/.test(s)) return "武器: 左手";
+  if (/右手|1HAND|2HAND|片手|両手|武器/.test(s)) return "武器: 右手";
+
+  // 公式DBの「腰（装）」「背中（装）」などを装飾として最優先で判定する。
+  if (/頭(?:装飾|[（(［\[]装[）)］\]]|アクセ|飾)|装飾頭|頭装飾|ヘア|ウィッグ/.test(s)) return "装飾: 頭";
+  if (/顔(?:装飾|[（(［\[]装[）)］\]]|アクセ|飾)|装飾顔|顔装飾/.test(s)) return "装飾: 顔";
+  if (/耳(?:装飾|[（(［\[]装[）)］\]]|アクセ|飾)|装飾耳|耳装飾|イヤリング|イヤー/.test(s)) return "装飾: 耳";
+  if (/指(?:装飾|[（(［\[]装[）)］\]]|アクセ|飾)|装飾指|指装飾|リング/.test(s)) return "装飾: 指";
+  if (/胸(?:装飾|[（(［\[]装[）)］\]]|アクセ|飾)|装飾胸|胸装飾|ネックレス|ペンダント/.test(s)) return "装飾: 胸";
+  if (/背中(?:装飾|[（(［\[]装[）)］\]]|アクセ|飾)|装飾背中|背中装飾|背負|バック/.test(s)) return "装飾: 背中";
+  if (/腰(?:装飾|[（(［\[]装[）)］\]]|アクセ|飾)|装飾腰|腰装飾/.test(s)) return "装飾: 腰";
+
+  if (/頭/.test(s)) return "防具: 頭";
+  if (/胴|胸当|鎧|服/.test(s)) return "防具: 胴";
+  if (/手|腕|グローブ|ガントレット/.test(s)) return "防具: 手";
+  if (/パンツ|腰巻|スカート|ズボン|下半身/.test(s)) return "防具: パンツ";
+  if (/靴|足|ブーツ/.test(s)) return "防具: 靴";
+  if (/肩|マント|ショルダー/.test(s)) return "防具: 肩";
+  if (/腰|ベルト/.test(s)) return "防具: 腰";
+  return "防具: 頭";
+}
+
+function idbExtractEquipPart(lines, text, name="") {
+  const joined = lines.join("\n");
+  const inline = idbFirstMatch(joined, [
+    /装備部位\s*[:：]\s*([^\n]+)/,
+    /(?:装備箇所|部位)\s*[:：]\s*([^\n]+)/
+  ]);
+  if (inline && !/^(必要スキル|アーマークラス|使用可能|付加効果|追加効果)/.test(inline.trim())) return inline.trim();
+
+  const compact = idbCompactFieldText(joined, ["装備部位", "装備箇所", "部位"], ["必要スキル", "アーマークラス", "カラー", "使用可能性別", "使用可能種族", "使用可能シップ", "付加効果", "追加効果", "特殊条件"]);
+  if (compact) {
+    const first = compact.split(/\s+/).find(Boolean) || compact;
+    return first.trim();
+  }
+
+  const idx = lines.findIndex(l => /^(装備部位|装備箇所|部位)\s*[:：]?$/.test(l));
+  if (idx >= 0) {
+    for (let j = idx + 1; j < Math.min(lines.length, idx + 6); j++) {
+      const l = String(lines[j] || "").trim();
+      if (!l || /^(必要スキル|使用可能|ダメージ|攻撃間隔|付加効果|追加効果|説明|特殊条件)/.test(l)) break;
+      if (!/^(ALL|NG|OK)$/.test(l)) return l;
+    }
+  }
+
+  const slotWords = [
+    "腰装飾", "腰（装）", "腰(装)", "腰［装］", "腰[装]",
+    "背中装飾", "背中（装）", "背中(装)", "背中［装］", "背中[装]",
+    "頭装飾", "頭（装）", "顔装飾", "顔（装）", "耳装飾", "耳（装）",
+    "指装飾", "指（装）", "胸装飾", "胸（装）"
+  ];
+  const foundSlot = slotWords.find(w => joined.includes(w));
+  if (foundSlot) return foundSlot;
+
+  const titleKind = name
+    ? idbFirstMatch(joined, [new RegExp(`${name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s+-\\s+(防具装飾|武器|防具|装飾|盾)\\s+-`)])
+    : "";
+  return titleKind || "";
+}
+
+function idbSectionLines(lines, labels, stopLabels, max=20) {
+  const labelPat = labels.map(x => String(x).replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|");
+  const stopPat = stopLabels.map(x => String(x).replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|");
+  const labelRe = new RegExp(`^(?:${labelPat})\\s*[:：]?$`);
+  const stopRe = new RegExp(`^(?:${stopPat})\\s*[:：]?`);
+  const inlineRe = new RegExp(`^(?:${labelPat})\\s*[:：]\\s*(.+)$`);
+
+  const idx = lines.findIndex(l => labelRe.test(l) || inlineRe.test(l));
+  if (idx >= 0) {
+    const out = [];
+    const inline = (lines[idx].match(inlineRe) || [])[1]?.trim() || "";
+    if (inline) out.push(inline);
+    for (let j = idx + 1; j < Math.min(lines.length, idx + max); j++) {
+      if (stopRe.test(lines[j])) break;
+      if (lines[j] && !/^(ALL|NG|OK)$/.test(lines[j])) out.push(lines[j]);
+    }
+    if (out.length) return out;
+  }
+
+  const compact = idbCompactFieldText(lines.join("\n"), labels, stopLabels);
+  if (!compact) return [];
+  return compact
+    .replace(/\s+(?=(?:攻撃力|魔力|移動速度|速度|最大HP|HP|最大MP|MP|最大ST|ST|最大重量|重量|命中|回避|防御力|アーマークラス|AC|攻撃ディレイ|魔法ディレイ|火耐性|耐火属性|水耐性|耐水属性|地耐性|耐地属性|風耐性|耐風属性|無耐性|耐無属性)\s*[+＋\-－]?\s*\d)/g, "\n")
+    .split(/\n+/)
+    .map(x => x.trim())
+    .filter(Boolean);
+}
+
+function idbExtractRequiredSkills(lines, text) {
+  const skills = [];
+  const skillNames = SKILL_SIM_ALL.map(x => x.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|");
+  const addSkill = (name, required) => {
+    required = parseFloat(required);
+    if (!name || !Number.isFinite(required)) return;
+    if (!skills.some(x => x.name === name && x.required === required)) {
+      skills.push({name, current: skillSimValue(name), required});
+    }
+  };
+
+  const section = idbSectionLines(lines, ["必要スキル", "必要Skill", "Required Skill"], ["装備部位", "使用可能", "ダメージ", "攻撃間隔", "付加効果", "追加効果", "説明", "特殊条件"], 12);
+  section.forEach(l => {
+    let m;
+    const re = new RegExp(`(${skillNames})\\s*[:：]?\\s*([0-9]+(?:\\.[0-9]+)?)`, "g");
+    while ((m = re.exec(l)) !== null) addSkill(m[1], m[2]);
+  });
+
+  if (!skills.length) {
+    let m;
+    const re = new RegExp(`(${skillNames})\\s*[:：]?\\s*([0-9]+(?:\\.[0-9]+)?)`, "g");
+    while ((m = re.exec(text)) !== null) addSkill(m[1], m[2]);
+  }
+
+  return skills.slice(0, 4);
+}
+
+function idbCanonicalEffectLine(line, nextLine="") {
+  let s = String(line || "").trim();
+  const n = String(nextLine || "").trim();
+  if (s && !/[+-]?\d+(?:\.\d+)?/.test(s) && /^[+-]?\d+(?:\.\d+)?%?$/.test(n)) {
+    s = `${s} ${n}`;
+  }
+  return s
+    .replace(/上昇/g, "+")
+    .replace(/増加/g, "+")
+    .replace(/減少/g, "-")
+    .replace(/補正/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function idbSplitEffectLine(line) {
+  const s = String(line || "").trim();
+  if (!s) return [];
+  // 「回避 + 10.0; 最大重量 + 30.0; 移動速度 + 5.0」のような公式DBスニペットを分割。
+  const parts = s.split(/\s*[;；]\s*/).map(x => x.trim()).filter(Boolean);
+  if (parts.length > 1) return parts;
+
+  // セミコロンが消えていても、主要ステータス名の直前で分割できる範囲だけ分ける。
+  const marked = s.replace(/\s+(?=(?:攻撃力|魔力|移動速度|速度|最大HP|HP|最大MP|MP|最大ST|ST|最大重量|重量|命中|回避|防御力|アーマークラス|AC|攻撃ディレイ|魔法ディレイ|火耐性|水耐性|地耐性|風耐性|無耐性)\s*[+-]?\s*\d)/g, "\n");
+  return marked.split(/\n+/).map(x => x.trim()).filter(Boolean);
+}
+
+function idbEffectNumberFor(line, labels) {
+  const label = Array.isArray(labels) ? labels.join("|") : labels;
+  const re = new RegExp(`(?:${label})\\s*(?:[+＋]|-|－)?\\s*([+-]?\\d+(?:\\.\\d+)?)`, "i");
+  const m = String(line || "").match(re);
+  if (m) {
+    const signText = (String(line || "").match(new RegExp(`(?:${label})\\s*([+＋\\-－])`, "i")) || [])[1] || "";
+    const n = parseFloat(m[1]);
+    return /[-－]/.test(signText) && n > 0 ? -n : n;
+  }
+  const fallback = String(line || "").match(/([+-]?\d+(?:\.\d+)?)/);
+  return fallback ? parseFloat(fallback[1]) : NaN;
+}
+
+function idbSetEquipmentBuff(row, name, note="") {
+  const n = String(name || "").trim();
+  const d = String(note || "").trim();
+  if (!n) return;
+  row.equipBuffEnabled = true;
+  row.equipBuffName = n;
+  row.equipBuffNote = d;
+  row.equipBuffSlot = true;
+}
+
+function idbExtractEquipBuff(lines, text="") {
+  let sec = idbSectionLines(lines, ["付加効果"], ["追加効果", "装備部位", "使用可能", "必要スキル", "ダメージ", "攻撃間隔", "有効レンジ", "アーマークラス", "消耗度", "重さ", "素材", "特殊条件", "レアアイテム", "アイテム画像", "説明"], 12)
+    .map(x => String(x || "").trim())
+    .filter(Boolean);
+
+  if (!sec.length && text) {
+    const compact = idbCompactFieldText(text, ["付加効果"], ["追加効果", "特殊条件", "装備部位", "必要スキル", "アーマークラス", "使用可能性別", "使用可能種族", "使用可能シップ"]);
+    if (compact) sec = compact.split(/\n+/).map(x => x.trim()).filter(Boolean);
+  }
+
+  if (!sec.length) return null;
+
+  let name = sec[0];
+  let noteLines = sec.slice(1);
+
+  const oneLine = name.match(/^(.+?)(?:\s{2,}|\s+)(.+)$/);
+  if (oneLine && oneLine[1].length <= 24 && /効果|獲物|説明|※|WarAge|移動|攻撃|防御|上昇|増加|減少|自然回復/.test(oneLine[2])) {
+    name = oneLine[1].trim();
+    noteLines.unshift(oneLine[2].trim());
+  }
+
+  return {name, note: noteLines.join(" ").trim()};
+}
+
+
+function idbApplyAdditionalEffectLine(row, line) {
+  const subLines = idbSplitEffectLine(line);
+  if (subLines.length > 1) {
+    subLines.forEach(part => idbApplyAdditionalEffectLine(row, part));
+    return;
+  }
+
+  const s = idbCanonicalEffectLine(line);
+  if (!s) return;
+
+  const add = (prop, v) => row[prop] = +(row[prop] || 0) + (+v || 0);
+  const display = (key, name, value, unit="") => pushDisplayEffect(row, key, value, name, unit, "display");
+
+  let num;
+
+  if (/(?:攻撃力|ATK)/i.test(s) && Number.isFinite(num = idbEffectNumberFor(s, ["攻撃力", "ATK"]))) return add("attack", num);
+  if (/(?:魔力|MGC)/i.test(s) && Number.isFinite(num = idbEffectNumberFor(s, ["魔力", "MGC"]))) return add("magic", num);
+  if (/(?:移動速度|速度)/.test(s) && Number.isFinite(num = idbEffectNumberFor(s, ["移動速度", "速度"]))) return add("speed", num);
+  if (/(?:最大HP|ＨＰ|HP)/i.test(s) && Number.isFinite(num = idbEffectNumberFor(s, ["最大HP", "ＨＰ", "HP"]))) return add("extraHP", num);
+  if (/(?:最大MP|ＭＰ|MP)/i.test(s) && Number.isFinite(num = idbEffectNumberFor(s, ["最大MP", "ＭＰ", "MP"]))) return add("extraMP", num);
+  if (/(?:最大ST|ＳＴ|ST)/i.test(s) && Number.isFinite(num = idbEffectNumberFor(s, ["最大ST", "ＳＴ", "ST"]))) return add("extraST", num);
+  if (/(?:最大重量|重量)/.test(s) && Number.isFinite(num = idbEffectNumberFor(s, ["最大重量", "重量"]))) return add("extraMaxWeight", num);
+  if (/命中/.test(s) && Number.isFinite(num = idbEffectNumberFor(s, ["命中"]))) return add("extraHit", num);
+  if (/回避/.test(s) && Number.isFinite(num = idbEffectNumberFor(s, ["回避"]))) return add("extraAvoid", num);
+  if (/(?:防御力|アーマークラス|AC)/i.test(s) && Number.isFinite(num = idbEffectNumberFor(s, ["防御力", "アーマークラス", "AC"]))) return add("extraAC", num);
+  if (/攻撃ディレイ/.test(s) && Number.isFinite(num = idbEffectNumberFor(s, ["攻撃ディレイ"]))) return add("extraAttackDelay", num);
+  if (/魔法ディレイ/.test(s) && Number.isFinite(num = idbEffectNumberFor(s, ["魔法ディレイ"]))) return add("extraMagicDelay", num);
+  if (/火耐性|耐火属性|火属性抵抗/.test(s) && Number.isFinite(num = idbEffectNumberFor(s, ["火耐性", "耐火属性", "火属性抵抗"]))) return add("extraFireRes", num);
+  if (/水耐性|耐水属性|水属性抵抗/.test(s) && Number.isFinite(num = idbEffectNumberFor(s, ["水耐性", "耐水属性", "水属性抵抗"]))) return add("extraWaterRes", num);
+  if (/地耐性|耐地属性|地属性抵抗/.test(s) && Number.isFinite(num = idbEffectNumberFor(s, ["地耐性", "耐地属性", "地属性抵抗"]))) return add("extraEarthRes", num);
+  if (/風耐性|耐風属性|風属性抵抗/.test(s) && Number.isFinite(num = idbEffectNumberFor(s, ["風耐性", "耐風属性", "風属性抵抗"]))) return add("extraWindRes", num);
+  if (/無耐性|耐無属性|無属性抵抗/.test(s) && Number.isFinite(num = idbEffectNumberFor(s, ["無耐性", "耐無属性", "無属性抵抗"]))) return add("extraNeutralRes", num);
+
+  const genericNum = idbEffectNumberFor(s, [".+?"]);
+  const skill = SKILL_SIM_ALL.find(name => s.includes(name));
+  if (skill && Number.isFinite(genericNum)) return display("skillPlus", skill, genericNum, "");
+
+  const elem = ELEMENT_DAMAGE_OPTIONS.find(x => s.includes(x.replace("属性", "")) || s.includes(x));
+  if (elem && /ダメージ|属性/.test(s) && Number.isFinite(genericNum)) return display("elementDamagePct", elem, genericNum, "%");
+
+  // 計算に未対応の効果は消さずに表示用へ残す
+  display("custom", s.replace(/[+-]?\d+(?:\.\d+)?%?/, "").trim() || "追加効果", Number.isFinite(genericNum) ? genericNum : 0, /%/.test(s) ? "%" : "");
+}
+
+function idbCollectEffectLines(lines, text="") {
+  const raw = [];
+  const joined = [lines.join("\n"), text || ""].join("\n");
+
+  ["追加効果", "特殊効果"].forEach(label => {
+    raw.push(...idbSectionLines(lines, [label], ["付加効果", "装備部位", "使用可能", "必要スキル", "ダメージ", "攻撃間隔", "有効レンジ", "アーマークラス", "消耗度", "重さ", "素材", "特殊条件", "レアアイテム", "アイテム画像", "説明"], 24));
+  });
+
+  const compact = idbCompactFieldText(joined, ["追加効果", "特殊効果"], ["特殊条件", "付加効果", "装備部位", "必要スキル", "アーマークラス", "使用可能性別", "使用可能種族", "使用可能シップ", "消耗度", "重さ", "素材"]);
+  if (compact) raw.push(compact);
+
+  const out = [];
+  const addUnique = v => {
+    const line = String(v || "").trim();
+    if (line && !/^(なし|無し|NO|－|-)$/.test(line) && !out.includes(line)) out.push(line);
+  };
+
+  const statRe = /(?:攻撃力|魔力|移動速度|速度|最大HP|HP|最大MP|MP|最大ST|ST|最大重量|重量|命中|回避|防御力|アーマークラス|AC|攻撃ディレイ|魔法ディレイ|火耐性|耐火属性|火属性抵抗|水耐性|耐水属性|水属性抵抗|地耐性|耐地属性|地属性抵抗|風耐性|耐風属性|風属性抵抗|無耐性|耐無属性|無属性抵抗)\s*[+＋\-－]?\s*\d+(?:\.\d+)?/g;
+
+  for (let i = 0; i < raw.length; i++) {
+    const line = idbCanonicalEffectLine(raw[i], raw[i + 1]);
+    let found = false;
+    let m;
+    statRe.lastIndex = 0;
+    while ((m = statRe.exec(line)) !== null) {
+      addUnique(m[0]);
+      found = true;
+    }
+    if (!found) {
+      idbSplitEffectLine(line).forEach(addUnique);
+    }
+    if (line !== raw[i] && /^[+-]?\d+(?:\.\d+)?%?$/.test(String(raw[i + 1] || "").trim())) i++;
+  }
+
+  if (!out.length && compact) {
+    let m;
+    statRe.lastIndex = 0;
+    while ((m = statRe.exec(compact)) !== null) addUnique(m[0]);
+  }
+
+  return out.slice(0, 30);
+}
+
+function idbExtractInertiaDataPage(raw) {
+  const s = String(raw || "");
+  let encoded = "";
+
+  try {
+    if (typeof DOMParser !== "undefined") {
+      const doc = new DOMParser().parseFromString(s, "text/html");
+      encoded = doc.querySelector("#app")?.getAttribute("data-page") || "";
+    }
+  } catch {}
+
+  if (!encoded) {
+    const m = s.match(/<div\s+id=["']app["'][^>]*\sdata-page=["']([\s\S]*?)["'][^>]*>/i)
+      || s.match(/data-page=["']([\s\S]*?)["']/i);
+    encoded = m ? m[1] : "";
+  }
+
+  if (!encoded) return null;
+
+  try {
+    const decoded = idbDecodeHtmlEntities(idbDecodeJsonEscapes(encoded));
+    return JSON.parse(decoded);
+  } catch (e) {
+    try {
+      const decoded = encoded
+        .replace(/&quot;/g, "\"")
+        .replace(/&amp;/g, "&")
+        .replace(/&#039;/g, "'")
+        .replace(/&#39;/g, "'")
+        .replace(/\\\//g, "/");
+      return JSON.parse(decoded);
+    } catch {
+      return null;
+    }
+  }
+}
+
+function idbStructuredItemFromPage(page) {
+  const props = page?.props || {};
+  return props.defense || props.defence || props.weapon || props.shield || props.asset || null;
+}
+
+function idbStatusValue(status) {
+  const p = status?.pivot || {};
+  const v = p.value ?? status.value ?? p.add_value ?? 0;
+  return parseFloat(v) || 0;
+}
+
+function idbApplyStructuredStatus(row, name, value) {
+  const n = String(name || "").trim();
+  const v = parseFloat(value) || 0;
+  if (!n || !v || n === "なし") return;
+
+  const add = prop => row[prop] = +(row[prop] || 0) + v;
+  if (/攻撃力/.test(n)) return add("attack");
+  if (/魔力/.test(n)) return add("magic");
+  if (/移動速度|速度/.test(n)) return add("speed");
+  if (/最大HP|HP/.test(n)) return add("extraHP");
+  if (/最大MP|MP/.test(n)) return add("extraMP");
+  if (/最大ST|ST/.test(n)) return add("extraST");
+  if (/最大重量|重量/.test(n)) return add("extraMaxWeight");
+  if (/命中/.test(n)) return add("extraHit");
+  if (/回避/.test(n)) return add("extraAvoid");
+  if (/防御力|アーマークラス|AC/.test(n)) return add("extraAC");
+  if (/攻撃ディレイ/.test(n)) return add("extraAttackDelay");
+  if (/魔法ディレイ/.test(n)) return add("extraMagicDelay");
+  if (/耐火属性|火耐性|火属性抵抗/.test(n)) return add("extraFireRes");
+  if (/耐水属性|水耐性|水属性抵抗/.test(n)) return add("extraWaterRes");
+  if (/耐地属性|地耐性|地属性抵抗/.test(n)) return add("extraEarthRes");
+  if (/耐風属性|風耐性|風属性抵抗/.test(n)) return add("extraWindRes");
+  if (/耐無属性|無耐性|無属性抵抗/.test(n)) return add("extraNeutralRes");
+
+  pushDisplayEffect(row, "custom", v, n, "", "display");
+}
+
+function idbWeaponSkillName(item) {
+  const reqs = idbStructuredWeaponRequirements(item);
+  return reqs[0]?.name || "";
+}
+
+function idbNormalizeSkillNameForTool(name) {
+  const s = String(name || "").trim();
+  if (!s || s === "[object Object]") return "";
+
+  const direct = SKILL_SIM_ALL.find(x => x === s);
+  if (direct) return direct;
+
+  const noSpace = s.replace(/\s+/g, "");
+  const alias = {
+    "刀剣": "刀剣",
+    "こんぼう": "こんぼう",
+    "棍棒": "こんぼう",
+    "槍": "槍",
+    "素手": "素手",
+    "弓": "弓",
+    "銃器": "銃器",
+    "投げ": "投げ",
+    "罠": "罠",
+    "牙": "牙",
+    "キック": "キック",
+    "戦闘技術": "戦闘技術",
+    "盾": "盾",
+    "着こなし": "着こなし",
+    "攻撃回避": "攻撃回避"
+  };
+  if (alias[noSpace]) return alias[noSpace];
+
+  return SKILL_SIM_ALL.find(x => noSpace.includes(x.replace(/\s+/g, ""))) || s;
+}
+
+function idbNumberFromAny(v) {
+  if (v == null) return 0;
+  if (typeof v === "number") return Number.isFinite(v) ? v : 0;
+  if (typeof v === "string") {
+    const m = v.match(/([0-9]+(?:\.[0-9]+)?)/);
+    return m ? parseFloat(m[1]) : 0;
+  }
+  return 0;
+}
+
+function idbSkillNameFromAny(v) {
+  if (v == null) return "";
+  if (typeof v === "string") return idbNormalizeSkillNameForTool(v);
+  if (typeof v === "object") {
+    return idbNormalizeSkillNameForTool(
+      v.name ?? v.skill_name ?? v.label ?? v.title ?? v.jp_name ?? v.ja_name ?? v.display_name ?? ""
+    );
+  }
+  return "";
+}
+
+function idbSkillLevelFromAny(v) {
+  if (v == null) return 0;
+  if (typeof v === "number" || typeof v === "string") return idbNumberFromAny(v);
+  if (typeof v !== "object") return 0;
+
+  const directKeys = [
+    "required", "required_level", "requiredLevel", "need_level", "needLevel",
+    "skill_level", "skillLevel", "level", "value", "num", "point"
+  ];
+  for (const key of directKeys) {
+    const n = idbNumberFromAny(v[key]);
+    if (n) return n;
+  }
+
+  const nested = [v.pivot, v.requirement, v.required, v.condition, v.meta].filter(Boolean);
+  for (const obj of nested) {
+    const n = idbSkillLevelFromAny(obj);
+    if (n) return n;
+  }
+
+  return 0;
+}
+
+function idbAddStructuredRequirement(out, name, level) {
+  const skillName = idbSkillNameFromAny(name);
+  const required = idbNumberFromAny(level);
+  if (!skillName || !required) return;
+  if (!out.some(x => x.name === skillName && +x.required === +required)) {
+    out.push({name: skillName, current: skillSimValue(skillName), required});
+  }
+}
+
+function idbStructuredWeaponRequirements(item) {
+  const out = [];
+
+  const directName = item?.requiredSkill ?? item?.required_skill_name ?? item?.skill_name ?? item?.weapon_skill_name ?? "";
+  const directLevel =
+    item?.requiredSkillLevel ?? item?.required_skill_level ?? item?.required_level ??
+    item?.need_level ?? item?.skill_level ?? item?.required_skill_value ??
+    item?.require_skill_value ?? item?.skill_value ?? item?.level ?? 0;
+  idbAddStructuredRequirement(out, directName, directLevel);
+
+  const objects = [
+    item?.requiredSkill,
+    item?.required_skill,
+    item?.skill,
+    item?.weapon_skill,
+    item?.attack_skill,
+    item?.require_skill,
+    item?.requirement_skill,
+    item?.type
+  ].filter(Boolean);
+
+  objects.forEach(obj => {
+    const name = idbSkillNameFromAny(obj);
+    const level = idbSkillLevelFromAny(obj) || idbNumberFromAny(directLevel);
+    idbAddStructuredRequirement(out, name, level);
+  });
+
+  const arrays = [
+    item?.requiredSkills,
+    item?.required_skills,
+    item?.skills,
+    item?.requirements,
+    item?.weapon_requirements,
+    item?.skill_requirements
+  ].filter(Array.isArray);
+
+  arrays.flat().forEach(req => {
+    const name = idbSkillNameFromAny(req?.skill ?? req?.required_skill ?? req?.name ?? req?.skill_name ?? req);
+    const level = idbSkillLevelFromAny(req) || idbSkillLevelFromAny(req?.skill) || idbSkillLevelFromAny(req?.required_skill);
+    idbAddStructuredRequirement(out, name, level);
+  });
+
+  // 最後の保険: オブジェクト内の「skillらしい名前」と「levelらしい数値」を拾う。
+  if (!out.length && item && typeof item === "object") {
+    let guessedName = "";
+    let guessedLevel = 0;
+    Object.entries(item).forEach(([key, value]) => {
+      const k = key.toLowerCase();
+      if (!guessedName && /skill/.test(k)) guessedName = idbSkillNameFromAny(value);
+      if (!guessedLevel && /(level|required|need).*skill|skill.*(level|required|need)|need_level|required_level/.test(k)) {
+        guessedLevel = idbNumberFromAny(value);
+      }
+    });
+    idbAddStructuredRequirement(out, guessedName, guessedLevel);
+  }
+
+  return out.slice(0, 4);
+}
+
+
+function idbRowFromStructuredItem(item, page=null) {
+  if (!item || typeof item !== "object") return null;
+
+  const equipText = String(item.equip || item.equip_name || item.equipPart || item.equip_part || item.equip?.name || "");
+  const itemKind = String(item.type || item.itemType || page?.component || "");
+  const hasWeaponData = item.damage != null || item.attack_interval != null || item.range != null || /Weapon/i.test(itemKind);
+  const slot = idbMapSlot(`${equipText} ${item.name || ""} ${hasWeaponData ? "武器" : ""}`);
+  const row = defaultEquipmentCandidate(slot, false);
+
+  row.name = String(item.name || item.item_name || "公式DB取り込み装備").trim();
+  row.enabled = false;
+  row.note = item.info ? String(item.info).trim() : "公式DB URL取り込み";
+  row.weaponTwoHanded = /2HAND|両手/i.test(equipText) ? "○" : "×";
+
+  if (item.armor_class != null) row.extraAC = parseFloat(item.armor_class) || 0;
+  const damageValue = item.damage ?? item.attack ?? item.atk ?? item.power;
+  const intervalValue = item.attack_interval ?? item.attackInterval ?? item.delay ?? item.interval;
+  const rangeValue = item.range ?? item.effective_range ?? item.effectiveRange;
+  const durabilityValue = item.durability ?? item.max_durability ?? item.maxDurability;
+
+  if (damageValue != null) row.weaponDamage = parseFloat(damageValue) || 0;
+  if (intervalValue != null) row.weaponAttackInterval = parseFloat(intervalValue) || 0;
+  if (rangeValue != null) row.weaponRange = parseFloat(rangeValue) || 0;
+  if (durabilityValue != null) row.weaponDurability = parseFloat(durabilityValue) || 0;
+
+  const weaponReqs = idbStructuredWeaponRequirements(item);
+  if (hasWeaponData && weaponReqs.length) {
+    row.weaponReq = weaponReqs;
+  }
+
+  const technic = item.technic || item.buff || item.effect || null;
+  if (technic?.name && technic.name !== "なし") {
+    idbSetEquipmentBuff(row, technic.name, technic.info || "");
+  }
+
+  const addStatuses = item.add_statuses || item.addStatuses || item.add_status || [];
+  if (Array.isArray(addStatuses)) {
+    addStatuses.forEach(st => idbApplyStructuredStatus(row, st.name, idbStatusValue(st)));
+  }
+
+  return {
+    row: normalizeEquipmentCandidate(row),
+    text: "",
+    lines: [],
+    equipPart: equipText,
+    effectLines: Array.isArray(addStatuses)
+      ? addStatuses.filter(st => st?.name && st.name !== "なし" && idbStatusValue(st)).map(st => `${st.name} ${idbStatusValue(st) >= 0 ? "+" : ""}${idbStatusValue(st)}`)
+      : [],
+    source: "data-page"
+  };
+}
+
+function parseIdbStructuredPage(raw) {
+  const page = idbExtractInertiaDataPage(raw);
+  const item = idbStructuredItemFromPage(page);
+  if (!item) return null;
+  return idbRowFromStructuredItem(item, page);
+}
+
+
+function parseIdbEquipmentFromPaste(raw) {
+  const structured = parseIdbStructuredPage(raw);
+  if (structured?.row) return structured;
+
+  const text = idbTextFromPaste(raw);
+  const lines = idbLines(text);
+  if (!text) throw new Error("公式DBページの本文を貼り付けてください。");
+
+  const name = idbGuessName(lines, text);
+  const equipPart = idbExtractEquipPart(lines, text, name);
+  const slot = idbMapSlot(`${equipPart} ${name}`);
+
+  const row = defaultEquipmentCandidate(slot, false);
+  row.name = name;
+  row.enabled = false;
+  row.note = "公式DB貼り付け取り込み";
+  row.weaponTwoHanded = /2HAND|両手/i.test(`${equipPart} ${text}`) ? "○" : "×";
+
+  const damage = idbValueAfterLabels(lines, ["ダメージ", "Damage"]);
+  const interval = idbValueAfterLabels(lines, ["攻撃間隔", "間隔", "Attack Interval"]);
+  const range = idbValueAfterLabels(lines, ["有効レンジ", "レンジ", "射程", "Range"]);
+  const ac = idbValueAfterLabels(lines, ["アーマークラス", "防御力", "AC"]);
+  const durability = idbValueAfterLabels(lines, ["消耗度", "耐久", "Durability"]);
+
+  if (damage) row.weaponDamage = damage;
+  if (interval) row.weaponAttackInterval = interval;
+  if (range) row.weaponRange = range;
+  if (durability) row.weaponDurability = durability;
+  if (ac) row.extraAC = ac;
+
+  row.weaponReq = idbExtractRequiredSkills(lines, text);
+
+  const buff = idbExtractEquipBuff(lines, text);
+  if (buff) idbSetEquipmentBuff(row, buff.name, buff.note);
+
+  const effectLines = idbCollectEffectLines(lines, text);
+  effectLines.forEach(line => idbApplyAdditionalEffectLine(row, line));
+
+  return {
+    row: normalizeEquipmentCandidate(row),
+    text,
+    lines,
+    equipPart,
+    effectLines
+  };
+}
+
+function idbApplyManualCorrections(parsed) {
+  if (!parsed?.row) return parsed;
+  const name = byId("idbParsedName")?.value?.trim();
+  const slot = byId("idbParsedSlot")?.value?.trim();
+  if (name) parsed.row.name = name;
+  if (slot) parsed.row.slot = slot;
+  return parsed;
+}
+
+function idbEquipmentPreviewHtml(parsed) {
+  const r = parsed.row;
+  const parts = [
+    `<b>${escapeHtml(r.name || "名称未取得")}</b>`,
+    `推定部位: ${escapeHtml(r.slot || "-")}`,
+    parsed.equipPart ? `公式DB上の装備部位: ${escapeHtml(parsed.equipPart)}` : "",
+    +r.weaponDamage ? `武器ダメージ: ${fmt(+r.weaponDamage, 1)}` : "",
+    +r.weaponAttackInterval ? `攻撃間隔: ${fmt(+r.weaponAttackInterval, 1)}` : "",
+    +r.weaponRange ? `射程: ${fmt(+r.weaponRange, 1)}` : "",
+    r.weaponTwoHanded === "○" ? "両手武器: ○" : "",
+    r.weaponReq?.length ? `必要スキル: ${escapeHtml(r.weaponReq.map(x => `${x.name} ${x.required}`).join(" / "))}` : "",
+    extraStatsEffectText(r, "base") ? `装備本体: ${escapeHtml(extraStatsEffectText(r, "base"))}` : "",
+    r.equipBuffEnabled ? `装備Buff: ${escapeHtml(r.equipBuffName || "Buff")} ${r.equipBuffNote ? " / " + escapeHtml(r.equipBuffNote) : ""}` : "",
+    additionalEffectsSummary(r).length ? `表示用効果: ${escapeHtml(additionalEffectsSummary(r).join(" / "))}` : "",
+    parsed.effectLines?.length ? `読み取った追加効果行: ${escapeHtml(parsed.effectLines.join(" / "))}` : ""
+  ].filter(Boolean);
+  return parts.map(x => `<div>${x}</div>`).join("");
+}
+
+
+function idbParserSelfTest() {
+  const inertiaPage = `<div id="app" data-page="{&quot;component&quot;:&quot;Public/Items/Defences/Show&quot;,&quot;props&quot;:{&quot;defense&quot;:{&quot;id&quot;:22761,&quot;name&quot;:&quot;ジャイアント ドラゴンフライ&quot;,&quot;info&quot;:&quot;人より巨大なトンボの一種&quot;,&quot;equip&quot;:&quot;腰（装）&quot;,&quot;armor_class&quot;:0,&quot;requiredSkill&quot;:&quot;着こなし&quot;,&quot;need_level&quot;:1,&quot;technic&quot;:{&quot;name&quot;:&quot;トンボの餌&quot;,&quot;info&quot;:&quot;高速で移動する巨大なトンボに捕獲された獲物\\n※WarAgeでは効果がない&quot;},&quot;add_statuses&quot;:[{&quot;name&quot;:&quot;回避&quot;,&quot;pivot&quot;:{&quot;value&quot;:10}},{&quot;name&quot;:&quot;最大重量&quot;,&quot;pivot&quot;:{&quot;value&quot;:30}},{&quot;name&quot;:&quot;移動速度&quot;,&quot;pivot&quot;:{&quot;value&quot;:5}},{&quot;name&quot;:&quot;なし&quot;,&quot;pivot&quot;:{&quot;value&quot;:0}}]}}}"></div>`;
+
+  const weaponPageDirect = `<div id="app" data-page="{&quot;component&quot;:&quot;Public/Items/Weapons/Show&quot;,&quot;props&quot;:{&quot;weapon&quot;:{&quot;id&quot;:17163,&quot;name&quot;:&quot;バール&quot;,&quot;equip&quot;:&quot;右手 1HAND&quot;,&quot;damage&quot;:65,&quot;attack_interval&quot;:310,&quot;range&quot;:4.2,&quot;durability&quot;:22,&quot;requiredSkill&quot;:&quot;こんぼう&quot;,&quot;need_level&quot;:81}}}"></div>`;
+
+  const weaponPageNested = `<div id="app" data-page="{&quot;component&quot;:&quot;Public/Items/Weapons/Show&quot;,&quot;props&quot;:{&quot;weapon&quot;:{&quot;id&quot;:99999,&quot;name&quot;:&quot;テスト刀剣&quot;,&quot;equip&quot;:&quot;右手 2HAND&quot;,&quot;damage&quot;:100,&quot;attackInterval&quot;:450,&quot;effectiveRange&quot;:5.5,&quot;required_skill&quot;:{&quot;name&quot;:&quot;刀剣&quot;,&quot;pivot&quot;:{&quot;value&quot;:91}}}}}"></div>`;
+
+  const samples = [
+`ジャイアント ドラゴンフライ
+装備部位
+    腰（装）
+必要スキル
+    着こなし 1.0
+アーマークラス
+    0.0
+付加効果
+    トンボの餌
+    高速で移動する巨大なトンボに捕獲された獲物 ※WarAgeでは効果がない
+追加効果
+        回避 +10.0
+        最大重量 +30.0
+        移動速度 +5.0`,
+`真紅の大剣
+装備部位
+    背中（装）
+必要スキル
+    着こなし 1.0
+アーマークラス
+    0.0
+付加効果
+    気炎万丈
+    火属性と攻撃力依存の物理ダメージが上昇して、スタミナの自然回復量が増加する ※WarAgeでは効果がない 
+追加効果
+        攻撃力 +5.0
+        耐火属性 +20.0`,
+`ジャイアント ドラゴンフライ 説明 人より巨大なトンボの一種 装備部位 腰（装） 必要スキル 着こなし 1.0 アーマークラス 0.0 使用可能性別 ALL 付加効果 トンボの餌 高速で移動する巨大なトンボに捕獲された獲物 ※WarAgeでは効果がない 追加効果 回避 +10.0 最大重量 +30.0 移動速度 +5.0 特殊条件`,
+`<html><head><title>真紅の大剣 - 防具装飾 - Master of Epic 公式データベース</title></head><body><table><tr><th>装備部位</th><td>背中（装）</td></tr><tr><th>アーマークラス</th><td>0.0</td></tr></table><h2>付加効果</h2><p>気炎万丈</p><p>火属性と攻撃力依存の物理ダメージが上昇して、スタミナの自然回復量が増加する ※WarAgeでは効果がない</p><h2>追加効果</h2><p>攻撃力 +5.0</p><p>耐火属性 +20.0</p></body></html>`,
+inertiaPage,
+weaponPageDirect,
+weaponPageNested
+  ];
+  return samples.map(s => {
+    const parsed = parseIdbEquipmentFromPaste(s).row;
+    return {
+      name: parsed.name,
+      slot: parsed.slot,
+      ac: parsed.extraAC,
+      buffName: parsed.equipBuffName,
+      buffNote: parsed.equipBuffNote,
+      attack: parsed.attack,
+      avoid: parsed.extraAvoid,
+      maxWeight: parsed.extraMaxWeight,
+      speed: parsed.speed,
+      fireRes: parsed.extraFireRes,
+      weaponDamage: parsed.weaponDamage,
+      weaponAttackInterval: parsed.weaponAttackInterval,
+      weaponRange: parsed.weaponRange,
+      weaponReq: parsed.weaponReq
+    };
+  });
+}
+
+function previewIdbEquipmentImport() {
+  const el = byId("idbImportPreview");
+  try {
+    const parsed = parseIdbEquipmentFromPaste(byId("idbPasteBox")?.value || "");
+    if (byId("idbParsedName")) byId("idbParsedName").value = parsed.row.name || "";
+    if (byId("idbParsedSlot")) byId("idbParsedSlot").value = parsed.row.slot || "";
+    if (el) {
+      el.classList.remove("bad");
+      el.innerHTML = idbEquipmentPreviewHtml(parsed);
+    }
+    return parsed;
+  } catch (e) {
+    if (el) {
+      el.classList.add("bad");
+      el.textContent = "解析に失敗: " + e.message;
+    }
+    return null;
+  }
+}
+
+function addIdbEquipmentCandidate() {
+  const parsedRaw = parseIdbEquipmentFromPaste(byId("idbPasteBox")?.value || "");
+  const parsed = idbApplyManualCorrections(parsedRaw);
+  if (!parsed) return;
+  state.equipment = normalizeEquipmentRows(state.equipment);
+  const row = parsed.row;
+  row.enabled = false;
+  state.equipment.push(normalizeEquipmentCandidate(row));
+  renderEquipmentTable();
+  renderTagLinkSummary();
+  renderShowcaseTab();
+  calc();
+
+  const el = byId("idbImportPreview");
+  if (el) {
+    el.classList.remove("bad");
+    el.innerHTML = idbEquipmentPreviewHtml(parsed) + `<div class="okText">装備候補へ追加しました。使用する場合は該当部位の候補で「使用」をONにしてください。</div>`;
+  }
+}
+
+
+
 function clearAllEquipmentUsage() {
   state.equipment = normalizeEquipmentRows(state.equipment).map(row => ({...row, enabled:false}));
   renderEquipmentTable();
@@ -5351,6 +6453,8 @@ function renderRaceTable() {
 
 
 function initializeBrowserApp() {
+  loadIdbWorkerEndpoint();
+
   setupTabLayout();
 
   document.querySelectorAll("input,select").forEach(el => {

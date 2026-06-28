@@ -735,6 +735,72 @@ MoE固有の主な仮定:
     </div>
   </div>
 
+
+  <div class="sectionImportExportBox idbImportBox">
+    <h3>公式DBから装備情報を取り込む（試作）</h3>
+    <p class="small">
+      公式DBの検索ページを開き、個別ページの本文を貼り付けて装備候補へ変換します。
+      GitHub Pagesだけでは公式DBを直接取得できない場合があるため、まずは「貼り付け取り込み」方式です。
+    </p>
+    <div class="idbSearchRow">
+      <input id="idbSearchName" type="text" placeholder="例: バール / レーヴァテイン / 怒髪天ウィッグ">
+      <button type="button" onclick="openIdbSearch()">公式DBで検索</button>
+      <button type="button" onclick="openIdbTop()">公式DBトップを開く</button>
+    </div>
+    <div class="idbWorkerImportBox">
+      <h4>URLから取り込む（Cloudflare Worker使用）</h4>
+      <p class="small">
+        Worker URLを設定すると、公式DBの個別アイテムURLからHTMLを取得して解析できます。検索ページの自動巡回はしません。
+      </p>
+      <div class="idbWorkerFixedNotice small">
+        使用するWorker: <code>https://divine-grass-1b84.sincostanrap.workers.dev</code>
+      </div>
+      <div class="idbWorkerRow idbWorkerRowFixed">
+        <label>公式DB 個別URL
+          <input id="idbItemUrl" type="url" placeholder="https://idb.moepic.com/items/defences/22761">
+        </label>
+        <button type="button" onclick="testIdbWorkerConnection()">Worker接続テスト</button>
+        <button type="button" onclick="fetchIdbUrlViaWorker()">URLから取得して解析</button>
+      </div>
+      <div id="idbWorkerStatus" class="small muted">Worker URLは固定です。公式DBの個別アイテムURLだけ取得します。</div>
+    </div>
+
+    <textarea id="idbPasteBox" class="partialImportBox" placeholder="公式DBの個別ページを開いて、ページ本文をコピーしてここへ貼り付けます。HTMLを貼っても、見えている本文を貼ってもOKです。"></textarea>
+    <div class="idbManualRow">
+      <label>解析結果の装備名
+        <input id="idbParsedName" type="text" placeholder="解析後に自動入力。違う場合はここで修正">
+      </label>
+      <label>解析結果の部位
+        <select id="idbParsedSlot">
+          <option value="">自動推定</option>
+          <option value="武器: 右手">武器: 右手</option>
+          <option value="武器: 左手">武器: 左手</option>
+          <option value="武器: 弾丸">武器: 弾丸</option>
+          <option value="防具: 頭">防具: 頭</option>
+          <option value="防具: 胴">防具: 胴</option>
+          <option value="防具: 手">防具: 手</option>
+          <option value="防具: パンツ">防具: パンツ</option>
+          <option value="防具: 靴">防具: 靴</option>
+          <option value="防具: 肩">防具: 肩</option>
+          <option value="防具: 腰">防具: 腰</option>
+          <option value="装飾: 頭">装飾: 頭</option>
+          <option value="装飾: 顔">装飾: 顔</option>
+          <option value="装飾: 耳">装飾: 耳</option>
+          <option value="装飾: 指">装飾: 指</option>
+          <option value="装飾: 胸">装飾: 胸</option>
+          <option value="装飾: 背中">装飾: 背中</option>
+          <option value="装飾: 腰">装飾: 腰</option>
+        </select>
+      </label>
+    </div>
+    <div class="partialImportActions">
+      <button type="button" onclick="previewIdbEquipmentImport()">貼り付け内容を解析</button>
+      <button type="button" onclick="addIdbEquipmentCandidate()">装備候補に追加</button>
+      <button type="button" onclick="clearIdbImportBox()">クリア</button>
+    </div>
+    <div id="idbImportPreview" class="idbImportPreview small">まだ解析していません。</div>
+  </div>
+
   <div class="sectionImportExportBox">
     <h3>装備だけインポート / エクスポート</h3>
     <p class="small">
