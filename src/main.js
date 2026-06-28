@@ -3028,6 +3028,48 @@ function skillKnowledgeEvaluate(item) {
   return {item, evaluated, missing, totalShortage, available, success, status, tierInfo};
 }
 
+
+function activeSkillSimMasteries() {
+  const data = skillKnowledgeData();
+  return (data.masteries || [])
+    .map(skillKnowledgeEvaluate)
+    .filter(ev => ev.available && ev.tierInfo && ev.tierInfo.achieved)
+    .map(ev => ({
+      id: ev.item.id,
+      code: ev.item.code || "",
+      name: ev.tierInfo.achieved.name || ev.item.name || "マスタリー",
+      baseName: ev.item.name || "",
+      tierMin: +(ev.tierInfo.achieved.min || 0),
+      category: ev.item.category || "マスタリー",
+      buffSlotCost: +(ev.item.buffSlotCost || 1),
+      usesBuffSlot: ev.item.usesBuffSlot !== false,
+      effect: ev.item.buffEffect || {},
+      source: ev.item.source || "skillSim"
+    }));
+}
+
+function skillSimMasteryBuffRows() {
+  return activeSkillSimMasteries()
+    .filter(m => m.usesBuffSlot)
+    .map(m => ({
+      name: `マスタリー: ${m.name}`,
+      source: "skillSimMastery",
+      enabled: true,
+      note: m.effect.note || "マスタリーによるBuff枠使用",
+      buffSlotCost: +(m.buffSlotCost || 1),
+      masteryCode: m.code,
+      masteryTierMin: m.tierMin
+    }));
+}
+
+function expandSkillSimMasteryBuffState(st) {
+  st = clone(st || state);
+  const rows = skillSimMasteryBuffRows();
+  st.other = (Array.isArray(st.other) ? st.other : []).filter(b => b.source !== "skillSimMastery").concat(rows);
+  return st;
+}
+
+
 function skillKnowledgeCategories() {
   const data = skillKnowledgeData();
   const cats = new Set(["all"]);
@@ -3114,7 +3156,7 @@ function skillKnowledgeFilterState() {
 function skillKnowledgeSearchText(ev) {
   const item = ev.item || {};
   return [
-    item.name, item.category, item.kind, item.note, item.reagent,
+    item.name, item.category, item.kind, item.note, item.reagent, item.description, item.acquisition,
     ...(Array.isArray(item.requirements) ? item.requirements.map(skillKnowledgeRequirementText) : [])
   ].filter(Boolean).join(" ").toLowerCase();
 }
@@ -3175,6 +3217,7 @@ function skillKnowledgeItemHtml(ev, type) {
   if (item.range) extra.push(`射程 ${String(item.range).replace(/\n+/g, " ")}`);
   if (item.move) extra.push(`移動 ${String(item.move).replace(/\n+/g, " ")}`);
   if (item.reagent) extra.push(`触媒 ${item.reagent}`);
+  if (item.element) extra.push(`属性 ${String(item.element).replace(/\n+/g, " ")}`);
   if (item.effect) extra.push(String(item.effect).replace(/\n+/g, " / "));
   const extraHtml = extra.length ? `<div class="skillKnowledgeExtra">${escapeHtml(extra.join(" / "))}</div>` : "";
   const prereq = Array.isArray(item.prerequisiteTechniques) && item.prerequisiteTechniques.length
@@ -3220,7 +3263,9 @@ function renderSkillKnowledge() {
     const evaluated = (data[key] || []).map(skillKnowledgeEvaluate);
     total += evaluated.length;
     okCount += evaluated.filter(x => x.available).length;
-    const visible = evaluated.filter(ev => skillKnowledgeMatches(ev, filter));
+    // マスタリーはスキル投入ボタンとBuff枠確認のため、状態フィルタに関係なく常時全件表示。
+    // テクニック/魔法だけ「使用可能/あと少し」などの表示絞り込みを適用する。
+    const visible = key === "masteries" ? evaluated : evaluated.filter(ev => skillKnowledgeMatches(ev, filter));
     shown += visible.length;
 
     let html = visible.length
@@ -3378,6 +3423,7 @@ function renderSkillSim() {
   SKILL_SIM_GROUPS.forEach(([group, list]) => {
     const box = document.createElement("section");
     box.className = "skillSimGroup skillSimGroupBar";
+    box.dataset.skillGroup = group;
     const h = document.createElement("h3");
     h.textContent = group;
     box.appendChild(h);
@@ -3424,6 +3470,14 @@ function updateSkillSimSummary() {
   ].map(x => `<div>${x}</div>`).join("");
 
   renderSkillKnowledge();
+
+  const activeMasteries = activeSkillSimMasteries();
+  const masterySlots = activeMasteries.reduce((s, m) => s + +(m.buffSlotCost || 1), 0);
+  const masteryText = activeMasteries.length ? activeMasteries.map(m => m.name).join(" / ") : "なし";
+  if (summaryEl) {
+    summaryEl.innerHTML += `<br>発動マスタリー: ${escapeHtml(masteryText)} / Buff枠 ${fmt(masterySlots, 0)}`;
+  }
+
 }
 
 function applySkillSimToCalc(silent=false) {
@@ -9050,7 +9104,7 @@ function calc() {
   // sync readonly and auto fields into inputs
   inputs.raceCoeff = byId("raceCoeff").value;
   inputs.techMultiplier = byId("techMultiplier").value;
-  const m = computeMetrics(state, inputs);
+  const m = computeMetrics(expandSkillSimMasteryBuffState(state), inputs);
 
   if (inputs.attackType === "attack") byId("techMultiplier").value = "1.0000";
   if (inputs.attackType === "heavy") byId("techMultiplier").value = m.attackMultiplier.toFixed(4);
@@ -9494,7 +9548,7 @@ function renderActualDiff() {
     return;
   }
   const inputs = collectInputs();
-  const m = computeMetrics(state, inputs);
+  const m = computeMetrics(expandSkillSimMasteryBuffState(state), inputs);
   const lines = [];
   if (actualDamage) {
     const diff = actualDamage - m.finalDamage;

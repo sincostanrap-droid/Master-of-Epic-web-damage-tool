@@ -3476,3 +3476,49 @@
     grid-template-columns: 1fr;
   }
 }
+
+
+/* v1.21.0: 左=戦闘/基本/生産、中央=熟練、右=知識表示 */
+.skillSimWorkbench {
+  grid-template-columns: minmax(560px, 1.55fr) minmax(340px, .9fr);
+}
+.skillSimWorkbench .skillSimGroups {
+  grid-template-columns: minmax(240px, .78fr) minmax(310px, 1.22fr);
+  grid-template-areas:
+    "combat mastery"
+    "basic mastery"
+    "production mastery";
+}
+.skillSimGroupBar[data-skill-group="戦闘"] {
+  grid-area: combat;
+}
+.skillSimGroupBar[data-skill-group="基本"] {
+  grid-area: basic;
+}
+.skillSimGroupBar[data-skill-group="生産"] {
+  grid-area: production;
+}
+.skillSimGroupBar[data-skill-group="熟練"] {
+  grid-area: mastery;
+}
+.skillSimGroupBar[data-skill-group="熟練"] .skillBarRow {
+  grid-template-columns: 6.8em minmax(130px, 1fr) 4.7em;
+}
+.skillKnowledgeFold:first-child .skillKnowledgeItems {
+  max-height: none;
+}
+@media (max-width: 1180px) {
+  .skillSimWorkbench {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 900px) {
+  .skillSimWorkbench .skillSimGroups {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "combat"
+      "basic"
+      "production"
+      "mastery";
+  }
+}

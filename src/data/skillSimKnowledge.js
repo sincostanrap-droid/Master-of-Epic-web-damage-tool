@@ -1,11 +1,10 @@
 /*
   skillSimKnowledge.js
 
-  v1.20.9:
-  - 盗み、複合技、特殊技を追加投入。
-  - 表内テクニックのみを取り込み、短評セクションや関連テクニック欄は取り込まない。
-  - 複合技は Skill 欄から複数必要スキルを解析して requirements に保持。
-  - 魔法データはまだサンプルです。
+  v1.21.1:
+  - ユーザー提供の MoERead 熟練(魔法) HTMLから、表内の魔法のみを自前データ化。
+  - 短評セクションや効果量テーブルなどは取り込まない。
+  - 複合魔法は Skill 欄から複数必要スキルを解析して requirements に保持。
 */
 (function(){
   "use strict";
@@ -64,7 +63,13 @@
       "アブソーブ ガード",
       "シバルリー スピリッツ"
     ],
-    "source": "MoERead シップ/複合"
+    "source": "MoERead シップ/複合",
+    "usesBuffSlot": true,
+    "buffSlotCost": 1,
+    "buffName": "ウォーリアー / ファイター / ナイト",
+    "buffEffect": {
+      "note": "マスタリーはBuff枠を使用します。数値効果は未確定のため、この版ではBuff枠使用のみ演算へ反映します。"
+    }
   },
   {
     "id": "mastery-alc",
@@ -123,7 +128,13 @@
       "マルチプル エンハンス",
       "メルト バースト"
     ],
-    "source": "MoERead シップ/複合"
+    "source": "MoERead シップ/複合",
+    "usesBuffSlot": true,
+    "buffSlotCost": 1,
+    "buffName": "アルケミスト / マスター ウィザード / ウォーロック",
+    "buffEffect": {
+      "note": "マスタリーはBuff枠を使用します。数値効果は未確定のため、この版ではBuff枠使用のみ演算へ反映します。"
+    }
   },
   {
     "id": "mastery-for",
@@ -177,7 +188,13 @@
       "リバイバル ソウル",
       "クイック アロー"
     ],
-    "source": "MoERead シップ/複合"
+    "source": "MoERead シップ/複合",
+    "usesBuffSlot": true,
+    "buffSlotCost": 1,
+    "buffName": "フォレスター / フォレスト マスター / スカイウォーカー",
+    "buffEffect": {
+      "note": "マスタリーはBuff枠を使用します。数値効果は未確定のため、この版ではBuff枠使用のみ演算へ反映します。"
+    }
   },
   {
     "id": "mastery-nec",
@@ -241,7 +258,13 @@
       "地獄の祭壇",
       "サモン プロセルピナ"
     ],
-    "source": "MoERead シップ/複合"
+    "source": "MoERead シップ/複合",
+    "usesBuffSlot": true,
+    "buffSlotCost": 1,
+    "buffName": "ネクロマンサー / ダーク プリースト / シャドウ ナイト",
+    "buffEffect": {
+      "note": "マスタリーはBuff枠を使用します。数値効果は未確定のため、この版ではBuff枠使用のみ演算へ反映します。"
+    }
   },
   {
     "id": "mastery-cre",
@@ -292,7 +315,13 @@
       "エキスパート センス",
       "サモン アプレンティス"
     ],
-    "source": "MoERead シップ/複合"
+    "source": "MoERead シップ/複合",
+    "usesBuffSlot": true,
+    "buffSlotCost": 1,
+    "buffName": "クリエイター / マスター クリエイター / ジェネシス",
+    "buffEffect": {
+      "note": "マスタリーはBuff枠を使用します。数値効果は未確定のため、この版ではBuff枠使用のみ演算へ反映します。"
+    }
   },
   {
     "id": "mastery-bom",
@@ -347,7 +376,13 @@
       "パンプキン ボム",
       "エアリアル ボミング"
     ],
-    "source": "MoERead シップ/複合"
+    "source": "MoERead シップ/複合",
+    "usesBuffSlot": true,
+    "buffSlotCost": 1,
+    "buffName": "爆弾男 / 爆弾女 / 超爆弾男 / 超爆弾女 / ボンバーキング / ボンバークイーン",
+    "buffEffect": {
+      "note": "マスタリーはBuff枠を使用します。数値効果は未確定のため、この版ではBuff枠使用のみ演算へ反映します。"
+    }
   },
   {
     "id": "mastery-bre",
@@ -401,7 +436,13 @@
       "トリミング ケア",
       "リバイバルソウル"
     ],
-    "source": "MoERead シップ/複合"
+    "source": "MoERead シップ/複合",
+    "usesBuffSlot": true,
+    "buffSlotCost": 1,
+    "buffName": "ブリーダー / ブリード マスター / ブリード ロード",
+    "buffEffect": {
+      "note": "マスタリーはBuff枠を使用します。数値効果は未確定のため、この版ではBuff枠使用のみ演算へ反映します。"
+    }
   },
   {
     "id": "mastery-tem",
@@ -460,7 +501,13 @@
       "ゴッド ブレス",
       "ヘブンズ ジャッジメント"
     ],
-    "source": "MoERead シップ/複合"
+    "source": "MoERead シップ/複合",
+    "usesBuffSlot": true,
+    "buffSlotCost": 1,
+    "buffName": "テンプルナイト / パラディン / セイクリッドロード",
+    "buffEffect": {
+      "note": "マスタリーはBuff枠を使用します。数値効果は未確定のため、この版ではBuff枠使用のみ演算へ反映します。"
+    }
   },
   {
     "id": "mastery-dru",
@@ -514,7 +561,13 @@
       "スノー ストーム",
       "桜花の魔鏡"
     ],
-    "source": "MoERead シップ/複合"
+    "source": "MoERead シップ/複合",
+    "usesBuffSlot": true,
+    "buffSlotCost": 1,
+    "buffName": "ドルイド / マスター ドルイド / ドルイド キング / ドルイド クイーン",
+    "buffEffect": {
+      "note": "マスタリーはBuff枠を使用します。数値効果は未確定のため、この版ではBuff枠使用のみ演算へ反映します。"
+    }
   },
   {
     "id": "mastery-sag",
@@ -578,7 +631,13 @@
       "紅き援軍要請",
       "蒼き援軍要請"
     ],
-    "source": "MoERead シップ/複合"
+    "source": "MoERead シップ/複合",
+    "usesBuffSlot": true,
+    "buffSlotCost": 1,
+    "buffName": "紺碧の賢者 / 深緋の賢者 / 白銀の賢者",
+    "buffEffect": {
+      "note": "マスタリーはBuff枠を使用します。数値効果は未確定のため、この版ではBuff枠使用のみ演算へ反映します。"
+    }
   },
   {
     "id": "mastery-gre",
@@ -645,7 +704,13 @@
       "鳥獣戯画",
       "マスプロダクション"
     ],
-    "source": "MoERead シップ/複合"
+    "source": "MoERead シップ/複合",
+    "usesBuffSlot": true,
+    "buffSlotCost": 1,
+    "buffName": "グレート クリエイター / クリエイト ロード / 人間国宝",
+    "buffEffect": {
+      "note": "マスタリーはBuff枠を使用します。数値効果は未確定のため、この版ではBuff枠使用のみ演算へ反映します。"
+    }
   },
   {
     "id": "mastery-mer",
@@ -704,7 +769,13 @@
       "リコール アンダーリング",
       "パンプキン ボム"
     ],
-    "source": "MoERead シップ/複合"
+    "source": "MoERead シップ/複合",
+    "usesBuffSlot": true,
+    "buffSlotCost": 1,
+    "buffName": "傭兵 / ヒットマン / ゴッドファーザー",
+    "buffEffect": {
+      "note": "マスタリーはBuff枠を使用します。数値効果は未確定のため、この版ではBuff枠使用のみ演算へ反映します。"
+    }
   },
   {
     "id": "mastery-sam",
@@ -769,7 +840,13 @@
       "弧月破斬",
       "堅守の太刀"
     ],
-    "source": "MoERead シップ/複合"
+    "source": "MoERead シップ/複合",
+    "usesBuffSlot": true,
+    "buffSlotCost": 1,
+    "buffName": "サムライ / サムライ マスター / 将軍",
+    "buffEffect": {
+      "note": "マスタリーはBuff枠を使用します。数値効果は未確定のため、この版ではBuff枠使用のみ演算へ反映します。"
+    }
   },
   {
     "id": "mastery-min",
@@ -821,7 +898,13 @@
       "サモン マイナーズ",
       "サモン ブラスト ファーネス"
     ],
-    "source": "MoERead シップ/複合"
+    "source": "MoERead シップ/複合",
+    "usesBuffSlot": true,
+    "buffSlotCost": 1,
+    "buffName": "マイン ビショップ / メタル ビショップ / フルメタル ビショップ",
+    "buffEffect": {
+      "note": "マスタリーはBuff枠を使用します。数値効果は未確定のため、この版ではBuff枠使用のみ演算へ反映します。"
+    }
   },
   {
     "id": "mastery-kit",
@@ -866,7 +949,13 @@
       "サモン チョコ キャット",
       "フランバージュ"
     ],
-    "source": "MoERead シップ/複合"
+    "source": "MoERead シップ/複合",
+    "usesBuffSlot": true,
+    "buffSlotCost": 1,
+    "buffName": "厨房師 / マスター厨房師 / ゴッド厨房師",
+    "buffEffect": {
+      "note": "マスタリーはBuff枠を使用します。数値効果は未確定のため、この版ではBuff枠使用のみ演算へ反映します。"
+    }
   },
   {
     "id": "mastery-ass",
@@ -940,7 +1029,13 @@
       "兵糧丸",
       "パンプキン ボム"
     ],
-    "source": "MoERead シップ/複合"
+    "source": "MoERead シップ/複合",
+    "usesBuffSlot": true,
+    "buffSlotCost": 1,
+    "buffName": "アサシン / 忍者 / 御庭番",
+    "buffEffect": {
+      "note": "マスタリーはBuff枠を使用します。数値効果は未確定のため、この版ではBuff枠使用のみ演算へ反映します。"
+    }
   },
   {
     "id": "mastery-sea",
@@ -1000,7 +1095,13 @@
       "鮪型魚雷",
       "オーシャン ストリーム"
     ],
-    "source": "MoERead シップ/複合"
+    "source": "MoERead シップ/複合",
+    "usesBuffSlot": true,
+    "buffSlotCost": 1,
+    "buffName": "海戦士 / 英雄海戦士 / 海王",
+    "buffEffect": {
+      "note": "マスタリーはBuff枠を使用します。数値効果は未確定のため、この版ではBuff枠使用のみ演算へ反映します。"
+    }
   },
   {
     "id": "mastery-bra",
@@ -1062,7 +1163,13 @@
       "リバーサル エナジー",
       "フォース プロヴォーク"
     ],
-    "source": "MoERead シップ/複合"
+    "source": "MoERead シップ/複合",
+    "usesBuffSlot": true,
+    "buffSlotCost": 1,
+    "buffName": "ブレイブナイト / アーマーナイト / ジャスティス タンク",
+    "buffEffect": {
+      "note": "マスタリーはBuff枠を使用します。数値効果は未確定のため、この版ではBuff枠使用のみ演算へ反映します。"
+    }
   },
   {
     "id": "mastery-evi",
@@ -1114,7 +1221,13 @@
       "カラミティ フォース",
       "ブラッド カーニバル"
     ],
-    "source": "MoERead シップ/複合"
+    "source": "MoERead シップ/複合",
+    "usesBuffSlot": true,
+    "buffSlotCost": 1,
+    "buffName": "イビルナイト / デスナイト / ヘルナイト",
+    "buffEffect": {
+      "note": "マスタリーはBuff枠を使用します。数値効果は未確定のため、この版ではBuff枠使用のみ演算へ反映します。"
+    }
   },
   {
     "id": "mastery-cos",
@@ -1173,7 +1286,13 @@
       "フィニッシング エンド スパーク",
       "ファイナル アルティメット ヒーロー ビーム"
     ],
-    "source": "MoERead シップ/複合"
+    "source": "MoERead シップ/複合",
+    "usesBuffSlot": true,
+    "buffSlotCost": 1,
+    "buffName": "コスプレイヤー / コスプレヒーロー / コスプレヒロイン / ヒーロー / ヒロイン",
+    "buffEffect": {
+      "note": "マスタリーはBuff枠を使用します。数値効果は未確定のため、この版ではBuff枠使用のみ演算へ反映します。"
+    }
   },
   {
     "id": "mastery-dab",
@@ -1227,7 +1346,13 @@
     "prerequisiteTechniques": [
       "ウォーター アート"
     ],
-    "source": "MoERead シップ/複合"
+    "source": "MoERead シップ/複合",
+    "usesBuffSlot": true,
+    "buffSlotCost": 1,
+    "buffName": "物好き / ネタ師変人 / 神ネタ師",
+    "buffEffect": {
+      "note": "マスタリーはBuff枠を使用します。数値効果は未確定のため、この版ではBuff枠使用のみ演算へ反映します。"
+    }
   },
   {
     "id": "mastery-ath",
@@ -1274,7 +1399,13 @@
       "エア ジャンプ",
       "ハイパー ジャンプ"
     ],
-    "source": "MoERead シップ/複合"
+    "source": "MoERead シップ/複合",
+    "usesBuffSlot": true,
+    "buffSlotCost": 1,
+    "buffName": "アスリート / トライアスリート / 鉄人",
+    "buffEffect": {
+      "note": "マスタリーはBuff枠を使用します。数値効果は未確定のため、この版ではBuff枠使用のみ演算へ反映します。"
+    }
   },
   {
     "id": "mastery-dkf",
@@ -1331,7 +1462,13 @@
       "オーラ ナックル",
       "飛燕脚"
     ],
-    "source": "MoERead シップ/複合"
+    "source": "MoERead シップ/複合",
+    "usesBuffSlot": true,
+    "buffSlotCost": 1,
+    "buffName": "酔拳士 / 酔拳マスター / 酔拳聖",
+    "buffEffect": {
+      "note": "マスタリーはBuff枠を使用します。数値効果は未確定のため、この版ではBuff枠使用のみ演算へ反映します。"
+    }
   },
   {
     "id": "mastery-row",
@@ -1394,7 +1531,13 @@
       "飛燕脚",
       "酔拳"
     ],
-    "source": "MoERead シップ/複合"
+    "source": "MoERead シップ/複合",
+    "usesBuffSlot": true,
+    "buffSlotCost": 1,
+    "buffName": "荒くれ者 / レスラー / チャンピオン",
+    "buffEffect": {
+      "note": "マスタリーはBuff枠を使用します。数値効果は未確定のため、この版ではBuff枠使用のみ演算へ反映します。"
+    }
   },
   {
     "id": "mastery-idl",
@@ -1446,7 +1589,13 @@
       "ファッシネイト キッス",
       "スモーク マシーン"
     ],
-    "source": "MoERead シップ/複合"
+    "source": "MoERead シップ/複合",
+    "usesBuffSlot": true,
+    "buffSlotCost": 1,
+    "buffName": "新人アイドル / ビスクアイドル / ダイアロスアイドル",
+    "buffEffect": {
+      "note": "マスタリーはBuff枠を使用します。数値効果は未確定のため、この版ではBuff枠使用のみ演算へ反映します。"
+    }
   },
   {
     "id": "mastery-hou",
@@ -1492,7 +1641,13 @@
     "prerequisiteTechniques": [
       "エリア クリーニング"
     ],
-    "source": "MoERead シップ/複合"
+    "source": "MoERead シップ/複合",
+    "usesBuffSlot": true,
+    "buffSlotCost": 1,
+    "buffName": "ハウスキーパー / メイド(お手伝い) / バレット(従者) / アビゲイル(侍女) / バトラー(執事)",
+    "buffEffect": {
+      "note": "マスタリーはBuff枠を使用します。数値効果は未確定のため、この版ではBuff枠使用のみ演算へ反映します。"
+    }
   },
   {
     "id": "mastery-adv",
@@ -1547,7 +1702,13 @@
       "タイダウン ローピング",
       "シークレット シーフ"
     ],
-    "source": "MoERead シップ/複合"
+    "source": "MoERead シップ/複合",
+    "usesBuffSlot": true,
+    "buffSlotCost": 1,
+    "buffName": "アドベンチャラー / エクスプローラー / トレジャーハンター",
+    "buffEffect": {
+      "note": "マスタリーはBuff枠を使用します。数値効果は未確定のため、この版ではBuff枠使用のみ演算へ反映します。"
+    }
   },
   {
     "id": "mastery-spy",
@@ -1593,7 +1754,13 @@
     "prerequisiteTechniques": [
       "シークレット シーフ"
     ],
-    "source": "MoERead シップ/複合"
+    "source": "MoERead シップ/複合",
+    "usesBuffSlot": true,
+    "buffSlotCost": 1,
+    "buffName": "スパイ / ストーカー / ステルス",
+    "buffEffect": {
+      "note": "マスタリーはBuff枠を使用します。数値効果は未確定のため、この版ではBuff枠使用のみ演算へ反映します。"
+    }
   },
   {
     "id": "mastery-yan",
@@ -1645,7 +1812,13 @@
       "グレア アイ",
       "リコール アンダーリング"
     ],
-    "source": "MoERead シップ/複合"
+    "source": "MoERead シップ/複合",
+    "usesBuffSlot": true,
+    "buffSlotCost": 1,
+    "buffName": "レディース / チンピラ / アウトロー / ギャング",
+    "buffEffect": {
+      "note": "マスタリーはBuff枠を使用します。数値効果は未確定のため、この版ではBuff枠使用のみ演算へ反映します。"
+    }
   },
   {
     "id": "mastery-tea",
@@ -1699,7 +1872,13 @@
     "prerequisiteTechniques": [
       "未実装"
     ],
-    "source": "MoERead シップ/複合"
+    "source": "MoERead シップ/複合",
+    "usesBuffSlot": true,
+    "buffSlotCost": 1,
+    "buffName": "アカデミアン / ティーチャー / プロフェッサー",
+    "buffEffect": {
+      "note": "マスタリーはBuff枠を使用します。数値効果は未確定のため、この版ではBuff枠使用のみ演算へ反映します。"
+    }
   },
   {
     "id": "mastery-bbd",
@@ -1746,7 +1925,13 @@
       "ヴァンパイア ノクターン",
       "リコール オーディエンス"
     ],
-    "source": "MoERead シップ/複合"
+    "source": "MoERead シップ/複合",
+    "usesBuffSlot": true,
+    "buffSlotCost": 1,
+    "buffName": "ブラッドバード / ドレッドバード / カオスバード",
+    "buffEffect": {
+      "note": "マスタリーはBuff枠を使用します。数値効果は未確定のため、この版ではBuff枠使用のみ演算へ反映します。"
+    }
   },
   {
     "id": "mastery-due",
@@ -1794,7 +1979,13 @@
       "ブレイン ブレイカー",
       "ガード レイジ"
     ],
-    "source": "MoERead シップ/複合"
+    "source": "MoERead シップ/複合",
+    "usesBuffSlot": true,
+    "buffSlotCost": 1,
+    "buffName": "デュエリスト / レガトゥス / タイラント",
+    "buffEffect": {
+      "note": "マスタリーはBuff枠を使用します。数値効果は未確定のため、この版ではBuff枠使用のみ演算へ反映します。"
+    }
   },
   {
     "id": "mastery-col",
@@ -1844,7 +2035,13 @@
     "prerequisiteTechniques": [
       "未実装"
     ],
-    "source": "MoERead シップ/複合"
+    "source": "MoERead シップ/複合",
+    "usesBuffSlot": true,
+    "buffSlotCost": 1,
+    "buffName": "コレクター / コレクト マスター / 採集王",
+    "buffEffect": {
+      "note": "マスタリーはBuff枠を使用します。数値効果は未確定のため、この版ではBuff枠使用のみ演算へ反映します。"
+    }
   },
   {
     "id": "mastery-elm",
@@ -1903,7 +2100,13 @@
       "エレメント シールド",
       "シュートアロー"
     ],
-    "source": "MoERead シップ/複合"
+    "source": "MoERead シップ/複合",
+    "usesBuffSlot": true,
+    "buffSlotCost": 1,
+    "buffName": "エレメンタルナイト / エレメンタルマスター / エレメンタルロード",
+    "buffEffect": {
+      "note": "マスタリーはBuff枠を使用します。数値効果は未確定のため、この版ではBuff枠使用のみ演算へ反映します。"
+    }
   }
 ];
   const techniques = [
@@ -5755,7 +5958,7 @@
     "successSkill": "パフォーマンス",
     "successRequired": 0,
     "cost": {
-      "st": 0.0
+      "st": 0
     },
     "castTime": "180",
     "delay": "360",
@@ -5781,7 +5984,7 @@
     "successSkill": "パフォーマンス",
     "successRequired": 0,
     "cost": {
-      "st": 0.0
+      "st": 0
     },
     "castTime": "180",
     "delay": "360",
@@ -5807,7 +6010,7 @@
     "successSkill": "パフォーマンス",
     "successRequired": 0,
     "cost": {
-      "st": 0.0
+      "st": 0
     },
     "castTime": "180",
     "delay": "360",
@@ -5833,7 +6036,7 @@
     "successSkill": "投げ",
     "successRequired": 0,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "80",
     "delay": "680",
@@ -5859,7 +6062,7 @@
     "successSkill": "投げ",
     "successRequired": 0,
     "cost": {
-      "st": 10.0
+      "st": 10
     },
     "castTime": "77",
     "delay": "247",
@@ -5909,7 +6112,7 @@
     "successSkill": "神秘魔法",
     "successRequired": 0,
     "cost": {
-      "mp": 5.0
+      "mp": 5
     },
     "castTime": "135",
     "delay": "200",
@@ -5935,7 +6138,7 @@
     "successSkill": "神秘魔法",
     "successRequired": 0,
     "cost": {
-      "mp": 5.0
+      "mp": 5
     },
     "castTime": "135",
     "delay": "200",
@@ -5961,7 +6164,7 @@
     "successSkill": "銃器",
     "successRequired": 0,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "150",
     "delay": "1150",
@@ -6029,13 +6232,13 @@
     "requirements": [
       {
         "skill": "パフォーマンス",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "パフォーマンス",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "40",
     "delay": "540",
@@ -6055,13 +6258,13 @@
     "requirements": [
       {
         "skill": "パフォーマンス",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "パフォーマンス",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "180",
     "delay": "680",
@@ -6081,13 +6284,13 @@
     "requirements": [
       {
         "skill": "音楽",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "音楽",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 0.0
+      "st": 0
     },
     "castTime": "320",
     "delay": "18270",
@@ -6107,13 +6310,13 @@
     "requirements": [
       {
         "skill": "こんぼう",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "こんぼう",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "200",
     "delay": "600",
@@ -6133,13 +6336,13 @@
     "requirements": [
       {
         "skill": "パフォーマンス",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "パフォーマンス",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "150",
     "delay": "650",
@@ -6159,13 +6362,13 @@
     "requirements": [
       {
         "skill": "パフォーマンス",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "パフォーマンス",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "150",
     "delay": "650",
@@ -6185,13 +6388,13 @@
     "requirements": [
       {
         "skill": "パフォーマンス",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "パフォーマンス",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "150",
     "delay": "650",
@@ -6211,13 +6414,13 @@
     "requirements": [
       {
         "skill": "パフォーマンス",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "パフォーマンス",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "240",
     "delay": "420",
@@ -6237,13 +6440,13 @@
     "requirements": [
       {
         "skill": "パフォーマンス",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "パフォーマンス",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 1.0
+      "st": 1
     },
     "castTime": "220",
     "delay": "216000",
@@ -6263,13 +6466,13 @@
     "requirements": [
       {
         "skill": "パフォーマンス",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "パフォーマンス",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "900",
     "delay": "1400",
@@ -6289,13 +6492,13 @@
     "requirements": [
       {
         "skill": "パフォーマンス",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "パフォーマンス",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 1.0
+      "st": 1
     },
     "castTime": "190",
     "delay": "390",
@@ -6315,13 +6518,13 @@
     "requirements": [
       {
         "skill": "パフォーマンス",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "パフォーマンス",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "300",
     "delay": "800",
@@ -6341,13 +6544,13 @@
     "requirements": [
       {
         "skill": "パフォーマンス",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "パフォーマンス",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "40",
     "delay": "540",
@@ -6367,13 +6570,13 @@
     "requirements": [
       {
         "skill": "パフォーマンス",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "パフォーマンス",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "40",
     "delay": "540",
@@ -6393,13 +6596,13 @@
     "requirements": [
       {
         "skill": "パフォーマンス",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "パフォーマンス",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "40",
     "delay": "540",
@@ -6419,13 +6622,13 @@
     "requirements": [
       {
         "skill": "パフォーマンス",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "パフォーマンス",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "200",
     "delay": "700",
@@ -6445,13 +6648,13 @@
     "requirements": [
       {
         "skill": "パフォーマンス",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "パフォーマンス",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "50",
     "delay": "550",
@@ -6471,13 +6674,13 @@
     "requirements": [
       {
         "skill": "パフォーマンス",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "パフォーマンス",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "200",
     "delay": "500",
@@ -6497,13 +6700,13 @@
     "requirements": [
       {
         "skill": "パフォーマンス",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "パフォーマンス",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "200",
     "delay": "700",
@@ -6523,13 +6726,13 @@
     "requirements": [
       {
         "skill": "パフォーマンス",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "パフォーマンス",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "300",
     "delay": "800",
@@ -6549,13 +6752,13 @@
     "requirements": [
       {
         "skill": "パフォーマンス",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "パフォーマンス",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "720",
     "delay": "1220",
@@ -6575,13 +6778,13 @@
     "requirements": [
       {
         "skill": "パフォーマンス",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "パフォーマンス",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "200",
     "delay": "700",
@@ -6601,13 +6804,13 @@
     "requirements": [
       {
         "skill": "パフォーマンス",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "パフォーマンス",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "20",
     "delay": "1000",
@@ -6627,13 +6830,13 @@
     "requirements": [
       {
         "skill": "パフォーマンス",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "パフォーマンス",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 1.0
+      "st": 1
     },
     "castTime": "180",
     "delay": "380",
@@ -6653,13 +6856,13 @@
     "requirements": [
       {
         "skill": "パフォーマンス",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "パフォーマンス",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "230",
     "delay": "730",
@@ -6679,13 +6882,13 @@
     "requirements": [
       {
         "skill": "パフォーマンス",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "パフォーマンス",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 0.0
+      "st": 0
     },
     "castTime": "270",
     "delay": "770",
@@ -6705,13 +6908,13 @@
     "requirements": [
       {
         "skill": "パフォーマンス",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "パフォーマンス",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "750",
     "delay": "1240",
@@ -6731,13 +6934,13 @@
     "requirements": [
       {
         "skill": "パフォーマンス",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "パフォーマンス",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "580",
     "delay": "1080",
@@ -6757,13 +6960,13 @@
     "requirements": [
       {
         "skill": "パフォーマンス",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "パフォーマンス",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "200",
     "delay": "1200",
@@ -6783,13 +6986,13 @@
     "requirements": [
       {
         "skill": "パフォーマンス",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "パフォーマンス",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "648",
     "delay": "1648",
@@ -6809,13 +7012,13 @@
     "requirements": [
       {
         "skill": "パフォーマンス",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "パフォーマンス",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "350",
     "delay": "850",
@@ -6835,13 +7038,13 @@
     "requirements": [
       {
         "skill": "パフォーマンス",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "パフォーマンス",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "300",
     "delay": "900",
@@ -6861,13 +7064,13 @@
     "requirements": [
       {
         "skill": "パフォーマンス",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "パフォーマンス",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "120",
     "delay": "620",
@@ -6887,13 +7090,13 @@
     "requirements": [
       {
         "skill": "パフォーマンス",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "パフォーマンス",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "270",
     "delay": "770",
@@ -6913,13 +7116,13 @@
     "requirements": [
       {
         "skill": "パフォーマンス",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "パフォーマンス",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "200",
     "delay": "700",
@@ -6939,13 +7142,13 @@
     "requirements": [
       {
         "skill": "パフォーマンス",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "パフォーマンス",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "220",
     "delay": "820",
@@ -6965,13 +7168,13 @@
     "requirements": [
       {
         "skill": "パフォーマンス",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "パフォーマンス",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "20",
     "delay": "1500",
@@ -6991,13 +7194,13 @@
     "requirements": [
       {
         "skill": "パフォーマンス",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "パフォーマンス",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "120",
     "delay": "620",
@@ -7017,13 +7220,13 @@
     "requirements": [
       {
         "skill": "パフォーマンス",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "パフォーマンス",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "280",
     "delay": "780",
@@ -7043,13 +7246,13 @@
     "requirements": [
       {
         "skill": "パフォーマンス",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "パフォーマンス",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "700",
     "delay": "1200",
@@ -7069,13 +7272,13 @@
     "requirements": [
       {
         "skill": "パフォーマンス",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "パフォーマンス",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "200",
     "delay": "700",
@@ -7095,13 +7298,13 @@
     "requirements": [
       {
         "skill": "パフォーマンス",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "パフォーマンス",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 1.0
+      "st": 1
     },
     "castTime": "330",
     "delay": "830",
@@ -7121,13 +7324,13 @@
     "requirements": [
       {
         "skill": "音楽",
-        "min": 11.0
+        "min": 11
       }
     ],
     "successSkill": "音楽",
-    "successRequired": 11.0,
+    "successRequired": 11,
     "cost": {
-      "st": 0.0
+      "st": 0
     },
     "castTime": "60",
     "delay": "560",
@@ -7147,13 +7350,13 @@
     "requirements": [
       {
         "skill": "精神力",
-        "min": 30.0
+        "min": 30
       }
     ],
     "successSkill": "精神力",
-    "successRequired": 30.0,
+    "successRequired": 30,
     "cost": {
-      "st": 15.0
+      "st": 15
     },
     "castTime": "80",
     "delay": "680",
@@ -7173,13 +7376,13 @@
     "requirements": [
       {
         "skill": "精神力",
-        "min": 30.0
+        "min": 30
       }
     ],
     "successSkill": "精神力",
-    "successRequired": 30.0,
+    "successRequired": 30,
     "cost": {
-      "st": 15.0
+      "st": 15
     },
     "castTime": "80",
     "delay": "900",
@@ -7199,13 +7402,13 @@
     "requirements": [
       {
         "skill": "銃器",
-        "min": 40.0
+        "min": 40
       }
     ],
     "successSkill": "銃器",
-    "successRequired": 40.0,
+    "successRequired": 40,
     "cost": {
-      "st": 20.0
+      "st": 20
     },
     "castTime": "295",
     "delay": "750",
@@ -7225,13 +7428,13 @@
     "requirements": [
       {
         "skill": "銃器",
-        "min": 60.0
+        "min": 60
       }
     ],
     "successSkill": "銃器",
-    "successRequired": 60.0,
+    "successRequired": 60,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "160",
     "delay": "800",
@@ -7251,13 +7454,13 @@
     "requirements": [
       {
         "skill": "弓",
-        "min": 60.0
+        "min": 60
       }
     ],
     "successSkill": "弓",
-    "successRequired": 60.0,
+    "successRequired": 60,
     "cost": {
-      "st": 28.0
+      "st": 28
     },
     "castTime": "160",
     "delay": "900",
@@ -7277,13 +7480,13 @@
     "requirements": [
       {
         "skill": "刀剣",
-        "min": 60.0
+        "min": 60
       }
     ],
     "successSkill": "刀剣",
-    "successRequired": 60.0,
+    "successRequired": 60,
     "cost": {
-      "st": 28.0
+      "st": 28
     },
     "castTime": "100",
     "delay": "900",
@@ -7303,13 +7506,13 @@
     "requirements": [
       {
         "skill": "こんぼう",
-        "min": 60.0
+        "min": 60
       }
     ],
     "successSkill": "こんぼう",
-    "successRequired": 60.0,
+    "successRequired": 60,
     "cost": {
-      "st": 28.0
+      "st": 28
     },
     "castTime": "220",
     "delay": "900",
@@ -7329,13 +7532,13 @@
     "requirements": [
       {
         "skill": "槍",
-        "min": 60.0
+        "min": 60
       }
     ],
     "successSkill": "槍",
-    "successRequired": 60.0,
+    "successRequired": 60,
     "cost": {
-      "st": 28.0
+      "st": 28
     },
     "castTime": "180",
     "delay": "900",
@@ -7355,13 +7558,13 @@
     "requirements": [
       {
         "skill": "銃器",
-        "min": 60.0
+        "min": 60
       }
     ],
     "successSkill": "銃器",
-    "successRequired": 60.0,
+    "successRequired": 60,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "160",
     "delay": "1200",
@@ -7381,13 +7584,13 @@
     "requirements": [
       {
         "skill": "弓",
-        "min": 60.0
+        "min": 60
       }
     ],
     "successSkill": "弓",
-    "successRequired": 60.0,
+    "successRequired": 60,
     "cost": {
-      "st": 28.0
+      "st": 28
     },
     "castTime": "160",
     "delay": "900",
@@ -7407,13 +7610,13 @@
     "requirements": [
       {
         "skill": "槍",
-        "min": 60.0
+        "min": 60
       }
     ],
     "successSkill": "槍",
-    "successRequired": 60.0,
+    "successRequired": 60,
     "cost": {
-      "st": 28.0
+      "st": 28
     },
     "castTime": "180",
     "delay": "1200",
@@ -7433,13 +7636,13 @@
     "requirements": [
       {
         "skill": "刀剣",
-        "min": 80.0
+        "min": 80
       }
     ],
     "successSkill": "刀剣",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "260",
     "delay": "1000",
@@ -7459,13 +7662,13 @@
     "requirements": [
       {
         "skill": "こんぼう",
-        "min": 80.0
+        "min": 80
       }
     ],
     "successSkill": "こんぼう",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "250",
     "delay": "1000",
@@ -7485,13 +7688,13 @@
     "requirements": [
       {
         "skill": "刀剣",
-        "min": 80.0
+        "min": 80
       }
     ],
     "successSkill": "刀剣",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "180",
     "delay": "1000",
@@ -7511,13 +7714,13 @@
     "requirements": [
       {
         "skill": "槍",
-        "min": 80.0
+        "min": 80
       }
     ],
     "successSkill": "槍",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "280",
     "delay": "1000",
@@ -7537,13 +7740,13 @@
     "requirements": [
       {
         "skill": "刀剣",
-        "min": 80.0
+        "min": 80
       }
     ],
     "successSkill": "刀剣",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "240",
     "delay": "1000",
@@ -7563,13 +7766,13 @@
     "requirements": [
       {
         "skill": "素手",
-        "min": 80.0
+        "min": 80
       }
     ],
     "successSkill": "素手",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "335",
     "delay": "1500",
@@ -7589,13 +7792,13 @@
     "requirements": [
       {
         "skill": "刀剣",
-        "min": 80.0
+        "min": 80
       }
     ],
     "successSkill": "刀剣",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "190",
     "delay": "1100",
@@ -7615,13 +7818,13 @@
     "requirements": [
       {
         "skill": "素手",
-        "min": 80.0
+        "min": 80
       }
     ],
     "successSkill": "素手",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "275",
     "delay": "1500",
@@ -7641,13 +7844,13 @@
     "requirements": [
       {
         "skill": "こんぼう",
-        "min": 80.0
+        "min": 80
       }
     ],
     "successSkill": "こんぼう",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "200",
     "delay": "1100",
@@ -7667,13 +7870,13 @@
     "requirements": [
       {
         "skill": "盗み",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "盗み",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "270",
     "delay": "510",
@@ -7692,13 +7895,13 @@
     "requirements": [
       {
         "skill": "盗み",
-        "min": 20.0
+        "min": 20
       }
     ],
     "successSkill": "盗み",
-    "successRequired": 20.0,
+    "successRequired": 20,
     "cost": {
-      "st": 11.0
+      "st": 11
     },
     "castTime": "120",
     "delay": "1220",
@@ -7717,13 +7920,13 @@
     "requirements": [
       {
         "skill": "盗み",
-        "min": 30.0
+        "min": 30
       }
     ],
     "successSkill": "盗み",
-    "successRequired": 30.0,
+    "successRequired": 30,
     "cost": {
-      "st": 15.0
+      "st": 15
     },
     "castTime": "120",
     "delay": "2200",
@@ -7742,13 +7945,13 @@
     "requirements": [
       {
         "skill": "盗み",
-        "min": 40.0
+        "min": 40
       }
     ],
     "successSkill": "盗み",
-    "successRequired": 40.0,
+    "successRequired": 40,
     "cost": {
-      "st": 19.0
+      "st": 19
     },
     "castTime": "270",
     "delay": "1270",
@@ -7767,13 +7970,13 @@
     "requirements": [
       {
         "skill": "盗み",
-        "min": 50.0
+        "min": 50
       }
     ],
     "successSkill": "盗み",
-    "successRequired": 50.0,
+    "successRequired": 50,
     "cost": {
-      "st": 23.0
+      "st": 23
     },
     "castTime": "60",
     "delay": "2600",
@@ -7792,13 +7995,13 @@
     "requirements": [
       {
         "skill": "盗み",
-        "min": 60.0
+        "min": 60
       }
     ],
     "successSkill": "盗み",
-    "successRequired": 60.0,
+    "successRequired": 60,
     "cost": {
-      "st": 28.0
+      "st": 28
     },
     "castTime": "120",
     "delay": "22000",
@@ -7817,13 +8020,13 @@
     "requirements": [
       {
         "skill": "盗み",
-        "min": 80.0
+        "min": 80
       }
     ],
     "successSkill": "盗み",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "120",
     "delay": "2200",
@@ -8854,13 +9057,13 @@
     "requirements": [
       {
         "skill": "パフォーマンス",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "パフォーマンス",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "150",
     "delay": "750",
@@ -8879,13 +9082,13 @@
     "requirements": [
       {
         "skill": "取引",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "取引",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "150",
     "delay": "750",
@@ -8904,13 +9107,13 @@
     "requirements": [
       {
         "skill": "取引",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "取引",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "150",
     "delay": "750",
@@ -8929,13 +9132,13 @@
     "requirements": [
       {
         "skill": "召喚魔法",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "召喚魔法",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 30.0
+      "st": 30
     },
     "castTime": "150",
     "delay": "2150",
@@ -8954,13 +9157,13 @@
     "requirements": [
       {
         "skill": "木工",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "木工",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "150",
     "delay": "750",
@@ -8979,13 +9182,13 @@
     "requirements": [
       {
         "skill": "調教",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "調教",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "180",
     "delay": "2150",
@@ -9004,13 +9207,13 @@
     "requirements": [
       {
         "skill": "取引",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "取引",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 40.0
+      "st": 40
     },
     "castTime": "150",
     "delay": "750",
@@ -9029,13 +9232,13 @@
     "requirements": [
       {
         "skill": "取引",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "取引",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 40.0
+      "st": 40
     },
     "castTime": "150",
     "delay": "750",
@@ -9054,13 +9257,13 @@
     "requirements": [
       {
         "skill": "取引",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "取引",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 40.0
+      "st": 40
     },
     "castTime": "150",
     "delay": "750",
@@ -9079,13 +9282,13 @@
     "requirements": [
       {
         "skill": "取引",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "取引",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 40.0
+      "st": 40
     },
     "castTime": "150",
     "delay": "750",
@@ -9104,13 +9307,13 @@
     "requirements": [
       {
         "skill": "召喚魔法",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "召喚魔法",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 30.0
+      "st": 30
     },
     "castTime": "150",
     "delay": "2150",
@@ -9129,13 +9332,13 @@
     "requirements": [
       {
         "skill": "栽培",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "栽培",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "200",
     "delay": "1200",
@@ -9154,13 +9357,13 @@
     "requirements": [
       {
         "skill": "音楽",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "音楽",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "150",
     "delay": "2150",
@@ -9179,13 +9382,13 @@
     "requirements": [
       {
         "skill": "木工",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "木工",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 40.0
+      "st": 40
     },
     "castTime": "150",
     "delay": "750",
@@ -9204,13 +9407,13 @@
     "requirements": [
       {
         "skill": "栽培",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "栽培",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "200",
     "delay": "1200",
@@ -9229,13 +9432,13 @@
     "requirements": [
       {
         "skill": "栽培",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "栽培",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "60",
     "delay": "480",
@@ -9254,13 +9457,13 @@
     "requirements": [
       {
         "skill": "暗黒命令",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "暗黒命令",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 15.0
+      "st": 15
     },
     "castTime": "120",
     "delay": "1320",
@@ -9279,13 +9482,13 @@
     "requirements": [
       {
         "skill": "音楽",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "音楽",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "120",
     "delay": "2120",
@@ -9304,13 +9507,13 @@
     "requirements": [
       {
         "skill": "料理",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "料理",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "150",
     "delay": "750",
@@ -9329,13 +9532,13 @@
     "requirements": [
       {
         "skill": "暗黒命令",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "暗黒命令",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "200",
     "delay": "2200",
@@ -9354,13 +9557,13 @@
     "requirements": [
       {
         "skill": "召喚魔法",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "召喚魔法",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 30.0
+      "st": 30
     },
     "castTime": "150",
     "delay": "2150",
@@ -9379,13 +9582,13 @@
     "requirements": [
       {
         "skill": "採掘",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "採掘",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "270",
     "delay": "2000",
@@ -9404,13 +9607,13 @@
     "requirements": [
       {
         "skill": "音楽",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "音楽",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 30.0
+      "st": 30
     },
     "castTime": "150",
     "delay": "2150",
@@ -9429,13 +9632,13 @@
     "requirements": [
       {
         "skill": "素手",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "素手",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "150",
     "delay": "750",
@@ -9454,13 +9657,13 @@
     "requirements": [
       {
         "skill": "水泳",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "水泳",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 10.0
+      "st": 10
     },
     "castTime": "150",
     "delay": "1500",
@@ -9479,13 +9682,13 @@
     "requirements": [
       {
         "skill": "取引",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "取引",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 30.0
+      "st": 30
     },
     "castTime": "150",
     "delay": "750",
@@ -9504,13 +9707,13 @@
     "requirements": [
       {
         "skill": "召喚魔法",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "召喚魔法",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "60",
     "delay": "660",
@@ -9529,13 +9732,13 @@
     "requirements": [
       {
         "skill": "取引",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "取引",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "450",
     "delay": "1450",
@@ -9554,13 +9757,13 @@
     "requirements": [
       {
         "skill": "パフォーマンス",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "パフォーマンス",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "60",
     "delay": "120",
@@ -9579,13 +9782,13 @@
     "requirements": [
       {
         "skill": "栽培",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "栽培",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "60",
     "delay": "480",
@@ -9604,13 +9807,13 @@
     "requirements": [
       {
         "skill": "神秘魔法",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "神秘魔法",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "150",
     "delay": "750",
@@ -9629,13 +9832,13 @@
     "requirements": [
       {
         "skill": "取引",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "取引",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "150",
     "delay": "750",
@@ -9654,13 +9857,13 @@
     "requirements": [
       {
         "skill": "調教",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "調教",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "150",
     "delay": "750",
@@ -9679,13 +9882,13 @@
     "requirements": [
       {
         "skill": "採掘",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "採掘",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "270",
     "delay": "2000",
@@ -9704,13 +9907,13 @@
     "requirements": [
       {
         "skill": "音楽",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "音楽",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "150",
     "delay": "2150",
@@ -9729,13 +9932,13 @@
     "requirements": [
       {
         "skill": "神秘魔法",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "神秘魔法",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "150",
     "delay": "1650",
@@ -9754,13 +9957,13 @@
     "requirements": [
       {
         "skill": "音楽",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "音楽",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "190",
     "delay": "1690",
@@ -9779,13 +9982,13 @@
     "requirements": [
       {
         "skill": "裁縫",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "裁縫",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "60",
     "delay": "360",
@@ -9804,13 +10007,13 @@
     "requirements": [
       {
         "skill": "取引",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "取引",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "150",
     "delay": "750",
@@ -9829,13 +10032,13 @@
     "requirements": [
       {
         "skill": "栽培",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "栽培",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "60",
     "delay": "480",
@@ -9854,13 +10057,13 @@
     "requirements": [
       {
         "skill": "パフォーマンス",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "パフォーマンス",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "100",
     "delay": "1100",
@@ -9879,13 +10082,13 @@
     "requirements": [
       {
         "skill": "料理",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "料理",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "450",
     "delay": "1450",
@@ -9904,13 +10107,13 @@
     "requirements": [
       {
         "skill": "取引",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "取引",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "150",
     "delay": "1650",
@@ -9929,13 +10132,13 @@
     "requirements": [
       {
         "skill": "採掘",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "採掘",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "270",
     "delay": "2000",
@@ -9954,13 +10157,13 @@
     "requirements": [
       {
         "skill": "料理",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "料理",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "150",
     "delay": "750",
@@ -9979,13 +10182,13 @@
     "requirements": [
       {
         "skill": "栽培",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "栽培",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "200",
     "delay": "1200",
@@ -10004,13 +10207,13 @@
     "requirements": [
       {
         "skill": "料理",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "料理",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "150",
     "delay": "750",
@@ -10029,13 +10232,13 @@
     "requirements": [
       {
         "skill": "召喚魔法",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "召喚魔法",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 10.0
+      "st": 10
     },
     "castTime": "150",
     "delay": "2400",
@@ -10054,13 +10257,13 @@
     "requirements": [
       {
         "skill": "召喚魔法",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "召喚魔法",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "150",
     "delay": "10950",
@@ -10079,13 +10282,13 @@
     "requirements": [
       {
         "skill": "パフォーマンス",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "パフォーマンス",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "150",
     "delay": "750",
@@ -10104,13 +10307,13 @@
     "requirements": [
       {
         "skill": "戦闘技術",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "戦闘技術",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "60",
     "delay": "360",
@@ -10129,13 +10332,13 @@
     "requirements": [
       {
         "skill": "召喚魔法",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "召喚魔法",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "150",
     "delay": "750",
@@ -10154,13 +10357,13 @@
     "requirements": [
       {
         "skill": "パフォーマンス",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "パフォーマンス",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "150",
     "delay": "750",
@@ -10179,13 +10382,13 @@
     "requirements": [
       {
         "skill": "料理",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "料理",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "150",
     "delay": "750",
@@ -10204,13 +10407,13 @@
     "requirements": [
       {
         "skill": "取引",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "取引",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "150",
     "delay": "750",
@@ -10229,13 +10432,13 @@
     "requirements": [
       {
         "skill": "料理",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "料理",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "450",
     "delay": "1450",
@@ -10254,13 +10457,13 @@
     "requirements": [
       {
         "skill": "音楽",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "音楽",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "150",
     "delay": "750",
@@ -10279,13 +10482,13 @@
     "requirements": [
       {
         "skill": "召喚魔法",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "召喚魔法",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 30.0
+      "st": 30
     },
     "castTime": "150",
     "delay": "2150",
@@ -10304,13 +10507,13 @@
     "requirements": [
       {
         "skill": "薬調合",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "薬調合",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "120",
     "delay": "1200",
@@ -10329,13 +10532,13 @@
     "requirements": [
       {
         "skill": "料理",
-        "min": 10.0
+        "min": 10
       }
     ],
     "successSkill": "料理",
-    "successRequired": 10.0,
+    "successRequired": 10,
     "cost": {
-      "st": 40.0
+      "st": 40
     },
     "castTime": "150",
     "delay": "750",
@@ -10354,13 +10557,13 @@
     "requirements": [
       {
         "skill": "料理",
-        "min": 10.0
+        "min": 10
       }
     ],
     "successSkill": "料理",
-    "successRequired": 10.0,
+    "successRequired": 10,
     "cost": {
-      "st": 40.0
+      "st": 40
     },
     "castTime": "150",
     "delay": "750",
@@ -10379,13 +10582,13 @@
     "requirements": [
       {
         "skill": "取引",
-        "min": 10.0
+        "min": 10
       }
     ],
     "successSkill": "取引",
-    "successRequired": 10.0,
+    "successRequired": 10,
     "cost": {
-      "st": 40.0
+      "st": 40
     },
     "castTime": "150",
     "delay": "750",
@@ -10404,13 +10607,13 @@
     "requirements": [
       {
         "skill": "取引",
-        "min": 10.0
+        "min": 10
       }
     ],
     "successSkill": "取引",
-    "successRequired": 10.0,
+    "successRequired": 10,
     "cost": {
-      "st": 40.0
+      "st": 40
     },
     "castTime": "150",
     "delay": "750",
@@ -10429,13 +10632,13 @@
     "requirements": [
       {
         "skill": "取引",
-        "min": 10.0
+        "min": 10
       }
     ],
     "successSkill": "取引",
-    "successRequired": 10.0,
+    "successRequired": 10,
     "cost": {
-      "st": 40.0
+      "st": 40
     },
     "castTime": "150",
     "delay": "750",
@@ -10454,13 +10657,13 @@
     "requirements": [
       {
         "skill": "取引",
-        "min": 10.0
+        "min": 10
       }
     ],
     "successSkill": "取引",
-    "successRequired": 10.0,
+    "successRequired": 10,
     "cost": {
-      "st": 40.0
+      "st": 40
     },
     "castTime": "150",
     "delay": "750",
@@ -10479,13 +10682,13 @@
     "requirements": [
       {
         "skill": "取引",
-        "min": 12.0
+        "min": 12
       }
     ],
     "successSkill": "取引",
-    "successRequired": 12.0,
+    "successRequired": 12,
     "cost": {
-      "st": 25.0
+      "st": 25
     },
     "castTime": "150",
     "delay": "1225",
@@ -10504,13 +10707,13 @@
     "requirements": [
       {
         "skill": "美容",
-        "min": 15.0
+        "min": 15
       }
     ],
     "successSkill": "美容",
-    "successRequired": 15.0,
+    "successRequired": 15,
     "cost": {
-      "st": 15.0
+      "st": 15
     },
     "castTime": "150",
     "delay": "750",
@@ -10529,13 +10732,13 @@
     "requirements": [
       {
         "skill": "料理",
-        "min": 30.0
+        "min": 30
       }
     ],
     "successSkill": "料理",
-    "successRequired": 30.0,
+    "successRequired": 30,
     "cost": {
-      "st": 10.0
+      "st": 10
     },
     "castTime": "150",
     "delay": "20150",
@@ -10554,17 +10757,17 @@
     "requirements": [
       {
         "skill": "銃器",
-        "min": 30.0
+        "min": 30
       },
       {
         "skill": "鍛冶",
-        "min": 30.0
+        "min": 30
       }
     ],
     "successSkill": "銃器",
-    "successRequired": 30.0,
+    "successRequired": 30,
     "cost": {
-      "st": 15.0
+      "st": 15
     },
     "castTime": "100",
     "delay": "700",
@@ -10583,13 +10786,13 @@
     "requirements": [
       {
         "skill": "取引",
-        "min": 40.0
+        "min": 40
       }
     ],
     "successSkill": "取引",
-    "successRequired": 40.0,
+    "successRequired": 40,
     "cost": {
-      "st": 20.0
+      "st": 20
     },
     "castTime": "150",
     "delay": "1650",
@@ -10608,17 +10811,17 @@
     "requirements": [
       {
         "skill": "罠",
-        "min": 50.0
+        "min": 50
       },
       {
         "skill": "暗黒命令",
-        "min": 40.0
+        "min": 40
       }
     ],
     "successSkill": "罠",
-    "successRequired": 50.0,
+    "successRequired": 50,
     "cost": {
-      "st": 23.0
+      "st": 23
     },
     "castTime": "150",
     "delay": "2150",
@@ -10637,13 +10840,13 @@
     "requirements": [
       {
         "skill": "薬調合",
-        "min": 40.0
+        "min": 40
       }
     ],
     "successSkill": "薬調合",
-    "successRequired": 40.0,
+    "successRequired": 40,
     "cost": {
-      "st": 19.0
+      "st": 19
     },
     "castTime": "100",
     "delay": "1300",
@@ -10662,17 +10865,17 @@
     "requirements": [
       {
         "skill": "銃器",
-        "min": 90.0
+        "min": 90
       },
       {
         "skill": "神秘魔法",
-        "min": 40.0
+        "min": 40
       }
     ],
     "successSkill": "銃器",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 45.0
+      "st": 45
     },
     "castTime": "150",
     "delay": "2500",
@@ -10691,17 +10894,17 @@
     "requirements": [
       {
         "skill": "木工",
-        "min": 40.0
+        "min": 40
       },
       {
         "skill": "鍛冶",
-        "min": 40.0
+        "min": 40
       }
     ],
     "successSkill": "木工",
-    "successRequired": 40.0,
+    "successRequired": 40,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "60",
     "delay": "660",
@@ -10720,17 +10923,17 @@
     "requirements": [
       {
         "skill": "罠",
-        "min": 70.0
+        "min": 70
       },
       {
         "skill": "暗黒命令",
-        "min": 50.0
+        "min": 50
       }
     ],
     "successSkill": "罠",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "100",
     "delay": "2300",
@@ -10749,13 +10952,13 @@
     "requirements": [
       {
         "skill": "音楽",
-        "min": 50.0
+        "min": 50
       }
     ],
     "successSkill": "音楽",
-    "successRequired": 50.0,
+    "successRequired": 50,
     "cost": {
-      "st": 23.0
+      "st": 23
     },
     "castTime": "120",
     "delay": "1620",
@@ -10774,13 +10977,13 @@
     "requirements": [
       {
         "skill": "銃器",
-        "min": 50.0
+        "min": 50
       }
     ],
     "successSkill": "銃器",
-    "successRequired": 50.0,
+    "successRequired": 50,
     "cost": {
-      "st": 23.0
+      "st": 23
     },
     "castTime": "150",
     "delay": "1950",
@@ -10799,13 +11002,13 @@
     "requirements": [
       {
         "skill": "取引",
-        "min": 50.0
+        "min": 50
       }
     ],
     "successSkill": "取引",
-    "successRequired": 50.0,
+    "successRequired": 50,
     "cost": {
-      "st": 23.0
+      "st": 23
     },
     "castTime": "200",
     "delay": "2000",
@@ -10824,17 +11027,17 @@
     "requirements": [
       {
         "skill": "罠",
-        "min": 60.0
+        "min": 60
       },
       {
         "skill": "暗黒命令",
-        "min": 60.0
+        "min": 60
       }
     ],
     "successSkill": "罠",
-    "successRequired": 60.0,
+    "successRequired": 60,
     "cost": {
-      "st": 28.0
+      "st": 28
     },
     "castTime": "100",
     "delay": "1500",
@@ -10853,17 +11056,17 @@
     "requirements": [
       {
         "skill": "物まね",
-        "min": 80.0
+        "min": 80
       },
       {
         "skill": "戦闘技術",
-        "min": 60.0
+        "min": 60
       }
     ],
     "successSkill": "物まね",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "150",
     "delay": "2150",
@@ -10882,17 +11085,17 @@
     "requirements": [
       {
         "skill": "栽培",
-        "min": 60.0
+        "min": 60
       },
       {
         "skill": "薬調合",
-        "min": 60.0
+        "min": 60
       }
     ],
     "successSkill": "栽培",
-    "successRequired": 60.0,
+    "successRequired": 60,
     "cost": {
-      "st": 28.0
+      "st": 28
     },
     "castTime": "100",
     "delay": "1300",
@@ -10911,13 +11114,13 @@
     "requirements": [
       {
         "skill": "シャウト",
-        "min": 60.0
+        "min": 60
       }
     ],
     "successSkill": "シャウト",
-    "successRequired": 60.0,
+    "successRequired": 60,
     "cost": {
-      "st": 28.0
+      "st": 28
     },
     "castTime": "160",
     "delay": "1350",
@@ -10936,13 +11139,13 @@
     "requirements": [
       {
         "skill": "戦闘技術",
-        "min": 60.0
+        "min": 60
       }
     ],
     "successSkill": "戦闘技術",
-    "successRequired": 60.0,
+    "successRequired": 60,
     "cost": {
-      "st": 28.0
+      "st": 28
     },
     "castTime": "150",
     "delay": "1500",
@@ -10961,17 +11164,17 @@
     "requirements": [
       {
         "skill": "盾",
-        "min": 80.0
+        "min": 80
       },
       {
         "skill": "戦闘技術",
-        "min": 60.0
+        "min": 60
       }
     ],
     "successSkill": "盾",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "120",
     "delay": "2120",
@@ -10990,17 +11193,17 @@
     "requirements": [
       {
         "skill": "木工",
-        "min": 60.0
+        "min": 60
       },
       {
         "skill": "鍛冶",
-        "min": 60.0
+        "min": 60
       }
     ],
     "successSkill": "木工",
-    "successRequired": 60.0,
+    "successRequired": 60,
     "cost": {
-      "st": 28.0
+      "st": 28
     },
     "castTime": "150",
     "delay": "1800",
@@ -11019,13 +11222,13 @@
     "requirements": [
       {
         "skill": "水泳",
-        "min": 60.0
+        "min": 60
       }
     ],
     "successSkill": "水泳",
-    "successRequired": 60.0,
+    "successRequired": 60,
     "cost": {
-      "st": 28.0
+      "st": 28
     },
     "castTime": "150",
     "delay": "1050",
@@ -11044,17 +11247,17 @@
     "requirements": [
       {
         "skill": "銃器",
-        "min": 70.0
+        "min": 70
       },
       {
         "skill": "精神力",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "銃器",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "200",
     "delay": "2200",
@@ -11073,17 +11276,17 @@
     "requirements": [
       {
         "skill": "銃器",
-        "min": 90.0
+        "min": 90
       },
       {
         "skill": "戦闘技術",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "銃器",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 45.0
+      "st": 45
     },
     "castTime": "150",
     "delay": "1950",
@@ -11102,13 +11305,13 @@
     "requirements": [
       {
         "skill": "精神力",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "精神力",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "200",
     "delay": "2200",
@@ -11127,13 +11330,13 @@
     "requirements": [
       {
         "skill": "罠",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "罠",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "60",
     "delay": "1260",
@@ -11152,17 +11355,17 @@
     "requirements": [
       {
         "skill": "魔法熟練",
-        "min": 70.0
+        "min": 70
       },
       {
         "skill": "生命力",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "魔法熟練",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "100",
     "delay": "2000",
@@ -11181,13 +11384,13 @@
     "requirements": [
       {
         "skill": "召喚魔法",
-        "min": 78.0
+        "min": 78
       }
     ],
     "successSkill": "召喚魔法",
-    "successRequired": 78.0,
+    "successRequired": 78,
     "cost": {
-      "st": 78.0
+      "st": 78
     },
     "castTime": "200",
     "delay": "7800",
@@ -11206,17 +11409,17 @@
     "requirements": [
       {
         "skill": "盾",
-        "min": 80.0
+        "min": 80
       },
       {
         "skill": "着こなし",
-        "min": 80.0
+        "min": 80
       }
     ],
     "successSkill": "盾",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "120",
     "delay": "2120",
@@ -11235,13 +11438,13 @@
     "requirements": [
       {
         "skill": "自然調和",
-        "min": 80.0
+        "min": 80
       }
     ],
     "successSkill": "自然調和",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "120",
     "delay": "2120",
@@ -11260,17 +11463,17 @@
     "requirements": [
       {
         "skill": "魔法熟練",
-        "min": 80.0
+        "min": 80
       },
       {
         "skill": "召喚魔法",
-        "min": 80.0
+        "min": 80
       }
     ],
     "successSkill": "魔法熟練",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 46.0
+      "st": 46
     },
     "castTime": "450",
     "delay": "2450",
@@ -11289,13 +11492,13 @@
     "requirements": [
       {
         "skill": "罠",
-        "min": 90.0
+        "min": 90
       }
     ],
     "successSkill": "罠",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 45.0
+      "st": 45
     },
     "castTime": "120",
     "delay": "2120",
@@ -11314,13 +11517,13 @@
     "requirements": [
       {
         "skill": "回復魔法",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "回復魔法",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 20.0
+      "st": 20
     },
     "castTime": "130",
     "delay": "650",
@@ -11339,13 +11542,13 @@
     "requirements": [
       {
         "skill": "包帯",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "包帯",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 10.0
+      "st": 10
     },
     "castTime": "120",
     "delay": "1000",
@@ -11364,13 +11567,13 @@
     "requirements": [
       {
         "skill": "神秘魔法",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "神秘魔法",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 20.0
+      "st": 20
     },
     "castTime": "250",
     "delay": "36000",
@@ -11389,13 +11592,13 @@
     "requirements": [
       {
         "skill": "生命力",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "生命力",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 35.0
+      "st": 35
     },
     "castTime": "200",
     "delay": "4200",
@@ -11414,13 +11617,13 @@
     "requirements": [
       {
         "skill": "精神力",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "精神力",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 25.0
+      "st": 25
     },
     "castTime": "150",
     "delay": "950",
@@ -11439,13 +11642,13 @@
     "requirements": [
       {
         "skill": "精神力",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "精神力",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 35.0
+      "st": 35
     },
     "castTime": "200",
     "delay": "3200",
@@ -11464,13 +11667,13 @@
     "requirements": [
       {
         "skill": "弓",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "弓",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 15.0
+      "st": 15
     },
     "castTime": "140",
     "delay": "1500",
@@ -11489,13 +11692,13 @@
     "requirements": [
       {
         "skill": "精神力",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "精神力",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 30.0
+      "st": 30
     },
     "castTime": "130",
     "delay": "650",
@@ -11514,13 +11717,13 @@
     "requirements": [
       {
         "skill": "音楽",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "音楽",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "280",
     "delay": "1000",
@@ -11539,17 +11742,17 @@
     "requirements": [
       {
         "skill": "暗黒命令",
-        "min": 10.0
+        "min": 10
       },
       {
         "skill": "筋力",
-        "min": 50.0
+        "min": 50
       }
     ],
     "successSkill": "暗黒命令",
-    "successRequired": 10.0,
+    "successRequired": 10,
     "cost": {
-      "st": 15.0
+      "st": 15
     },
     "castTime": "170",
     "delay": "750",
@@ -11568,17 +11771,17 @@
     "requirements": [
       {
         "skill": "銃器",
-        "min": 70.0
+        "min": 70
       },
       {
         "skill": "回復魔法",
-        "min": 20.0
+        "min": 20
       }
     ],
     "successSkill": "銃器",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "135",
     "delay": "800",
@@ -11597,13 +11800,13 @@
     "requirements": [
       {
         "skill": "ダンス",
-        "min": 30.0
+        "min": 30
       }
     ],
     "successSkill": "ダンス",
-    "successRequired": 30.0,
+    "successRequired": 30,
     "cost": {
-      "st": 15.0
+      "st": 15
     },
     "castTime": "400",
     "delay": "400",
@@ -11622,13 +11825,13 @@
     "requirements": [
       {
         "skill": "パフォーマンス",
-        "min": 30.0
+        "min": 30
       }
     ],
     "successSkill": "パフォーマンス",
-    "successRequired": 30.0,
+    "successRequired": 30,
     "cost": {
-      "st": 15.0
+      "st": 15
     },
     "castTime": "200",
     "delay": "1500",
@@ -11647,17 +11850,17 @@
     "requirements": [
       {
         "skill": "生命力",
-        "min": 40.0
+        "min": 40
       },
       {
         "skill": "持久力",
-        "min": 40.0
+        "min": 40
       }
     ],
     "successSkill": "生命力",
-    "successRequired": 40.0,
+    "successRequired": 40,
     "cost": {
-      "st": 21.0
+      "st": 21
     },
     "castTime": "184",
     "delay": "1840",
@@ -11676,17 +11879,17 @@
     "requirements": [
       {
         "skill": "盗み",
-        "min": 40.0
+        "min": 40
       },
       {
         "skill": "死の魔法",
-        "min": 40.0
+        "min": 40
       }
     ],
     "successSkill": "盗み",
-    "successRequired": 40.0,
+    "successRequired": 40,
     "cost": {
-      "st": 19.0
+      "st": 19
     },
     "castTime": "150",
     "delay": "1150",
@@ -11705,17 +11908,17 @@
     "requirements": [
       {
         "skill": "自然調和",
-        "min": 60.0
+        "min": 60
       },
       {
         "skill": "自然回復",
-        "min": 40.0
+        "min": 40
       }
     ],
     "successSkill": "自然調和",
-    "successRequired": 60.0,
+    "successRequired": 60,
     "cost": {
-      "st": 28.0
+      "st": 28
     },
     "castTime": "150",
     "delay": "1350",
@@ -11734,13 +11937,13 @@
     "requirements": [
       {
         "skill": "薬調合",
-        "min": 40.0
+        "min": 40
       }
     ],
     "successSkill": "薬調合",
-    "successRequired": 40.0,
+    "successRequired": 40,
     "cost": {
-      "st": 19.0
+      "st": 19
     },
     "castTime": "120",
     "delay": "1920",
@@ -11759,17 +11962,17 @@
     "requirements": [
       {
         "skill": "パフォーマンス",
-        "min": 60.0
+        "min": 60
       },
       {
         "skill": "ダンス",
-        "min": 40.0
+        "min": 40
       }
     ],
     "successSkill": "パフォーマンス",
-    "successRequired": 60.0,
+    "successRequired": 60,
     "cost": {
-      "st": 28.0
+      "st": 28
     },
     "castTime": "220",
     "delay": "2220",
@@ -11788,13 +11991,13 @@
     "requirements": [
       {
         "skill": "調教",
-        "min": 50.0
+        "min": 50
       }
     ],
     "successSkill": "調教",
-    "successRequired": 50.0,
+    "successRequired": 50,
     "cost": {
-      "st": 23.0
+      "st": 23
     },
     "castTime": "220",
     "delay": "1120",
@@ -11813,13 +12016,13 @@
     "requirements": [
       {
         "skill": "音楽",
-        "min": 50.0
+        "min": 50
       }
     ],
     "successSkill": "音楽",
-    "successRequired": 50.0,
+    "successRequired": 50,
     "cost": {
-      "st": 23.0
+      "st": 23
     },
     "castTime": "250",
     "delay": "900",
@@ -11838,13 +12041,13 @@
     "requirements": [
       {
         "skill": "音楽",
-        "min": 50.0
+        "min": 50
       }
     ],
     "successSkill": "音楽",
-    "successRequired": 50.0,
+    "successRequired": 50,
     "cost": {
-      "st": 23.0
+      "st": 23
     },
     "castTime": "250",
     "delay": "900",
@@ -11863,13 +12066,13 @@
     "requirements": [
       {
         "skill": "戦闘技術",
-        "min": 60.0
+        "min": 60
       }
     ],
     "successSkill": "戦闘技術",
-    "successRequired": 60.0,
+    "successRequired": 60,
     "cost": {
-      "st": 28.0
+      "st": 28
     },
     "castTime": "280",
     "delay": "1780",
@@ -11888,21 +12091,21 @@
     "requirements": [
       {
         "skill": "自然調和",
-        "min": 90.0
+        "min": 90
       },
       {
         "skill": "回復魔法",
-        "min": 60.0
+        "min": 60
       },
       {
         "skill": "魔法熟練",
-        "min": 60.0
+        "min": 60
       }
     ],
     "successSkill": "自然調和",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 100.0
+      "st": 100
     },
     "castTime": "300",
     "delay": "7200",
@@ -11921,13 +12124,13 @@
     "requirements": [
       {
         "skill": "回復魔法",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "回復魔法",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "150",
     "delay": "7200",
@@ -11946,21 +12149,21 @@
     "requirements": [
       {
         "skill": "自然調和",
-        "min": 70.0
+        "min": 70
       },
       {
         "skill": "魔法熟練",
-        "min": 70.0
+        "min": 70
       },
       {
         "skill": "自然回復",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "自然調和",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 40.0
+      "st": 40
     },
     "castTime": "300",
     "delay": "1500",
@@ -11979,13 +12182,13 @@
     "requirements": [
       {
         "skill": "回復魔法",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "回復魔法",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 50.0
+      "st": 50
     },
     "castTime": "280",
     "delay": "18280",
@@ -12004,17 +12207,17 @@
     "requirements": [
       {
         "skill": "ダンス",
-        "min": 70.0
+        "min": 70
       },
       {
         "skill": "音楽",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "ダンス",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "510",
     "delay": "1850",
@@ -12033,17 +12236,17 @@
     "requirements": [
       {
         "skill": "戦闘技術",
-        "min": 80.0
+        "min": 80
       },
       {
         "skill": "神秘魔法",
-        "min": 80.0
+        "min": 80
       }
     ],
     "successSkill": "戦闘技術",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 0.0
+      "st": 0
     },
     "castTime": "200",
     "delay": "1200",
@@ -12062,13 +12265,13 @@
     "requirements": [
       {
         "skill": "調教",
-        "min": 90.0
+        "min": 90
       }
     ],
     "successSkill": "調教",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 45.0
+      "st": 45
     },
     "castTime": "220",
     "delay": "1020",
@@ -12087,13 +12290,13 @@
     "requirements": [
       {
         "skill": "調教",
-        "min": 90.0
+        "min": 90
       }
     ],
     "successSkill": "調教",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 45.0
+      "st": 45
     },
     "castTime": "250",
     "delay": "4250",
@@ -12112,13 +12315,13 @@
     "requirements": [
       {
         "skill": "暗黒命令",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "暗黒命令",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 20.0
+      "st": 20
     },
     "castTime": "150",
     "delay": "1500",
@@ -12138,13 +12341,13 @@
     "requirements": [
       {
         "skill": "銃器",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "銃器",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "120",
     "delay": "480",
@@ -12164,13 +12367,13 @@
     "requirements": [
       {
         "skill": "採掘",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "採掘",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 10.0
+      "st": 10
     },
     "castTime": "200",
     "delay": "1000",
@@ -12190,13 +12393,13 @@
     "requirements": [
       {
         "skill": "キック",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "キック",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "120",
     "delay": "300",
@@ -12216,13 +12419,13 @@
     "requirements": [
       {
         "skill": "精神力",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "精神力",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 60.0
+      "st": 60
     },
     "castTime": "180",
     "delay": "1080",
@@ -12242,13 +12445,13 @@
     "requirements": [
       {
         "skill": "筋力",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "筋力",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 10.0
+      "st": 10
     },
     "castTime": "120",
     "delay": "1320",
@@ -12268,13 +12471,13 @@
     "requirements": [
       {
         "skill": "精神力",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "精神力",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 20.0
+      "st": 20
     },
     "castTime": "100",
     "delay": "900",
@@ -12294,13 +12497,13 @@
     "requirements": [
       {
         "skill": "こんぼう",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "こんぼう",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "130",
     "delay": "720",
@@ -12320,13 +12523,13 @@
     "requirements": [
       {
         "skill": "採掘",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "採掘",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "105",
     "delay": "950",
@@ -12346,13 +12549,13 @@
     "requirements": [
       {
         "skill": "筋力",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "筋力",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 30.0
+      "st": 30
     },
     "castTime": "200",
     "delay": "1800",
@@ -12372,13 +12575,13 @@
     "requirements": [
       {
         "skill": "筋力",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "筋力",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 10.0
+      "st": 10
     },
     "castTime": "40",
     "delay": "40",
@@ -12398,13 +12601,13 @@
     "requirements": [
       {
         "skill": "筋力",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "筋力",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 40.0
+      "st": 40
     },
     "castTime": "180",
     "delay": "600",
@@ -12424,13 +12627,13 @@
     "requirements": [
       {
         "skill": "銃器",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "銃器",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 20.0
+      "st": 20
     },
     "castTime": "120",
     "delay": "1600",
@@ -12450,13 +12653,13 @@
     "requirements": [
       {
         "skill": "筋力",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "筋力",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 20.0
+      "st": 20
     },
     "castTime": "120",
     "delay": "900",
@@ -12476,13 +12679,13 @@
     "requirements": [
       {
         "skill": "精神力",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "精神力",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 20.0
+      "st": 20
     },
     "castTime": "130",
     "delay": "450",
@@ -12502,13 +12705,13 @@
     "requirements": [
       {
         "skill": "銃器",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "銃器",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 20.0
+      "st": 20
     },
     "castTime": "200",
     "delay": "1400",
@@ -12528,13 +12731,13 @@
     "requirements": [
       {
         "skill": "包帯",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "包帯",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 10.0
+      "st": 10
     },
     "castTime": "120",
     "delay": "1100",
@@ -12554,13 +12757,13 @@
     "requirements": [
       {
         "skill": "破壊魔法",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "破壊魔法",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 20.0
+      "st": 20
     },
     "castTime": "130",
     "delay": "450",
@@ -12580,13 +12783,13 @@
     "requirements": [
       {
         "skill": "精神力",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "精神力",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 20.0
+      "st": 20
     },
     "castTime": "40",
     "delay": "80",
@@ -12606,13 +12809,13 @@
     "requirements": [
       {
         "skill": "筋力",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "筋力",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 35.0
+      "st": 35
     },
     "castTime": "130",
     "delay": "1800",
@@ -12632,13 +12835,13 @@
     "requirements": [
       {
         "skill": "こんぼう",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "こんぼう",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 25.0
+      "st": 25
     },
     "castTime": "100",
     "delay": "1200",
@@ -12658,13 +12861,13 @@
     "requirements": [
       {
         "skill": "精神力",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "精神力",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 25.0
+      "st": 25
     },
     "castTime": "170",
     "delay": "1300",
@@ -12684,13 +12887,13 @@
     "requirements": [
       {
         "skill": "素手",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "素手",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 25.0
+      "st": 25
     },
     "castTime": "100",
     "delay": "1300",
@@ -12710,13 +12913,13 @@
     "requirements": [
       {
         "skill": "刀剣",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "刀剣",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 25.0
+      "st": 25
     },
     "castTime": "120",
     "delay": "1300",
@@ -12736,13 +12939,13 @@
     "requirements": [
       {
         "skill": "銃器",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "銃器",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 35.0
+      "st": 35
     },
     "castTime": "160",
     "delay": "1800",
@@ -12762,13 +12965,13 @@
     "requirements": [
       {
         "skill": "銃器",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "銃器",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 35.0
+      "st": 35
     },
     "castTime": "180",
     "delay": "2000",
@@ -12788,13 +12991,13 @@
     "requirements": [
       {
         "skill": "筋力",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "筋力",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 35.0
+      "st": 35
     },
     "castTime": "215",
     "delay": "2400",
@@ -12814,13 +13017,13 @@
     "requirements": [
       {
         "skill": "こんぼう",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "こんぼう",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 35.0
+      "st": 35
     },
     "castTime": "120",
     "delay": "1500",
@@ -12840,13 +13043,13 @@
     "requirements": [
       {
         "skill": "こんぼう",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "こんぼう",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 35.0
+      "st": 35
     },
     "castTime": "130",
     "delay": "1800",
@@ -12866,13 +13069,13 @@
     "requirements": [
       {
         "skill": "銃器",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "銃器",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 25.0
+      "st": 25
     },
     "castTime": "130",
     "delay": "1300",
@@ -12892,13 +13095,13 @@
     "requirements": [
       {
         "skill": "素手",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "素手",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 25.0
+      "st": 25
     },
     "castTime": "120",
     "delay": "1300",
@@ -12918,13 +13121,13 @@
     "requirements": [
       {
         "skill": "銃器",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "銃器",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 35.0
+      "st": 35
     },
     "castTime": "200",
     "delay": "1800",
@@ -12944,13 +13147,13 @@
     "requirements": [
       {
         "skill": "銃器",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "銃器",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 25.0
+      "st": 25
     },
     "castTime": "160",
     "delay": "1300",
@@ -12970,13 +13173,13 @@
     "requirements": [
       {
         "skill": "刀剣",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "刀剣",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 25.0
+      "st": 25
     },
     "castTime": "150",
     "delay": "1300",
@@ -12996,13 +13199,13 @@
     "requirements": [
       {
         "skill": "筋力",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "筋力",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 25.0
+      "st": 25
     },
     "castTime": "130",
     "delay": "2000",
@@ -13022,13 +13225,13 @@
     "requirements": [
       {
         "skill": "銃器",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "銃器",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 25.0
+      "st": 25
     },
     "castTime": "130",
     "delay": "1200",
@@ -13048,13 +13251,13 @@
     "requirements": [
       {
         "skill": "銃器",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "銃器",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 25.0
+      "st": 25
     },
     "castTime": "180",
     "delay": "1400",
@@ -13074,13 +13277,13 @@
     "requirements": [
       {
         "skill": "筋力",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "筋力",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 30.0
+      "st": 30
     },
     "castTime": "60",
     "delay": "1200",
@@ -13100,13 +13303,13 @@
     "requirements": [
       {
         "skill": "死の魔法",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "死の魔法",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 20.0
+      "st": 20
     },
     "castTime": "150",
     "delay": "1000",
@@ -13126,13 +13329,13 @@
     "requirements": [
       {
         "skill": "水泳",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "水泳",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 20.0
+      "st": 20
     },
     "castTime": "100",
     "delay": "240",
@@ -13152,17 +13355,17 @@
     "requirements": [
       {
         "skill": "投げ",
-        "min": 8.0
+        "min": 8
       },
       {
         "skill": "暗黒命令",
-        "min": 8.0
+        "min": 8
       }
     ],
     "successSkill": "投げ",
-    "successRequired": 8.0,
+    "successRequired": 8,
     "cost": {
-      "st": 10.0
+      "st": 10
     },
     "castTime": "180",
     "delay": "1200",
@@ -13182,17 +13385,17 @@
     "requirements": [
       {
         "skill": "素手",
-        "min": 8.0
+        "min": 8
       },
       {
         "skill": "生命力",
-        "min": 8.0
+        "min": 8
       }
     ],
     "successSkill": "素手",
-    "successRequired": 8.0,
+    "successRequired": 8,
     "cost": {
-      "st": 12.0
+      "st": 12
     },
     "castTime": "180",
     "delay": "1050",
@@ -13212,17 +13415,17 @@
     "requirements": [
       {
         "skill": "こんぼう",
-        "min": 8.0
+        "min": 8
       },
       {
         "skill": "罠",
-        "min": 8.0
+        "min": 8
       }
     ],
     "successSkill": "こんぼう",
-    "successRequired": 8.0,
+    "successRequired": 8,
     "cost": {
-      "st": 10.0
+      "st": 10
     },
     "castTime": "130",
     "delay": "1200",
@@ -13242,21 +13445,21 @@
     "requirements": [
       {
         "skill": "キック",
-        "min": 70.0
+        "min": 70
       },
       {
         "skill": "持久力",
-        "min": 70.0
+        "min": 70
       },
       {
         "skill": "素手",
-        "min": 10.0
+        "min": 10
       }
     ],
     "successSkill": "キック",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "160",
     "delay": "1060",
@@ -13276,17 +13479,17 @@
     "requirements": [
       {
         "skill": "料理",
-        "min": 30.0
+        "min": 30
       },
       {
         "skill": "投げ",
-        "min": 10.0
+        "min": 10
       }
     ],
     "successSkill": "料理",
-    "successRequired": 30.0,
+    "successRequired": 30,
     "cost": {
-      "st": 9.0
+      "st": 9
     },
     "castTime": "110",
     "delay": "1200",
@@ -13306,17 +13509,17 @@
     "requirements": [
       {
         "skill": "刀剣",
-        "min": 10.0
+        "min": 10
       },
       {
         "skill": "戦闘技術",
-        "min": 10.0
+        "min": 10
       }
     ],
     "successSkill": "刀剣",
-    "successRequired": 10.0,
+    "successRequired": 10,
     "cost": {
-      "st": 9.0
+      "st": 9
     },
     "castTime": "150",
     "delay": "1200",
@@ -13336,17 +13539,17 @@
     "requirements": [
       {
         "skill": "パフォーマンス",
-        "min": 50.0
+        "min": 50
       },
       {
         "skill": "召喚魔法",
-        "min": 20.0
+        "min": 20
       }
     ],
     "successSkill": "パフォーマンス",
-    "successRequired": 50.0,
+    "successRequired": 50,
     "cost": {
-      "st": 23.0
+      "st": 23
     },
     "castTime": "250",
     "delay": "1140",
@@ -13366,17 +13569,17 @@
     "requirements": [
       {
         "skill": "自然調和",
-        "min": 80.0
+        "min": 80
       },
       {
         "skill": "神秘魔法",
-        "min": 20.0
+        "min": 20
       }
     ],
     "successSkill": "自然調和",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "250",
     "delay": "1650",
@@ -13396,17 +13599,17 @@
     "requirements": [
       {
         "skill": "生命力",
-        "min": 70.0
+        "min": 70
       },
       {
         "skill": "神秘魔法",
-        "min": 20.0
+        "min": 20
       }
     ],
     "successSkill": "生命力",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "150",
     "delay": "1550",
@@ -13426,17 +13629,17 @@
     "requirements": [
       {
         "skill": "素手",
-        "min": 50.0
+        "min": 50
       },
       {
         "skill": "神秘魔法",
-        "min": 20.0
+        "min": 20
       }
     ],
     "successSkill": "素手",
-    "successRequired": 50.0,
+    "successRequired": 50,
     "cost": {
-      "st": 23.0
+      "st": 23
     },
     "castTime": "90",
     "delay": "1200",
@@ -13456,17 +13659,17 @@
     "requirements": [
       {
         "skill": "銃器",
-        "min": 60.0
+        "min": 60
       },
       {
         "skill": "集中力",
-        "min": 20.0
+        "min": 20
       }
     ],
     "successSkill": "銃器",
-    "successRequired": 60.0,
+    "successRequired": 60,
     "cost": {
-      "st": 28.0
+      "st": 28
     },
     "castTime": "60",
     "delay": "400",
@@ -13486,17 +13689,17 @@
     "requirements": [
       {
         "skill": "素手",
-        "min": 60.0
+        "min": 60
       },
       {
         "skill": "パフォーマンス",
-        "min": 20.0
+        "min": 20
       }
     ],
     "successSkill": "素手",
-    "successRequired": 60.0,
+    "successRequired": 60,
     "cost": {
-      "st": 28.0
+      "st": 28
     },
     "castTime": "120",
     "delay": "900",
@@ -13516,13 +13719,13 @@
     "requirements": [
       {
         "skill": "生命力",
-        "min": 30.0
+        "min": 30
       }
     ],
     "successSkill": "生命力",
-    "successRequired": 30.0,
+    "successRequired": 30,
     "cost": {
-      "st": 20.0
+      "st": 20
     },
     "castTime": "200",
     "delay": "900",
@@ -13542,13 +13745,13 @@
     "requirements": [
       {
         "skill": "水泳",
-        "min": 30.0
+        "min": 30
       }
     ],
     "successSkill": "水泳",
-    "successRequired": 30.0,
+    "successRequired": 30,
     "cost": {
-      "st": 15.0
+      "st": 15
     },
     "castTime": "140",
     "delay": "1240",
@@ -13568,17 +13771,17 @@
     "requirements": [
       {
         "skill": "弓",
-        "min": 70.0
+        "min": 70
       },
       {
         "skill": "盗み",
-        "min": 30.0
+        "min": 30
       }
     ],
     "successSkill": "弓",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "140",
     "delay": "1200",
@@ -13598,13 +13801,13 @@
     "requirements": [
       {
         "skill": "罠",
-        "min": 30.0
+        "min": 30
       }
     ],
     "successSkill": "罠",
-    "successRequired": 30.0,
+    "successRequired": 30,
     "cost": {
-      "st": 15.0
+      "st": 15
     },
     "castTime": "150",
     "delay": "1650",
@@ -13624,17 +13827,17 @@
     "requirements": [
       {
         "skill": "投げ",
-        "min": 30.0
+        "min": 30
       },
       {
         "skill": "薬調合",
-        "min": 30.0
+        "min": 30
       }
     ],
     "successSkill": "投げ",
-    "successRequired": 30.0,
+    "successRequired": 30,
     "cost": {
-      "st": 19.0
+      "st": 19
     },
     "castTime": "120",
     "delay": "920",
@@ -13654,13 +13857,13 @@
     "requirements": [
       {
         "skill": "精神力",
-        "min": 30.0
+        "min": 30
       }
     ],
     "successSkill": "精神力",
-    "successRequired": 30.0,
+    "successRequired": 30,
     "cost": {
-      "st": 20.0
+      "st": 20
     },
     "castTime": "200",
     "delay": "1200",
@@ -13680,17 +13883,17 @@
     "requirements": [
       {
         "skill": "弓",
-        "min": 90.0
+        "min": 90
       },
       {
         "skill": "集中力",
-        "min": 30.0
+        "min": 30
       }
     ],
     "successSkill": "弓",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 45.0
+      "st": 45
     },
     "castTime": "250",
     "delay": "1200",
@@ -13710,13 +13913,13 @@
     "requirements": [
       {
         "skill": "暗黒命令",
-        "min": 30.0
+        "min": 30
       }
     ],
     "successSkill": "暗黒命令",
-    "successRequired": 30.0,
+    "successRequired": 30,
     "cost": {
-      "st": 28.0
+      "st": 28
     },
     "castTime": "150",
     "delay": "1150",
@@ -13736,13 +13939,13 @@
     "requirements": [
       {
         "skill": "料理",
-        "min": 30.0
+        "min": 30
       }
     ],
     "successSkill": "料理",
-    "successRequired": 30.0,
+    "successRequired": 30,
     "cost": {
-      "st": 27.0
+      "st": 27
     },
     "castTime": "150",
     "delay": "1050",
@@ -13762,17 +13965,17 @@
     "requirements": [
       {
         "skill": "刀剣",
-        "min": 30.0
+        "min": 30
       },
       {
         "skill": "盗み",
-        "min": 30.0
+        "min": 30
       }
     ],
     "successSkill": "刀剣",
-    "successRequired": 30.0,
+    "successRequired": 30,
     "cost": {
-      "st": 15.0
+      "st": 15
     },
     "castTime": "120",
     "delay": "1200",
@@ -13792,13 +13995,13 @@
     "requirements": [
       {
         "skill": "素手",
-        "min": 30.0
+        "min": 30
       }
     ],
     "successSkill": "素手",
-    "successRequired": 30.0,
+    "successRequired": 30,
     "cost": {
-      "st": 15.0
+      "st": 15
     },
     "castTime": "120",
     "delay": "980",
@@ -13818,17 +14021,17 @@
     "requirements": [
       {
         "skill": "伐採",
-        "min": 30.0
+        "min": 30
       },
       {
         "skill": "木工",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "伐採",
-    "successRequired": 30.0,
+    "successRequired": 30,
     "cost": {
-      "st": 28.0
+      "st": 28
     },
     "castTime": "100",
     "delay": "800",
@@ -13848,13 +14051,13 @@
     "requirements": [
       {
         "skill": "銃器",
-        "min": 30.0
+        "min": 30
       }
     ],
     "successSkill": "銃器",
-    "successRequired": 30.0,
+    "successRequired": 30,
     "cost": {
-      "st": 20.0
+      "st": 20
     },
     "castTime": "120",
     "delay": "360",
@@ -13874,17 +14077,17 @@
     "requirements": [
       {
         "skill": "銃器",
-        "min": 80.0
+        "min": 80
       },
       {
         "skill": "破壊魔法",
-        "min": 30.0
+        "min": 30
       }
     ],
     "successSkill": "銃器",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 39.0
+      "st": 39
     },
     "castTime": "140",
     "delay": "1300",
@@ -13904,17 +14107,17 @@
     "requirements": [
       {
         "skill": "槍",
-        "min": 40.0
+        "min": 40
       },
       {
         "skill": "精神力",
-        "min": 30.0
+        "min": 30
       }
     ],
     "successSkill": "槍",
-    "successRequired": 40.0,
+    "successRequired": 40,
     "cost": {
-      "st": 30.0
+      "st": 30
     },
     "castTime": "135",
     "delay": "1100",
@@ -13934,17 +14137,17 @@
     "requirements": [
       {
         "skill": "刀剣",
-        "min": 50.0
+        "min": 50
       },
       {
         "skill": "知能",
-        "min": 30.0
+        "min": 30
       }
     ],
     "successSkill": "刀剣",
-    "successRequired": 50.0,
+    "successRequired": 50,
     "cost": {
-      "st": 23.0
+      "st": 23
     },
     "castTime": "155",
     "delay": "1100",
@@ -13964,13 +14167,13 @@
     "requirements": [
       {
         "skill": "採掘",
-        "min": 30.0
+        "min": 30
       }
     ],
     "successSkill": "採掘",
-    "successRequired": 30.0,
+    "successRequired": 30,
     "cost": {
-      "st": 15.0
+      "st": 15
     },
     "castTime": "220",
     "delay": "870",
@@ -13990,13 +14193,13 @@
     "requirements": [
       {
         "skill": "刀剣",
-        "min": 30.0
+        "min": 30
       }
     ],
     "successSkill": "刀剣",
-    "successRequired": 30.0,
+    "successRequired": 30,
     "cost": {
-      "st": 15.0
+      "st": 15
     },
     "castTime": "200",
     "delay": "2200",
@@ -14016,17 +14219,17 @@
     "requirements": [
       {
         "skill": "槍",
-        "min": 70.0
+        "min": 70
       },
       {
         "skill": "水泳",
-        "min": 40.0
+        "min": 40
       }
     ],
     "successSkill": "槍",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "180",
     "delay": "1250",
@@ -14046,17 +14249,17 @@
     "requirements": [
       {
         "skill": "弓",
-        "min": 80.0
+        "min": 80
       },
       {
         "skill": "呪文抵抗力",
-        "min": 40.0
+        "min": 40
       }
     ],
     "successSkill": "弓",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "160",
     "delay": "1200",
@@ -14076,17 +14279,17 @@
     "requirements": [
       {
         "skill": "こんぼう",
-        "min": 60.0
+        "min": 60
       },
       {
         "skill": "自然調和",
-        "min": 40.0
+        "min": 40
       }
     ],
     "successSkill": "こんぼう",
-    "successRequired": 60.0,
+    "successRequired": 60,
     "cost": {
-      "st": 28.0
+      "st": 28
     },
     "castTime": "180",
     "delay": "1300",
@@ -14106,17 +14309,17 @@
     "requirements": [
       {
         "skill": "こんぼう",
-        "min": 70.0
+        "min": 70
       },
       {
         "skill": "集中力",
-        "min": 40.0
+        "min": 40
       }
     ],
     "successSkill": "こんぼう",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "180",
     "delay": "1200",
@@ -14136,13 +14339,13 @@
     "requirements": [
       {
         "skill": "収穫",
-        "min": 40.0
+        "min": 40
       }
     ],
     "successSkill": "収穫",
-    "successRequired": 40.0,
+    "successRequired": 40,
     "cost": {
-      "st": 19.0
+      "st": 19
     },
     "castTime": "300",
     "delay": "1200",
@@ -14162,17 +14365,17 @@
     "requirements": [
       {
         "skill": "伐採",
-        "min": 40.0
+        "min": 40
       },
       {
         "skill": "木工",
-        "min": 40.0
+        "min": 40
       }
     ],
     "successSkill": "伐採",
-    "successRequired": 40.0,
+    "successRequired": 40,
     "cost": {
-      "st": 19.0
+      "st": 19
     },
     "castTime": "150",
     "delay": "1000",
@@ -14192,21 +14395,21 @@
     "requirements": [
       {
         "skill": "素手",
-        "min": 80.0
+        "min": 80
       },
       {
         "skill": "戦闘技術",
-        "min": 80.0
+        "min": 80
       },
       {
         "skill": "神秘魔法",
-        "min": 40.0
+        "min": 40
       }
     ],
     "successSkill": "素手",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "110",
     "delay": "1200",
@@ -14226,13 +14429,13 @@
     "requirements": [
       {
         "skill": "弓",
-        "min": 40.0
+        "min": 40
       }
     ],
     "successSkill": "弓",
-    "successRequired": 40.0,
+    "successRequired": 40,
     "cost": {
-      "st": 19.0
+      "st": 19
     },
     "castTime": "80",
     "delay": "600",
@@ -14252,13 +14455,13 @@
     "requirements": [
       {
         "skill": "罠",
-        "min": 40.0
+        "min": 40
       }
     ],
     "successSkill": "罠",
-    "successRequired": 40.0,
+    "successRequired": 40,
     "cost": {
-      "st": 21.0
+      "st": 21
     },
     "castTime": "60",
     "delay": "340",
@@ -14278,17 +14481,17 @@
     "requirements": [
       {
         "skill": "暗黒命令",
-        "min": 90.0
+        "min": 90
       },
       {
         "skill": "死の魔法",
-        "min": 40.0
+        "min": 40
       }
     ],
     "successSkill": "暗黒命令",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 45.0
+      "st": 45
     },
     "castTime": "150",
     "delay": "1400",
@@ -14308,13 +14511,13 @@
     "requirements": [
       {
         "skill": "牙",
-        "min": 40.0
+        "min": 40
       }
     ],
     "successSkill": "牙",
-    "successRequired": 40.0,
+    "successRequired": 40,
     "cost": {
-      "st": 19.0
+      "st": 19
     },
     "castTime": "150",
     "delay": "1200",
@@ -14334,17 +14537,17 @@
     "requirements": [
       {
         "skill": "盗み",
-        "min": 40.0
+        "min": 40
       },
       {
         "skill": "筋力",
-        "min": 50.0
+        "min": 50
       }
     ],
     "successSkill": "盗み",
-    "successRequired": 40.0,
+    "successRequired": 40,
     "cost": {
-      "st": 19.0
+      "st": 19
     },
     "castTime": "120",
     "delay": "1800",
@@ -14364,17 +14567,17 @@
     "requirements": [
       {
         "skill": "シャウト",
-        "min": 60.0
+        "min": 60
       },
       {
         "skill": "音楽",
-        "min": 40.0
+        "min": 40
       }
     ],
     "successSkill": "シャウト",
-    "successRequired": 60.0,
+    "successRequired": 60,
     "cost": {
-      "st": 28.0
+      "st": 28
     },
     "castTime": "200",
     "delay": "1000",
@@ -14394,13 +14597,13 @@
     "requirements": [
       {
         "skill": "筋力",
-        "min": 40.0
+        "min": 40
       }
     ],
     "successSkill": "筋力",
-    "successRequired": 40.0,
+    "successRequired": 40,
     "cost": {
-      "st": 20.0
+      "st": 20
     },
     "castTime": "150",
     "delay": "1150",
@@ -14420,17 +14623,17 @@
     "requirements": [
       {
         "skill": "暗黒命令",
-        "min": 40.0
+        "min": 40
       },
       {
         "skill": "精神力",
-        "min": 40.0
+        "min": 40
       }
     ],
     "successSkill": "暗黒命令",
-    "successRequired": 40.0,
+    "successRequired": 40,
     "cost": {
-      "st": 19.0
+      "st": 19
     },
     "castTime": "120",
     "delay": "920",
@@ -14450,17 +14653,17 @@
     "requirements": [
       {
         "skill": "キック",
-        "min": 40.0
+        "min": 40
       },
       {
         "skill": "戦闘技術",
-        "min": 40.0
+        "min": 40
       }
     ],
     "successSkill": "キック",
-    "successRequired": 40.0,
+    "successRequired": 40,
     "cost": {
-      "st": 19.0
+      "st": 19
     },
     "castTime": "75",
     "delay": "725",
@@ -14480,17 +14683,17 @@
     "requirements": [
       {
         "skill": "刀剣",
-        "min": 40.0
+        "min": 40
       },
       {
         "skill": "暗黒命令",
-        "min": 40.0
+        "min": 40
       }
     ],
     "successSkill": "刀剣",
-    "successRequired": 40.0,
+    "successRequired": 40,
     "cost": {
-      "st": 19.0
+      "st": 19
     },
     "castTime": "200",
     "delay": "1200",
@@ -14510,17 +14713,17 @@
     "requirements": [
       {
         "skill": "破壊魔法",
-        "min": 60.0
+        "min": 60
       },
       {
         "skill": "集中力",
-        "min": 40.0
+        "min": 40
       }
     ],
     "successSkill": "破壊魔法",
-    "successRequired": 60.0,
+    "successRequired": 60,
     "cost": {
-      "st": 28.0
+      "st": 28
     },
     "castTime": "150",
     "delay": "950",
@@ -14540,13 +14743,13 @@
     "requirements": [
       {
         "skill": "素手",
-        "min": 40.0
+        "min": 40
       }
     ],
     "successSkill": "素手",
-    "successRequired": 40.0,
+    "successRequired": 40,
     "cost": {
-      "st": 30.0
+      "st": 30
     },
     "castTime": "180",
     "delay": "1300",
@@ -14566,21 +14769,21 @@
     "requirements": [
       {
         "skill": "キック",
-        "min": 90.0
+        "min": 90
       },
       {
         "skill": "物まね",
-        "min": 40.0
+        "min": 40
       },
       {
         "skill": "パフォーマンス",
-        "min": 40.0
+        "min": 40
       }
     ],
     "successSkill": "キック",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 45.0
+      "st": 45
     },
     "castTime": "150",
     "delay": "1150",
@@ -14600,17 +14803,17 @@
     "requirements": [
       {
         "skill": "刀剣",
-        "min": 60.0
+        "min": 60
       },
       {
         "skill": "牙",
-        "min": 40.0
+        "min": 40
       }
     ],
     "successSkill": "刀剣",
-    "successRequired": 60.0,
+    "successRequired": 60,
     "cost": {
-      "st": 28.0
+      "st": 28
     },
     "castTime": "180",
     "delay": "1200",
@@ -14630,13 +14833,13 @@
     "requirements": [
       {
         "skill": "刀剣",
-        "min": 40.0
+        "min": 40
       }
     ],
     "successSkill": "刀剣",
-    "successRequired": 40.0,
+    "successRequired": 40,
     "cost": {
-      "st": 19.0
+      "st": 19
     },
     "castTime": "120",
     "delay": "800",
@@ -14656,13 +14859,13 @@
     "requirements": [
       {
         "skill": "こんぼう",
-        "min": 40.0
+        "min": 40
       }
     ],
     "successSkill": "こんぼう",
-    "successRequired": 40.0,
+    "successRequired": 40,
     "cost": {
-      "st": 0.0
+      "st": 0
     },
     "castTime": "20",
     "delay": "0",
@@ -14682,17 +14885,17 @@
     "requirements": [
       {
         "skill": "銃器",
-        "min": 80.0
+        "min": 80
       },
       {
         "skill": "鍛冶",
-        "min": 40.0
+        "min": 40
       }
     ],
     "successSkill": "銃器",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "155",
     "delay": "1500",
@@ -14712,17 +14915,17 @@
     "requirements": [
       {
         "skill": "暗黒命令",
-        "min": 60.0
+        "min": 60
       },
       {
         "skill": "精神力",
-        "min": 40.0
+        "min": 40
       }
     ],
     "successSkill": "暗黒命令",
-    "successRequired": 60.0,
+    "successRequired": 60,
     "cost": {
-      "st": 28.0
+      "st": 28
     },
     "castTime": "240",
     "delay": "1400",
@@ -14742,13 +14945,13 @@
     "requirements": [
       {
         "skill": "精神力",
-        "min": 40.0
+        "min": 40
       }
     ],
     "successSkill": "精神力",
-    "successRequired": 40.0,
+    "successRequired": 40,
     "cost": {
-      "st": 21.0
+      "st": 21
     },
     "castTime": "150",
     "delay": "1500",
@@ -14768,13 +14971,13 @@
     "requirements": [
       {
         "skill": "酩酊",
-        "min": 40.0
+        "min": 40
       }
     ],
     "successSkill": "酩酊",
-    "successRequired": 40.0,
+    "successRequired": 40,
     "cost": {
-      "st": 19.0
+      "st": 19
     },
     "castTime": "500",
     "delay": "1460",
@@ -14794,17 +14997,17 @@
     "requirements": [
       {
         "skill": "刀剣",
-        "min": 90.0
+        "min": 90
       },
       {
         "skill": "精神力",
-        "min": 40.0
+        "min": 40
       }
     ],
     "successSkill": "刀剣",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 45.0
+      "st": 45
     },
     "castTime": "180",
     "delay": "1500",
@@ -14824,17 +15027,17 @@
     "requirements": [
       {
         "skill": "弓",
-        "min": 42.0
+        "min": 42
       },
       {
         "skill": "神秘魔法",
-        "min": 42.0
+        "min": 42
       }
     ],
     "successSkill": "弓",
-    "successRequired": 42.0,
+    "successRequired": 42,
     "cost": {
-      "st": 48.0
+      "st": 48
     },
     "castTime": "155",
     "delay": "1300",
@@ -14854,17 +15057,17 @@
     "requirements": [
       {
         "skill": "暗黒命令",
-        "min": 42.0
+        "min": 42
       },
       {
         "skill": "戦闘技術",
-        "min": 42.0
+        "min": 42
       }
     ],
     "successSkill": "暗黒命令",
-    "successRequired": 42.0,
+    "successRequired": 42,
     "cost": {
-      "st": 30.0
+      "st": 30
     },
     "castTime": "240",
     "delay": "1200",
@@ -14884,17 +15087,17 @@
     "requirements": [
       {
         "skill": "こんぼう",
-        "min": 90.0
+        "min": 90
       },
       {
         "skill": "破壊魔法",
-        "min": 50.0
+        "min": 50
       }
     ],
     "successSkill": "こんぼう",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 45.0
+      "st": 45
     },
     "castTime": "190",
     "delay": "1300",
@@ -14914,17 +15117,17 @@
     "requirements": [
       {
         "skill": "暗黒命令",
-        "min": 90.0
+        "min": 90
       },
       {
         "skill": "死の魔法",
-        "min": 50.0
+        "min": 50
       }
     ],
     "successSkill": "暗黒命令",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 45.0
+      "st": 45
     },
     "castTime": "200",
     "delay": "3200",
@@ -14944,17 +15147,17 @@
     "requirements": [
       {
         "skill": "弓",
-        "min": 70.0
+        "min": 70
       },
       {
         "skill": "自然調和",
-        "min": 50.0
+        "min": 50
       }
     ],
     "successSkill": "弓",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "160",
     "delay": "1200",
@@ -14974,17 +15177,17 @@
     "requirements": [
       {
         "skill": "槍",
-        "min": 70.0
+        "min": 70
       },
       {
         "skill": "投げ",
-        "min": 50.0
+        "min": 50
       }
     ],
     "successSkill": "槍",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "130",
     "delay": "1500\n(191008以降)",
@@ -15004,13 +15207,13 @@
     "requirements": [
       {
         "skill": "筋力",
-        "min": 50.0
+        "min": 50
       }
     ],
     "successSkill": "筋力",
-    "successRequired": 50.0,
+    "successRequired": 50,
     "cost": {
-      "st": 23.0
+      "st": 23
     },
     "castTime": "150",
     "delay": "950",
@@ -15030,13 +15233,13 @@
     "requirements": [
       {
         "skill": "神秘魔法",
-        "min": 50.0
+        "min": 50
       }
     ],
     "successSkill": "神秘魔法",
-    "successRequired": 50.0,
+    "successRequired": 50,
     "cost": {
-      "st": 23.0
+      "st": 23
     },
     "castTime": "150",
     "delay": "1150",
@@ -15056,13 +15259,13 @@
     "requirements": [
       {
         "skill": "生命力",
-        "min": 50.0
+        "min": 50
       }
     ],
     "successSkill": "生命力",
-    "successRequired": 50.0,
+    "successRequired": 50,
     "cost": {
-      "st": 23.0
+      "st": 23
     },
     "castTime": "200",
     "delay": "1500",
@@ -15082,13 +15285,13 @@
     "requirements": [
       {
         "skill": "知能",
-        "min": 50.0
+        "min": 50
       }
     ],
     "successSkill": "知能",
-    "successRequired": 50.0,
+    "successRequired": 50,
     "cost": {
-      "st": 40.0
+      "st": 40
     },
     "castTime": "180",
     "delay": "1380",
@@ -15108,17 +15311,17 @@
     "requirements": [
       {
         "skill": "投げ",
-        "min": 90.0
+        "min": 90
       },
       {
         "skill": "破壊魔法",
-        "min": 50.0
+        "min": 50
       }
     ],
     "successSkill": "投げ",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 45.0
+      "st": 45
     },
     "castTime": "160",
     "delay": "1360",
@@ -15138,17 +15341,17 @@
     "requirements": [
       {
         "skill": "刀剣",
-        "min": 70.0
+        "min": 70
       },
       {
         "skill": "自然調和",
-        "min": 50.0
+        "min": 50
       }
     ],
     "successSkill": "刀剣",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "120\n(80)",
     "delay": "1200",
@@ -15168,17 +15371,17 @@
     "requirements": [
       {
         "skill": "罠",
-        "min": 60.0
+        "min": 60
       },
       {
         "skill": "自然調和",
-        "min": 50.0
+        "min": 50
       }
     ],
     "successSkill": "罠",
-    "successRequired": 60.0,
+    "successRequired": 60,
     "cost": {
-      "st": 28.0
+      "st": 28
     },
     "castTime": "60",
     "delay": "1400",
@@ -15198,17 +15401,17 @@
     "requirements": [
       {
         "skill": "罠",
-        "min": 70.0
+        "min": 70
       },
       {
         "skill": "自然調和",
-        "min": 50.0
+        "min": 50
       }
     ],
     "successSkill": "罠",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "100",
     "delay": "2000",
@@ -15228,17 +15431,17 @@
     "requirements": [
       {
         "skill": "銃器",
-        "min": 70.0
+        "min": 70
       },
       {
         "skill": "戦闘技術",
-        "min": 50.0
+        "min": 50
       }
     ],
     "successSkill": "銃器",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "120",
     "delay": "650",
@@ -15258,17 +15461,17 @@
     "requirements": [
       {
         "skill": "素手",
-        "min": 80.0
+        "min": 80
       },
       {
         "skill": "精神力",
-        "min": 50.0
+        "min": 50
       }
     ],
     "successSkill": "素手",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "200",
     "delay": "1000",
@@ -15288,13 +15491,13 @@
     "requirements": [
       {
         "skill": "自然調和",
-        "min": 60.0
+        "min": 60
       }
     ],
     "successSkill": "自然調和",
-    "successRequired": 60.0,
+    "successRequired": 60,
     "cost": {
-      "st": 28.0
+      "st": 28
     },
     "castTime": "280",
     "delay": "1700",
@@ -15314,17 +15517,17 @@
     "requirements": [
       {
         "skill": "精神力",
-        "min": 80.0
+        "min": 80
       },
       {
         "skill": "戦闘技術",
-        "min": 60.0
+        "min": 60
       }
     ],
     "successSkill": "精神力",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 39.0
+      "st": 39
     },
     "castTime": "180",
     "delay": "1500",
@@ -15344,13 +15547,13 @@
     "requirements": [
       {
         "skill": "料理",
-        "min": 60.0
+        "min": 60
       }
     ],
     "successSkill": "料理",
-    "successRequired": 60.0,
+    "successRequired": 60,
     "cost": {
-      "st": 45.0
+      "st": 45
     },
     "castTime": "120",
     "delay": "1000",
@@ -15370,13 +15573,13 @@
     "requirements": [
       {
         "skill": "強化魔法",
-        "min": 60.0
+        "min": 60
       }
     ],
     "successSkill": "強化魔法",
-    "successRequired": 60.0,
+    "successRequired": 60,
     "cost": {
-      "st": 34.0
+      "st": 34
     },
     "castTime": "243",
     "delay": "332",
@@ -15396,13 +15599,13 @@
     "requirements": [
       {
         "skill": "素手",
-        "min": 60.0
+        "min": 60
       }
     ],
     "successSkill": "素手",
-    "successRequired": 60.0,
+    "successRequired": 60,
     "cost": {
-      "st": 28.0
+      "st": 28
     },
     "castTime": "120",
     "delay": "1000",
@@ -15422,17 +15625,17 @@
     "requirements": [
       {
         "skill": "こんぼう",
-        "min": 90.0
+        "min": 90
       },
       {
         "skill": "戦闘技術",
-        "min": 60.0
+        "min": 60
       }
     ],
     "successSkill": "こんぼう",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 45.0
+      "st": 45
     },
     "castTime": "200",
     "delay": "1500",
@@ -15452,17 +15655,17 @@
     "requirements": [
       {
         "skill": "槍",
-        "min": 90.0
+        "min": 90
       },
       {
         "skill": "牙",
-        "min": 60.0
+        "min": 60
       }
     ],
     "successSkill": "槍",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 45.0
+      "st": 45
     },
     "castTime": "150",
     "delay": "1500",
@@ -15482,17 +15685,17 @@
     "requirements": [
       {
         "skill": "こんぼう",
-        "min": 60.0
+        "min": 60
       },
       {
         "skill": "戦闘技術",
-        "min": 60.0
+        "min": 60
       }
     ],
     "successSkill": "こんぼう",
-    "successRequired": 60.0,
+    "successRequired": 60,
     "cost": {
-      "st": 28.0
+      "st": 28
     },
     "castTime": "120",
     "delay": "1100",
@@ -15512,17 +15715,17 @@
     "requirements": [
       {
         "skill": "戦闘技術",
-        "min": 60.0
+        "min": 60
       },
       {
         "skill": "キック",
-        "min": 90.0
+        "min": 90
       }
     ],
     "successSkill": "戦闘技術",
-    "successRequired": 60.0,
+    "successRequired": 60,
     "cost": {
-      "st": 45.0
+      "st": 45
     },
     "castTime": "295",
     "delay": "1250",
@@ -15542,17 +15745,17 @@
     "requirements": [
       {
         "skill": "弓",
-        "min": 90.0
+        "min": 90
       },
       {
         "skill": "キック",
-        "min": 60.0
+        "min": 60
       }
     ],
     "successSkill": "弓",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 45.0
+      "st": 45
     },
     "castTime": "155",
     "delay": "1300",
@@ -15572,17 +15775,17 @@
     "requirements": [
       {
         "skill": "素手",
-        "min": 60.0
+        "min": 60
       },
       {
         "skill": "筋力",
-        "min": 80.0
+        "min": 80
       }
     ],
     "successSkill": "素手",
-    "successRequired": 60.0,
+    "successRequired": 60,
     "cost": {
-      "st": 28.0
+      "st": 28
     },
     "castTime": "90",
     "delay": "1110",
@@ -15602,13 +15805,13 @@
     "requirements": [
       {
         "skill": "弓",
-        "min": 60.0
+        "min": 60
       }
     ],
     "successSkill": "弓",
-    "successRequired": 60.0,
+    "successRequired": 60,
     "cost": {
-      "st": 28.0
+      "st": 28
     },
     "castTime": "150",
     "delay": "1100",
@@ -15628,13 +15831,13 @@
     "requirements": [
       {
         "skill": "料理",
-        "min": 60.0
+        "min": 60
       }
     ],
     "successSkill": "料理",
-    "successRequired": 60.0,
+    "successRequired": 60,
     "cost": {
-      "st": 28.0
+      "st": 28
     },
     "castTime": "120",
     "delay": "920",
@@ -15654,13 +15857,13 @@
     "requirements": [
       {
         "skill": "こんぼう",
-        "min": 60.0
+        "min": 60
       }
     ],
     "successSkill": "こんぼう",
-    "successRequired": 60.0,
+    "successRequired": 60,
     "cost": {
-      "st": 28.0
+      "st": 28
     },
     "castTime": "920",
     "delay": "1200",
@@ -15680,13 +15883,13 @@
     "requirements": [
       {
         "skill": "素手",
-        "min": 60.0
+        "min": 60
       }
     ],
     "successSkill": "素手",
-    "successRequired": 60.0,
+    "successRequired": 60,
     "cost": {
-      "st": 28.0
+      "st": 28
     },
     "castTime": "160",
     "delay": "1000",
@@ -15706,17 +15909,17 @@
     "requirements": [
       {
         "skill": "暗黒命令",
-        "min": 80.0
+        "min": 80
       },
       {
         "skill": "罠",
-        "min": 60.0
+        "min": 60
       }
     ],
     "successSkill": "暗黒命令",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "150",
     "delay": "2150",
@@ -15736,13 +15939,13 @@
     "requirements": [
       {
         "skill": "素手",
-        "min": 60.0
+        "min": 60
       }
     ],
     "successSkill": "素手",
-    "successRequired": 60.0,
+    "successRequired": 60,
     "cost": {
-      "st": 28.0
+      "st": 28
     },
     "castTime": "150",
     "delay": "1050",
@@ -15762,17 +15965,17 @@
     "requirements": [
       {
         "skill": "投げ",
-        "min": 80.0
+        "min": 80
       },
       {
         "skill": "戦闘技術",
-        "min": 60.0
+        "min": 60
       }
     ],
     "successSkill": "投げ",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "180",
     "delay": "1400",
@@ -15792,17 +15995,17 @@
     "requirements": [
       {
         "skill": "銃器",
-        "min": 70.0
+        "min": 70
       },
       {
         "skill": "薬調合",
-        "min": 60.0
+        "min": 60
       }
     ],
     "successSkill": "銃器",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "155",
     "delay": "1500",
@@ -15822,17 +16025,17 @@
     "requirements": [
       {
         "skill": "槍",
-        "min": 90.0
+        "min": 90
       },
       {
         "skill": "キック",
-        "min": 60.0
+        "min": 60
       }
     ],
     "successSkill": "槍",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 45.0
+      "st": 45
     },
     "castTime": "205",
     "delay": "1440",
@@ -15852,13 +16055,13 @@
     "requirements": [
       {
         "skill": "キック",
-        "min": 60.0
+        "min": 60
       }
     ],
     "successSkill": "キック",
-    "successRequired": 60.0,
+    "successRequired": 60,
     "cost": {
-      "st": 28.0
+      "st": 28
     },
     "castTime": "100",
     "delay": "1000",
@@ -15878,17 +16081,17 @@
     "requirements": [
       {
         "skill": "槍",
-        "min": 70.0
+        "min": 70
       },
       {
         "skill": "戦闘技術",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "槍",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "120",
     "delay": "1380",
@@ -15908,13 +16111,13 @@
     "requirements": [
       {
         "skill": "投げ",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "投げ",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "110",
     "delay": "1380",
@@ -15934,17 +16137,17 @@
     "requirements": [
       {
         "skill": "精神力",
-        "min": 70.0
+        "min": 70
       },
       {
         "skill": "強化魔法",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "精神力",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "160",
     "delay": "1140",
@@ -15964,13 +16167,13 @@
     "requirements": [
       {
         "skill": "キック",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "キック",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "325",
     "delay": "1225",
@@ -15990,13 +16193,13 @@
     "requirements": [
       {
         "skill": "銃器",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "銃器",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "250",
     "delay": "1800",
@@ -16016,17 +16219,17 @@
     "requirements": [
       {
         "skill": "銃器",
-        "min": 90.0
+        "min": 90
       },
       {
         "skill": "罠",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "銃器",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 45.0
+      "st": 45
     },
     "castTime": "155",
     "delay": "1500",
@@ -16046,17 +16249,17 @@
     "requirements": [
       {
         "skill": "槍",
-        "min": 70.0
+        "min": 70
       },
       {
         "skill": "強化魔法",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "槍",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "125",
     "delay": "1200",
@@ -16076,13 +16279,13 @@
     "requirements": [
       {
         "skill": "銃器",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "銃器",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "190",
     "delay": "910",
@@ -16102,17 +16305,17 @@
     "requirements": [
       {
         "skill": "刀剣",
-        "min": 90.0
+        "min": 90
       },
       {
         "skill": "神秘魔法",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "刀剣",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 45.0
+      "st": 45
     },
     "castTime": "200",
     "delay": "1500",
@@ -16132,17 +16335,17 @@
     "requirements": [
       {
         "skill": "精神力",
-        "min": 80.0
+        "min": 80
       },
       {
         "skill": "神秘魔法",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "精神力",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "60",
     "delay": "860",
@@ -16162,13 +16365,13 @@
     "requirements": [
       {
         "skill": "死の魔法",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "死の魔法",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "200",
     "delay": "2000",
@@ -16188,17 +16391,17 @@
     "requirements": [
       {
         "skill": "牙",
-        "min": 70.0
+        "min": 70
       },
       {
         "skill": "戦闘技術",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "牙",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "110",
     "delay": "1010",
@@ -16218,17 +16421,17 @@
     "requirements": [
       {
         "skill": "素手",
-        "min": 80.0
+        "min": 80
       },
       {
         "skill": "キック",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "素手",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "230",
     "delay": "900",
@@ -16248,13 +16451,13 @@
     "requirements": [
       {
         "skill": "パフォーマンス",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "パフォーマンス",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "400",
     "delay": "1680",
@@ -16274,13 +16477,13 @@
     "requirements": [
       {
         "skill": "パフォーマンス",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "パフォーマンス",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "350",
     "delay": "1800",
@@ -16300,13 +16503,13 @@
     "requirements": [
       {
         "skill": "パフォーマンス",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "パフォーマンス",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "350",
     "delay": "1800",
@@ -16326,17 +16529,17 @@
     "requirements": [
       {
         "skill": "暗黒命令",
-        "min": 70.0
+        "min": 70
       },
       {
         "skill": "牙",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "暗黒命令",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "180",
     "delay": "1200",
@@ -16356,13 +16559,13 @@
     "requirements": [
       {
         "skill": "素手",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "素手",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "160",
     "delay": "1200",
@@ -16382,17 +16585,17 @@
     "requirements": [
       {
         "skill": "ダンス",
-        "min": 80.0
+        "min": 80
       },
       {
         "skill": "持久力",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "ダンス",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "480",
     "delay": "1200",
@@ -16412,17 +16615,17 @@
     "requirements": [
       {
         "skill": "こんぼう",
-        "min": 70.0
+        "min": 70
       },
       {
         "skill": "戦闘技術",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "こんぼう",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "180",
     "delay": "1200",
@@ -16442,17 +16645,17 @@
     "requirements": [
       {
         "skill": "牙",
-        "min": 70.0
+        "min": 70
       },
       {
         "skill": "死の魔法",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "牙",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 40.0
+      "st": 40
     },
     "castTime": "150",
     "delay": "1300",
@@ -16472,17 +16675,17 @@
     "requirements": [
       {
         "skill": "弓",
-        "min": 90.0
+        "min": 90
       },
       {
         "skill": "神秘魔法",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "弓",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 45.0
+      "st": 45
     },
     "castTime": "200",
     "delay": "1600",
@@ -16502,13 +16705,13 @@
     "requirements": [
       {
         "skill": "弓",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "弓",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "180",
     "delay": "800",
@@ -16528,13 +16731,13 @@
     "requirements": [
       {
         "skill": "盾",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "盾",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "100",
     "delay": "900",
@@ -16554,17 +16757,17 @@
     "requirements": [
       {
         "skill": "筋力",
-        "min": 90.0
+        "min": 90
       },
       {
         "skill": "自然調和",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "筋力",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 45.0
+      "st": 45
     },
     "castTime": "150",
     "delay": "1500",
@@ -16584,13 +16787,13 @@
     "requirements": [
       {
         "skill": "音楽",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "音楽",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "250",
     "delay": "1250",
@@ -16610,17 +16813,17 @@
     "requirements": [
       {
         "skill": "刀剣",
-        "min": 70.0
+        "min": 70
       },
       {
         "skill": "筋力",
-        "min": 80.0
+        "min": 80
       }
     ],
     "successSkill": "刀剣",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "140",
     "delay": "1350",
@@ -16640,17 +16843,17 @@
     "requirements": [
       {
         "skill": "刀剣",
-        "min": 80.0
+        "min": 80
       },
       {
         "skill": "戦闘技術",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "刀剣",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "140",
     "delay": "1500",
@@ -16670,13 +16873,13 @@
     "requirements": [
       {
         "skill": "刀剣",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "刀剣",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "130",
     "delay": "1250",
@@ -16696,17 +16899,17 @@
     "requirements": [
       {
         "skill": "キック",
-        "min": 70.0
+        "min": 70
       },
       {
         "skill": "こんぼう",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "キック",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "150",
     "delay": "1300",
@@ -16726,13 +16929,13 @@
     "requirements": [
       {
         "skill": "薬調合",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "薬調合",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "180",
     "delay": "1080",
@@ -16752,17 +16955,17 @@
     "requirements": [
       {
         "skill": "刀剣",
-        "min": 90.0
+        "min": 90
       },
       {
         "skill": "戦闘技術",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "刀剣",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 45.0
+      "st": 45
     },
     "castTime": "130",
     "delay": "1200",
@@ -16782,17 +16985,17 @@
     "requirements": [
       {
         "skill": "刀剣",
-        "min": 90.0
+        "min": 90
       },
       {
         "skill": "攻撃回避",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "刀剣",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 45.0
+      "st": 45
     },
     "castTime": "190",
     "delay": "1500",
@@ -16812,17 +17015,17 @@
     "requirements": [
       {
         "skill": "刀剣",
-        "min": 90.0
+        "min": 90
       },
       {
         "skill": "精神力",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "刀剣",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 45.0
+      "st": 45
     },
     "castTime": "170",
     "delay": "1000",
@@ -16842,17 +17045,17 @@
     "requirements": [
       {
         "skill": "刀剣",
-        "min": 70.0
+        "min": 70
       },
       {
         "skill": "生命力",
-        "min": 90.0
+        "min": 90
       }
     ],
     "successSkill": "刀剣",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "160",
     "delay": "2000",
@@ -16872,17 +17075,17 @@
     "requirements": [
       {
         "skill": "素手",
-        "min": 80.0
+        "min": 80
       },
       {
         "skill": "戦闘技術",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "素手",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "100",
     "delay": "1000",
@@ -16902,13 +17105,13 @@
     "requirements": [
       {
         "skill": "銃器",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "銃器",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "140",
     "delay": "1200",
@@ -16928,13 +17131,13 @@
     "requirements": [
       {
         "skill": "刀剣",
-        "min": 80.0
+        "min": 80
       }
     ],
     "successSkill": "刀剣",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "120",
     "delay": "2000",
@@ -16954,13 +17157,13 @@
     "requirements": [
       {
         "skill": "キック",
-        "min": 80.0
+        "min": 80
       }
     ],
     "successSkill": "キック",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "150",
     "delay": "1650",
@@ -16980,17 +17183,17 @@
     "requirements": [
       {
         "skill": "銃器",
-        "min": 80.0
+        "min": 80
       },
       {
         "skill": "戦闘技術",
-        "min": 80.0
+        "min": 80
       }
     ],
     "successSkill": "銃器",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "140",
     "delay": "1500",
@@ -17010,17 +17213,17 @@
     "requirements": [
       {
         "skill": "キック",
-        "min": 90.0
+        "min": 90
       },
       {
         "skill": "筋力",
-        "min": 80.0
+        "min": 80
       }
     ],
     "successSkill": "キック",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 45.0
+      "st": 45
     },
     "castTime": "200",
     "delay": "1700",
@@ -17040,29 +17243,29 @@
     "requirements": [
       {
         "skill": "水泳",
-        "min": 80.0
+        "min": 80
       },
       {
         "skill": "槍",
-        "min": 80.0
+        "min": 80
       },
       {
         "skill": "料理",
-        "min": 80.0
+        "min": 80
       },
       {
         "skill": "釣り",
-        "min": 80.0
+        "min": 80
       },
       {
         "skill": "取引",
-        "min": 80.0
+        "min": 80
       }
     ],
     "successSkill": "水泳",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "150",
     "delay": "1500",
@@ -17082,13 +17285,13 @@
     "requirements": [
       {
         "skill": "素手",
-        "min": 80.0
+        "min": 80
       }
     ],
     "successSkill": "素手",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "140",
     "delay": "1200",
@@ -17108,17 +17311,17 @@
     "requirements": [
       {
         "skill": "こんぼう",
-        "min": 80.0
+        "min": 80
       },
       {
         "skill": "強化魔法",
-        "min": 80.0
+        "min": 80
       }
     ],
     "successSkill": "こんぼう",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "131",
     "delay": "1100",
@@ -17138,13 +17341,13 @@
     "requirements": [
       {
         "skill": "暗黒命令",
-        "min": 80.0
+        "min": 80
       }
     ],
     "successSkill": "暗黒命令",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "200",
     "delay": "1600",
@@ -17164,17 +17367,17 @@
     "requirements": [
       {
         "skill": "素手",
-        "min": 80.0
+        "min": 80
       },
       {
         "skill": "筋力",
-        "min": 80.0
+        "min": 80
       }
     ],
     "successSkill": "素手",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "200",
     "delay": "1800",
@@ -17194,17 +17397,17 @@
     "requirements": [
       {
         "skill": "キック",
-        "min": 80.0
+        "min": 80
       },
       {
         "skill": "筋力",
-        "min": 80.0
+        "min": 80
       }
     ],
     "successSkill": "キック",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "80\n(30-35)",
     "delay": "950",
@@ -17224,17 +17427,17 @@
     "requirements": [
       {
         "skill": "素手",
-        "min": 80.0
+        "min": 80
       },
       {
         "skill": "攻撃回避",
-        "min": 80.0
+        "min": 80
       }
     ],
     "successSkill": "素手",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 39.0
+      "st": 39
     },
     "castTime": "140",
     "delay": "1300",
@@ -17254,13 +17457,13 @@
     "requirements": [
       {
         "skill": "こんぼう",
-        "min": 80.0
+        "min": 80
       }
     ],
     "successSkill": "こんぼう",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "150",
     "delay": "1350",
@@ -17280,13 +17483,13 @@
     "requirements": [
       {
         "skill": "盾",
-        "min": 80.0
+        "min": 80
       }
     ],
     "successSkill": "盾",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "150",
     "delay": "1200",
@@ -17306,17 +17509,17 @@
     "requirements": [
       {
         "skill": "罠",
-        "min": 80.0
+        "min": 80
       },
       {
         "skill": "暗黒命令",
-        "min": 80.0
+        "min": 80
       }
     ],
     "successSkill": "罠",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "170",
     "delay": "1370",
@@ -17336,21 +17539,21 @@
     "requirements": [
       {
         "skill": "罠",
-        "min": 80.0
+        "min": 80
       },
       {
         "skill": "薬調合",
-        "min": 80.0
+        "min": 80
       },
       {
         "skill": "呪文抵抗力",
-        "min": 80.0
+        "min": 80
       }
     ],
     "successSkill": "罠",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "100",
     "delay": "2000",
@@ -17370,13 +17573,13 @@
     "requirements": [
       {
         "skill": "銃器",
-        "min": 80.0
+        "min": 80
       }
     ],
     "successSkill": "銃器",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "140",
     "delay": "900",
@@ -17396,13 +17599,13 @@
     "requirements": [
       {
         "skill": "こんぼう",
-        "min": 80.0
+        "min": 80
       }
     ],
     "successSkill": "こんぼう",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "135",
     "delay": "1300",
@@ -17422,17 +17625,17 @@
     "requirements": [
       {
         "skill": "戦闘技術",
-        "min": 80.0
+        "min": 80
       },
       {
         "skill": "生命力",
-        "min": 80.0
+        "min": 80
       }
     ],
     "successSkill": "戦闘技術",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "140",
     "delay": "1800",
@@ -17452,21 +17655,21 @@
     "requirements": [
       {
         "skill": "槍",
-        "min": 80.0
+        "min": 80
       },
       {
         "skill": "戦闘技術",
-        "min": 80.0
+        "min": 80
       },
       {
         "skill": "攻撃回避",
-        "min": 80.0
+        "min": 80
       }
     ],
     "successSkill": "槍",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "95",
     "delay": "1300",
@@ -17486,13 +17689,13 @@
     "requirements": [
       {
         "skill": "槍",
-        "min": 80.0
+        "min": 80
       }
     ],
     "successSkill": "槍",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "150",
     "delay": "1500",
@@ -17512,17 +17715,17 @@
     "requirements": [
       {
         "skill": "刀剣",
-        "min": 80.0
+        "min": 80
       },
       {
         "skill": "戦闘技術",
-        "min": 80.0
+        "min": 80
       }
     ],
     "successSkill": "刀剣",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "140",
     "delay": "1250",
@@ -17542,17 +17745,17 @@
     "requirements": [
       {
         "skill": "素手",
-        "min": 80.0
+        "min": 80
       },
       {
         "skill": "キック",
-        "min": 80.0
+        "min": 80
       }
     ],
     "successSkill": "素手",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "120",
     "delay": "1200",
@@ -17572,13 +17775,13 @@
     "requirements": [
       {
         "skill": "盾",
-        "min": 80.0
+        "min": 80
       }
     ],
     "successSkill": "盾",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "170",
     "delay": "900",
@@ -17598,13 +17801,13 @@
     "requirements": [
       {
         "skill": "刀剣",
-        "min": 80.0
+        "min": 80
       }
     ],
     "successSkill": "刀剣",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "300",
     "delay": "1200",
@@ -17624,17 +17827,17 @@
     "requirements": [
       {
         "skill": "弓",
-        "min": 80.0
+        "min": 80
       },
       {
         "skill": "筋力",
-        "min": 80.0
+        "min": 80
       }
     ],
     "successSkill": "弓",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "160",
     "delay": "1200",
@@ -17654,17 +17857,17 @@
     "requirements": [
       {
         "skill": "素手",
-        "min": 80.0
+        "min": 80
       },
       {
         "skill": "キック",
-        "min": 80.0
+        "min": 80
       }
     ],
     "successSkill": "素手",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 30.0
+      "st": 30
     },
     "castTime": "280",
     "delay": "1500",
@@ -17684,13 +17887,13 @@
     "requirements": [
       {
         "skill": "薬調合",
-        "min": 80.0
+        "min": 80
       }
     ],
     "successSkill": "薬調合",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 39.0
+      "st": 39
     },
     "castTime": "180",
     "delay": "1680",
@@ -17710,13 +17913,13 @@
     "requirements": [
       {
         "skill": "酩酊",
-        "min": 80.0
+        "min": 80
       }
     ],
     "successSkill": "酩酊",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 100.0
+      "st": 100
     },
     "castTime": "250",
     "delay": "1650",
@@ -17736,17 +17939,17 @@
     "requirements": [
       {
         "skill": "槍",
-        "min": 80.0
+        "min": 80
       },
       {
         "skill": "強化魔法",
-        "min": 80.0
+        "min": 80
       }
     ],
     "successSkill": "槍",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "150",
     "delay": "1200",
@@ -17766,13 +17969,13 @@
     "requirements": [
       {
         "skill": "刀剣",
-        "min": 90.0
+        "min": 90
       }
     ],
     "successSkill": "刀剣",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 45.0
+      "st": 45
     },
     "castTime": "300",
     "delay": "2000",
@@ -17792,13 +17995,13 @@
     "requirements": [
       {
         "skill": "弓",
-        "min": 90.0
+        "min": 90
       }
     ],
     "successSkill": "弓",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 45.0
+      "st": 45
     },
     "castTime": "330",
     "delay": "1100",
@@ -17818,17 +18021,17 @@
     "requirements": [
       {
         "skill": "銃器",
-        "min": 90.0
+        "min": 90
       },
       {
         "skill": "戦闘技術",
-        "min": 90.0
+        "min": 90
       }
     ],
     "successSkill": "銃器",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 45.0
+      "st": 45
     },
     "castTime": "200",
     "delay": "1800",
@@ -17848,17 +18051,17 @@
     "requirements": [
       {
         "skill": "槍",
-        "min": 90.0
+        "min": 90
       },
       {
         "skill": "攻撃回避",
-        "min": 90.0
+        "min": 90
       }
     ],
     "successSkill": "槍",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 45.0
+      "st": 45
     },
     "castTime": "200",
     "delay": "1350",
@@ -17878,13 +18081,13 @@
     "requirements": [
       {
         "skill": "刀剣",
-        "min": 90.0
+        "min": 90
       }
     ],
     "successSkill": "刀剣",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 45.0
+      "st": 45
     },
     "castTime": "180",
     "delay": "1800",
@@ -17904,17 +18107,17 @@
     "requirements": [
       {
         "skill": "槍",
-        "min": 90.0
+        "min": 90
       },
       {
         "skill": "水泳",
-        "min": 90.0
+        "min": 90
       }
     ],
     "successSkill": "槍",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 45.0
+      "st": 45
     },
     "castTime": "170",
     "delay": "1100",
@@ -17934,13 +18137,13 @@
     "requirements": [
       {
         "skill": "罠",
-        "min": 90.0
+        "min": 90
       }
     ],
     "successSkill": "罠",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 45.0
+      "st": 45
     },
     "castTime": "300",
     "delay": "2100",
@@ -17960,17 +18163,17 @@
     "requirements": [
       {
         "skill": "罠",
-        "min": 90.0
+        "min": 90
       },
       {
         "skill": "薬調合",
-        "min": 90.0
+        "min": 90
       }
     ],
     "successSkill": "罠",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 45.0
+      "st": 45
     },
     "castTime": "125",
     "delay": "1300",
@@ -17990,21 +18193,21 @@
     "requirements": [
       {
         "skill": "こんぼう",
-        "min": 90.0
+        "min": 90
       },
       {
         "skill": "筋力",
-        "min": 90.0
+        "min": 90
       },
       {
         "skill": "精神力",
-        "min": 90.0
+        "min": 90
       }
     ],
     "successSkill": "こんぼう",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 150.0
+      "st": 150
     },
     "castTime": "200",
     "delay": "2000",
@@ -18024,17 +18227,17 @@
     "requirements": [
       {
         "skill": "こんぼう",
-        "min": 90.0
+        "min": 90
       },
       {
         "skill": "筋力",
-        "min": 90.0
+        "min": 90
       }
     ],
     "successSkill": "こんぼう",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 45.0
+      "st": 45
     },
     "castTime": "195",
     "delay": "1300",
@@ -18054,13 +18257,13 @@
     "requirements": [
       {
         "skill": "こんぼう",
-        "min": 90.0
+        "min": 90
       }
     ],
     "successSkill": "こんぼう",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 45.0
+      "st": 45
     },
     "castTime": "240",
     "delay": "1500",
@@ -18080,13 +18283,13 @@
     "requirements": [
       {
         "skill": "罠",
-        "min": 90.0
+        "min": 90
       }
     ],
     "successSkill": "罠",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 45.0
+      "st": 45
     },
     "castTime": "400",
     "delay": "1500",
@@ -18106,17 +18309,17 @@
     "requirements": [
       {
         "skill": "筋力",
-        "min": 90.0
+        "min": 90
       },
       {
         "skill": "戦闘技術",
-        "min": 90.0
+        "min": 90
       }
     ],
     "successSkill": "筋力",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 45.0
+      "st": 45
     },
     "castTime": "150",
     "delay": "1350",
@@ -18136,21 +18339,21 @@
     "requirements": [
       {
         "skill": "槍",
-        "min": 90.0
+        "min": 90
       },
       {
         "skill": "強化魔法",
-        "min": 90.0
+        "min": 90
       },
       {
         "skill": "攻撃回避",
-        "min": 90.0
+        "min": 90
       }
     ],
     "successSkill": "槍",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 45.0
+      "st": 45
     },
     "castTime": "150",
     "delay": "1500",
@@ -18170,17 +18373,17 @@
     "requirements": [
       {
         "skill": "こんぼう",
-        "min": 90.0
+        "min": 90
       },
       {
         "skill": "戦闘技術",
-        "min": 90.0
+        "min": 90
       }
     ],
     "successSkill": "こんぼう",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 45.0
+      "st": 45
     },
     "castTime": "500",
     "delay": "1600",
@@ -18200,13 +18403,13 @@
     "requirements": [
       {
         "skill": "筋力",
-        "min": 90.0
+        "min": 90
       }
     ],
     "successSkill": "筋力",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 45.0
+      "st": 45
     },
     "castTime": "180",
     "delay": "1500",
@@ -18226,13 +18429,13 @@
     "requirements": [
       {
         "skill": "刀剣",
-        "min": 90.0
+        "min": 90
       }
     ],
     "successSkill": "刀剣",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 45.0
+      "st": 45
     },
     "castTime": "160",
     "delay": "1300",
@@ -18252,13 +18455,13 @@
     "requirements": [
       {
         "skill": "銃器",
-        "min": 90.0
+        "min": 90
       }
     ],
     "successSkill": "銃器",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 45.0
+      "st": 45
     },
     "castTime": "350",
     "delay": "2000",
@@ -18278,13 +18481,13 @@
     "requirements": [
       {
         "skill": "こんぼう",
-        "min": 90.0
+        "min": 90
       }
     ],
     "successSkill": "こんぼう",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 45.0
+      "st": 45
     },
     "castTime": "180",
     "delay": "1500",
@@ -18304,17 +18507,17 @@
     "requirements": [
       {
         "skill": "投げ",
-        "min": 90.0
+        "min": 90
       },
       {
         "skill": "落下耐性",
-        "min": 90.0
+        "min": 90
       }
     ],
     "successSkill": "投げ",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 45.0
+      "st": 45
     },
     "castTime": "210",
     "delay": "4000",
@@ -18334,13 +18537,13 @@
     "requirements": [
       {
         "skill": "刀剣",
-        "min": 90.0
+        "min": 90
       }
     ],
     "successSkill": "刀剣",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 45.0
+      "st": 45
     },
     "castTime": "220",
     "delay": "1500",
@@ -18360,13 +18563,13 @@
     "requirements": [
       {
         "skill": "刀剣",
-        "min": 90.0
+        "min": 90
       }
     ],
     "successSkill": "刀剣",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 45.0
+      "st": 45
     },
     "castTime": "180",
     "delay": "1500",
@@ -18386,13 +18589,13 @@
     "requirements": [
       {
         "skill": "刀剣",
-        "min": 90.0
+        "min": 90
       }
     ],
     "successSkill": "刀剣",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 45.0
+      "st": 45
     },
     "castTime": "120",
     "delay": "1500",
@@ -18412,13 +18615,13 @@
     "requirements": [
       {
         "skill": "刀剣",
-        "min": 90.0
+        "min": 90
       }
     ],
     "successSkill": "刀剣",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 45.0
+      "st": 45
     },
     "castTime": "150",
     "delay": "1500",
@@ -18438,17 +18641,17 @@
     "requirements": [
       {
         "skill": "刀剣",
-        "min": 90.0
+        "min": 90
       },
       {
         "skill": "戦闘技術",
-        "min": 90.0
+        "min": 90
       }
     ],
     "successSkill": "刀剣",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 45.0
+      "st": 45
     },
     "castTime": "530",
     "delay": "1100",
@@ -18474,7 +18677,7 @@
     "successSkill": "生命力",
     "successRequired": 0,
     "cost": {
-      "st": 0.0
+      "st": 0
     },
     "castTime": "20",
     "delay": "20",
@@ -18492,13 +18695,13 @@
     "requirements": [
       {
         "skill": "パフォーマンス",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "パフォーマンス",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 15.0
+      "st": 15
     },
     "castTime": "0",
     "delay": "900",
@@ -18517,13 +18720,13 @@
     "requirements": [
       {
         "skill": "取引",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "取引",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 40.0
+      "st": 40
     },
     "castTime": "150",
     "delay": "750",
@@ -18542,13 +18745,13 @@
     "requirements": [
       {
         "skill": "物まね",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "物まね",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 10.0
+      "st": 10
     },
     "castTime": "150",
     "delay": "1750",
@@ -18567,13 +18770,13 @@
     "requirements": [
       {
         "skill": "素手",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "素手",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 15.0
+      "st": 15
     },
     "castTime": "200",
     "delay": "1000",
@@ -18592,13 +18795,13 @@
     "requirements": [
       {
         "skill": "銃器",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "銃器",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "120",
     "delay": "480",
@@ -18617,13 +18820,13 @@
     "requirements": [
       {
         "skill": "精神力",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "精神力",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "0",
     "delay": "1500",
@@ -18642,13 +18845,13 @@
     "requirements": [
       {
         "skill": "薬調合",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "薬調合",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 20.0
+      "st": 20
     },
     "castTime": "100",
     "delay": "4100",
@@ -18667,13 +18870,13 @@
     "requirements": [
       {
         "skill": "神秘魔法",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "神秘魔法",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 10.0
+      "st": 10
     },
     "castTime": "0",
     "delay": "600",
@@ -18692,13 +18895,13 @@
     "requirements": [
       {
         "skill": "料理",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "料理",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 20.0
+      "st": 20
     },
     "castTime": "250",
     "delay": "2250",
@@ -18717,13 +18920,13 @@
     "requirements": [
       {
         "skill": "自然調和",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "自然調和",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 10.0
+      "st": 10
     },
     "castTime": "0",
     "delay": "1200",
@@ -18742,13 +18945,13 @@
     "requirements": [
       {
         "skill": "自然調和",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "自然調和",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "60",
     "delay": "1260",
@@ -18767,13 +18970,13 @@
     "requirements": [
       {
         "skill": "自然調和",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "自然調和",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "0",
     "delay": "400",
@@ -18792,13 +18995,13 @@
     "requirements": [
       {
         "skill": "銃器",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "銃器",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "150",
     "delay": "750",
@@ -18817,13 +19020,13 @@
     "requirements": [
       {
         "skill": "素手",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "素手",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "200",
     "delay": "1550",
@@ -18842,13 +19045,13 @@
     "requirements": [
       {
         "skill": "パフォーマンス",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "パフォーマンス",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 20.0
+      "st": 20
     },
     "castTime": "170",
     "delay": "1170",
@@ -18867,13 +19070,13 @@
     "requirements": [
       {
         "skill": "キック",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "キック",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 15.0
+      "st": 15
     },
     "castTime": "0",
     "delay": "600",
@@ -18892,13 +19095,13 @@
     "requirements": [
       {
         "skill": "持久力",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "持久力",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 20.0
+      "st": 20
     },
     "castTime": "0",
     "delay": "900",
@@ -18917,13 +19120,13 @@
     "requirements": [
       {
         "skill": "採掘",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "採掘",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 10.0
+      "st": 10
     },
     "castTime": "0",
     "delay": "800",
@@ -18942,13 +19145,13 @@
     "requirements": [
       {
         "skill": "生命力",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "生命力",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 50.0
+      "st": 50
     },
     "castTime": "150",
     "delay": "3150",
@@ -18967,17 +19170,17 @@
     "requirements": [
       {
         "skill": "戦闘技術",
-        "min": 1.0
+        "min": 1
       },
       {
         "skill": "パフォーマンス",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "戦闘技術",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 20.0
+      "st": 20
     },
     "castTime": "180",
     "delay": "1180",
@@ -18996,13 +19199,13 @@
     "requirements": [
       {
         "skill": "回復魔法",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "回復魔法",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 20.0
+      "st": 20
     },
     "castTime": "150",
     "delay": "1050",
@@ -19021,13 +19224,13 @@
     "requirements": [
       {
         "skill": "自然調和",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "自然調和",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "150",
     "delay": "1350",
@@ -19046,13 +19249,13 @@
     "requirements": [
       {
         "skill": "牙",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "牙",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 20.0
+      "st": 20
     },
     "castTime": "150",
     "delay": "2150",
@@ -19071,13 +19274,13 @@
     "requirements": [
       {
         "skill": "精神力",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "精神力",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 40.0
+      "st": 40
     },
     "castTime": "0",
     "delay": "1200",
@@ -19096,13 +19299,13 @@
     "requirements": [
       {
         "skill": "美容",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "美容",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 30.0
+      "st": 30
     },
     "castTime": "200",
     "delay": "5400",
@@ -19121,13 +19324,13 @@
     "requirements": [
       {
         "skill": "召喚魔法",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "召喚魔法",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 20.0
+      "st": 20
     },
     "castTime": "130",
     "delay": "1150",
@@ -19146,13 +19349,13 @@
     "requirements": [
       {
         "skill": "神秘魔法",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "神秘魔法",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "20",
     "delay": "500",
@@ -19171,13 +19374,13 @@
     "requirements": [
       {
         "skill": "神秘魔法",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "神秘魔法",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "20",
     "delay": "500",
@@ -19196,13 +19399,13 @@
     "requirements": [
       {
         "skill": "神秘魔法",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "神秘魔法",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "20",
     "delay": "500",
@@ -19221,13 +19424,13 @@
     "requirements": [
       {
         "skill": "神秘魔法",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "神秘魔法",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "20",
     "delay": "500",
@@ -19246,13 +19449,13 @@
     "requirements": [
       {
         "skill": "神秘魔法",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "神秘魔法",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 0.0
+      "st": 0
     },
     "castTime": "100",
     "delay": "500",
@@ -19271,13 +19474,13 @@
     "requirements": [
       {
         "skill": "神秘魔法",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "神秘魔法",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "20",
     "delay": "1000",
@@ -19296,13 +19499,13 @@
     "requirements": [
       {
         "skill": "神秘魔法",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "神秘魔法",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "20",
     "delay": "500",
@@ -19321,13 +19524,13 @@
     "requirements": [
       {
         "skill": "神秘魔法",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "神秘魔法",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "20",
     "delay": "500",
@@ -19346,13 +19549,13 @@
     "requirements": [
       {
         "skill": "神秘魔法",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "神秘魔法",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "20",
     "delay": "500",
@@ -19371,13 +19574,13 @@
     "requirements": [
       {
         "skill": "神秘魔法",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "神秘魔法",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "20",
     "delay": "500",
@@ -19396,13 +19599,13 @@
     "requirements": [
       {
         "skill": "精神力",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "精神力",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 20.0
+      "st": 20
     },
     "castTime": "0",
     "delay": "300",
@@ -19421,13 +19624,13 @@
     "requirements": [
       {
         "skill": "戦闘技術",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "戦闘技術",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "40",
     "delay": "440",
@@ -19446,13 +19649,13 @@
     "requirements": [
       {
         "skill": "自然調和",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "自然調和",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 35.0
+      "st": 35
     },
     "castTime": "200",
     "delay": "2000",
@@ -19471,13 +19674,13 @@
     "requirements": [
       {
         "skill": "自然調和",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "自然調和",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 35.0
+      "st": 35
     },
     "castTime": "200",
     "delay": "2200",
@@ -19496,13 +19699,13 @@
     "requirements": [
       {
         "skill": "パフォーマンス",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "パフォーマンス",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "40",
     "delay": "2000",
@@ -19521,13 +19724,13 @@
     "requirements": [
       {
         "skill": "キック",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "キック",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "20",
     "delay": "1500",
@@ -19546,13 +19749,13 @@
     "requirements": [
       {
         "skill": "調教",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "調教",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 20.0
+      "st": 20
     },
     "castTime": "120",
     "delay": "1320",
@@ -19571,13 +19774,13 @@
     "requirements": [
       {
         "skill": "調教",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "調教",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "120",
     "delay": "1620",
@@ -19596,13 +19799,13 @@
     "requirements": [
       {
         "skill": "暗黒命令",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "暗黒命令",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 30.0
+      "st": 30
     },
     "castTime": "150",
     "delay": "3300",
@@ -19621,13 +19824,13 @@
     "requirements": [
       {
         "skill": "精神力",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "精神力",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 30.0
+      "st": 30
     },
     "castTime": "150",
     "delay": "3300",
@@ -19646,13 +19849,13 @@
     "requirements": [
       {
         "skill": "神秘魔法",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "神秘魔法",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 30.0
+      "st": 30
     },
     "castTime": "600",
     "delay": "18000",
@@ -19671,13 +19874,13 @@
     "requirements": [
       {
         "skill": "神秘魔法",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "神秘魔法",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "200",
     "delay": "800",
@@ -19696,13 +19899,13 @@
     "requirements": [
       {
         "skill": "パフォーマンス",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "パフォーマンス",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "360",
     "delay": "960",
@@ -19721,13 +19924,13 @@
     "requirements": [
       {
         "skill": "薬調合",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "薬調合",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "100",
     "delay": "1600",
@@ -19746,13 +19949,13 @@
     "requirements": [
       {
         "skill": "自然調和",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "自然調和",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 0.0
+      "st": 0
     },
     "castTime": "100",
     "delay": "1300",
@@ -19771,13 +19974,13 @@
     "requirements": [
       {
         "skill": "パフォーマンス",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "パフォーマンス",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 15.0
+      "st": 15
     },
     "castTime": "120",
     "delay": "2000",
@@ -19796,13 +19999,13 @@
     "requirements": [
       {
         "skill": "物まね",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "物まね",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "0",
     "delay": "1500",
@@ -19821,13 +20024,13 @@
     "requirements": [
       {
         "skill": "強化魔法",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "強化魔法",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 20.0
+      "st": 20
     },
     "castTime": "130",
     "delay": "950",
@@ -19846,13 +20049,13 @@
     "requirements": [
       {
         "skill": "精神力",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "精神力",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "150",
     "delay": "54000",
@@ -19871,13 +20074,13 @@
     "requirements": [
       {
         "skill": "暗黒命令",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "暗黒命令",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 30.0
+      "st": 30
     },
     "castTime": "160",
     "delay": "1400",
@@ -19896,13 +20099,13 @@
     "requirements": [
       {
         "skill": "戦闘技術",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "戦闘技術",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "20",
     "delay": "420",
@@ -19921,13 +20124,13 @@
     "requirements": [
       {
         "skill": "持久力",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "持久力",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 30.0
+      "st": 30
     },
     "castTime": "0",
     "delay": "750",
@@ -19946,13 +20149,13 @@
     "requirements": [
       {
         "skill": "神秘魔法",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "神秘魔法",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 20.0
+      "st": 20
     },
     "castTime": "100",
     "delay": "1000",
@@ -19971,13 +20174,13 @@
     "requirements": [
       {
         "skill": "パフォーマンス",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "パフォーマンス",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "250",
     "delay": "750",
@@ -19996,13 +20199,13 @@
     "requirements": [
       {
         "skill": "パフォーマンス",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "パフォーマンス",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "20",
     "delay": "520",
@@ -20021,17 +20224,17 @@
     "requirements": [
       {
         "skill": "盗み",
-        "min": 10.0
+        "min": 10
       },
       {
         "skill": "攻撃回避",
-        "min": 10.0
+        "min": 10
       }
     ],
     "successSkill": "盗み",
-    "successRequired": 10.0,
+    "successRequired": 10,
     "cost": {
-      "st": 9.0
+      "st": 9
     },
     "castTime": "90",
     "delay": "800",
@@ -20050,17 +20253,17 @@
     "requirements": [
       {
         "skill": "弓",
-        "min": 10.0
+        "min": 10
       },
       {
         "skill": "自然調和",
-        "min": 10.0
+        "min": 10
       }
     ],
     "successSkill": "弓",
-    "successRequired": 10.0,
+    "successRequired": 10,
     "cost": {
-      "st": 9.0
+      "st": 9
     },
     "castTime": "100",
     "delay": "1100",
@@ -20079,17 +20282,17 @@
     "requirements": [
       {
         "skill": "物まね",
-        "min": 10.0
+        "min": 10
       },
       {
         "skill": "自然調和",
-        "min": 10.0
+        "min": 10
       }
     ],
     "successSkill": "物まね",
-    "successRequired": 10.0,
+    "successRequired": 10,
     "cost": {
-      "st": 9.0
+      "st": 9
     },
     "castTime": "100",
     "delay": "1300",
@@ -20108,17 +20311,17 @@
     "requirements": [
       {
         "skill": "暗黒命令",
-        "min": 20.0
+        "min": 20
       },
       {
         "skill": "攻撃回避",
-        "min": 20.0
+        "min": 20
       }
     ],
     "successSkill": "暗黒命令",
-    "successRequired": 20.0,
+    "successRequired": 20,
     "cost": {
-      "st": 11.0
+      "st": 11
     },
     "castTime": "40",
     "delay": "800",
@@ -20137,17 +20340,17 @@
     "requirements": [
       {
         "skill": "素手",
-        "min": 90.0
+        "min": 90
       },
       {
         "skill": "神秘魔法",
-        "min": 20.0
+        "min": 20
       }
     ],
     "successSkill": "素手",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 45.0
+      "st": 45
     },
     "castTime": "150",
     "delay": "3000",
@@ -20166,17 +20369,17 @@
     "requirements": [
       {
         "skill": "パフォーマンス",
-        "min": 20.0
+        "min": 20
       },
       {
         "skill": "攻撃回避",
-        "min": 20.0
+        "min": 20
       }
     ],
     "successSkill": "パフォーマンス",
-    "successRequired": 20.0,
+    "successRequired": 20,
     "cost": {
-      "st": 15.0
+      "st": 15
     },
     "castTime": "0",
     "delay": "1500",
@@ -20195,17 +20398,17 @@
     "requirements": [
       {
         "skill": "パフォーマンス",
-        "min": 40.0
+        "min": 40
       },
       {
         "skill": "ダンス",
-        "min": 20.0
+        "min": 20
       }
     ],
     "successSkill": "パフォーマンス",
-    "successRequired": 40.0,
+    "successRequired": 40,
     "cost": {
-      "st": 19.0
+      "st": 19
     },
     "castTime": "520",
     "delay": "1800",
@@ -20224,17 +20427,17 @@
     "requirements": [
       {
         "skill": "戦闘技術",
-        "min": 50.0
+        "min": 50
       },
       {
         "skill": "盗み",
-        "min": 30.0
+        "min": 30
       }
     ],
     "successSkill": "戦闘技術",
-    "successRequired": 50.0,
+    "successRequired": 50,
     "cost": {
-      "st": 23.0
+      "st": 23
     },
     "castTime": "40",
     "delay": "900",
@@ -20253,13 +20456,13 @@
     "requirements": [
       {
         "skill": "調教",
-        "min": 30.0
+        "min": 30
       }
     ],
     "successSkill": "調教",
-    "successRequired": 30.0,
+    "successRequired": 30,
     "cost": {
-      "st": 15.0
+      "st": 15
     },
     "castTime": "200",
     "delay": "1700",
@@ -20278,17 +20481,17 @@
     "requirements": [
       {
         "skill": "パフォーマンス",
-        "min": 60.0
+        "min": 60
       },
       {
         "skill": "薬調合",
-        "min": 30.0
+        "min": 30
       }
     ],
     "successSkill": "パフォーマンス",
-    "successRequired": 60.0,
+    "successRequired": 60,
     "cost": {
-      "st": 28.0
+      "st": 28
     },
     "castTime": "170",
     "delay": "750",
@@ -20307,17 +20510,17 @@
     "requirements": [
       {
         "skill": "自然調和",
-        "min": 30.0
+        "min": 30
       },
       {
         "skill": "死体回収",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "自然調和",
-    "successRequired": 30.0,
+    "successRequired": 30,
     "cost": {
-      "st": 40.0
+      "st": 40
     },
     "castTime": "100",
     "delay": "1100",
@@ -20336,17 +20539,17 @@
     "requirements": [
       {
         "skill": "盗み",
-        "min": 70.0
+        "min": 70
       },
       {
         "skill": "暗黒命令",
-        "min": 30.0
+        "min": 30
       }
     ],
     "successSkill": "盗み",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "150",
     "delay": "2150",
@@ -20365,13 +20568,13 @@
     "requirements": [
       {
         "skill": "神秘魔法",
-        "min": 30.0
+        "min": 30
       }
     ],
     "successSkill": "神秘魔法",
-    "successRequired": 30.0,
+    "successRequired": 30,
     "cost": {
-      "st": 15.0
+      "st": 15
     },
     "castTime": "250",
     "delay": "2050",
@@ -20390,17 +20593,17 @@
     "requirements": [
       {
         "skill": "銃器",
-        "min": 60.0
+        "min": 60
       },
       {
         "skill": "鍛冶",
-        "min": 30.0
+        "min": 30
       }
     ],
     "successSkill": "銃器",
-    "successRequired": 60.0,
+    "successRequired": 60,
     "cost": {
-      "st": 28.0
+      "st": 28
     },
     "castTime": "150",
     "delay": "1200",
@@ -20419,13 +20622,13 @@
     "requirements": [
       {
         "skill": "自然調和",
-        "min": 30.0
+        "min": 30
       }
     ],
     "successSkill": "自然調和",
-    "successRequired": 30.0,
+    "successRequired": 30,
     "cost": {
-      "st": 30.0
+      "st": 30
     },
     "castTime": "150",
     "delay": "2200",
@@ -20444,17 +20647,17 @@
     "requirements": [
       {
         "skill": "音楽",
-        "min": 30.0
+        "min": 30
       },
       {
         "skill": "パフォーマンス",
-        "min": 30.0
+        "min": 30
       }
     ],
     "successSkill": "音楽",
-    "successRequired": 30.0,
+    "successRequired": 30,
     "cost": {
-      "st": 15.0
+      "st": 15
     },
     "castTime": "20",
     "delay": "750",
@@ -20473,17 +20676,17 @@
     "requirements": [
       {
         "skill": "調教",
-        "min": 30.0
+        "min": 30
       },
       {
         "skill": "神秘魔法",
-        "min": 30.0
+        "min": 30
       }
     ],
     "successSkill": "調教",
-    "successRequired": 30.0,
+    "successRequired": 30,
     "cost": {
-      "st": 15.0
+      "st": 15
     },
     "castTime": "120",
     "delay": "1320",
@@ -20502,13 +20705,13 @@
     "requirements": [
       {
         "skill": "自然調和",
-        "min": 30.0
+        "min": 30
       }
     ],
     "successSkill": "自然調和",
-    "successRequired": 30.0,
+    "successRequired": 30,
     "cost": {
-      "st": 15.0
+      "st": 15
     },
     "castTime": "150",
     "delay": "1350",
@@ -20527,13 +20730,13 @@
     "requirements": [
       {
         "skill": "精神力",
-        "min": 30.0
+        "min": 30
       }
     ],
     "successSkill": "精神力",
-    "successRequired": 30.0,
+    "successRequired": 30,
     "cost": {
-      "st": 15.0
+      "st": 15
     },
     "castTime": "140",
     "delay": "1500",
@@ -20552,17 +20755,17 @@
     "requirements": [
       {
         "skill": "死体回収",
-        "min": 30.0
+        "min": 30
       },
       {
         "skill": "パフォーマンス",
-        "min": 30.0
+        "min": 30
       }
     ],
     "successSkill": "死体回収",
-    "successRequired": 30.0,
+    "successRequired": 30,
     "cost": {
-      "st": 15.0
+      "st": 15
     },
     "castTime": "150",
     "delay": "2150",
@@ -20581,13 +20784,13 @@
     "requirements": [
       {
         "skill": "パフォーマンス",
-        "min": 30.0
+        "min": 30
       }
     ],
     "successSkill": "パフォーマンス",
-    "successRequired": 30.0,
+    "successRequired": 30,
     "cost": {
-      "st": 59.0
+      "st": 59
     },
     "castTime": "500",
     "delay": "1020",
@@ -20606,13 +20809,13 @@
     "requirements": [
       {
         "skill": "水泳",
-        "min": 30.0
+        "min": 30
       }
     ],
     "successSkill": "水泳",
-    "successRequired": 30.0,
+    "successRequired": 30,
     "cost": {
-      "st": 19.0
+      "st": 19
     },
     "castTime": "20",
     "delay": "1520",
@@ -20631,13 +20834,13 @@
     "requirements": [
       {
         "skill": "調教",
-        "min": 40.0
+        "min": 40
       }
     ],
     "successSkill": "調教",
-    "successRequired": 40.0,
+    "successRequired": 40,
     "cost": {
-      "st": 15.0
+      "st": 15
     },
     "castTime": "150",
     "delay": "750",
@@ -20656,17 +20859,17 @@
     "requirements": [
       {
         "skill": "音楽",
-        "min": 40.0
+        "min": 40
       },
       {
         "skill": "ダンス",
-        "min": 40.0
+        "min": 40
       }
     ],
     "successSkill": "音楽",
-    "successRequired": 40.0,
+    "successRequired": 40,
     "cost": {
-      "st": 19.0
+      "st": 19
     },
     "castTime": "400",
     "delay": "1500",
@@ -20685,13 +20888,13 @@
     "requirements": [
       {
         "skill": "戦闘技術",
-        "min": 40.0
+        "min": 40
       }
     ],
     "successSkill": "戦闘技術",
-    "successRequired": 40.0,
+    "successRequired": 40,
     "cost": {
-      "st": 19.0
+      "st": 19
     },
     "castTime": "180",
     "delay": "1180",
@@ -20710,17 +20913,17 @@
     "requirements": [
       {
         "skill": "採掘",
-        "min": 40.0
+        "min": 40
       },
       {
         "skill": "伐採",
-        "min": 40.0
+        "min": 40
       }
     ],
     "successSkill": "採掘",
-    "successRequired": 40.0,
+    "successRequired": 40,
     "cost": {
-      "st": 45.0
+      "st": 45
     },
     "castTime": "140",
     "delay": "1640",
@@ -20739,13 +20942,13 @@
     "requirements": [
       {
         "skill": "精神力",
-        "min": 40.0
+        "min": 40
       }
     ],
     "successSkill": "精神力",
-    "successRequired": 40.0,
+    "successRequired": 40,
     "cost": {
-      "st": 30.0
+      "st": 30
     },
     "castTime": "120",
     "delay": "1920",
@@ -20764,13 +20967,13 @@
     "requirements": [
       {
         "skill": "こんぼう",
-        "min": 40.0
+        "min": 40
       }
     ],
     "successSkill": "こんぼう",
-    "successRequired": 40.0,
+    "successRequired": 40,
     "cost": {
-      "st": 19.0
+      "st": 19
     },
     "castTime": "180",
     "delay": "1180",
@@ -20789,13 +20992,13 @@
     "requirements": [
       {
         "skill": "自然調和",
-        "min": 40.0
+        "min": 40
       }
     ],
     "successSkill": "自然調和",
-    "successRequired": 40.0,
+    "successRequired": 40,
     "cost": {
-      "st": 23.0
+      "st": 23
     },
     "castTime": "150",
     "delay": "950",
@@ -20814,13 +21017,13 @@
     "requirements": [
       {
         "skill": "筋力",
-        "min": 40.0
+        "min": 40
       }
     ],
     "successSkill": "筋力",
-    "successRequired": 40.0,
+    "successRequired": 40,
     "cost": {
-      "st": 19.0
+      "st": 19
     },
     "castTime": "150",
     "delay": "1450",
@@ -20839,17 +21042,17 @@
     "requirements": [
       {
         "skill": "調教",
-        "min": 40.0
+        "min": 40
       },
       {
         "skill": "集中力",
-        "min": 40.0
+        "min": 40
       }
     ],
     "successSkill": "調教",
-    "successRequired": 40.0,
+    "successRequired": 40,
     "cost": {
-      "st": 19.0
+      "st": 19
     },
     "castTime": "120",
     "delay": "1200",
@@ -20868,17 +21071,17 @@
     "requirements": [
       {
         "skill": "物まね",
-        "min": 40.0
+        "min": 40
       },
       {
         "skill": "自然調和",
-        "min": 40.0
+        "min": 40
       }
     ],
     "successSkill": "物まね",
-    "successRequired": 40.0,
+    "successRequired": 40,
     "cost": {
-      "st": 19.0
+      "st": 19
     },
     "castTime": "20",
     "delay": "2020",
@@ -20897,17 +21100,17 @@
     "requirements": [
       {
         "skill": "盾",
-        "min": 90.0
+        "min": 90
       },
       {
         "skill": "召喚魔法",
-        "min": 40.0
+        "min": 40
       }
     ],
     "successSkill": "盾",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 45.0
+      "st": 45
     },
     "castTime": "120",
     "delay": "2120",
@@ -20926,13 +21129,13 @@
     "requirements": [
       {
         "skill": "物まね",
-        "min": 40.0
+        "min": 40
       }
     ],
     "successSkill": "物まね",
-    "successRequired": 40.0,
+    "successRequired": 40,
     "cost": {
-      "st": 19.0
+      "st": 19
     },
     "castTime": "20",
     "delay": "2020",
@@ -20951,17 +21154,17 @@
     "requirements": [
       {
         "skill": "筋力",
-        "min": 90.0
+        "min": 90
       },
       {
         "skill": "集中力",
-        "min": 40.0
+        "min": 40
       }
     ],
     "successSkill": "筋力",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 45.0
+      "st": 45
     },
     "castTime": "244",
     "delay": "1944",
@@ -20980,21 +21183,21 @@
     "requirements": [
       {
         "skill": "生命力",
-        "min": 70.0
+        "min": 70
       },
       {
         "skill": "戦闘技術",
-        "min": 70.0
+        "min": 70
       },
       {
         "skill": "呪文抵抗力",
-        "min": 40.0
+        "min": 40
       }
     ],
     "successSkill": "生命力",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "150",
     "delay": "1900",
@@ -21013,17 +21216,17 @@
     "requirements": [
       {
         "skill": "盾",
-        "min": 90.0
+        "min": 90
       },
       {
         "skill": "呪文抵抗力",
-        "min": 40.0
+        "min": 40
       }
     ],
     "successSkill": "盾",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 45.0
+      "st": 45
     },
     "castTime": "120",
     "delay": "2120",
@@ -21042,13 +21245,13 @@
     "requirements": [
       {
         "skill": "鍛冶",
-        "min": 40.0
+        "min": 40
       }
     ],
     "successSkill": "鍛冶",
-    "successRequired": 40.0,
+    "successRequired": 40,
     "cost": {
-      "st": 20.0
+      "st": 20
     },
     "castTime": "150",
     "delay": "2150",
@@ -21067,13 +21270,13 @@
     "requirements": [
       {
         "skill": "筋力",
-        "min": 40.0
+        "min": 40
       }
     ],
     "successSkill": "筋力",
-    "successRequired": 40.0,
+    "successRequired": 40,
     "cost": {
-      "st": 19.0
+      "st": 19
     },
     "castTime": "150",
     "delay": "2150",
@@ -21092,13 +21295,13 @@
     "requirements": [
       {
         "skill": "牙",
-        "min": 40.0
+        "min": 40
       }
     ],
     "successSkill": "牙",
-    "successRequired": 40.0,
+    "successRequired": 40,
     "cost": {
-      "st": 19.0
+      "st": 19
     },
     "castTime": "150",
     "delay": "1600",
@@ -21117,17 +21320,17 @@
     "requirements": [
       {
         "skill": "落下耐性",
-        "min": 70.0
+        "min": 70
       },
       {
         "skill": "パフォーマンス",
-        "min": 40.0
+        "min": 40
       }
     ],
     "successSkill": "落下耐性",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "120",
     "delay": "920",
@@ -21146,17 +21349,17 @@
     "requirements": [
       {
         "skill": "精神力",
-        "min": 60.0
+        "min": 60
       },
       {
         "skill": "神秘魔法",
-        "min": 40.0
+        "min": 40
       }
     ],
     "successSkill": "精神力",
-    "successRequired": 60.0,
+    "successRequired": 60,
     "cost": {
-      "st": 28.0
+      "st": 28
     },
     "castTime": "150",
     "delay": "2150",
@@ -21175,13 +21378,13 @@
     "requirements": [
       {
         "skill": "音楽",
-        "min": 40.0
+        "min": 40
       }
     ],
     "successSkill": "音楽",
-    "successRequired": 40.0,
+    "successRequired": 40,
     "cost": {
-      "st": 19.0
+      "st": 19
     },
     "castTime": "120",
     "delay": "750",
@@ -21200,13 +21403,13 @@
     "requirements": [
       {
         "skill": "酩酊",
-        "min": 40.0
+        "min": 40
       }
     ],
     "successSkill": "酩酊",
-    "successRequired": 40.0,
+    "successRequired": 40,
     "cost": {
-      "st": 19.0
+      "st": 19
     },
     "castTime": "150",
     "delay": "1950",
@@ -21225,17 +21428,17 @@
     "requirements": [
       {
         "skill": "素手",
-        "min": 60.0
+        "min": 60
       },
       {
         "skill": "酩酊",
-        "min": 40.0
+        "min": 40
       }
     ],
     "successSkill": "素手",
-    "successRequired": 60.0,
+    "successRequired": 60,
     "cost": {
-      "st": 28.0
+      "st": 28
     },
     "castTime": "150",
     "delay": "2000",
@@ -21254,17 +21457,17 @@
     "requirements": [
       {
         "skill": "精神力",
-        "min": 50.0
+        "min": 50
       },
       {
         "skill": "知能",
-        "min": 50.0
+        "min": 50
       }
     ],
     "successSkill": "精神力",
-    "successRequired": 50.0,
+    "successRequired": 50,
     "cost": {
-      "st": 23.0
+      "st": 23
     },
     "castTime": "200",
     "delay": "2200",
@@ -21283,17 +21486,17 @@
     "requirements": [
       {
         "skill": "戦闘技術",
-        "min": 50.0
+        "min": 50
       },
       {
         "skill": "盾",
-        "min": 50.0
+        "min": 50
       }
     ],
     "successSkill": "戦闘技術",
-    "successRequired": 50.0,
+    "successRequired": 50,
     "cost": {
-      "st": 23.0
+      "st": 23
     },
     "castTime": "220",
     "delay": "1600",
@@ -21312,17 +21515,17 @@
     "requirements": [
       {
         "skill": "強化魔法",
-        "min": 80.0
+        "min": 80
       },
       {
         "skill": "呪文抵抗力",
-        "min": 50.0
+        "min": 50
       }
     ],
     "successSkill": "強化魔法",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "250",
     "delay": "2250",
@@ -21341,13 +21544,13 @@
     "requirements": [
       {
         "skill": "自然調和",
-        "min": 50.0
+        "min": 50
       }
     ],
     "successSkill": "自然調和",
-    "successRequired": 50.0,
+    "successRequired": 50,
     "cost": {
-      "st": 23.0
+      "st": 23
     },
     "castTime": "0",
     "delay": "180",
@@ -21366,17 +21569,17 @@
     "requirements": [
       {
         "skill": "暗黒命令",
-        "min": 60.0
+        "min": 60
       },
       {
         "skill": "死の魔法",
-        "min": 50.0
+        "min": 50
       }
     ],
     "successSkill": "暗黒命令",
-    "successRequired": 60.0,
+    "successRequired": 60,
     "cost": {
-      "st": 28.0
+      "st": 28
     },
     "castTime": "150",
     "delay": "1100",
@@ -21395,17 +21598,17 @@
     "requirements": [
       {
         "skill": "暗黒命令",
-        "min": 90.0
+        "min": 90
       },
       {
         "skill": "死の魔法",
-        "min": 50.0
+        "min": 50
       }
     ],
     "successSkill": "暗黒命令",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 45.0
+      "st": 45
     },
     "castTime": "240",
     "delay": "1500",
@@ -21424,17 +21627,17 @@
     "requirements": [
       {
         "skill": "暗黒命令",
-        "min": 70.0
+        "min": 70
       },
       {
         "skill": "死の魔法",
-        "min": 50.0
+        "min": 50
       }
     ],
     "successSkill": "暗黒命令",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 29.0
+      "st": 29
     },
     "castTime": "150",
     "delay": "2150",
@@ -21453,17 +21656,17 @@
     "requirements": [
       {
         "skill": "物まね",
-        "min": 60.0
+        "min": 60
       },
       {
         "skill": "盗み",
-        "min": 50.0
+        "min": 50
       }
     ],
     "successSkill": "物まね",
-    "successRequired": 60.0,
+    "successRequired": 60,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "100",
     "delay": "2300",
@@ -21482,17 +21685,17 @@
     "requirements": [
       {
         "skill": "暗黒命令",
-        "min": 50.0
+        "min": 50
       },
       {
         "skill": "死の魔法",
-        "min": 50.0
+        "min": 50
       }
     ],
     "successSkill": "暗黒命令",
-    "successRequired": 50.0,
+    "successRequired": 50,
     "cost": {
-      "st": 23.0
+      "st": 23
     },
     "castTime": "150",
     "delay": "1200",
@@ -21511,17 +21714,17 @@
     "requirements": [
       {
         "skill": "物まね",
-        "min": 60.0
+        "min": 60
       },
       {
         "skill": "薬調合",
-        "min": 50.0
+        "min": 50
       }
     ],
     "successSkill": "物まね",
-    "successRequired": 60.0,
+    "successRequired": 60,
     "cost": {
-      "st": 28.0
+      "st": 28
     },
     "castTime": "100",
     "delay": "2100",
@@ -21540,17 +21743,17 @@
     "requirements": [
       {
         "skill": "キック",
-        "min": 80.0
+        "min": 80
       },
       {
         "skill": "強化魔法",
-        "min": 50.0
+        "min": 50
       }
     ],
     "successSkill": "キック",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "130",
     "delay": "1030",
@@ -21569,17 +21772,17 @@
     "requirements": [
       {
         "skill": "精神力",
-        "min": 70.0
+        "min": 70
       },
       {
         "skill": "知能",
-        "min": 50.0
+        "min": 50
       }
     ],
     "successSkill": "精神力",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "200",
     "delay": "2200",
@@ -21598,17 +21801,17 @@
     "requirements": [
       {
         "skill": "精神力",
-        "min": 70.0
+        "min": 70
       },
       {
         "skill": "知能",
-        "min": 50.0
+        "min": 50
       }
     ],
     "successSkill": "精神力",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "200",
     "delay": "2200",
@@ -21627,17 +21830,17 @@
     "requirements": [
       {
         "skill": "精神力",
-        "min": 50.0
+        "min": 50
       },
       {
         "skill": "知能",
-        "min": 50.0
+        "min": 50
       }
     ],
     "successSkill": "精神力",
-    "successRequired": 50.0,
+    "successRequired": 50,
     "cost": {
-      "st": 23.0
+      "st": 23
     },
     "castTime": "200",
     "delay": "2200",
@@ -21656,13 +21859,13 @@
     "requirements": [
       {
         "skill": "魔法熟練",
-        "min": 50.0
+        "min": 50
       }
     ],
     "successSkill": "魔法熟練",
-    "successRequired": 50.0,
+    "successRequired": 50,
     "cost": {
-      "st": 28.0
+      "st": 28
     },
     "castTime": "0",
     "delay": "70",
@@ -21681,17 +21884,17 @@
     "requirements": [
       {
         "skill": "精神力",
-        "min": 70.0
+        "min": 70
       },
       {
         "skill": "知能",
-        "min": 50.0
+        "min": 50
       }
     ],
     "successSkill": "精神力",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "200",
     "delay": "2200",
@@ -21710,17 +21913,17 @@
     "requirements": [
       {
         "skill": "精神力",
-        "min": 70.0
+        "min": 70
       },
       {
         "skill": "知能",
-        "min": 50.0
+        "min": 50
       }
     ],
     "successSkill": "精神力",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "200",
     "delay": "2200",
@@ -21739,17 +21942,17 @@
     "requirements": [
       {
         "skill": "牙",
-        "min": 80.0
+        "min": 80
       },
       {
         "skill": "暗黒命令",
-        "min": 50.0
+        "min": 50
       }
     ],
     "successSkill": "牙",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "80",
     "delay": "1800",
@@ -21768,21 +21971,21 @@
     "requirements": [
       {
         "skill": "戦闘技術",
-        "min": 70.0
+        "min": 70
       },
       {
         "skill": "持久力",
-        "min": 70.0
+        "min": 70
       },
       {
         "skill": "盾",
-        "min": 50.0
+        "min": 50
       }
     ],
     "successSkill": "戦闘技術",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "150",
     "delay": "3600",
@@ -21801,17 +22004,17 @@
     "requirements": [
       {
         "skill": "攻撃回避",
-        "min": 70.0
+        "min": 70
       },
       {
         "skill": "神秘魔法",
-        "min": 50.0
+        "min": 50
       }
     ],
     "successSkill": "攻撃回避",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "20",
     "delay": "1100",
@@ -21830,17 +22033,17 @@
     "requirements": [
       {
         "skill": "精神力",
-        "min": 60.0
+        "min": 60
       },
       {
         "skill": "戦闘技術",
-        "min": 50.0
+        "min": 50
       }
     ],
     "successSkill": "精神力",
-    "successRequired": 60.0,
+    "successRequired": 60,
     "cost": {
-      "st": 28.0
+      "st": 28
     },
     "castTime": "200",
     "delay": "1800",
@@ -21859,13 +22062,13 @@
     "requirements": [
       {
         "skill": "死の魔法",
-        "min": 50.0
+        "min": 50
       }
     ],
     "successSkill": "死の魔法",
-    "successRequired": 50.0,
+    "successRequired": 50,
     "cost": {
-      "st": 23.0
+      "st": 23
     },
     "castTime": "120",
     "delay": "1620",
@@ -21884,17 +22087,17 @@
     "requirements": [
       {
         "skill": "キック",
-        "min": 60.0
+        "min": 60
       },
       {
         "skill": "精神力",
-        "min": 50.0
+        "min": 50
       }
     ],
     "successSkill": "キック",
-    "successRequired": 60.0,
+    "successRequired": 60,
     "cost": {
-      "st": 28.0
+      "st": 28
     },
     "castTime": "0",
     "delay": "240",
@@ -21913,17 +22116,17 @@
     "requirements": [
       {
         "skill": "キック",
-        "min": 50.0
+        "min": 50
       },
       {
         "skill": "筋力",
-        "min": 50.0
+        "min": 50
       }
     ],
     "successSkill": "キック",
-    "successRequired": 50.0,
+    "successRequired": 50,
     "cost": {
-      "st": 23.0
+      "st": 23
     },
     "castTime": "120",
     "delay": "1620",
@@ -21942,13 +22145,13 @@
     "requirements": [
       {
         "skill": "強化魔法",
-        "min": 60.0
+        "min": 60
       }
     ],
     "successSkill": "強化魔法",
-    "successRequired": 60.0,
+    "successRequired": 60,
     "cost": {
-      "st": 50.0
+      "st": 50
     },
     "castTime": "30",
     "delay": "1600",
@@ -21967,17 +22170,17 @@
     "requirements": [
       {
         "skill": "強化魔法",
-        "min": 80.0
+        "min": 80
       },
       {
         "skill": "集中力",
-        "min": 60.0
+        "min": 60
       }
     ],
     "successSkill": "強化魔法",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 46.0
+      "st": 46
     },
     "castTime": "900",
     "delay": "3000",
@@ -21996,13 +22199,13 @@
     "requirements": [
       {
         "skill": "生命力",
-        "min": 60.0
+        "min": 60
       }
     ],
     "successSkill": "生命力",
-    "successRequired": 60.0,
+    "successRequired": 60,
     "cost": {
-      "st": 50.0
+      "st": 50
     },
     "castTime": "140",
     "delay": "4200",
@@ -22021,17 +22224,17 @@
     "requirements": [
       {
         "skill": "精神力",
-        "min": 80.0
+        "min": 80
       },
       {
         "skill": "魔法熟練",
-        "min": 60.0
+        "min": 60
       }
     ],
     "successSkill": "精神力",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "200",
     "delay": "2200",
@@ -22050,17 +22253,17 @@
     "requirements": [
       {
         "skill": "強化魔法",
-        "min": 60.0
+        "min": 60
       },
       {
         "skill": "筋力",
-        "min": 60.0
+        "min": 60
       }
     ],
     "successSkill": "強化魔法",
-    "successRequired": 60.0,
+    "successRequired": 60,
     "cost": {
-      "st": 28.0
+      "st": 28
     },
     "castTime": "180",
     "delay": "2000",
@@ -22079,17 +22282,17 @@
     "requirements": [
       {
         "skill": "暗黒命令",
-        "min": 60.0
+        "min": 60
       },
       {
         "skill": "死体回収",
-        "min": 60.0
+        "min": 60
       }
     ],
     "successSkill": "暗黒命令",
-    "successRequired": 60.0,
+    "successRequired": 60,
     "cost": {
-      "st": 28.0
+      "st": 28
     },
     "castTime": "150",
     "delay": "2000",
@@ -22108,17 +22311,17 @@
     "requirements": [
       {
         "skill": "筋力",
-        "min": 90.0
+        "min": 90
       },
       {
         "skill": "強化魔法",
-        "min": 60.0
+        "min": 60
       }
     ],
     "successSkill": "筋力",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 50.0
+      "st": 50
     },
     "castTime": "150",
     "delay": "3150",
@@ -22137,13 +22340,13 @@
     "requirements": [
       {
         "skill": "盗み",
-        "min": 60.0
+        "min": 60
       }
     ],
     "successSkill": "盗み",
-    "successRequired": 60.0,
+    "successRequired": 60,
     "cost": {
-      "st": 28.0
+      "st": 28
     },
     "castTime": "160",
     "delay": "1360",
@@ -22162,17 +22365,17 @@
     "requirements": [
       {
         "skill": "水泳",
-        "min": 60.0
+        "min": 60
       },
       {
         "skill": "自然調和",
-        "min": 60.0
+        "min": 60
       }
     ],
     "successSkill": "水泳",
-    "successRequired": 60.0,
+    "successRequired": 60,
     "cost": {
-      "st": 28.0
+      "st": 28
     },
     "castTime": "20",
     "delay": "1500",
@@ -22191,13 +22394,13 @@
     "requirements": [
       {
         "skill": "戦闘技術",
-        "min": 60.0
+        "min": 60
       }
     ],
     "successSkill": "戦闘技術",
-    "successRequired": 60.0,
+    "successRequired": 60,
     "cost": {
-      "st": 28.0
+      "st": 28
     },
     "castTime": "150",
     "delay": "1950",
@@ -22216,13 +22419,13 @@
     "requirements": [
       {
         "skill": "自然調和",
-        "min": 60.0
+        "min": 60
       }
     ],
     "successSkill": "自然調和",
-    "successRequired": 60.0,
+    "successRequired": 60,
     "cost": {
-      "st": 28.0
+      "st": 28
     },
     "castTime": "20",
     "delay": "1620",
@@ -22241,13 +22444,13 @@
     "requirements": [
       {
         "skill": "盾",
-        "min": 60.0
+        "min": 60
       }
     ],
     "successSkill": "盾",
-    "successRequired": 60.0,
+    "successRequired": 60,
     "cost": {
-      "st": 28.0
+      "st": 28
     },
     "castTime": "150",
     "delay": "1900",
@@ -22266,13 +22469,13 @@
     "requirements": [
       {
         "skill": "調教",
-        "min": 60.0
+        "min": 60
       }
     ],
     "successSkill": "調教",
-    "successRequired": 60.0,
+    "successRequired": 60,
     "cost": {
-      "st": 28.0
+      "st": 28
     },
     "castTime": "110",
     "delay": "2510",
@@ -22291,17 +22494,17 @@
     "requirements": [
       {
         "skill": "魔法熟練",
-        "min": 60.0
+        "min": 60
       },
       {
         "skill": "精神力",
-        "min": 60.0
+        "min": 60
       }
     ],
     "successSkill": "魔法熟練",
-    "successRequired": 60.0,
+    "successRequired": 60,
     "cost": {
-      "st": 28.0
+      "st": 28
     },
     "castTime": "170",
     "delay": "2000",
@@ -22320,17 +22523,17 @@
     "requirements": [
       {
         "skill": "着こなし",
-        "min": 80.0
+        "min": 80
       },
       {
         "skill": "戦闘技術",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "着こなし",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 28.0
+      "st": 28
     },
     "castTime": "140",
     "delay": "1200",
@@ -22349,13 +22552,13 @@
     "requirements": [
       {
         "skill": "美容",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "美容",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 28.0
+      "st": 28
     },
     "castTime": "220",
     "delay": "1800",
@@ -22374,17 +22577,17 @@
     "requirements": [
       {
         "skill": "筋力",
-        "min": 80.0
+        "min": 80
       },
       {
         "skill": "戦闘技術",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "筋力",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "150",
     "delay": "1500",
@@ -22403,13 +22606,13 @@
     "requirements": [
       {
         "skill": "魔法熟練",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "魔法熟練",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "150",
     "delay": "2000",
@@ -22428,13 +22631,13 @@
     "requirements": [
       {
         "skill": "魔法熟練",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "魔法熟練",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "100",
     "delay": "1900",
@@ -22453,17 +22656,17 @@
     "requirements": [
       {
         "skill": "音楽",
-        "min": 70.0
+        "min": 70
       },
       {
         "skill": "ダンス",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "音楽",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "300",
     "delay": "1250",
@@ -22482,13 +22685,13 @@
     "requirements": [
       {
         "skill": "盗み",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "盗み",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "150",
     "delay": "2200",
@@ -22507,17 +22710,17 @@
     "requirements": [
       {
         "skill": "戦闘技術",
-        "min": 70.0
+        "min": 70
       },
       {
         "skill": "攻撃回避",
-        "min": 90.0
+        "min": 90
       }
     ],
     "successSkill": "戦闘技術",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 28.0
+      "st": 28
     },
     "castTime": "20",
     "delay": "500",
@@ -22536,17 +22739,17 @@
     "requirements": [
       {
         "skill": "シャウト",
-        "min": 80.0
+        "min": 80
       },
       {
         "skill": "強化魔法",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "シャウト",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 100.0
+      "st": 100
     },
     "castTime": "200",
     "delay": "1400",
@@ -22565,17 +22768,17 @@
     "requirements": [
       {
         "skill": "魔法熟練",
-        "min": 70.0
+        "min": 70
       },
       {
         "skill": "集中力",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "魔法熟練",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "170",
     "delay": "2000",
@@ -22594,13 +22797,13 @@
     "requirements": [
       {
         "skill": "シャウト",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "シャウト",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "200",
     "delay": "1700",
@@ -22619,13 +22822,13 @@
     "requirements": [
       {
         "skill": "死の魔法",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "死の魔法",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "170",
     "delay": "1600",
@@ -22644,25 +22847,25 @@
     "requirements": [
       {
         "skill": "自然調和",
-        "min": 70.0
+        "min": 70
       },
       {
         "skill": "水泳",
-        "min": 70.0
+        "min": 70
       },
       {
         "skill": "自然回復",
-        "min": 70.0
+        "min": 70
       },
       {
         "skill": "持久力",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "自然調和",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 40.0
+      "st": 40
     },
     "castTime": "60",
     "delay": "1860",
@@ -22681,13 +22884,13 @@
     "requirements": [
       {
         "skill": "戦闘技術",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "戦闘技術",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "150",
     "delay": "2150",
@@ -22706,17 +22909,17 @@
     "requirements": [
       {
         "skill": "強化魔法",
-        "min": 80.0
+        "min": 80
       },
       {
         "skill": "戦闘技術",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "強化魔法",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "260",
     "delay": "1300",
@@ -22735,17 +22938,17 @@
     "requirements": [
       {
         "skill": "戦闘技術",
-        "min": 80.0
+        "min": 80
       },
       {
         "skill": "強化魔法",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "戦闘技術",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "140",
     "delay": "1740",
@@ -22764,13 +22967,13 @@
     "requirements": [
       {
         "skill": "生命力",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "生命力",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 9.0
+      "st": 9
     },
     "castTime": "100",
     "delay": "1100",
@@ -22789,17 +22992,17 @@
     "requirements": [
       {
         "skill": "戦闘技術",
-        "min": 70.0
+        "min": 70
       },
       {
         "skill": "精神力",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "戦闘技術",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "130",
     "delay": "1930",
@@ -22818,17 +23021,17 @@
     "requirements": [
       {
         "skill": "自然調和",
-        "min": 70.0
+        "min": 70
       },
       {
         "skill": "キック",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "自然調和",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "0",
     "delay": "1000",
@@ -22847,17 +23050,17 @@
     "requirements": [
       {
         "skill": "魔法熟練",
-        "min": 80.0
+        "min": 80
       },
       {
         "skill": "集中力",
-        "min": 80.0
+        "min": 80
       }
     ],
     "successSkill": "魔法熟練",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 46.0
+      "st": 46
     },
     "castTime": "450",
     "delay": "2250",
@@ -22876,13 +23079,13 @@
     "requirements": [
       {
         "skill": "着こなし",
-        "min": 80.0
+        "min": 80
       }
     ],
     "successSkill": "着こなし",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "150",
     "delay": "1650",
@@ -22901,17 +23104,17 @@
     "requirements": [
       {
         "skill": "キック",
-        "min": 80.0
+        "min": 80
       },
       {
         "skill": "攻撃回避",
-        "min": 80.0
+        "min": 80
       }
     ],
     "successSkill": "キック",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 28.0
+      "st": 28
     },
     "castTime": "50",
     "delay": "750",
@@ -22930,17 +23133,17 @@
     "requirements": [
       {
         "skill": "神秘魔法",
-        "min": 80.0
+        "min": 80
       },
       {
         "skill": "集中力",
-        "min": 80.0
+        "min": 80
       }
     ],
     "successSkill": "神秘魔法",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "150",
     "delay": "2150",
@@ -22959,17 +23162,17 @@
     "requirements": [
       {
         "skill": "神秘魔法",
-        "min": 80.0
+        "min": 80
       },
       {
         "skill": "強化魔法",
-        "min": 80.0
+        "min": 80
       }
     ],
     "successSkill": "神秘魔法",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "150",
     "delay": "2150",
@@ -22988,17 +23191,17 @@
     "requirements": [
       {
         "skill": "精神力",
-        "min": 80.0
+        "min": 80
       },
       {
         "skill": "魔法熟練",
-        "min": 80.0
+        "min": 80
       }
     ],
     "successSkill": "精神力",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "150",
     "delay": "2400",
@@ -23017,17 +23220,17 @@
     "requirements": [
       {
         "skill": "回復魔法",
-        "min": 80.0
+        "min": 80
       },
       {
         "skill": "神秘魔法",
-        "min": 80.0
+        "min": 80
       }
     ],
     "successSkill": "回復魔法",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "150",
     "delay": "2400",
@@ -23046,13 +23249,13 @@
     "requirements": [
       {
         "skill": "暗黒命令",
-        "min": 80.0
+        "min": 80
       }
     ],
     "successSkill": "暗黒命令",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "180",
     "delay": "3000",
@@ -23071,17 +23274,17 @@
     "requirements": [
       {
         "skill": "神秘魔法",
-        "min": 90.0
+        "min": 90
       },
       {
         "skill": "呪文抵抗力",
-        "min": 80.0
+        "min": 80
       }
     ],
     "successSkill": "神秘魔法",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 45.0
+      "st": 45
     },
     "castTime": "120",
     "delay": "3720",
@@ -23100,15 +23303,15 @@
     "requirements": [
       {
         "skill": "着こなし",
-        "min": 80.0
+        "min": 80
       },
       {
         "skill": "物まね",
-        "min": 90.0
+        "min": 90
       }
     ],
     "successSkill": "着こなし",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {},
     "castTime": "-",
     "delay": "-",
@@ -23127,17 +23330,17 @@
     "requirements": [
       {
         "skill": "音楽",
-        "min": 90.0
+        "min": 90
       },
       {
         "skill": "強化魔法",
-        "min": 80.0
+        "min": 80
       }
     ],
     "successSkill": "音楽",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 45.0
+      "st": 45
     },
     "castTime": "300",
     "delay": "1200",
@@ -23156,13 +23359,13 @@
     "requirements": [
       {
         "skill": "戦闘技術",
-        "min": 80.0
+        "min": 80
       }
     ],
     "successSkill": "戦闘技術",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "150",
     "delay": "1750",
@@ -23181,13 +23384,13 @@
     "requirements": [
       {
         "skill": "牙",
-        "min": 80.0
+        "min": 80
       }
     ],
     "successSkill": "牙",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "150",
     "delay": "2200",
@@ -23206,17 +23409,17 @@
     "requirements": [
       {
         "skill": "戦闘技術",
-        "min": 80.0
+        "min": 80
       },
       {
         "skill": "筋力",
-        "min": 80.0
+        "min": 80
       }
     ],
     "successSkill": "戦闘技術",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "120",
     "delay": "1500",
@@ -23235,17 +23438,17 @@
     "requirements": [
       {
         "skill": "キック",
-        "min": 80.0
+        "min": 80
       },
       {
         "skill": "素手",
-        "min": 80.0
+        "min": 80
       }
     ],
     "successSkill": "キック",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "150",
     "delay": "2150",
@@ -23264,13 +23467,13 @@
     "requirements": [
       {
         "skill": "自然調和",
-        "min": 80.0
+        "min": 80
       }
     ],
     "successSkill": "自然調和",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "120",
     "delay": "2120",
@@ -23289,13 +23492,13 @@
     "requirements": [
       {
         "skill": "物まね",
-        "min": 80.0
+        "min": 80
       }
     ],
     "successSkill": "物まね",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 39.0
+      "st": 39
     },
     "castTime": "120",
     "delay": "2320",
@@ -23314,13 +23517,13 @@
     "requirements": [
       {
         "skill": "投げ",
-        "min": 80.0
+        "min": 80
       }
     ],
     "successSkill": "投げ",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "150",
     "delay": "600",
@@ -23339,13 +23542,13 @@
     "requirements": [
       {
         "skill": "生命力",
-        "min": 90.0
+        "min": 90
       }
     ],
     "successSkill": "生命力",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 30.0
+      "st": 30
     },
     "castTime": "3000",
     "delay": "1800",
@@ -23364,13 +23567,13 @@
     "requirements": [
       {
         "skill": "釣り",
-        "min": 90.0
+        "min": 90
       }
     ],
     "successSkill": "釣り",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 35.0
+      "st": 35
     },
     "castTime": "595",
     "delay": "800",
@@ -23389,13 +23592,13 @@
     "requirements": [
       {
         "skill": "着こなし",
-        "min": 90.0
+        "min": 90
       }
     ],
     "successSkill": "着こなし",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 35.0
+      "st": 35
     },
     "castTime": "200",
     "delay": "2000",
@@ -23414,37 +23617,37 @@
     "requirements": [
       {
         "skill": "鍛冶",
-        "min": 90.0
+        "min": 90
       },
       {
         "skill": "裁縫",
-        "min": 90.0
+        "min": 90
       },
       {
         "skill": "木工",
-        "min": 90.0
+        "min": 90
       },
       {
         "skill": "複製",
-        "min": 90.0
+        "min": 90
       },
       {
         "skill": "料理",
-        "min": 90.0
+        "min": 90
       },
       {
         "skill": "醸造",
-        "min": 90.0
+        "min": 90
       },
       {
         "skill": "薬調合",
-        "min": 90.0
+        "min": 90
       }
     ],
     "successSkill": "鍛冶",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 25.0
+      "st": 25
     },
     "castTime": "150",
     "delay": "30300",
@@ -23463,13 +23666,13 @@
     "requirements": [
       {
         "skill": "盗み",
-        "min": 90.0
+        "min": 90
       }
     ],
     "successSkill": "盗み",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 45.0
+      "st": 45
     },
     "castTime": "140",
     "delay": "1640",
@@ -23488,13 +23691,13 @@
     "requirements": [
       {
         "skill": "死の魔法",
-        "min": 90.0
+        "min": 90
       }
     ],
     "successSkill": "死の魔法",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 45.0
+      "st": 45
     },
     "castTime": "300",
     "delay": "9999",
@@ -23513,29 +23716,29 @@
     "requirements": [
       {
         "skill": "戦闘技術",
-        "min": 90.0
+        "min": 90
       },
       {
         "skill": "攻撃回避",
-        "min": 90.0
+        "min": 90
       },
       {
         "skill": "筋力",
-        "min": 90.0
+        "min": 90
       },
       {
         "skill": "包帯",
-        "min": 90.0
+        "min": 90
       },
       {
         "skill": "精神力",
-        "min": 90.0
+        "min": 90
       }
     ],
     "successSkill": "戦闘技術",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "240",
     "delay": "1200",
@@ -23554,37 +23757,37 @@
     "requirements": [
       {
         "skill": "刀剣",
-        "min": 90.0
+        "min": 90
       },
       {
         "skill": "罠",
-        "min": 90.0
+        "min": 90
       },
       {
         "skill": "物まね",
-        "min": 90.0
+        "min": 90
       },
       {
         "skill": "自然調和",
-        "min": 90.0
+        "min": 90
       },
       {
         "skill": "薬調合",
-        "min": 90.0
+        "min": 90
       },
       {
         "skill": "落下耐性",
-        "min": 90.0
+        "min": 90
       },
       {
         "skill": "投げ",
-        "min": 90.0
+        "min": 90
       }
     ],
     "successSkill": "刀剣",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 0.0
+      "st": 0
     },
     "castTime": "20",
     "delay": "20",
@@ -23602,13 +23805,13 @@
     "requirements": [
       {
         "skill": "戦闘技術",
-        "min": 90.0
+        "min": 90
       }
     ],
     "successSkill": "戦闘技術",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 45.0
+      "st": 45
     },
     "castTime": "90",
     "delay": "690",
@@ -23627,17 +23830,17 @@
     "requirements": [
       {
         "skill": "戦闘技術",
-        "min": 90.0
+        "min": 90
       },
       {
         "skill": "神秘魔法",
-        "min": 90.0
+        "min": 90
       }
     ],
     "successSkill": "戦闘技術",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 80.0
+      "st": 80
     },
     "castTime": "200",
     "delay": "18200",
@@ -23656,17 +23859,17 @@
     "requirements": [
       {
         "skill": "自然調和",
-        "min": 90.0
+        "min": 90
       },
       {
         "skill": "物まね",
-        "min": 90.0
+        "min": 90
       }
     ],
     "successSkill": "自然調和",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 100.0
+      "st": 100
     },
     "castTime": "200",
     "delay": "4000",
@@ -23685,21 +23888,21 @@
     "requirements": [
       {
         "skill": "自然調和",
-        "min": 90.0
+        "min": 90
       },
       {
         "skill": "物まね",
-        "min": 90.0
+        "min": 90
       },
       {
         "skill": "刀剣",
-        "min": 90.0
+        "min": 90
       }
     ],
     "successSkill": "自然調和",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 100.0
+      "st": 100
     },
     "castTime": "10",
     "delay": "10010",
@@ -23718,17 +23921,17 @@
     "requirements": [
       {
         "skill": "精神力",
-        "min": 150.0
+        "min": 150
       },
       {
         "skill": "集中力",
-        "min": 150.0
+        "min": 150
       }
     ],
     "successSkill": "精神力",
-    "successRequired": 150.0,
+    "successRequired": 150,
     "cost": {
-      "st": 100.0
+      "st": 100
     },
     "castTime": "110",
     "delay": "32400",
@@ -23747,13 +23950,13 @@
     "requirements": [
       {
         "skill": "盾",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "盾",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 5.0
+      "st": 5
     },
     "castTime": "300",
     "delay": "35300",
@@ -23772,13 +23975,13 @@
     "requirements": [
       {
         "skill": "精神力",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "精神力",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 30.0
+      "st": 30
     },
     "castTime": "150",
     "delay": "2200",
@@ -23797,13 +24000,13 @@
     "requirements": [
       {
         "skill": "攻撃回避",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "攻撃回避",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 20.0
+      "st": 20
     },
     "castTime": "100",
     "delay": "1300",
@@ -23822,13 +24025,13 @@
     "requirements": [
       {
         "skill": "生命力",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "生命力",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 15.0
+      "st": 15
     },
     "castTime": "120",
     "delay": "1300",
@@ -23847,13 +24050,13 @@
     "requirements": [
       {
         "skill": "物まね",
-        "min": 1.0
+        "min": 1
       }
     ],
     "successSkill": "物まね",
-    "successRequired": 1.0,
+    "successRequired": 1,
     "cost": {
-      "st": 20.0
+      "st": 20
     },
     "castTime": "120",
     "delay": "1120",
@@ -23872,21 +24075,21 @@
     "requirements": [
       {
         "skill": "回復魔法",
-        "min": 30.0
+        "min": 30
       },
       {
         "skill": "強化魔法",
-        "min": 70.0
+        "min": 70
       },
       {
         "skill": "死の魔法",
-        "min": 10.0
+        "min": 10
       }
     ],
     "successSkill": "回復魔法",
-    "successRequired": 30.0,
+    "successRequired": 30,
     "cost": {
-      "st": 15.0
+      "st": 15
     },
     "castTime": "120",
     "delay": "1020",
@@ -23905,21 +24108,21 @@
     "requirements": [
       {
         "skill": "盾",
-        "min": 80.0
+        "min": 80
       },
       {
         "skill": "着こなし",
-        "min": 80.0
+        "min": 80
       },
       {
         "skill": "攻撃回避",
-        "min": 10.0
+        "min": 10
       }
     ],
     "successSkill": "盾",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "200",
     "delay": "2200",
@@ -23938,17 +24141,17 @@
     "requirements": [
       {
         "skill": "攻撃回避",
-        "min": 60.0
+        "min": 60
       },
       {
         "skill": "パフォーマンス",
-        "min": 20.0
+        "min": 20
       }
     ],
     "successSkill": "攻撃回避",
-    "successRequired": 60.0,
+    "successRequired": 60,
     "cost": {
-      "st": 27.0
+      "st": 27
     },
     "castTime": "20",
     "delay": "1220",
@@ -23967,17 +24170,17 @@
     "requirements": [
       {
         "skill": "物まね",
-        "min": 30.0
+        "min": 30
       },
       {
         "skill": "神秘魔法",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "物まね",
-    "successRequired": 30.0,
+    "successRequired": 30,
     "cost": {
-      "st": 40.0
+      "st": 40
     },
     "castTime": "60",
     "delay": "1260",
@@ -23996,17 +24199,17 @@
     "requirements": [
       {
         "skill": "牙",
-        "min": 60.0
+        "min": 60
       },
       {
         "skill": "盾",
-        "min": 30.0
+        "min": 30
       }
     ],
     "successSkill": "牙",
-    "successRequired": 60.0,
+    "successRequired": 60,
     "cost": {
-      "st": 27.0
+      "st": 27
     },
     "castTime": "110",
     "delay": "1600",
@@ -24025,13 +24228,13 @@
     "requirements": [
       {
         "skill": "着こなし",
-        "min": 30.0
+        "min": 30
       }
     ],
     "successSkill": "着こなし",
-    "successRequired": 30.0,
+    "successRequired": 30,
     "cost": {
-      "st": 19.0
+      "st": 19
     },
     "castTime": "140",
     "delay": "1140",
@@ -24050,13 +24253,13 @@
     "requirements": [
       {
         "skill": "盾",
-        "min": 40.0
+        "min": 40
       }
     ],
     "successSkill": "盾",
-    "successRequired": 40.0,
+    "successRequired": 40,
     "cost": {
-      "st": 21.0
+      "st": 21
     },
     "castTime": "120",
     "delay": "1620",
@@ -24075,17 +24278,17 @@
     "requirements": [
       {
         "skill": "盾",
-        "min": 60.0
+        "min": 60
       },
       {
         "skill": "戦闘技術",
-        "min": 40.0
+        "min": 40
       }
     ],
     "successSkill": "盾",
-    "successRequired": 60.0,
+    "successRequired": 60,
     "cost": {
-      "st": 27.0
+      "st": 27
     },
     "castTime": "120",
     "delay": "1200",
@@ -24104,13 +24307,13 @@
     "requirements": [
       {
         "skill": "盾",
-        "min": 40.0
+        "min": 40
       }
     ],
     "successSkill": "盾",
-    "successRequired": 40.0,
+    "successRequired": 40,
     "cost": {
-      "st": 21.0
+      "st": 21
     },
     "castTime": "135",
     "delay": "1200",
@@ -24129,13 +24332,13 @@
     "requirements": [
       {
         "skill": "戦闘技術",
-        "min": 40.0
+        "min": 40
       }
     ],
     "successSkill": "戦闘技術",
-    "successRequired": 40.0,
+    "successRequired": 40,
     "cost": {
-      "st": 19.0
+      "st": 19
     },
     "castTime": "90",
     "delay": "600",
@@ -24154,17 +24357,17 @@
     "requirements": [
       {
         "skill": "パフォーマンス",
-        "min": 90.0
+        "min": 90
       },
       {
         "skill": "死体回収",
-        "min": 40.0
+        "min": 40
       }
     ],
     "successSkill": "パフォーマンス",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 45.0
+      "st": 45
     },
     "castTime": "60",
     "delay": "400",
@@ -24183,21 +24386,21 @@
     "requirements": [
       {
         "skill": "攻撃回避",
-        "min": 70.0
+        "min": 70
       },
       {
         "skill": "戦闘技術",
-        "min": 70.0
+        "min": 70
       },
       {
         "skill": "キック",
-        "min": 50.0
+        "min": 50
       }
     ],
     "successSkill": "攻撃回避",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "0",
     "delay": "1200",
@@ -24216,13 +24419,13 @@
     "requirements": [
       {
         "skill": "自然調和",
-        "min": 50.0
+        "min": 50
       }
     ],
     "successSkill": "自然調和",
-    "successRequired": 50.0,
+    "successRequired": 50,
     "cost": {
-      "st": 23.0
+      "st": 23
     },
     "castTime": "180",
     "delay": "1780",
@@ -24241,17 +24444,17 @@
     "requirements": [
       {
         "skill": "ダンス",
-        "min": 50.0
+        "min": 50
       },
       {
         "skill": "戦闘技術",
-        "min": 50.0
+        "min": 50
       }
     ],
     "successSkill": "ダンス",
-    "successRequired": 50.0,
+    "successRequired": 50,
     "cost": {
-      "st": 23.0
+      "st": 23
     },
     "castTime": "180",
     "delay": "1600",
@@ -24270,13 +24473,13 @@
     "requirements": [
       {
         "skill": "盾",
-        "min": 60.0
+        "min": 60
       }
     ],
     "successSkill": "盾",
-    "successRequired": 60.0,
+    "successRequired": 60,
     "cost": {
-      "st": 27.0
+      "st": 27
     },
     "castTime": "110",
     "delay": "1460",
@@ -24295,17 +24498,17 @@
     "requirements": [
       {
         "skill": "槍",
-        "min": 90.0
+        "min": 90
       },
       {
         "skill": "戦闘技術",
-        "min": 60.0
+        "min": 60
       }
     ],
     "successSkill": "槍",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 45.0
+      "st": 45
     },
     "castTime": "135",
     "delay": "1650",
@@ -24324,17 +24527,17 @@
     "requirements": [
       {
         "skill": "戦闘技術",
-        "min": 90.0
+        "min": 90
       },
       {
         "skill": "盾",
-        "min": 60.0
+        "min": 60
       }
     ],
     "successSkill": "戦闘技術",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 28.0
+      "st": 28
     },
     "castTime": "190",
     "delay": "900",
@@ -24353,17 +24556,17 @@
     "requirements": [
       {
         "skill": "盾",
-        "min": 60.0
+        "min": 60
       },
       {
         "skill": "戦闘技術",
-        "min": 90.0
+        "min": 90
       }
     ],
     "successSkill": "盾",
-    "successRequired": 60.0,
+    "successRequired": 60,
     "cost": {
-      "st": 27.0
+      "st": 27
     },
     "castTime": "140",
     "delay": "1200",
@@ -24382,17 +24585,17 @@
     "requirements": [
       {
         "skill": "牙",
-        "min": 60.0
+        "min": 60
       },
       {
         "skill": "自然調和",
-        "min": 60.0
+        "min": 60
       }
     ],
     "successSkill": "牙",
-    "successRequired": 60.0,
+    "successRequired": 60,
     "cost": {
-      "st": 28.0
+      "st": 28
     },
     "castTime": "60",
     "delay": "1000",
@@ -24411,13 +24614,13 @@
     "requirements": [
       {
         "skill": "盾",
-        "min": 60.0
+        "min": 60
       }
     ],
     "successSkill": "盾",
-    "successRequired": 60.0,
+    "successRequired": 60,
     "cost": {
-      "st": 27.0
+      "st": 27
     },
     "castTime": "135",
     "delay": "1200",
@@ -24436,13 +24639,13 @@
     "requirements": [
       {
         "skill": "自然調和",
-        "min": 60.0
+        "min": 60
       }
     ],
     "successSkill": "自然調和",
-    "successRequired": 60.0,
+    "successRequired": 60,
     "cost": {
-      "st": 28.0
+      "st": 28
     },
     "castTime": "120",
     "delay": "1320",
@@ -24461,13 +24664,13 @@
     "requirements": [
       {
         "skill": "盾",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "盾",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "20",
     "delay": "1300",
@@ -24486,25 +24689,25 @@
     "requirements": [
       {
         "skill": "罠",
-        "min": 70.0
+        "min": 70
       },
       {
         "skill": "自然調和",
-        "min": 70.0
+        "min": 70
       },
       {
         "skill": "投げ",
-        "min": 70.0
+        "min": 70
       },
       {
         "skill": "薬調合",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "罠",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "60",
     "delay": "1260",
@@ -24523,17 +24726,17 @@
     "requirements": [
       {
         "skill": "素手",
-        "min": 70.0
+        "min": 70
       },
       {
         "skill": "攻撃回避",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "素手",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "90",
     "delay": "1140",
@@ -24552,17 +24755,17 @@
     "requirements": [
       {
         "skill": "攻撃回避",
-        "min": 80.0
+        "min": 80
       },
       {
         "skill": "集中力",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "攻撃回避",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 39.0
+      "st": 39
     },
     "castTime": "100",
     "delay": "1500",
@@ -24581,17 +24784,17 @@
     "requirements": [
       {
         "skill": "パフォーマンス",
-        "min": 70.0
+        "min": 70
       },
       {
         "skill": "生命力",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "パフォーマンス",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "320",
     "delay": "1000",
@@ -24610,17 +24813,17 @@
     "requirements": [
       {
         "skill": "盾",
-        "min": 90.0
+        "min": 90
       },
       {
         "skill": "神秘魔法",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "盾",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 45.0
+      "st": 45
     },
     "castTime": "180",
     "delay": "1500",
@@ -24639,17 +24842,17 @@
     "requirements": [
       {
         "skill": "キック",
-        "min": 70.0
+        "min": 70
       },
       {
         "skill": "戦闘技術",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "キック",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "70",
     "delay": "1270",
@@ -24668,13 +24871,13 @@
     "requirements": [
       {
         "skill": "魔法熟練",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "魔法熟練",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "120",
     "delay": "1320",
@@ -24693,17 +24896,17 @@
     "requirements": [
       {
         "skill": "魔法熟練",
-        "min": 70.0
+        "min": 70
       },
       {
         "skill": "神秘魔法",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "魔法熟練",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "120",
     "delay": "2020",
@@ -24722,13 +24925,13 @@
     "requirements": [
       {
         "skill": "こんぼう",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "こんぼう",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "110",
     "delay": "1000",
@@ -24747,17 +24950,17 @@
     "requirements": [
       {
         "skill": "魔法熟練",
-        "min": 70.0
+        "min": 70
       },
       {
         "skill": "強化魔法",
-        "min": 70.0
+        "min": 70
       }
     ],
     "successSkill": "魔法熟練",
-    "successRequired": 70.0,
+    "successRequired": 70,
     "cost": {
-      "st": 33.0
+      "st": 33
     },
     "castTime": "100",
     "delay": "1300",
@@ -24776,17 +24979,17 @@
     "requirements": [
       {
         "skill": "生命力",
-        "min": 80.0
+        "min": 80
       },
       {
         "skill": "持久力",
-        "min": 80.0
+        "min": 80
       }
     ],
     "successSkill": "生命力",
-    "successRequired": 80.0,
+    "successRequired": 80,
     "cost": {
-      "st": 38.0
+      "st": 38
     },
     "castTime": "120",
     "delay": "2320",
@@ -24805,13 +25008,13 @@
     "requirements": [
       {
         "skill": "盾",
-        "min": 90.0
+        "min": 90
       }
     ],
     "successSkill": "盾",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 45.0
+      "st": 45
     },
     "castTime": "150",
     "delay": "7200",
@@ -24830,13 +25033,13 @@
     "requirements": [
       {
         "skill": "水泳",
-        "min": 90.0
+        "min": 90
       }
     ],
     "successSkill": "水泳",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 45.0
+      "st": 45
     },
     "castTime": "180",
     "delay": "2000",
@@ -24855,13 +25058,13 @@
     "requirements": [
       {
         "skill": "盾",
-        "min": 90.0
+        "min": 90
       }
     ],
     "successSkill": "盾",
-    "successRequired": 90.0,
+    "successRequired": 90,
     "cost": {
-      "st": 45.0
+      "st": 45
     },
     "castTime": "120",
     "delay": "1920",
@@ -26089,72 +26292,11670 @@
 ];
   const magic = [
   {
-    "id": "magic-minor-burst",
-    "name": "マイナー バースト",
-    "category": "破壊魔法",
+    "id": "magic-56ea057251-07b39a2f83-1",
+    "name": "サモン ヴァンパイアバット",
     "kind": "魔法",
+    "category": "召喚魔法",
     "requirements": [
       {
-        "skill": "破壊魔法",
-        "min": 1
+        "skill": "召喚魔法",
+        "min": 1.0
       }
     ],
-    "successSkill": "破壊魔法",
-    "successRequired": 1,
-    "mp": 5,
-    "reagent": "ノア ダスト",
-    "note": "サンプル。"
+    "successSkill": "召喚魔法",
+    "successRequired": 1.0,
+    "cost": {
+      "mp": 5.0
+    },
+    "castTime": "450",
+    "delay": "750",
+    "description": "魔界から吸血コウモリを呼び出す",
+    "range": "-",
+    "transfer": "×",
+    "acquisition": "NPC販売\nバット系",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%BE%A4%B4%AD",
+    "mp": 5.0,
+    "reagent": "EB1"
   },
   {
-    "id": "magic-healing",
-    "name": "ヒーリング",
-    "category": "回復魔法",
+    "id": "magic-56ea057251-8687937e7e-1",
+    "name": "ブラッド ディール",
     "kind": "魔法",
+    "category": "召喚魔法",
+    "requirements": [
+      {
+        "skill": "召喚魔法",
+        "min": 1.0
+      }
+    ],
+    "successSkill": "召喚魔法",
+    "successRequired": 1.0,
+    "cost": {
+      "mp": 5.0
+    },
+    "castTime": "135",
+    "delay": "200",
+    "description": "HPを犠牲に、MP回復速度を増加させる\n効果中はHPスリップダメージ(合計10〜20程度)\n当たり前だが、HPが0になると死亡する",
+    "range": "-",
+    "transfer": "×",
+    "acquisition": "NPC販売",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%BE%A4%B4%AD",
+    "mp": 5.0,
+    "reagent": "ND1"
+  },
+  {
+    "id": "magic-56ea057251-eb3fc3d115-10",
+    "name": "サモン ゾンビ ラット",
+    "kind": "魔法",
+    "category": "召喚魔法",
+    "requirements": [
+      {
+        "skill": "召喚魔法",
+        "min": 10.0
+      }
+    ],
+    "successSkill": "召喚魔法",
+    "successRequired": 10.0,
+    "cost": {
+      "mp": 9.0
+    },
+    "castTime": "450",
+    "delay": "750",
+    "description": "魔界から 腐肉をあさるゾンビ ラットを呼び出す",
+    "range": "-",
+    "transfer": "×",
+    "acquisition": "ゾンビ ラット",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%BE%A4%B4%AD",
+    "mp": 9.0,
+    "reagent": "EB1"
+  },
+  {
+    "id": "magic-56ea057251-df376e6fac-10",
+    "name": "サンクン アンカー",
+    "kind": "魔法",
+    "category": "召喚魔法",
+    "requirements": [
+      {
+        "skill": "召喚魔法",
+        "min": 10.0
+      }
+    ],
+    "successSkill": "召喚魔法",
+    "successRequired": 10.0,
+    "cost": {
+      "mp": 9.0
+    },
+    "castTime": "153",
+    "delay": "222",
+    "description": "超重量の錘(おもり)を召喚し 対象の所持アイテム総重量に加算させる\n重量増加とは別に、鈍足効果あり\n※ 土属性",
+    "range": "21.8",
+    "transfer": "×",
+    "acquisition": "NPC販売",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%BE%A4%B4%AD",
+    "mp": 9.0,
+    "reagent": "ND2"
+  },
+  {
+    "id": "magic-56ea057251-9d7a01ce2c-10",
+    "name": "ブラッド ルーレット",
+    "kind": "魔法",
+    "category": "召喚魔法",
+    "requirements": [
+      {
+        "skill": "召喚魔法",
+        "min": 10.0
+      }
+    ],
+    "successSkill": "召喚魔法",
+    "successRequired": 10.0,
+    "cost": {
+      "mp": 9.0
+    },
+    "castTime": "153",
+    "delay": "222",
+    "description": "ペットが攻撃された時、50%の確率でダメージを反射する\n※ 実際には「ペットが受けたダメージの50%」を反射する\n→\n短評参照",
+    "range": "22.5",
+    "transfer": "×",
+    "acquisition": "NPC販売",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%BE%A4%B4%AD",
+    "mp": 9.0,
+    "reagent": "ND2"
+  },
+  {
+    "id": "magic-56ea057251-e10b6ba00d-20",
+    "name": "ゴースト ダンス",
+    "kind": "魔法",
+    "category": "召喚魔法",
+    "requirements": [
+      {
+        "skill": "召喚魔法",
+        "min": 20.0
+      }
+    ],
+    "successSkill": "召喚魔法",
+    "successRequired": 20.0,
+    "cost": {
+      "mp": 13.0
+    },
+    "castTime": "171",
+    "delay": "244",
+    "description": "対象の回りに見えない亡霊がまとわりつき 一定時間ごとにダメージを与える\n火属性のDot魔法：9秒間隔で9回の魔法ダメージ",
+    "range": "22.8",
+    "transfer": "×",
+    "acquisition": "NPC販売",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%BE%A4%B4%AD",
+    "mp": 13.0,
+    "reagent": "ND2"
+  },
+  {
+    "id": "magic-56ea057251-364cb72b7d-20",
+    "name": "サモン ゾンビ アーミー",
+    "kind": "魔法",
+    "category": "召喚魔法",
+    "requirements": [
+      {
+        "skill": "召喚魔法",
+        "min": 20.0
+      }
+    ],
+    "successSkill": "召喚魔法",
+    "successRequired": 20.0,
+    "cost": {
+      "mp": 13.0
+    },
+    "castTime": "450",
+    "delay": "750",
+    "description": "魔界からゾンビ アーミーを呼び出す",
+    "range": "-",
+    "transfer": "×",
+    "acquisition": "NPC販売\nゾンビ系",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%BE%A4%B4%AD",
+    "mp": 13.0,
+    "reagent": "EB2"
+  },
+  {
+    "id": "magic-56ea057251-690546d65f-30",
+    "name": "ウォーン パニッシュメント",
+    "kind": "魔法",
+    "category": "召喚魔法",
+    "requirements": [
+      {
+        "skill": "召喚魔法",
+        "min": 30.0
+      }
+    ],
+    "successSkill": "召喚魔法",
+    "successRequired": 30.0,
+    "cost": {
+      "mp": 18.0
+    },
+    "castTime": "189",
+    "delay": "266",
+    "description": "近くにいる下僕達のHPを回復する",
+    "range": "-",
+    "transfer": "×",
+    "acquisition": "NPC販売",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%BE%A4%B4%AD",
+    "mp": 18.0,
+    "reagent": "NP1"
+  },
+  {
+    "id": "magic-56ea057251-dcb8af6066-30",
+    "name": "スティーム ドライブ",
+    "kind": "魔法",
+    "category": "召喚魔法",
+    "requirements": [
+      {
+        "skill": "召喚魔法",
+        "min": 30.0
+      }
+    ],
+    "successSkill": "召喚魔法",
+    "successRequired": 30.0,
+    "cost": {
+      "mp": 18.0
+    },
+    "castTime": "189",
+    "delay": "266",
+    "description": "近くにいる下僕に対し ACを犠牲にすることで移動速度を速めてやる",
+    "range": "-",
+    "transfer": "×",
+    "acquisition": "NPC販売",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%BE%A4%B4%AD",
+    "mp": 18.0,
+    "reagent": "NP1"
+  },
+  {
+    "id": "magic-56ea057251-cf2abe465d-30",
+    "name": "冥の鼓動",
+    "kind": "魔法",
+    "category": "召喚魔法",
+    "requirements": [
+      {
+        "skill": "召喚魔法",
+        "min": 30.0
+      }
+    ],
+    "successSkill": "召喚魔法",
+    "successRequired": 30.0,
+    "cost": {
+      "mp": 53.0
+    },
+    "castTime": "450",
+    "delay": "750",
+    "description": "大地を揺るがす 冥門の化身を召喚する\n召喚した化身のレベルは「召喚魔法スキル-8」になる",
+    "range": "-",
+    "transfer": "×",
+    "acquisition": "報酬(Chaos Age 冥の門)",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%BE%A4%B4%AD",
+    "mp": 53.0,
+    "reagent": "OP1"
+  },
+  {
+    "id": "magic-56ea057251-4e96ca32a0-40",
+    "name": "イムサマス グレイブ",
+    "kind": "魔法",
+    "category": "召喚魔法",
+    "requirements": [
+      {
+        "skill": "召喚魔法",
+        "min": 40.0
+      }
+    ],
+    "successSkill": "召喚魔法",
+    "successRequired": 40.0,
+    "cost": {
+      "mp": 23.0
+    },
+    "castTime": "450",
+    "delay": "750",
+    "description": "戦慄の記憶を植え付け 墓に近づいた者を走れなくする\n距離と持続時間は短い",
+    "range": "-",
+    "transfer": "×",
+    "acquisition": "NPC販売",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%BE%A4%B4%AD",
+    "mp": 23.0,
+    "reagent": "NP2"
+  },
+  {
+    "id": "magic-56ea057251-8a4445b9f4-40",
+    "name": "サモン スカルパスメイジ",
+    "kind": "魔法",
+    "category": "召喚魔法",
+    "requirements": [
+      {
+        "skill": "召喚魔法",
+        "min": 40.0
+      }
+    ],
+    "successSkill": "召喚魔法",
+    "successRequired": 40.0,
+    "cost": {
+      "mp": 23.0
+    },
+    "castTime": "450",
+    "delay": "750",
+    "description": "魔界からスカルパス メイジを呼び出す",
+    "range": "-",
+    "transfer": "×",
+    "acquisition": "NPC販売\nスカルパス メイジ",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%BE%A4%B4%AD",
+    "mp": 23.0,
+    "reagent": "EB3"
+  },
+  {
+    "id": "magic-56ea057251-02aacd31eb-50",
+    "name": "クライシス コール",
+    "kind": "魔法",
+    "category": "召喚魔法",
+    "requirements": [
+      {
+        "skill": "召喚魔法",
+        "min": 50.0
+      }
+    ],
+    "successSkill": "召喚魔法",
+    "successRequired": 50.0,
+    "cost": {
+      "mp": 28.0
+    },
+    "castTime": "225",
+    "delay": "310",
+    "description": "ペットを1体だけ手元に呼び戻す\n射程は目視できる範囲と同じくらい",
+    "range": "100",
+    "transfer": "×",
+    "acquisition": "NPC販売",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%BE%A4%B4%AD",
+    "mp": 28.0,
+    "reagent": "NP3"
+  },
+  {
+    "id": "magic-56ea057251-1129de85e6-50",
+    "name": "サモン ケルベロス",
+    "kind": "魔法",
+    "category": "召喚魔法",
+    "requirements": [
+      {
+        "skill": "召喚魔法",
+        "min": 50.0
+      }
+    ],
+    "successSkill": "召喚魔法",
+    "successRequired": 50.0,
+    "cost": {
+      "mp": 28.0
+    },
+    "castTime": "450",
+    "delay": "750",
+    "description": "地獄の番犬ケルベロスを召喚する",
+    "range": "-",
+    "transfer": "×",
+    "acquisition": "NPC販売",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%BE%A4%B4%AD",
+    "mp": 28.0,
+    "reagent": "EB3"
+  },
+  {
+    "id": "magic-56ea057251-21b8cf2895-60",
+    "name": "サモン バエル ウォッチャー",
+    "kind": "魔法",
+    "category": "召喚魔法",
+    "requirements": [
+      {
+        "skill": "召喚魔法",
+        "min": 60.0
+      }
+    ],
+    "successSkill": "召喚魔法",
+    "successRequired": 60.0,
+    "cost": {
+      "mp": 34.0
+    },
+    "castTime": "450",
+    "delay": "750",
+    "description": "雷と眠りの魔法が得意な目玉を召喚する",
+    "range": "-",
+    "transfer": "×",
+    "acquisition": "NPC販売(夜間キャンプ)\nウォッチャー系",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%BE%A4%B4%AD",
+    "mp": 34.0,
+    "reagent": "EB4"
+  },
+  {
+    "id": "magic-56ea057251-3c2636f45a-60",
+    "name": "バニッシュ サモンズ",
+    "kind": "魔法",
+    "category": "召喚魔法",
+    "requirements": [
+      {
+        "skill": "召喚魔法",
+        "min": 60.0
+      }
+    ],
+    "successSkill": "召喚魔法",
+    "successRequired": 60.0,
+    "cost": {
+      "mp": 34.0
+    },
+    "castTime": "243",
+    "delay": "332",
+    "description": "敵が召喚したモンスターを元の世界に戻す",
+    "range": "",
+    "transfer": "×",
+    "acquisition": "NPC販売(夜間キャンプ)",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%BE%A4%B4%AD",
+    "mp": 34.0,
+    "reagent": "NQ1"
+  },
+  {
+    "id": "magic-56ea057251-4774215eb9-70",
+    "name": "サモン ゾンビ オルヴァン",
+    "kind": "魔法",
+    "category": "召喚魔法",
+    "requirements": [
+      {
+        "skill": "召喚魔法",
+        "min": 70.0
+      }
+    ],
+    "successSkill": "召喚魔法",
+    "successRequired": 70.0,
+    "cost": {
+      "mp": 40.0
+    },
+    "castTime": "450",
+    "delay": "750",
+    "description": "魔界からオルヴァンのゾンビを呼び出す",
+    "range": "-",
+    "transfer": "×",
+    "acquisition": "オルヴァン系\n幻獣ミッシー",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%BE%A4%B4%AD",
+    "mp": 40.0,
+    "reagent": "EB4"
+  },
+  {
+    "id": "magic-56ea057251-21b8efbd4e-70",
+    "name": "デス マーチ",
+    "kind": "魔法",
+    "category": "召喚魔法",
+    "requirements": [
+      {
+        "skill": "召喚魔法",
+        "min": 70.0
+      }
+    ],
+    "successSkill": "召喚魔法",
+    "successRequired": 70.0,
+    "cost": {
+      "mp": 40.0
+    },
+    "castTime": "261",
+    "delay": "354",
+    "description": "近くにいる下僕に対し 魔力を犠牲にすることで攻撃力を高めてやる",
+    "range": "-",
+    "transfer": "×",
+    "acquisition": "NPC販売(ヌブール村)\nアスモダイ デューク",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%BE%A4%B4%AD",
+    "mp": 40.0,
+    "reagent": "NQ2"
+  },
+  {
+    "id": "magic-56ea057251-22d1b0e944-80",
+    "name": "サモン クイーン オブ ヘル",
+    "kind": "魔法",
+    "category": "召喚魔法",
+    "requirements": [
+      {
+        "skill": "召喚魔法",
+        "min": 80.0
+      }
+    ],
+    "successSkill": "召喚魔法",
+    "successRequired": 80.0,
+    "cost": {
+      "mp": 46.0
+    },
+    "castTime": "450",
+    "delay": "750",
+    "description": "魔界から女王を呼び出す\n※ 限られた時間しか地上にいられない\n滞在時間は他の召喚ペットと同じ",
+    "range": "-",
+    "transfer": "×",
+    "acquisition": "サキュバス系",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%BE%A4%B4%AD",
+    "mp": 46.0,
+    "reagent": "EB5"
+  },
+  {
+    "id": "magic-56ea057251-ae2423ebb7-80",
+    "name": "サモン ハラペコクマ",
+    "kind": "魔法",
+    "category": "召喚魔法",
+    "requirements": [
+      {
+        "skill": "召喚魔法",
+        "min": 80.0
+      }
+    ],
+    "successSkill": "召喚魔法",
+    "successRequired": 80.0,
+    "cost": {
+      "mp": 46.0
+    },
+    "castTime": "450",
+    "delay": "750",
+    "description": "何でも食べちゃうクマを召喚する",
+    "range": "",
+    "transfer": "",
+    "acquisition": "永住NPC クエスト報酬",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%BE%A4%B4%AD",
+    "mp": 46.0,
+    "reagent": "EB5"
+  },
+  {
+    "id": "magic-56ea057251-332a13674f-80",
+    "name": "ファイナル オーダー",
+    "kind": "魔法",
+    "category": "召喚魔法",
+    "requirements": [
+      {
+        "skill": "召喚魔法",
+        "min": 80.0
+      }
+    ],
+    "successSkill": "召喚魔法",
+    "successRequired": 80.0,
+    "cost": {
+      "mp": 46.0
+    },
+    "castTime": "279",
+    "delay": "376",
+    "description": "自分のペットを爆発させて近くの敵に大ダメージ",
+    "range": "22.5",
+    "transfer": "×",
+    "acquisition": "アスモダイ デューク\nノーザン ゲート キーパー",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%BE%A4%B4%AD",
+    "mp": 46.0,
+    "reagent": "NQ3"
+  },
+  {
+    "id": "magic-56ea057251-0802706dfc-90",
+    "name": "サモン カオス テンタクル",
+    "kind": "魔法",
+    "category": "召喚魔法",
+    "requirements": [
+      {
+        "skill": "召喚魔法",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "召喚魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 53.0
+    },
+    "castTime": "450",
+    "delay": "750",
+    "description": "異空間よりカオス生物を召喚する",
+    "range": "-",
+    "transfer": "×",
+    "acquisition": "Chaos Age 地の門 報酬",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%BE%A4%B4%AD",
+    "mp": 53.0,
+    "reagent": "OP1"
+  },
+  {
+    "id": "magic-56ea057251-a881eec929-90",
+    "name": "サモン ボーンナイト",
+    "kind": "魔法",
+    "category": "召喚魔法",
+    "requirements": [
+      {
+        "skill": "召喚魔法",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "召喚魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 53.0
+    },
+    "castTime": "470",
+    "delay": "750",
+    "description": "最大HPの半分を犠牲にして 混沌の剣士を召喚する\n召喚時に現在のHPの半分をダメージとして受ける。\n※ ゾーン移動時も召喚時と同様にダメージを受けます。\n召喚者には最大HPが半減するDebuffが付く\nノアピースは複製不可",
+    "range": "-",
+    "transfer": "×",
+    "acquisition": "火竜神殿-宝箱",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%BE%A4%B4%AD",
+    "mp": 53.0,
+    "reagent": "EB5"
+  },
+  {
+    "id": "magic-56ea057251-c3f7baddc2-90",
+    "name": "サモン マブスアンバッサダー",
+    "kind": "魔法",
+    "category": "召喚魔法",
+    "requirements": [
+      {
+        "skill": "召喚魔法",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "召喚魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 53.0
+    },
+    "castTime": "450",
+    "delay": "750",
+    "description": "戦闘能力の高い死神を召喚する",
+    "range": "-",
+    "transfer": "×",
+    "acquisition": "アスモダイ デューク",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%BE%A4%B4%AD",
+    "mp": 53.0,
+    "reagent": "EB5"
+  },
+  {
+    "id": "magic-d218a5fc79-dac3706e6c-1",
+    "name": "セルフ ヒーリング",
+    "kind": "魔法",
+    "category": "回復魔法",
     "requirements": [
       {
         "skill": "回復魔法",
-        "min": 10
+        "min": 1.0
       }
     ],
     "successSkill": "回復魔法",
-    "successRequired": 10,
-    "mp": 9,
-    "reagent": "ノア ダスト",
-    "note": "サンプル。"
+    "successRequired": 1.0,
+    "cost": {
+      "mp": 5.0
+    },
+    "castTime": "115",
+    "delay": "180",
+    "description": "魔力によって自身のHPを回復する",
+    "range": "-",
+    "transfer": "×",
+    "acquisition": "NPC販売\nオークプリースト",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%B2%F3%C9%FC",
+    "mp": 5.0,
+    "reagent": "ND1"
   },
   {
-    "id": "magic-buff",
-    "name": "エンライテン",
-    "category": "強化魔法",
+    "id": "magic-d218a5fc79-b1d91c9a05-1",
+    "name": "ターン アンデッド",
     "kind": "魔法",
+    "category": "回復魔法",
+    "requirements": [
+      {
+        "skill": "回復魔法",
+        "min": 1.0
+      }
+    ],
+    "successSkill": "回復魔法",
+    "successRequired": 1.0,
+    "cost": {
+      "mp": 5.0
+    },
+    "castTime": "115",
+    "delay": "180",
+    "description": "アンデッド系の敵を自分から遠ざける\nアンデッド系の敵にのみ使用できる\nタゲ切り魔法\n有効な敵は短評参照",
+    "range": "21.2",
+    "transfer": "○",
+    "acquisition": "NPC販売\nオークプリースト",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%B2%F3%C9%FC",
+    "mp": 5.0,
+    "reagent": "ND1"
+  },
+  {
+    "id": "magic-d218a5fc79-1202174270-10",
+    "name": "マイナー ヒーリング",
+    "kind": "魔法",
+    "category": "回復魔法",
+    "requirements": [
+      {
+        "skill": "回復魔法",
+        "min": 10.0
+      }
+    ],
+    "successSkill": "回復魔法",
+    "successRequired": 10.0,
+    "cost": {
+      "mp": 9.0
+    },
+    "castTime": "133",
+    "delay": "202",
+    "description": "魔力によってHPを回復",
+    "range": "23.8",
+    "transfer": "○",
+    "acquisition": "NPC販売\nオークプリースト",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%B2%F3%C9%FC",
+    "mp": 9.0,
+    "reagent": "ND2"
+  },
+  {
+    "id": "magic-d218a5fc79-5b4743fe2e-10",
+    "name": "マイナー リバイタル",
+    "kind": "魔法",
+    "category": "回復魔法",
+    "requirements": [
+      {
+        "skill": "回復魔法",
+        "min": 10.0
+      }
+    ],
+    "successSkill": "回復魔法",
+    "successRequired": 10.0,
+    "cost": {
+      "mp": 9.0
+    },
+    "castTime": "133",
+    "delay": "202",
+    "description": "対象に生気を吹き込みスタミナを回復させる",
+    "range": "24.8",
+    "transfer": "○",
+    "acquisition": "NPC販売\nオークプリースト",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%B2%F3%C9%FC",
+    "mp": 9.0,
+    "reagent": "ND2"
+  },
+  {
+    "id": "magic-d218a5fc79-de8f203c59-20",
+    "name": "アンチドート",
+    "kind": "魔法",
+    "category": "回復魔法",
+    "requirements": [
+      {
+        "skill": "回復魔法",
+        "min": 20.0
+      }
+    ],
+    "successSkill": "回復魔法",
+    "successRequired": 20.0,
+    "cost": {
+      "mp": 13.0
+    },
+    "castTime": "151",
+    "delay": "224",
+    "description": "悪しき魂を浄化し 毒を完全に中和する\n→\n解除法一覧",
+    "range": "24.8",
+    "transfer": "○",
+    "acquisition": "NPC販売\nオークプリースト",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%B2%F3%C9%FC",
+    "mp": 13.0,
+    "reagent": "ND3"
+  },
+  {
+    "id": "magic-d218a5fc79-8caa539bfe-20",
+    "name": "キュア ディズィーズ",
+    "kind": "魔法",
+    "category": "回復魔法",
+    "requirements": [
+      {
+        "skill": "回復魔法",
+        "min": 20.0
+      }
+    ],
+    "successSkill": "回復魔法",
+    "successRequired": 20.0,
+    "cost": {
+      "mp": 13.0
+    },
+    "castTime": "151",
+    "delay": "224",
+    "description": "聖なる力で対象の病気を完全に治す",
+    "range": "24.8",
+    "transfer": "○",
+    "acquisition": "NPC販売\nオークプリースト",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%B2%F3%C9%FC",
+    "mp": 13.0,
+    "reagent": "ND3"
+  },
+  {
+    "id": "magic-d218a5fc79-77e63c0bf0-30",
+    "name": "キャンセル マジック",
+    "kind": "魔法",
+    "category": "回復魔法",
+    "requirements": [
+      {
+        "skill": "回復魔法",
+        "min": 30.0
+      }
+    ],
+    "successSkill": "回復魔法",
+    "successRequired": 30.0,
+    "cost": {
+      "mp": 18.0
+    },
+    "castTime": "169",
+    "delay": "246",
+    "description": "ステータスダウン効果を打ち消す\n※複数ある場合最初にかけられたものを解除\n※毒・継続ダメージ・スタンなどは解除不可\n→\n解除法一覧",
+    "range": "24.8",
+    "transfer": "○",
+    "acquisition": "NPC販売\nオークプリースト",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%B2%F3%C9%FC",
+    "mp": 18.0,
+    "reagent": "NP1"
+  },
+  {
+    "id": "magic-d218a5fc79-a0d18449ab-30",
+    "name": "ライト ヒーリング",
+    "kind": "魔法",
+    "category": "回復魔法",
+    "requirements": [
+      {
+        "skill": "回復魔法",
+        "min": 30.0
+      }
+    ],
+    "successSkill": "回復魔法",
+    "successRequired": 30.0,
+    "cost": {
+      "mp": 18.0
+    },
+    "castTime": "169",
+    "delay": "246",
+    "description": "魔力によってHPを中程度回復する",
+    "range": "24.8",
+    "transfer": "○",
+    "acquisition": "NPC販売\nオークプリースト",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%B2%F3%C9%FC",
+    "mp": 18.0,
+    "reagent": "NP1"
+  },
+  {
+    "id": "magic-d218a5fc79-3f5b7c2a60-40",
+    "name": "リフレッシュ",
+    "kind": "魔法",
+    "category": "回復魔法",
+    "requirements": [
+      {
+        "skill": "回復魔法",
+        "min": 40.0
+      }
+    ],
+    "successSkill": "回復魔法",
+    "successRequired": 40.0,
+    "cost": {
+      "mp": 23.0
+    },
+    "castTime": "187",
+    "delay": "268",
+    "description": "対象のスタミナとHPを回復する",
+    "range": "21.8",
+    "transfer": "○",
+    "acquisition": "NPC販売\nタルタロッサクロス",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%B2%F3%C9%FC",
+    "mp": 23.0,
+    "reagent": "NP2"
+  },
+  {
+    "id": "magic-d218a5fc79-72b5ce6466-40",
+    "name": "レスト イン ピース",
+    "kind": "魔法",
+    "category": "回復魔法",
+    "requirements": [
+      {
+        "skill": "回復魔法",
+        "min": 40.0
+      }
+    ],
+    "successSkill": "回復魔法",
+    "successRequired": 40.0,
+    "cost": {
+      "mp": 23.0
+    },
+    "castTime": "187",
+    "delay": "268",
+    "description": "アンデッド系の敵に ダメージを与える\n弾道型・無属性\n有効な相手は\nターン アンデッド\nと同様",
+    "range": "22.2",
+    "transfer": "○",
+    "acquisition": "NPC販売\nゴーレム クレリック\nタルタロッサクロス",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%B2%F3%C9%FC",
+    "mp": 23.0,
+    "reagent": "NP2"
+  },
+  {
+    "id": "magic-d218a5fc79-e170490985-50",
+    "name": "ヒーリング",
+    "kind": "魔法",
+    "category": "回復魔法",
+    "requirements": [
+      {
+        "skill": "回復魔法",
+        "min": 50.0
+      }
+    ],
+    "successSkill": "回復魔法",
+    "successRequired": 50.0,
+    "cost": {
+      "mp": 28.0
+    },
+    "castTime": "205",
+    "delay": "290",
+    "description": "魔力を使い HPを大幅に回復する",
+    "range": "23.8",
+    "transfer": "○",
+    "acquisition": "NPC販売\nゴーレム クレリック\nタルタロッサクロス",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%B2%F3%C9%FC",
+    "mp": 28.0,
+    "reagent": "NP3"
+  },
+  {
+    "id": "magic-d218a5fc79-30051fe421-50",
+    "name": "リバイタル",
+    "kind": "魔法",
+    "category": "回復魔法",
+    "requirements": [
+      {
+        "skill": "回復魔法",
+        "min": 50.0
+      }
+    ],
+    "successSkill": "回復魔法",
+    "successRequired": 50.0,
+    "cost": {
+      "mp": 28.0
+    },
+    "castTime": "205",
+    "delay": "290",
+    "description": "エネルギーを注入し、対象のスタミナを回復する",
+    "range": "24.8",
+    "transfer": "○",
+    "acquisition": "NPC販売\nゴーレム クレリック\nタルタロッサクロス",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%B2%F3%C9%FC",
+    "mp": 28.0,
+    "reagent": "NP3"
+  },
+  {
+    "id": "magic-d218a5fc79-fcba9722a0-60",
+    "name": "グループ ヒーリング",
+    "kind": "魔法",
+    "category": "回復魔法",
+    "requirements": [
+      {
+        "skill": "回復魔法",
+        "min": 60.0
+      }
+    ],
+    "successSkill": "回復魔法",
+    "successRequired": 60.0,
+    "cost": {
+      "mp": 34.0
+    },
+    "castTime": "223",
+    "delay": "312",
+    "description": "自分の近くにいるパーティーメンバーを回復する\nターゲット不要。一定範囲内のPT全員を回復",
+    "range": "半径\n22.5",
+    "transfer": "×",
+    "acquisition": "NPC販売(夜間キャンプ)\nタルタロッサクロス\nオークハイプリースト（war_age）",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%B2%F3%C9%FC",
+    "mp": 34.0,
+    "reagent": "NQ1"
+  },
+  {
+    "id": "magic-d218a5fc79-067e56b180-60",
+    "name": "コンデンス マインド",
+    "kind": "魔法",
+    "category": "回復魔法",
+    "requirements": [
+      {
+        "skill": "回復魔法",
+        "min": 60.0
+      }
+    ],
+    "successSkill": "回復魔法",
+    "successRequired": 60.0,
+    "cost": {
+      "mp": 34.0
+    },
+    "castTime": "223",
+    "delay": "312",
+    "description": "対象者のMP回復率を上昇させる",
+    "range": "24.8",
+    "transfer": "×",
+    "acquisition": "NPC販売(夜間キャンプ)\nタルタロッサクロス\nオークハイプリースト（war_age）",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%B2%F3%C9%FC",
+    "mp": 34.0,
+    "reagent": "NQ1"
+  },
+  {
+    "id": "magic-d218a5fc79-57c287cb13-70",
+    "name": "ディバイン シャワー",
+    "kind": "魔法",
+    "category": "回復魔法",
+    "requirements": [
+      {
+        "skill": "回復魔法",
+        "min": 70.0
+      }
+    ],
+    "successSkill": "回復魔法",
+    "successRequired": 70.0,
+    "cost": {
+      "mp": 40.0
+    },
+    "castTime": "241",
+    "delay": "334",
+    "description": "空から神々しい光を呼び寄せ\n全てのステータスダウンを打ち消す\nDoT / Debuff を全て解除",
+    "range": "24.8",
+    "transfer": "×",
+    "acquisition": "NPC販売(ヌブール村)",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%B2%F3%C9%FC",
+    "mp": 40.0,
+    "reagent": "NQ2"
+  },
+  {
+    "id": "magic-d218a5fc79-18c7e85b36-70",
+    "name": "リジェネレイション",
+    "kind": "魔法",
+    "category": "回復魔法",
+    "requirements": [
+      {
+        "skill": "回復魔法",
+        "min": 70.0
+      }
+    ],
+    "successSkill": "回復魔法",
+    "successRequired": 70.0,
+    "cost": {
+      "mp": 40.0
+    },
+    "castTime": "241",
+    "delay": "334",
+    "description": "一定時間毎にHPが自動回復する\n※約12秒間隔で15回、\nマイナー ヒーリング\nが自動的にかかる",
+    "range": "23.8",
+    "transfer": "×",
+    "acquisition": "NPC販売(ヌブール村)",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%B2%F3%C9%FC",
+    "mp": 40.0,
+    "reagent": "NQ2"
+  },
+  {
+    "id": "magic-d218a5fc79-904972ef54-80",
+    "name": "ヒーリング オール",
+    "kind": "魔法",
+    "category": "回復魔法",
+    "requirements": [
+      {
+        "skill": "回復魔法",
+        "min": 80.0
+      }
+    ],
+    "successSkill": "回復魔法",
+    "successRequired": 80.0,
+    "cost": {
+      "mp": 46.0
+    },
+    "castTime": "259",
+    "delay": "356",
+    "description": "魔力によってHPを全回復する\n※使用者のスキル値とターゲットのHP残量によっては、全回復しないことがあります。",
+    "range": "21.8",
+    "transfer": "×",
+    "acquisition": "イクシオンハイプリースト\nタルタロッサプリースト\nサベージドルイド",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%B2%F3%C9%FC",
+    "mp": 46.0,
+    "reagent": "NQ3"
+  },
+  {
+    "id": "magic-d218a5fc79-456da6dc32-80",
+    "name": "リバイタル オール",
+    "kind": "魔法",
+    "category": "回復魔法",
+    "requirements": [
+      {
+        "skill": "回復魔法",
+        "min": 80.0
+      }
+    ],
+    "successSkill": "回復魔法",
+    "successRequired": 80.0,
+    "cost": {
+      "mp": 46.0
+    },
+    "castTime": "259",
+    "delay": "356",
+    "description": "エネルギーを注入し、対象のスタミナを全回復する\n※使用者のスキル値とターゲットのスタミナ残量によっては、全回復しないことがあります。",
+    "range": "23.8",
+    "transfer": "×",
+    "acquisition": "イクシオンハイプリースト\nタルタロッサプリースト\nサベージドルイド",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%B2%F3%C9%FC",
+    "mp": 46.0,
+    "reagent": "NQ3"
+  },
+  {
+    "id": "magic-d218a5fc79-09b6407ca7-90",
+    "name": "セイクリッド サークル",
+    "kind": "魔法",
+    "category": "回復魔法",
+    "requirements": [
+      {
+        "skill": "回復魔法",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "回復魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 53.0
+    },
+    "castTime": "277",
+    "delay": "378",
+    "description": "詠唱者の周りに聖なる光を発し 近くにいる者の傷を癒す\nターゲット不要。効果範囲は自分中心の半径6.5\n範囲内の味方全てを回復できる",
+    "range": "半径\n6.5",
+    "transfer": "×",
+    "acquisition": "イクシオンハイプリースト\nタルタロッサリバース\nタルタロッサプリースト\nシェリーイムサマス",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%B2%F3%C9%FC",
+    "mp": 53.0,
+    "reagent": "PNQ1"
+  },
+  {
+    "id": "magic-d218a5fc79-3463b3f3e6-90",
+    "name": "リザレクション",
+    "kind": "魔法",
+    "category": "回復魔法",
+    "requirements": [
+      {
+        "skill": "回復魔法",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "回復魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 100.0
+    },
+    "castTime": "277",
+    "delay": "378",
+    "description": "聖なる息吹で死者を蘇生させる",
+    "range": "9.8",
+    "transfer": "×",
+    "acquisition": "イクシオンハイプリースト\nタルタロッサリバース\nタルタロッサプリースト",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%B2%F3%C9%FC",
+    "mp": 100.0,
+    "reagent": "PNQ1"
+  },
+  {
+    "id": "magic-d218a5fc79-12e619615d-90",
+    "name": "異界の魔力",
+    "kind": "魔法",
+    "category": "回復魔法",
+    "requirements": [
+      {
+        "skill": "回復魔法",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "回復魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 200.0
+    },
+    "castTime": "300",
+    "delay": "18250",
+    "description": "溢れ出る異界の魔力をちょっとだけ使用し、対象を中心とした周囲の魔力が増加する\n発動に必要なBuff :\n異界の魔力炉心",
+    "range": "",
+    "transfer": "",
+    "acquisition": "レイド報酬(前提装備)",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%B2%F3%C9%FC",
+    "mp": 200.0,
+    "reagent": "OP3"
+  },
+  {
+    "id": "magic-04ec43f111-44067daa03-1",
+    "name": "フリーズ ブラッド",
+    "kind": "魔法",
+    "category": "強化魔法",
     "requirements": [
       {
         "skill": "強化魔法",
-        "min": 20
+        "min": 1.0
       }
     ],
     "successSkill": "強化魔法",
-    "successRequired": 20,
-    "mp": 11,
-    "reagent": "ノア ダスト",
-    "note": "サンプル。"
+    "successRequired": 1.0,
+    "cost": {
+      "mp": 5.0
+    },
+    "castTime": "135",
+    "delay": "200",
+    "description": "敵の血液を凍らせ 最大HPを下げる",
+    "range": "24.8",
+    "transfer": "×",
+    "acquisition": "NPC販売",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%B6%AF%B2%BD",
+    "mp": 5.0,
+    "reagent": "ND1"
   },
   {
-    "id": "magic-mesmerize",
-    "name": "メスメライズ",
-    "category": "神秘魔法",
+    "id": "magic-04ec43f111-12ed576155-1",
+    "name": "マナ エスケープ",
     "kind": "魔法",
+    "category": "強化魔法",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 1.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 1.0,
+    "cost": {
+      "mp": 5.0
+    },
+    "castTime": "135",
+    "delay": "200",
+    "description": "大地の精霊の力を借り 敵のMPを地面に吸収させる",
+    "range": "",
+    "transfer": "×",
+    "acquisition": "NPC販売",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%B6%AF%B2%BD",
+    "mp": 5.0,
+    "reagent": "ND1"
+  },
+  {
+    "id": "magic-04ec43f111-cc670cf0c8-10",
+    "name": "スピリット リヴィール",
+    "kind": "魔法",
+    "category": "強化魔法",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 10.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 10.0,
+    "cost": {
+      "mp": 9.0
+    },
+    "castTime": "153",
+    "delay": "222",
+    "description": "精霊の力を借りて 敵の防御力を下げる",
+    "range": "24.8",
+    "transfer": "×",
+    "acquisition": "NPC販売",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%B6%AF%B2%BD",
+    "mp": 9.0,
+    "reagent": "ND2"
+  },
+  {
+    "id": "magic-04ec43f111-e8fcd8629a-10",
+    "name": "ブラインド サイト",
+    "kind": "魔法",
+    "category": "強化魔法",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 10.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 10.0,
+    "cost": {
+      "mp": 9.0
+    },
+    "castTime": "153",
+    "delay": "222",
+    "description": "敵の視界を遮り 直接攻撃の命中率を下げる",
+    "range": "24.8",
+    "transfer": "×",
+    "acquisition": "NPC販売",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%B6%AF%B2%BD",
+    "mp": 9.0,
+    "reagent": "ND2"
+  },
+  {
+    "id": "magic-04ec43f111-c182f04f5e-20",
+    "name": "エンライテン",
+    "kind": "魔法",
+    "category": "強化魔法",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 20.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 20.0,
+    "cost": {
+      "mp": 13.0
+    },
+    "castTime": "171",
+    "delay": "244",
+    "description": "直接攻撃の極意を授け 武器の命中率を上げる\n戦技ナイト マインドとは併用できない",
+    "range": "24.8",
+    "transfer": "×",
+    "acquisition": "NPC販売",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%B6%AF%B2%BD",
+    "mp": 13.0,
+    "reagent": "ND3"
+  },
+  {
+    "id": "magic-04ec43f111-7828dba78f-20",
+    "name": "クイックニング",
+    "kind": "魔法",
+    "category": "強化魔法",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 20.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 20.0,
+    "cost": {
+      "mp": 13.0
+    },
+    "castTime": "171",
+    "delay": "244",
+    "description": "対象の動体視力を強化し 回避率を上げる",
+    "range": "24.8",
+    "transfer": "×",
+    "acquisition": "NPC販売",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%B6%AF%B2%BD",
+    "mp": 13.0,
+    "reagent": "ND3"
+  },
+  {
+    "id": "magic-04ec43f111-b5cd0da721-30",
+    "name": "スピリット ガード",
+    "kind": "魔法",
+    "category": "強化魔法",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 30.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 30.0,
+    "cost": {
+      "mp": 18.0
+    },
+    "castTime": "189",
+    "delay": "266",
+    "description": "精霊の加護を得て 防御力を高める\nホーリー ガード\nとは併用できない",
+    "range": "24.8",
+    "transfer": "×",
+    "acquisition": "NPC販売",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%B6%AF%B2%BD",
+    "mp": 18.0,
+    "reagent": "NP1"
+  },
+  {
+    "id": "magic-04ec43f111-08c2f90d56-30",
+    "name": "ヴィガー",
+    "kind": "魔法",
+    "category": "強化魔法",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 30.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 30.0,
+    "cost": {
+      "mp": 18.0
+    },
+    "castTime": "189",
+    "delay": "266",
+    "description": "対象の体に力が漲り 直接攻撃力が上昇する\n戦技バーサーク系とは併用できない",
+    "range": "24.8",
+    "transfer": "×",
+    "acquisition": "NPC販売",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%B6%AF%B2%BD",
+    "mp": 18.0,
+    "reagent": "NP1"
+  },
+  {
+    "id": "magic-04ec43f111-d0af612095-40",
+    "name": "バブル ボール",
+    "kind": "魔法",
+    "category": "強化魔法",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 40.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 40.0,
+    "cost": {
+      "mp": 23.0
+    },
+    "castTime": "207",
+    "delay": "288",
+    "description": "酸素の気泡が顔を包み 水中でも呼吸できるようになる\n呼吸ゲージが最大のままで固定され、減少しなくなる",
+    "range": "24.8",
+    "transfer": "×",
+    "acquisition": "NPC販売\nオーク シャーマン\nイクシオン シャーマン",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%B6%AF%B2%BD",
+    "mp": 23.0,
+    "reagent": "NP2"
+  },
+  {
+    "id": "magic-04ec43f111-6105921981-40",
+    "name": "バブル ボール β",
+    "kind": "魔法",
+    "category": "強化魔法",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 40.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 40.0,
+    "cost": {
+      "mp": 23.0
+    },
+    "castTime": "207",
+    "delay": "288",
+    "description": "酸素の気泡が顔を包み 水中でも呼吸できるようになる\n※ジャンプで解除可能\nジャンプ解除以外は下記バブルボールと完全に同じ",
+    "range": "24.8",
+    "transfer": "×",
+    "acquisition": "クエスト報酬\n初出240820",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%B6%AF%B2%BD",
+    "mp": 23.0,
+    "reagent": "NP2"
+  },
+  {
+    "id": "magic-04ec43f111-204c1fcac8-40",
+    "name": "レイジング",
+    "kind": "魔法",
+    "category": "強化魔法",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 40.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 40.0,
+    "cost": {
+      "mp": 23.0
+    },
+    "castTime": "207",
+    "delay": "288",
+    "description": "荷物の重さが一定量までゼロになる",
+    "range": "21.8",
+    "transfer": "×",
+    "acquisition": "NPC販売\nオーク シャーマン\nイクシオン シャーマン",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%B6%AF%B2%BD",
+    "mp": 23.0,
+    "reagent": "NP2"
+  },
+  {
+    "id": "magic-04ec43f111-32336750d3-50",
+    "name": "ブラッド ラッシュ",
+    "kind": "魔法",
+    "category": "強化魔法",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 50.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 50.0,
+    "cost": {
+      "mp": 28.0
+    },
+    "castTime": "225",
+    "delay": "310",
+    "description": "体内の血液を沸騰させ 対象の最大HPを上げる",
+    "range": "24.8",
+    "transfer": "×",
+    "acquisition": "NPC販売\nオーク シャーマン\nイクシオン シャーマン",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%B6%AF%B2%BD",
+    "mp": 28.0,
+    "reagent": "NP3"
+  },
+  {
+    "id": "magic-04ec43f111-ba16e5d5eb-50",
+    "name": "マインド ラッシュ",
+    "kind": "魔法",
+    "category": "強化魔法",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 50.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 50.0,
+    "cost": {
+      "mp": 28.0
+    },
+    "castTime": "225",
+    "delay": "310",
+    "description": "精神力を強化し 対象の最大MPを上げる",
+    "range": "24.8",
+    "transfer": "×",
+    "acquisition": "NPC販売\nオーク シャーマン\nイクシオン シャーマン",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%B6%AF%B2%BD",
+    "mp": 28.0,
+    "reagent": "NP3"
+  },
+  {
+    "id": "magic-04ec43f111-943fee1355-60",
+    "name": "インヴィジビリティ",
+    "kind": "魔法",
+    "category": "強化魔法",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 60.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 60.0,
+    "cost": {
+      "mp": 34.0
+    },
+    "castTime": "243",
+    "delay": "332",
+    "description": "一定時間姿を消しさる\n※ 行動を起こすと効果は切れる\n*1\nまとめ\n参照",
+    "range": "21.8",
+    "transfer": "×",
+    "acquisition": "NPC販売(夜間キャンプ)\nオークシャーマン\nイクシオン シャーマン",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%B6%AF%B2%BD",
+    "mp": 34.0,
+    "reagent": "NQ1"
+  },
+  {
+    "id": "magic-04ec43f111-496c7b1aad-60",
+    "name": "スティーム ブラッド",
+    "kind": "魔法",
+    "category": "強化魔法",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 60.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 60.0,
+    "cost": {
+      "mp": 34.0
+    },
+    "castTime": "243",
+    "delay": "332",
+    "description": "体内の血を沸騰させ 一時的に足を早くする\n※効果継続中はスタミナが少しずつ減り続ける",
+    "range": "24.8",
+    "transfer": "×",
+    "acquisition": "NPC販売(夜間キャンプ)\nオークシャーマン\nイクシオン シャーマン",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%B6%AF%B2%BD",
+    "mp": 34.0,
+    "reagent": "NQ1"
+  },
+  {
+    "id": "magic-04ec43f111-19efef28fd-70",
+    "name": "ディバイン シールド",
+    "kind": "魔法",
+    "category": "強化魔法",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 70.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 70.0,
+    "cost": {
+      "mp": 40.0
+    },
+    "castTime": "241",
+    "delay": "334",
+    "description": "ダメージ量の大小を問わず 1発分の魔法を無効化する",
+    "range": "24.8",
+    "transfer": "×",
+    "acquisition": "イクシオンファナティック\nレイン エレメンタル",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%B6%AF%B2%BD",
+    "mp": 40.0,
+    "reagent": "NQ2"
+  },
+  {
+    "id": "magic-04ec43f111-1680c158a3-70",
+    "name": "ホーリー ガード",
+    "kind": "魔法",
+    "category": "強化魔法",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 70.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 70.0,
+    "cost": {
+      "mp": 40.0
+    },
+    "castTime": "241",
+    "delay": "334",
+    "description": "自分の周りにいる仲間を聖なる力で包み込み 直接攻撃に対する防御力を上げる\n範囲魔法・効果時間がとても長い\nスピリットガード\nとは併用できない",
+    "range": "-",
+    "transfer": "×",
+    "acquisition": "NPC販売(ヌブール村)\nイクシオン ファナティック",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%B6%AF%B2%BD",
+    "mp": 40.0,
+    "reagent": "NQ2"
+  },
+  {
+    "id": "magic-04ec43f111-c44e0ac992-80",
+    "name": "ウルティメイト ヘルス",
+    "kind": "魔法",
+    "category": "強化魔法",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 80.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 80.0,
+    "cost": {
+      "mp": 46.0
+    },
+    "castTime": "279",
+    "delay": "376",
+    "description": "一定時間 最大HPとHP自然回復量が大幅に上昇する",
+    "range": "24.8",
+    "transfer": "×",
+    "acquisition": "レッドライン\nレイン エレメンタル",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%B6%AF%B2%BD",
+    "mp": 46.0,
+    "reagent": "NQ3"
+  },
+  {
+    "id": "magic-04ec43f111-d4ba095cb8-80",
+    "name": "シー インヴィジィブル",
+    "kind": "魔法",
+    "category": "強化魔法",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 80.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 80.0,
+    "cost": {
+      "mp": 46.0
+    },
+    "castTime": "279",
+    "delay": "376",
+    "description": "透明状態の者を見破ることが出来る\n範囲魔法",
+    "range": "-",
+    "transfer": "×",
+    "acquisition": "レッドライン\nレイン エレメンタル",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%B6%AF%B2%BD",
+    "mp": 46.0,
+    "reagent": "NQ3"
+  },
+  {
+    "id": "magic-04ec43f111-1989e330ee-90",
+    "name": "ウォーター バリア",
+    "kind": "魔法",
+    "category": "強化魔法",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 53.0
+    },
+    "castTime": "277",
+    "delay": "479",
+    "description": "水球を身に纏い衝撃と炎から身を守る\n自分専用",
+    "range": "-",
+    "transfer": "×",
+    "acquisition": "ChaosAge水の門 報酬",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%B6%AF%B2%BD",
+    "mp": 53.0,
+    "reagent": "OP1"
+  },
+  {
+    "id": "magic-04ec43f111-715a268693-90",
+    "name": "エレメンタル アーマー",
+    "kind": "魔法",
+    "category": "強化魔法",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 53.0
+    },
+    "castTime": "297",
+    "delay": "398",
+    "description": "精霊の力を味方につけることにより 地水火風属性の魔法耐久度が上がる\n無属性を含む全耐性が上がる",
+    "range": "24.8",
+    "transfer": "×",
+    "acquisition": "イクシオン ファナティック\nミスト エレメンタル\nレイン エレメンタル",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%B6%AF%B2%BD",
+    "mp": 53.0,
+    "reagent": "PNQ1"
+  },
+  {
+    "id": "magic-04ec43f111-8a85a29610-90",
+    "name": "トランスフォーム",
+    "kind": "魔法",
+    "category": "強化魔法",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 53.0
+    },
+    "castTime": "297",
+    "delay": "398",
+    "description": "精霊の力を借り 最大MPと魔法力を犠牲に 命中率と防御力を大幅に上昇させる\n※ジャンプすると元の姿に戻る\n自分専用\n変身系Buff\nジャンプで解除される",
+    "range": "-",
+    "transfer": "×",
+    "acquisition": "ミスト エレメンタル\nレイン エレメンタル\nサベージ ドルイドロード\nエミリー\nウォーター ウンディーネ\nステンノ",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%B6%AF%B2%BD",
+    "mp": 53.0,
+    "reagent": "PNQ1"
+  },
+  {
+    "id": "magic-1843df4088-a093a18f79-1",
+    "name": "グレイブヤード ミスト",
+    "kind": "魔法",
+    "category": "死の魔法",
+    "requirements": [
+      {
+        "skill": "死の魔法",
+        "min": 1.0
+      }
+    ],
+    "successSkill": "死の魔法",
+    "successRequired": 1.0,
+    "cost": {
+      "mp": 5.0
+    },
+    "castTime": "135",
+    "delay": "200",
+    "description": "気味の悪い霧を発生させて 敵を近寄れなくさせる\nMobに対して使用する 反応範囲が狭くなるDebuff",
+    "range": "28.8",
+    "transfer": "×",
+    "acquisition": "NPC販売",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%BB%E0",
+    "mp": 5.0,
+    "reagent": "ND1",
+    "element": "風"
+  },
+  {
+    "id": "magic-1843df4088-21f5af6d62-1",
+    "name": "スピリット ドレイン",
+    "kind": "魔法",
+    "category": "死の魔法",
+    "requirements": [
+      {
+        "skill": "死の魔法",
+        "min": 1.0
+      }
+    ],
+    "successSkill": "死の魔法",
+    "successRequired": 1.0,
+    "cost": {
+      "mp": 5.0
+    },
+    "castTime": "135",
+    "delay": "200",
+    "description": "一定時間 対象の魔力を減少させる",
+    "range": "22.8",
+    "transfer": "×",
+    "acquisition": "NPC販売",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%BB%E0",
+    "mp": 5.0,
+    "reagent": "ND1",
+    "element": "無"
+  },
+  {
+    "id": "magic-1843df4088-979c9efff2-10",
+    "name": "ウェイスト エナジー",
+    "kind": "魔法",
+    "category": "死の魔法",
+    "requirements": [
+      {
+        "skill": "死の魔法",
+        "min": 10.0
+      }
+    ],
+    "successSkill": "死の魔法",
+    "successRequired": 10.0,
+    "cost": {
+      "mp": 9.0
+    },
+    "castTime": "153",
+    "delay": "222",
+    "description": "対象の全ての行動において スタミナの消費を増加させる\n※対NPCは、移動速度が遅くなる効果\nST消費量が1.4倍になるDebuff",
+    "range": "24.8",
+    "transfer": "×",
+    "acquisition": "NPC販売",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%BB%E0",
+    "mp": 9.0,
+    "reagent": "ND2",
+    "element": "無"
+  },
+  {
+    "id": "magic-1843df4088-4c4f2f1972-10",
+    "name": "マッド コート",
+    "kind": "魔法",
+    "category": "死の魔法",
+    "requirements": [
+      {
+        "skill": "死の魔法",
+        "min": 10.0
+      }
+    ],
+    "successSkill": "死の魔法",
+    "successRequired": 10.0,
+    "cost": {
+      "mp": 9.0
+    },
+    "castTime": "153",
+    "delay": "222",
+    "description": "敵の体に粘土を絡めることで動きを鈍らせ 回避率を減少させる",
+    "range": "24.8",
+    "transfer": "×",
+    "acquisition": "NPC販売\nマッドゴーレム系",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%BB%E0",
+    "mp": 9.0,
+    "reagent": "ND2",
+    "element": "地"
+  },
+  {
+    "id": "magic-1843df4088-7aab211fc5-20",
+    "name": "カースド ブレス",
+    "kind": "魔法",
+    "category": "死の魔法",
+    "requirements": [
+      {
+        "skill": "死の魔法",
+        "min": 20.0
+      }
+    ],
+    "successSkill": "死の魔法",
+    "successRequired": 20.0,
+    "cost": {
+      "mp": 13.0
+    },
+    "castTime": "171",
+    "delay": "244",
+    "description": "呪いの言葉を浴びせ 対象の最大HP・MP・スタミナを下げる",
+    "range": "24.8",
+    "transfer": "×",
+    "acquisition": "NPC販売",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%BB%E0",
+    "mp": 13.0,
+    "reagent": "ND3",
+    "element": "風"
+  },
+  {
+    "id": "magic-1843df4088-820ff8196d-20",
+    "name": "バインディング ハンズ",
+    "kind": "魔法",
+    "category": "死の魔法",
+    "requirements": [
+      {
+        "skill": "死の魔法",
+        "min": 20.0
+      }
+    ],
+    "successSkill": "死の魔法",
+    "successRequired": 20.0,
+    "cost": {
+      "mp": 13.0
+    },
+    "castTime": "151",
+    "delay": "224",
+    "description": "地面から伸びる無数の悪霊の手が 対象を捕まえる",
+    "range": "18.8",
+    "transfer": "×",
+    "acquisition": "NPC販売",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%BB%E0",
+    "mp": 13.0,
+    "reagent": "ND3",
+    "element": "無"
+  },
+  {
+    "id": "magic-1843df4088-7e39dd2565-30",
+    "name": "エバー ディズィーズ",
+    "kind": "魔法",
+    "category": "死の魔法",
+    "requirements": [
+      {
+        "skill": "死の魔法",
+        "min": 30.0
+      }
+    ],
+    "successSkill": "死の魔法",
+    "successRequired": 30.0,
+    "cost": {
+      "mp": 18.0
+    },
+    "castTime": "189",
+    "delay": "266",
+    "description": "敵を一種の病気状態にし スタミナの自然回復停止と徐々に減少する効果を与える\n※対NPCには、攻撃間隔が遅くなる効果",
+    "range": "24.8",
+    "transfer": "×",
+    "acquisition": "NPC販売\nグレイブンネクロマンサー",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%BB%E0",
+    "mp": 18.0,
+    "reagent": "NP1",
+    "element": "風"
+  },
+  {
+    "id": "magic-1843df4088-2f031bd92b-30",
+    "name": "エピデミック オール",
+    "kind": "魔法",
+    "category": "死の魔法",
+    "requirements": [
+      {
+        "skill": "死の魔法",
+        "min": 30.0
+      }
+    ],
+    "successSkill": "死の魔法",
+    "successRequired": 30.0,
+    "cost": {
+      "mp": 18.0
+    },
+    "castTime": "189",
+    "delay": "266",
+    "description": "呪いの言葉を浴びせかけ 近くにいるもの全てを病気にさせる\n（HP・MPの自然回復がなくなる）\n※範囲魔法の効果",
+    "range": "24.8",
+    "transfer": "×",
+    "acquisition": "NPC販売\nグレイブンネクロマンサー",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%BB%E0",
+    "mp": 18.0,
+    "reagent": "NP1",
+    "element": "地"
+  },
+  {
+    "id": "magic-1843df4088-af900382d7-40",
+    "name": "プリゾナー ヴェイル",
+    "kind": "魔法",
+    "category": "死の魔法",
+    "requirements": [
+      {
+        "skill": "死の魔法",
+        "min": 40.0
+      }
+    ],
+    "successSkill": "死の魔法",
+    "successRequired": 40.0,
+    "cost": {
+      "mp": 23.0
+    },
+    "castTime": "187",
+    "delay": "268",
+    "description": "顔全体を邪念で覆い 呪文詠唱を不可能にさせる\n対象が詠唱中の場合には、一定の確率で詠唱を止める事が可能",
+    "range": "22.8",
+    "transfer": "×",
+    "acquisition": "NPC販売\nデスナイト\nパレスナイト\nリビングデッド",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%BB%E0",
+    "mp": 23.0,
+    "reagent": "NP2",
+    "element": "水"
+  },
+  {
+    "id": "magic-1843df4088-80879da208-40",
+    "name": "ロットン ブレス",
+    "kind": "魔法",
+    "category": "死の魔法",
+    "requirements": [
+      {
+        "skill": "死の魔法",
+        "min": 40.0
+      }
+    ],
+    "successSkill": "死の魔法",
+    "successRequired": 40.0,
+    "cost": {
+      "mp": 23.0
+    },
+    "castTime": "187",
+    "delay": "268",
+    "description": "悪魔の吐息を吐き 強化効果を新しいものから５個解除する\n強力なBuff剥がし。小範囲魔法",
+    "range": "21.8",
+    "transfer": "×",
+    "acquisition": "NPC販売\nデスナイト\nパレスナイト\nリビングデッド",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%BB%E0",
+    "mp": 23.0,
+    "reagent": "NP2",
+    "element": "風"
+  },
+  {
+    "id": "magic-1843df4088-22f0f01cb4-50",
+    "name": "コープス エクスプロージョン",
+    "kind": "魔法",
+    "category": "死の魔法",
+    "requirements": [
+      {
+        "skill": "死の魔法",
+        "min": 50.0
+      }
+    ],
+    "successSkill": "死の魔法",
+    "successRequired": 50.0,
+    "cost": {
+      "mp": 28.0
+    },
+    "castTime": "225",
+    "delay": "310",
+    "description": "死体を爆発させ 周りにいる敵にダメージを与える\n範囲魔法\nDoT扱いで複数掛けても重複しない",
+    "range": "",
+    "transfer": "×",
+    "acquisition": "NPC販売\nデスナイト\nパレスナイト\nリビングデッド",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%BB%E0",
+    "mp": 28.0,
+    "reagent": "NP3",
+    "element": "火"
+  },
+  {
+    "id": "magic-1843df4088-b892a1ddce-50",
+    "name": "バプティズム ポイズン",
+    "kind": "魔法",
+    "category": "死の魔法",
+    "requirements": [
+      {
+        "skill": "死の魔法",
+        "min": 50.0
+      }
+    ],
+    "successSkill": "死の魔法",
+    "successRequired": 50.0,
+    "cost": {
+      "mp": 28.0
+    },
+    "castTime": "225",
+    "delay": "310",
+    "description": "強烈な毒の洗礼を浴びせかける\n5秒間隔で4回の毒ダメージ",
+    "range": "23.8",
+    "transfer": "×",
+    "acquisition": "NPC販売\nデスナイト\nパレスナイト\nリビングデッド",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%BB%E0",
+    "mp": 28.0,
+    "reagent": "NP3",
+    "element": "地"
+  },
+  {
+    "id": "magic-1843df4088-7fc0fcb54c-60",
+    "name": "ディアボリック アイ",
+    "kind": "魔法",
+    "category": "死の魔法",
+    "requirements": [
+      {
+        "skill": "死の魔法",
+        "min": 60.0
+      }
+    ],
+    "successSkill": "死の魔法",
+    "successRequired": 60.0,
+    "cost": {
+      "mp": 34.0
+    },
+    "castTime": "223",
+    "delay": "312",
+    "description": "自分の周囲に隠れている者を暴き出す\n範囲魔法\n透明化Buffを剥がす効果。(看破Buffではない)",
+    "range": "-",
+    "transfer": "×",
+    "acquisition": "NPC販売(夜間キャンプ)\nデスナイト\nパレスナイト\nウォッチャー系\nリビングデッド",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%BB%E0",
+    "mp": 34.0,
+    "reagent": "NQ1",
+    "element": "無"
+  },
+  {
+    "id": "magic-1843df4088-9936001481-60",
+    "name": "ラピッド ディケイ",
+    "kind": "魔法",
+    "category": "死の魔法",
+    "requirements": [
+      {
+        "skill": "死の魔法",
+        "min": 60.0
+      }
+    ],
+    "successSkill": "死の魔法",
+    "successRequired": 60.0,
+    "cost": {
+      "mp": 34.0
+    },
+    "castTime": "223",
+    "delay": "312",
+    "description": "死体の近くにいる者に強烈な死臭を浴びせかけ、酔い状態にさせる\n※対NPCは、有効な魔法効果を１つ解除する効果",
+    "range": "",
+    "transfer": "×",
+    "acquisition": "NPC販売(夜間キャンプ)\nデスナイト\nパレスナイト\nリビングデッド",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%BB%E0",
+    "mp": 34.0,
+    "reagent": "NQ1",
+    "element": "水"
+  },
+  {
+    "id": "magic-1843df4088-76adfa9aa4-70",
+    "name": "コープス ミーティング",
+    "kind": "魔法",
+    "category": "死の魔法",
+    "requirements": [
+      {
+        "skill": "死の魔法",
+        "min": 70.0
+      }
+    ],
+    "successSkill": "死の魔法",
+    "successRequired": 70.0,
+    "cost": {
+      "mp": 46.0
+    },
+    "castTime": "279",
+    "delay": "376",
+    "description": "他者の死体を 術者の元に引き寄せる\n※同じゾーン内の死体しか引き寄せられない\n霊体にかける魔法",
+    "range": "",
+    "transfer": "×",
+    "acquisition": "クエスト報酬(暗使)\nアスモダイ\nアスモダイデューク\n腐った死体\nドッペルゲンガー",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%BB%E0",
+    "mp": 46.0,
+    "reagent": "PNQ7",
+    "element": "地"
+  },
+  {
+    "id": "magic-1843df4088-919958fbd0-70",
+    "name": "シャドウ モーフ",
+    "kind": "魔法",
+    "category": "死の魔法",
+    "requirements": [
+      {
+        "skill": "死の魔法",
+        "min": 70.0
+      }
+    ],
+    "successSkill": "死の魔法",
+    "successRequired": 70.0,
+    "cost": {
+      "mp": 40.0
+    },
+    "castTime": "261",
+    "delay": "354",
+    "description": "その場で影となり 姿をくらます\n※動く事は出来ないが 他者から見えなくなる\n→\nタゲ切り魔法",
+    "range": "-",
+    "transfer": "×",
+    "acquisition": "NPC販売(ヌブール村)\nアスモダイ\nドッペルゲンガー",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%BB%E0",
+    "mp": 40.0,
+    "reagent": "NQ2",
+    "element": "無"
+  },
+  {
+    "id": "magic-1843df4088-01835bef75-80",
+    "name": "イーヴル オーメン",
+    "kind": "魔法",
+    "category": "死の魔法",
+    "requirements": [
+      {
+        "skill": "死の魔法",
+        "min": 80.0
+      }
+    ],
+    "successSkill": "死の魔法",
+    "successRequired": 80.0,
+    "cost": {
+      "mp": 46.0
+    },
+    "castTime": "259",
+    "delay": "356",
+    "description": "害のあるお告げが下され 良くない結果を招かせられる\n対象か自分自身のどちらかに 131ダメージ(固定)",
+    "range": "20.75",
+    "transfer": "×",
+    "acquisition": "アスモダイ\nアスモダイデューク\nドッペルゲンガー\nイーゴマインド",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%BB%E0",
+    "mp": 46.0,
+    "reagent": "-",
+    "element": "無"
+  },
+  {
+    "id": "magic-1843df4088-92a929cd45-80",
+    "name": "ヘル パニッシュ",
+    "kind": "魔法",
+    "category": "死の魔法",
+    "requirements": [
+      {
+        "skill": "死の魔法",
+        "min": 80.0
+      }
+    ],
+    "successSkill": "死の魔法",
+    "successRequired": 80.0,
+    "cost": {
+      "mp": 46.0
+    },
+    "castTime": "279",
+    "delay": "376",
+    "description": "一定時間直接攻撃を攻撃者に跳ね返す。\n※HPを回復すると 効果は消え去る",
+    "range": "-",
+    "transfer": "×",
+    "acquisition": "アスモダイ\nアスモダイデューク\nドッペルゲンガー\nイーゴマインド",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%BB%E0",
+    "mp": 46.0,
+    "reagent": "-",
+    "element": "地"
+  },
+  {
+    "id": "magic-1843df4088-2c38d7e6da-90",
+    "name": "リボーン ワンス",
+    "kind": "魔法",
+    "category": "死の魔法",
+    "requirements": [
+      {
+        "skill": "死の魔法",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "死の魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 53.0
+    },
+    "castTime": "297",
+    "delay": "398",
+    "description": "一度死んでも 瀕死状態で生き返ることができる",
+    "range": "-",
+    "transfer": "×",
+    "acquisition": "アスモダイ\nアスモダイデューク\nドッペルゲンガー\nサベージドルイドロード\nエミリー\nウォーターウンディーネ\nイーゴマインド",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%BB%E0",
+    "mp": 53.0,
+    "reagent": "PNQ1",
+    "element": "火"
+  },
+  {
+    "id": "magic-1843df4088-0dd6bfb6cb-90",
+    "name": "リープ カーニバル",
+    "kind": "魔法",
+    "category": "死の魔法",
+    "requirements": [
+      {
+        "skill": "死の魔法",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "死の魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 100.0
+    },
+    "castTime": "297",
+    "delay": "398",
+    "description": "魔法発動後 一定時間以内に近接両手武器で攻撃すると、\n敵に即死級のダメージを与えることができる\n※通常攻撃のみ効果が発動します\n基本技「アタック」に限り以下の固定ダメージになるBuff\n・2HANDの刀剣 (対人250・対Mob500ダメージ)\n・2HANDの棍棒 (対人220・対Mob440ダメージ)\n・2HANDの槍 (対人200・対Mob400ダメージ)\n・素手 (対人160・対Mob320ダメージ)\n自分専用。効果時間は短く、アタック1〜2回が限度\n効果中は移動速度が著しく低下する",
+    "range": "-",
+    "transfer": "×",
+    "acquisition": "アスモダイ\nアスモダイデューク\nドッペルゲンガー\nイーゴマインド",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%BB%E0",
+    "mp": 100.0,
+    "reagent": "PNQ1",
+    "element": "無"
+  },
+  {
+    "id": "magic-1843df4088-8b35ac5d96-90",
+    "name": "ロットン ベイパー",
+    "kind": "魔法",
+    "category": "死の魔法",
+    "requirements": [
+      {
+        "skill": "死の魔法",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "死の魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 45.0
+    },
+    "castTime": "220",
+    "delay": "2000",
+    "description": "EGK の放出する 腐った蒸気",
+    "range": "？",
+    "transfer": "×",
+    "acquisition": "ChaosAge風の門 報酬",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%BB%E0",
+    "mp": 45.0,
+    "reagent": "OP1",
+    "element": "風"
+  },
+  {
+    "id": "magic-04c97dbe4a-ca4b4d75c1-1",
+    "name": "マイナー バースト",
+    "kind": "魔法",
+    "category": "破壊魔法",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 1.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 1.0,
+    "cost": {
+      "mp": 5.0
+    },
+    "castTime": "115",
+    "delay": "180",
+    "description": "小さな火の玉を生み出して 敵にぶつける",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "NPC販売\nオーク メイジ\nマナ ゴーレム",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%C7%CB%B2%F5",
+    "mp": 5.0,
+    "reagent": "ND1",
+    "element": "火"
+  },
+  {
+    "id": "magic-04c97dbe4a-e1d104ba57-1",
+    "name": "リトル ツイスター",
+    "kind": "魔法",
+    "category": "破壊魔法",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 1.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 1.0,
+    "cost": {
+      "mp": 5.0
+    },
+    "castTime": "195",
+    "delay": "180",
+    "description": "突風を巻き起こし ダメージを与える\n※ 前方に限り、対象と近いほどヒット数が増える\n特殊な魔法：詳しくは\n短評\n参照",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "NPC販売\nオーク メイジ",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%C7%CB%B2%F5",
+    "mp": 5.0,
+    "reagent": "ND1",
+    "element": "風"
+  },
+  {
+    "id": "magic-04c97dbe4a-5e65bab65f-10",
+    "name": "アイス ボール",
+    "kind": "魔法",
+    "category": "破壊魔法",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 10.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 10.0,
+    "cost": {
+      "mp": 9.0
+    },
+    "castTime": "133",
+    "delay": "202",
+    "description": "敵に氷の弾をぶつける\n鈍足効果",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "NPC販売\nオーク メイジ",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%C7%CB%B2%F5",
+    "mp": 9.0,
+    "reagent": "ND2",
+    "element": "水"
+  },
+  {
+    "id": "magic-04c97dbe4a-8d7bcc9e6e-10",
+    "name": "ポイズン ミスト",
+    "kind": "魔法",
+    "category": "破壊魔法",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 10.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 10.0,
+    "cost": {
+      "mp": 9.0
+    },
+    "castTime": "133",
+    "delay": "202",
+    "description": "毒の霧を発生させ 敵を毒状態にする\n3秒間隔で9回の毒ダメージ",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "NPC販売\nオーク メイジ",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%C7%CB%B2%F5",
+    "mp": 9.0,
+    "reagent": "ND2",
+    "element": "地"
+  },
+  {
+    "id": "magic-04c97dbe4a-030c3198b6-20",
+    "name": "ショック ボルト",
+    "kind": "魔法",
+    "category": "破壊魔法",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 20.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 20.0,
+    "cost": {
+      "mp": 13.0
+    },
+    "castTime": "151",
+    "delay": "224",
+    "description": "電撃でダメージを与える",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "NPC販売\nオーク メイジ",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%C7%CB%B2%F5",
+    "mp": 13.0,
+    "reagent": "ND3",
+    "element": "風"
+  },
+  {
+    "id": "magic-04c97dbe4a-8b02c91614-20",
+    "name": "ブレイズ",
+    "kind": "魔法",
+    "category": "破壊魔法",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 20.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 20.0,
+    "cost": {
+      "mp": 13.0
+    },
+    "castTime": "151",
+    "delay": "224",
+    "description": "火柱を発生させ 敵に継続的なダメージを与える\n1秒間隔で4回の魔法ダメージ",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "NPC販売\nオーク メイジ\nマナ ゴーレム",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%C7%CB%B2%F5",
+    "mp": 13.0,
+    "reagent": "ND3",
+    "element": "火"
+  },
+  {
+    "id": "magic-04c97dbe4a-29fc051aca-30",
+    "name": "フリーズ",
+    "kind": "魔法",
+    "category": "破壊魔法",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 30.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 30.0,
+    "cost": {
+      "mp": 18.0
+    },
+    "castTime": "169",
+    "delay": "246",
+    "description": "敵を凍らせてダメージを与え 移動速度を遅くする\n鈍足効果",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "NPC販売\nオーク メイジ",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%C7%CB%B2%F5",
+    "mp": 18.0,
+    "reagent": "NP1",
+    "element": "水"
+  },
+  {
+    "id": "magic-04c97dbe4a-439db53213-30",
+    "name": "ポイズン レイン",
+    "kind": "魔法",
+    "category": "破壊魔法",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 30.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 30.0,
+    "cost": {
+      "mp": 18.0
+    },
+    "castTime": "169",
+    "delay": "246",
+    "description": "毒の雨を降らせ 敵に強烈な毒の効果を与える\n4秒間隔で7回の毒ダメージ",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "NPC販売\nオーク メイジ",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%C7%CB%B2%F5",
+    "mp": 18.0,
+    "reagent": "NP1",
+    "element": "地"
+  },
+  {
+    "id": "magic-04c97dbe4a-bcbb5d38a0-40",
+    "name": "オーブン",
+    "kind": "魔法",
+    "category": "破壊魔法",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 40.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 40.0,
+    "cost": {
+      "mp": 23.0
+    },
+    "castTime": "187",
+    "delay": "268",
+    "description": "対象の周りに火災を発生させ 継続ダメージを与えて焼き尽くす\n範囲魔法。10秒間隔で5回の魔法ダメージ",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "NPC販売\nツァー",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%C7%CB%B2%F5",
+    "mp": 23.0,
+    "reagent": "NP2",
+    "element": "火"
+  },
+  {
+    "id": "magic-04c97dbe4a-7cd031cd0b-40",
+    "name": "ソニック ケイジ",
+    "kind": "魔法",
+    "category": "破壊魔法",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 40.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 40.0,
+    "cost": {
+      "mp": 23.0
+    },
+    "castTime": "187",
+    "delay": "268",
+    "description": "対象にダメージを与え 周りにいる敵にもダメージを伝達させる\n範囲魔法。ダメージは対象の最大HPが多いほど増加(最大40)",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "NPC販売\nツァー",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%C7%CB%B2%F5",
+    "mp": 23.0,
+    "reagent": "NP2",
+    "element": "地"
+  },
+  {
+    "id": "magic-04c97dbe4a-d72f8761b4-50",
+    "name": "サンダーボルト",
+    "kind": "魔法",
+    "category": "破壊魔法",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 50.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 50.0,
+    "cost": {
+      "mp": 28.0
+    },
+    "castTime": "205",
+    "delay": "290",
+    "description": "雷を落とし ダメージと麻痺の効果を与える\n麻痺効果",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "NPC販売\nツァー\n大デンキウナギ",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%C7%CB%B2%F5",
+    "mp": 28.0,
+    "reagent": "NP3",
+    "element": "風"
+  },
+  {
+    "id": "magic-04c97dbe4a-e74e65c63a-50",
+    "name": "スターダスト",
+    "kind": "魔法",
+    "category": "破壊魔法",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 50.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 50.0,
+    "cost": {
+      "mp": 28.0
+    },
+    "castTime": "205",
+    "delay": "290",
+    "description": "空から無数の星屑を降らせ 敵にぶつける\n※ 時間差魔法\n4秒後に1回の魔法ダメージ",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "NPC販売\nツァー",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%C7%CB%B2%F5",
+    "mp": 28.0,
+    "reagent": "NP3",
+    "element": "地"
+  },
+  {
+    "id": "magic-04c97dbe4a-0e619490c8-60",
+    "name": "バースト",
+    "kind": "魔法",
+    "category": "破壊魔法",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 60.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 60.0,
+    "cost": {
+      "mp": 34.0
+    },
+    "castTime": "223",
+    "delay": "312",
+    "description": "炎の玉を生み出して 敵にぶつける",
+    "range": "",
+    "transfer": "×",
+    "acquisition": "NPC販売(夜間キャンプ)\nツァー\nマナ ゴーレム\nマジック ゴーレム",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%C7%CB%B2%F5",
+    "mp": 34.0,
+    "reagent": "NQ1",
+    "element": "火"
+  },
+  {
+    "id": "magic-04c97dbe4a-84c7bdcf70-60",
+    "name": "ブリザード",
+    "kind": "魔法",
+    "category": "破壊魔法",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 60.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 60.0,
+    "cost": {
+      "mp": 34.0
+    },
+    "castTime": "223",
+    "delay": "312",
+    "description": "氷の竜巻を起こして大ダメージを与え 移動速度を遅くする\n範囲魔法。鈍足効果",
+    "range": "",
+    "transfer": "×",
+    "acquisition": "NPC販売(夜間キャンプ)\nツァー",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%C7%CB%B2%F5",
+    "mp": 34.0,
+    "reagent": "NQ1",
+    "element": "水"
+  },
+  {
+    "id": "magic-04c97dbe4a-7449f1fa9e-70",
+    "name": "ストロング ボルト",
+    "kind": "魔法",
+    "category": "破壊魔法",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 70.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 70.0,
+    "cost": {
+      "mp": 40.0
+    },
+    "castTime": "241",
+    "delay": "334",
+    "description": "強烈な雷撃を脳天に落とし ダメージと麻痺の効果を与える\n範囲魔法（他より広範囲）・麻痺効果",
+    "range": "",
+    "transfer": "×",
+    "acquisition": "ツァー\nイクシオン ソーサラー\nサイドワインダー\n大デンキウナギ",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%C7%CB%B2%F5",
+    "mp": 40.0,
+    "reagent": "NQ2",
+    "element": "風"
+  },
+  {
+    "id": "magic-04c97dbe4a-5ad207f2ce-70",
+    "name": "ポイズン クラウド",
+    "kind": "魔法",
+    "category": "破壊魔法",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 70.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 70.0,
+    "cost": {
+      "mp": 40.0
+    },
+    "castTime": "241",
+    "delay": "334",
+    "description": "毒の雲を発生させ 範囲内の敵に継続的なダメージを与える\n範囲魔法。5秒間隔で6回の毒ダメージ",
+    "range": "",
+    "transfer": "×",
+    "acquisition": "NPC販売(ヌブール村)\nサイドワインダー",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%C7%CB%B2%F5",
+    "mp": 40.0,
+    "reagent": "NQ2",
+    "element": "地"
+  },
+  {
+    "id": "magic-04c97dbe4a-7cf0883209-80",
+    "name": "フローズン ビーム",
+    "kind": "魔法",
+    "category": "破壊魔法",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 80.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 80.0,
+    "cost": {
+      "mp": 46.0
+    },
+    "castTime": "259",
+    "delay": "356",
+    "description": "凍結ダメージを与え対象を凍結させる\n※ 凍結中の対象はクリティカルを大幅に受けやすくなる\nやや弱い鈍足効果・被クリティカル率上昇のDebuff",
+    "range": "",
+    "transfer": "×",
+    "acquisition": "サイドワインダー",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%C7%CB%B2%F5",
+    "mp": 46.0,
+    "reagent": "NQ3",
+    "element": "水"
+  },
+  {
+    "id": "magic-04c97dbe4a-6df626a091-80",
+    "name": "メガ バースト",
+    "kind": "魔法",
+    "category": "破壊魔法",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 80.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 80.0,
+    "cost": {
+      "mp": 46.0
+    },
+    "castTime": "259",
+    "delay": "356",
+    "description": "強烈な炎が渦巻く爆発を起こし 敵に大ダメージを与える",
+    "range": "",
+    "transfer": "×",
+    "acquisition": "サイドワインダー\nマナ ゴーレム\nマジック ゴーレム",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%C7%CB%B2%F5",
+    "mp": 46.0,
+    "reagent": "NQ3",
+    "element": "火"
+  },
+  {
+    "id": "magic-04c97dbe4a-7901b0fbc4-90",
+    "name": "アクア ツイスター",
+    "kind": "魔法",
+    "category": "破壊魔法",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 53.0
+    },
+    "castTime": "277",
+    "delay": "479",
+    "description": "WGKが操る 水の古代魔法\n大気中の水分から 小規模の水の渦を作り出す\n術者中心の範囲魔法。対象を180度方向転換させる",
+    "range": "",
+    "transfer": "×",
+    "acquisition": "報酬(Chaos Age 水の門)",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%C7%CB%B2%F5",
+    "mp": 53.0,
+    "reagent": "OP1",
+    "element": "水"
+  },
+  {
+    "id": "magic-04c97dbe4a-e5f824333b-90",
+    "name": "カオス フレア",
+    "kind": "魔法",
+    "category": "破壊魔法",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 53.0
+    },
+    "castTime": "277",
+    "delay": "378",
+    "description": "あらゆる負の要素が混じった強烈な爆発を起こし 対象を跡形もなく吹き飛ばす\nノックバック効果",
+    "range": "",
+    "transfer": "×",
+    "acquisition": "サイドワインダー\nサベージ ドルイド ロード\nエミリー\nウォーター ウンディーネ",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%C7%CB%B2%F5",
+    "mp": 53.0,
+    "reagent": "PNQ1",
+    "element": "無"
+  },
+  {
+    "id": "magic-04c97dbe4a-4e53dffca5-90",
+    "name": "ディバイン スパーク ボール",
+    "kind": "魔法",
+    "category": "破壊魔法",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 53.0
+    },
+    "castTime": "277",
+    "delay": "479",
+    "description": "意思を持って動く雷の球が 無差別に敵を襲う\n※ 術者を攻撃した対象へ 球が自動的に反撃する",
+    "range": "",
+    "transfer": "×",
+    "acquisition": "報酬(Chaos Age 天の門)",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%C7%CB%B2%F5",
+    "mp": 53.0,
+    "reagent": "OP1",
+    "element": "？"
+  },
+  {
+    "id": "magic-04c97dbe4a-2fe965e050-90",
+    "name": "メテオ ストライク",
+    "kind": "魔法",
+    "category": "破壊魔法",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 53.0
+    },
+    "castTime": "277",
+    "delay": "378",
+    "description": "巨大な隕石を頭上に落とす\n※ 時間差魔法\n範囲魔法。4秒(5秒?)後に1回の魔法ダメージ",
+    "range": "",
+    "transfer": "×",
+    "acquisition": "イクシオン ソーサラー\nサイドワインダー\nマジック ゴーレム",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%C7%CB%B2%F5",
+    "mp": 53.0,
+    "reagent": "PNQ1",
+    "element": "地"
+  },
+  {
+    "id": "magic-04c97dbe4a-89d67ee3ac-90",
+    "name": "メテオライト インパクト",
+    "kind": "魔法",
+    "category": "破壊魔法",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 53.0
+    },
+    "castTime": "277",
+    "delay": "479",
+    "description": "敵単体に巨大な隕石を落下させ 衝撃で大ダメージを与える古代魔法\n※ War Ageでは魔法チャージ不可\n微弱なノックバック効果\n対PC・人型Mobには転倒モーションあり",
+    "range": "",
+    "transfer": "×",
+    "acquisition": "報酬(Chaos Age 冥の門)",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%C7%CB%B2%F5",
+    "mp": 53.0,
+    "reagent": "OP1",
+    "element": "地"
+  },
+  {
+    "id": "magic-73ce8d2790-c67fa3bcb4-1",
+    "name": "ライト",
+    "kind": "魔法",
+    "category": "神秘魔法",
     "requirements": [
       {
         "skill": "神秘魔法",
-        "min": 40
+        "min": 1.0
       }
     ],
     "successSkill": "神秘魔法",
-    "successRequired": 40,
-    "mp": 23,
-    "reagent": "ノア パウダー",
-    "note": "サンプル。"
+    "successRequired": 1.0,
+    "cost": {
+      "mp": 5.0
+    },
+    "castTime": "135",
+    "delay": "200",
+    "description": "魔力によって明かりを灯す",
+    "range": "24.8",
+    "transfer": "×",
+    "acquisition": "NPC販売\nオーク呪術師",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%BF%C0%C8%EB",
+    "mp": 5.0,
+    "reagent": "ND1"
+  },
+  {
+    "id": "magic-73ce8d2790-9812107d0a-1",
+    "name": "リエージェント アルケミー",
+    "kind": "魔法",
+    "category": "神秘魔法",
+    "requirements": [
+      {
+        "skill": "神秘魔法",
+        "min": 1.0
+      }
+    ],
+    "successSkill": "神秘魔法",
+    "successRequired": 1.0,
+    "cost": {
+      "mp": 5.0
+    },
+    "castTime": "450",
+    "delay": "750",
+    "description": "ノア ダストからノア パウダーを作りだす",
+    "range": "-",
+    "transfer": "×",
+    "acquisition": "NPC販売\nオーク呪術師",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%BF%C0%C8%EB",
+    "mp": 5.0,
+    "reagent": "ND1"
+  },
+  {
+    "id": "magic-73ce8d2790-59c41ad098-10",
+    "name": "リコール ドリンク",
+    "kind": "魔法",
+    "category": "神秘魔法",
+    "requirements": [
+      {
+        "skill": "神秘魔法",
+        "min": 10.0
+      }
+    ],
+    "successSkill": "神秘魔法",
+    "successRequired": 10.0,
+    "cost": {
+      "mp": 9.0
+    },
+    "castTime": "480",
+    "delay": "660",
+    "description": "飲み物を召喚する\n召喚した飲み物は、ログアウト・エリア移動で消滅",
+    "range": "-",
+    "transfer": "×",
+    "acquisition": "NPC販売\nオーク呪術師",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%BF%C0%C8%EB",
+    "mp": 9.0,
+    "reagent": "ND2"
+  },
+  {
+    "id": "magic-73ce8d2790-5dac4940df-10",
+    "name": "リコール レイション",
+    "kind": "魔法",
+    "category": "神秘魔法",
+    "requirements": [
+      {
+        "skill": "神秘魔法",
+        "min": 10.0
+      }
+    ],
+    "successSkill": "神秘魔法",
+    "successRequired": 10.0,
+    "cost": {
+      "mp": 9.0
+    },
+    "castTime": "480",
+    "delay": "660",
+    "description": "食べ物を召喚する\n召喚した食べ物は、ログアウト・エリア移動で消滅",
+    "range": "-",
+    "transfer": "×",
+    "acquisition": "NPC販売\nオーク呪術師",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%BF%C0%C8%EB",
+    "mp": 9.0,
+    "reagent": "ND2"
+  },
+  {
+    "id": "magic-73ce8d2790-03d451f717-20",
+    "name": "ソーン スキン",
+    "kind": "魔法",
+    "category": "神秘魔法",
+    "requirements": [
+      {
+        "skill": "神秘魔法",
+        "min": 20.0
+      }
+    ],
+    "successSkill": "神秘魔法",
+    "successRequired": 20.0,
+    "cost": {
+      "mp": 13.0
+    },
+    "castTime": "151",
+    "delay": "224",
+    "description": "体に刺を発生させ 直接攻撃で受けたダメージの一部を相手に跳ね返す\n※ ダメージを受けると効果は消えてしまう\n物理ダメージの3割程度を反射する",
+    "range": "-",
+    "transfer": "×",
+    "acquisition": "NPC販売\nオーク呪術師",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%BF%C0%C8%EB",
+    "mp": 13.0,
+    "reagent": "ND3"
+  },
+  {
+    "id": "magic-73ce8d2790-3ffb0df848-20",
+    "name": "フレイム ブレイド",
+    "kind": "魔法",
+    "category": "神秘魔法",
+    "requirements": [
+      {
+        "skill": "神秘魔法",
+        "min": 20.0
+      }
+    ],
+    "successSkill": "神秘魔法",
+    "successRequired": 20.0,
+    "cost": {
+      "mp": 13.0
+    },
+    "castTime": "151",
+    "delay": "224",
+    "description": "武器に炎を宿らせ 炎属性を追加する\n※ プレイヤーのメイン攻撃にのみ属性を付加する\n→\nエンチャント魔法の特性",
+    "range": "24.8",
+    "transfer": "×",
+    "acquisition": "NPC販売\nオーク呪術師",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%BF%C0%C8%EB",
+    "mp": 13.0,
+    "reagent": "ND3"
+  },
+  {
+    "id": "magic-73ce8d2790-2708f01194-30",
+    "name": "スモール ワープ",
+    "kind": "魔法",
+    "category": "神秘魔法",
+    "requirements": [
+      {
+        "skill": "神秘魔法",
+        "min": 30.0
+      }
+    ],
+    "successSkill": "神秘魔法",
+    "successRequired": 30.0,
+    "cost": {
+      "mp": 18.0
+    },
+    "castTime": "189",
+    "delay": "266",
+    "description": "対象と同じ位置に瞬間移動する",
+    "range": "19.8",
+    "transfer": "×",
+    "acquisition": "NPC販売\nオーク呪術師",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%BF%C0%C8%EB",
+    "mp": 18.0,
+    "reagent": "NP1"
+  },
+  {
+    "id": "magic-73ce8d2790-8d1b2a69c3-30",
+    "name": "リコール ストーン ウォール",
+    "kind": "魔法",
+    "category": "神秘魔法",
+    "requirements": [
+      {
+        "skill": "神秘魔法",
+        "min": 30.0
+      }
+    ],
+    "successSkill": "神秘魔法",
+    "successRequired": 30.0,
+    "cost": {
+      "mp": 18.0
+    },
+    "castTime": "189",
+    "delay": "266",
+    "description": "空間に巨大な壁を出現させ 通路を遮断する",
+    "range": "17.8",
+    "transfer": "×",
+    "acquisition": "NPC販売\nオーク呪術師\nストーンゴーレム系",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%BF%C0%C8%EB",
+    "mp": 18.0,
+    "reagent": "NP1"
+  },
+  {
+    "id": "magic-73ce8d2790-4e163ef1c6-40",
+    "name": "ディスペル サモン",
+    "kind": "魔法",
+    "category": "神秘魔法",
+    "requirements": [
+      {
+        "skill": "神秘魔法",
+        "min": 40.0
+      }
+    ],
+    "successSkill": "神秘魔法",
+    "successRequired": 40.0,
+    "cost": {
+      "mp": 23.0
+    },
+    "castTime": "187",
+    "delay": "268",
+    "description": "召喚されたペットを異空間に飛ばして消し去る",
+    "range": "22.1",
+    "transfer": "×",
+    "acquisition": "NPC販売\nタルタロッサ ビート",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%BF%C0%C8%EB",
+    "mp": 23.0,
+    "reagent": "NP2"
+  },
+  {
+    "id": "magic-73ce8d2790-61176674ec-40",
+    "name": "メスメライズ",
+    "kind": "魔法",
+    "category": "神秘魔法",
+    "requirements": [
+      {
+        "skill": "神秘魔法",
+        "min": 40.0
+      }
+    ],
+    "successSkill": "神秘魔法",
+    "successRequired": 40.0,
+    "cost": {
+      "mp": 23.0
+    },
+    "castTime": "187",
+    "delay": "268",
+    "description": "敵を眠らせ行動不能にする\n対象の呪文抵抗の影響を受けない",
+    "range": "20.8",
+    "transfer": "×",
+    "acquisition": "NPC販売",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%BF%C0%C8%EB",
+    "mp": 23.0,
+    "reagent": "NP2"
+  },
+  {
+    "id": "magic-73ce8d2790-a1505b05a0-50",
+    "name": "テレポート",
+    "kind": "魔法",
+    "category": "神秘魔法",
+    "requirements": [
+      {
+        "skill": "神秘魔法",
+        "min": 50.0
+      }
+    ],
+    "successSkill": "神秘魔法",
+    "successRequired": 50.0,
+    "cost": {
+      "mp": 28.0
+    },
+    "castTime": "480",
+    "delay": "660",
+    "description": "自分のホーム ポイント/記録した場所へ瞬時に移動する",
+    "range": "-",
+    "transfer": "×",
+    "acquisition": "NPC販売",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%BF%C0%C8%EB",
+    "mp": 28.0,
+    "reagent": "NP3"
+  },
+  {
+    "id": "magic-73ce8d2790-3447471068-50",
+    "name": "フリーズ ブレイド",
+    "kind": "魔法",
+    "category": "神秘魔法",
+    "requirements": [
+      {
+        "skill": "神秘魔法",
+        "min": 50.0
+      }
+    ],
+    "successSkill": "神秘魔法",
+    "successRequired": 50.0,
+    "cost": {
+      "mp": 28.0
+    },
+    "castTime": "225",
+    "delay": "310",
+    "description": "武器に冷気を宿らせ 水属性を追加する\n※ プレイヤーのメイン攻撃にのみ属性を付加する\n→\nエンチャント魔法の特性",
+    "range": "24.8",
+    "transfer": "×",
+    "acquisition": "NPC販売\nエミリー",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%BF%C0%C8%EB",
+    "mp": 28.0,
+    "reagent": "NP3"
+  },
+  {
+    "id": "magic-73ce8d2790-b3066e257b-60",
+    "name": "コーリング",
+    "kind": "魔法",
+    "category": "神秘魔法",
+    "requirements": [
+      {
+        "skill": "神秘魔法",
+        "min": 60.0
+      }
+    ],
+    "successSkill": "神秘魔法",
+    "successRequired": 60.0,
+    "cost": {
+      "mp": 34.0
+    },
+    "castTime": "243",
+    "delay": "332",
+    "description": "対象を自分の現在位置へ引き寄せる",
+    "range": "14.6",
+    "transfer": "×",
+    "acquisition": "NPC販売(夜間キャンプ)",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%BF%C0%C8%EB",
+    "mp": 34.0,
+    "reagent": "NQ1"
+  },
+  {
+    "id": "magic-73ce8d2790-96ab1e33a9-60",
+    "name": "ミツクニ オーダー",
+    "kind": "魔法",
+    "category": "神秘魔法",
+    "requirements": [
+      {
+        "skill": "神秘魔法",
+        "min": 60.0
+      }
+    ],
+    "successSkill": "神秘魔法",
+    "successRequired": 60.0,
+    "cost": {
+      "mp": 34.0
+    },
+    "castTime": "243",
+    "delay": "332",
+    "description": "対象を後方に空間移動させる\nノックバック効果\n対PC/人型Mobでは、その場で強制土下座",
+    "range": "15.8",
+    "transfer": "×",
+    "acquisition": "NPC販売(夜間キャンプ)",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%BF%C0%C8%EB",
+    "mp": 34.0,
+    "reagent": "NQ1"
+  },
+  {
+    "id": "magic-73ce8d2790-a4ce88953f-70",
+    "name": "イリュージョン シールド",
+    "kind": "魔法",
+    "category": "神秘魔法",
+    "requirements": [
+      {
+        "skill": "神秘魔法",
+        "min": 70.0
+      }
+    ],
+    "successSkill": "神秘魔法",
+    "successRequired": 70.0,
+    "cost": {
+      "mp": 40.0
+    },
+    "castTime": "480",
+    "delay": "780",
+    "description": "幻影の盾を召喚する\n3回攻撃を受けると壊れる\nログアウトで消滅",
+    "range": "-",
+    "transfer": "×",
+    "acquisition": "NPC販売(ヌブールの村)\nタルタロッサ ビート\nサベージ ドルイド\nウォーター ウンディーネ",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%BF%C0%C8%EB",
+    "mp": 40.0,
+    "reagent": "NQ2"
+  },
+  {
+    "id": "magic-73ce8d2790-63c963cf2a-70",
+    "name": "リコール アルター",
+    "kind": "魔法",
+    "category": "神秘魔法",
+    "requirements": [
+      {
+        "skill": "神秘魔法",
+        "min": 70.0
+      }
+    ],
+    "successSkill": "神秘魔法",
+    "successRequired": 70.0,
+    "cost": {
+      "mp": 40.0
+    },
+    "castTime": "450",
+    "delay": "750",
+    "description": "アルターを出現させ 近くにいる者をホーム ポイント/記録した場所へ送り届ける\n※ 術者がいなくなった時や、アルターが消滅した時にはテレポートできなくなります。",
+    "range": "-",
+    "transfer": "×",
+    "acquisition": "タルタロッサ ビート\nエミリー",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%BF%C0%C8%EB",
+    "mp": 40.0,
+    "reagent": "NQ2"
+  },
+  {
+    "id": "magic-73ce8d2790-a50346d0b2-80",
+    "name": "テレポート オール",
+    "kind": "魔法",
+    "category": "神秘魔法",
+    "requirements": [
+      {
+        "skill": "神秘魔法",
+        "min": 80.0
+      }
+    ],
+    "successSkill": "神秘魔法",
+    "successRequired": 80.0,
+    "cost": {
+      "mp": 46.0
+    },
+    "castTime": "480",
+    "delay": "577",
+    "description": "一瞬でパーティー全員をホーム ポイント/記録した場所へ移動させる\n※ War Ageでは魔法チャージ不可",
+    "range": "225.4",
+    "transfer": "×",
+    "acquisition": "タルタロッサ ビート",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%BF%C0%C8%EB",
+    "mp": 46.0,
+    "reagent": "NQ3"
+  },
+  {
+    "id": "magic-73ce8d2790-6ee6a50fb6-80",
+    "name": "テレポート クロース",
+    "kind": "魔法",
+    "category": "神秘魔法",
+    "requirements": [
+      {
+        "skill": "神秘魔法",
+        "min": 80.0
+      }
+    ],
+    "successSkill": "神秘魔法",
+    "successRequired": 80.0,
+    "cost": {
+      "mp": 46.0
+    },
+    "castTime": "279",
+    "delay": "376",
+    "description": "術者の位置にパーティ全員を呼び寄せる\n※ War Ageでは魔法チャージ不可\n効果範囲は対象が見える程度(グループ ヒーリングより少し広いぐらい)",
+    "range": "37.6",
+    "transfer": "×",
+    "acquisition": "タルタロッサ ビート",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%BF%C0%C8%EB",
+    "mp": 46.0,
+    "reagent": "NQ3"
+  },
+  {
+    "id": "magic-73ce8d2790-f98ee505e9-90",
+    "name": "イリュージョン ソード",
+    "kind": "魔法",
+    "category": "神秘魔法",
+    "requirements": [
+      {
+        "skill": "神秘魔法",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "神秘魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 53.0
+    },
+    "castTime": "480",
+    "delay": "780",
+    "description": "幻覚で最強の剣を作り出し召喚する\n1回攻撃すると壊れる(ミス/範囲外/空撃ち含む)\nログアウトで消滅",
+    "range": "-",
+    "transfer": "×",
+    "acquisition": "タルタロッサ ビート\nシャドウ ナイト",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%BF%C0%C8%EB",
+    "mp": 53.0,
+    "reagent": "PNQ1"
+  },
+  {
+    "id": "magic-73ce8d2790-9bc06b39da-90",
+    "name": "ライトニング ブレイド",
+    "kind": "魔法",
+    "category": "神秘魔法",
+    "requirements": [
+      {
+        "skill": "神秘魔法",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "神秘魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 53.0
+    },
+    "castTime": "297",
+    "delay": "398",
+    "description": "武器に雷を宿らせて 風属性を追加する\n※ 自分の武器のみ有効\n→\nエンチャント魔法の特性",
+    "range": "-",
+    "transfer": "×",
+    "acquisition": "タルタロッサ ビート\n大デンキウナギ\nウォーター ウンディーネ\nサベージ ドルイド ロード",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%BF%C0%C8%EB",
+    "mp": 53.0,
+    "reagent": "PNQ1"
+  },
+  {
+    "id": "magic-035c0294aa-527016a974-1",
+    "name": "アザゼル召喚",
+    "kind": "魔法",
+    "category": "複合魔法/召喚",
+    "requirements": [
+      {
+        "skill": "召喚魔法",
+        "min": 1.0
+      }
+    ],
+    "successSkill": "召喚魔法",
+    "successRequired": 1.0,
+    "cost": {
+      "mp": 5.0
+    },
+    "castTime": "450",
+    "delay": "750",
+    "description": "※\nグリモア ＜ 淫奔 ＞\nを使用して覚える。\nカレーライスを生贄に魔界からアザゼルを召喚する\n※召喚魔法スキルに関係なく、召喚することができます\n※War Age では使用できません\n使用アイテム : カレー ライス 1\n※限定課金アイテムなので複合に記載。",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "『よんでますよ、アザゼルさん。Z』\nコラボ",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%BE%A4%B4%AD",
+    "mp": 5.0,
+    "reagent": "特殊"
+  },
+  {
+    "id": "magic-035c0294aa-9d701a7333-1",
+    "name": "サモン キラービー",
+    "kind": "魔法",
+    "category": "複合魔法/召喚",
+    "requirements": [
+      {
+        "skill": "召喚魔法",
+        "min": 1.0
+      }
+    ],
+    "successSkill": "召喚魔法",
+    "successRequired": 1.0,
+    "cost": {
+      "mp": 20.0
+    },
+    "castTime": "450",
+    "delay": "750",
+    "description": "複数のキラービーを召喚する\n発動に必要なBuff :\nキラークイーン",
+    "range": "",
+    "transfer": "",
+    "acquisition": "もえガチャ(前提装備)\n初出240312",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%BE%A4%B4%AD",
+    "mp": 20.0,
+    "reagent": "EB4"
+  },
+  {
+    "id": "magic-035c0294aa-bef6ab770b-1",
+    "name": "サモン マジカルサファイア",
+    "kind": "魔法",
+    "category": "複合魔法/召喚",
+    "requirements": [
+      {
+        "skill": "召喚魔法",
+        "min": 1.0
+      }
+    ],
+    "successSkill": "召喚魔法",
+    "successRequired": 1.0,
+    "cost": {
+      "mp": 20.0
+    },
+    "castTime": "450",
+    "delay": "750",
+    "description": "※\nカレイドステッキ [ マジカルサファイア ]\nを使用して覚える。\nマスターに対して様々な魔術サポートを行ってくれるカレイドステッキ\n※ 限定課金アイテムなので複合に記載。",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "『Fate/kaleid liner プリズマイリヤ\nツヴァイ ヘルツ！』コラボ\nもえガチャ\n151201〜151229\n復刻250722〜250805",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%BE%A4%B4%AD",
+    "mp": 20.0,
+    "reagent": "PNQ 1"
+  },
+  {
+    "id": "magic-035c0294aa-27357ef0f4-1",
+    "name": "サモン マジカルルビー",
+    "kind": "魔法",
+    "category": "複合魔法/召喚",
+    "requirements": [
+      {
+        "skill": "召喚魔法",
+        "min": 1.0
+      }
+    ],
+    "successSkill": "召喚魔法",
+    "successRequired": 1.0,
+    "cost": {
+      "mp": 20.0
+    },
+    "castTime": "450",
+    "delay": "750",
+    "description": "※\nカレイドステッキ [ マジカルルビー ]\nを使用して覚える。\nマジカルルビーを召喚する。\n※ 限定課金アイテムなので複合に記載。",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "『Fate/kaleid liner プリズマイリヤ\nツヴァイ ヘルツ！』コラボ\nもえガチャ\n151201〜151229\n復刻250722〜250805",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%BE%A4%B4%AD",
+    "mp": 20.0,
+    "reagent": "PNQ 1"
+  },
+  {
+    "id": "magic-035c0294aa-fabfe69cb8-1",
+    "name": "ベルゼブブ召喚",
+    "kind": "魔法",
+    "category": "複合魔法/召喚",
+    "requirements": [
+      {
+        "skill": "召喚魔法",
+        "min": 1.0
+      }
+    ],
+    "successSkill": "召喚魔法",
+    "successRequired": 1.0,
+    "cost": {
+      "mp": 5.0
+    },
+    "castTime": "450",
+    "delay": "750",
+    "description": "※\nグリモア ＜ 暴露 ＞\nを使用して覚える。\nカレーライスを生贄に魔界からベルゼブブを召喚する。\n使用アイテム : カレー ライス 1\n※限定課金アイテムなので複合に記載。",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "『よんでますよ、アザゼルさん。Z』\nコラボ",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%BE%A4%B4%AD",
+    "mp": 5.0,
+    "reagent": "特殊"
+  },
+  {
+    "id": "magic-035c0294aa-25999d6d0f-1",
+    "name": "モロク召喚",
+    "kind": "魔法",
+    "category": "複合魔法/召喚",
+    "requirements": [
+      {
+        "skill": "召喚魔法",
+        "min": 1.0
+      }
+    ],
+    "successSkill": "召喚魔法",
+    "successRequired": 1.0,
+    "cost": {
+      "mp": 5.0
+    },
+    "castTime": "450",
+    "delay": "750",
+    "description": "※\nグリモア ＜ 暴虐 ＞\nを使用して覚える。\nカレーライスを生贄に魔界からモロクを召喚する。\n使用アイテム : カレー ライス 1\n※限定課金アイテムなので複合に記載。",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "『よんでますよ、アザゼルさん。Z』\nコラボ",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%BE%A4%B4%AD",
+    "mp": 5.0,
+    "reagent": "特殊"
+  },
+  {
+    "id": "magic-035c0294aa-f4e1b3573f-1-1",
+    "name": "小犬座の扉",
+    "kind": "魔法",
+    "category": "複合魔法/召喚",
+    "requirements": [
+      {
+        "skill": "召喚魔法",
+        "min": 1.0
+      },
+      {
+        "skill": "魔法熟練",
+        "min": 1.0
+      }
+    ],
+    "successSkill": "召喚魔法",
+    "successRequired": 1.0,
+    "cost": {
+      "mp": 5.0
+    },
+    "castTime": "450",
+    "delay": "750",
+    "description": "小犬座の星霊ニコラを召喚する\n※近くにいる場合、MPが減っていると10秒ごとに20回復してくれる",
+    "range": "",
+    "transfer": "",
+    "acquisition": "『FAIRY TAIL』コラボ\nもえガチャ\n初出190129",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%BE%A4%B4%AD",
+    "mp": 5.0,
+    "reagent": "PNQ1"
+  },
+  {
+    "id": "magic-035c0294aa-c26f804442-60-10",
+    "name": "ホーリー レコード",
+    "kind": "魔法",
+    "category": "複合魔法/召喚",
+    "requirements": [
+      {
+        "skill": "神秘魔法",
+        "min": 60.0
+      },
+      {
+        "skill": "召喚魔法",
+        "min": 10.0
+      }
+    ],
+    "successSkill": "神秘魔法",
+    "successRequired": 60.0,
+    "cost": {
+      "mp": 34.0
+    },
+    "castTime": "243",
+    "delay": "338",
+    "description": "現在地をレコード ストーンに書き込む",
+    "range": "",
+    "transfer": "×",
+    "acquisition": "複製\nNPC販売(\nWarAge奇跡\n)",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%BE%A4%B4%AD",
+    "mp": 34.0,
+    "reagent": "NQ1"
+  },
+  {
+    "id": "magic-035c0294aa-d8345d80cf-10-10",
+    "name": "リコール チャーリー ライト",
+    "kind": "魔法",
+    "category": "複合魔法/召喚",
+    "requirements": [
+      {
+        "skill": "召喚魔法",
+        "min": 10.0
+      },
+      {
+        "skill": "強化魔法",
+        "min": 10.0
+      }
+    ],
+    "successSkill": "召喚魔法",
+    "successRequired": 10.0,
+    "cost": {
+      "mp": 9.0
+    },
+    "castTime": "450",
+    "delay": "520",
+    "description": "ランタンで周囲を明るく照らすチャーリーを召喚する",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "錬金の箱\n第2弾",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%BE%A4%B4%AD",
+    "mp": 9.0,
+    "reagent": "PD1"
+  },
+  {
+    "id": "magic-035c0294aa-78aa31586c-20-20",
+    "name": "デイモンコール",
+    "kind": "魔法",
+    "category": "複合魔法/召喚",
+    "requirements": [
+      {
+        "skill": "召喚魔法",
+        "min": 20.0
+      },
+      {
+        "skill": "暗黒命令",
+        "min": 20.0
+      }
+    ],
+    "successSkill": "召喚魔法",
+    "successRequired": 20.0,
+    "cost": {
+      "mp": 9.0
+    },
+    "castTime": "450",
+    "delay": "750",
+    "description": "口の悪い悪霊を召喚する魔法 ※スキルが低いと役に立たない",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "『灰と幻想のグリムガル』コラボ\nもえガチャ\n160503",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%BE%A4%B4%AD",
+    "mp": 9.0,
+    "reagent": "EB 1"
+  },
+  {
+    "id": "magic-035c0294aa-2ec18486c2-20-20",
+    "name": "リコール インセクト",
+    "kind": "魔法",
+    "category": "複合魔法/召喚",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 20.0
+      },
+      {
+        "skill": "召喚魔法",
+        "min": 20.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 20.0,
+    "cost": {
+      "mp": 11.0
+    },
+    "castTime": "480",
+    "delay": "660",
+    "description": "魔力によって昆虫を呼び出す",
+    "range": "",
+    "transfer": "×",
+    "acquisition": "複製\nランステイル",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%BE%A4%B4%AD",
+    "mp": 11.0,
+    "reagent": "PD1"
+  },
+  {
+    "id": "magic-035c0294aa-424a033a92-20-40",
+    "name": "リコール モノアイ ロボ",
+    "kind": "魔法",
+    "category": "複合魔法/召喚",
+    "requirements": [
+      {
+        "skill": "鍛冶",
+        "min": 20.0
+      },
+      {
+        "skill": "神秘魔法",
+        "min": 40.0
+      }
+    ],
+    "successSkill": "鍛冶",
+    "successRequired": 20.0,
+    "cost": {
+      "mp": 11.0
+    },
+    "castTime": "450",
+    "delay": "630",
+    "description": "ノアの力で動く単眼の中型兵器ロボット、使用者のスキルによって性能が変化する",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n160322",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%BE%A4%B4%AD",
+    "mp": 11.0,
+    "reagent": "PNQ 1"
+  },
+  {
+    "id": "magic-035c0294aa-3-80-20",
+    "name": "第3位階天使召喚",
+    "kind": "魔法",
+    "category": "複合魔法/召喚",
+    "requirements": [
+      {
+        "skill": "神秘魔法",
+        "min": 80.0
+      },
+      {
+        "skill": "召喚魔法",
+        "min": 20.0
+      }
+    ],
+    "successSkill": "神秘魔法",
+    "successRequired": 80.0,
+    "cost": {
+      "mp": 46.0
+    },
+    "castTime": "450",
+    "delay": "750",
+    "description": "アークエンジェル・フレイムを召喚する",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "『オーバーロード』コラボ\nもえガチャ\n170926",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%BE%A4%B4%AD",
+    "mp": 46.0,
+    "reagent": "PNQ 3"
+  },
+  {
+    "id": "magic-035c0294aa-40afdb283f-70-30",
+    "name": "アクセルシューター",
+    "kind": "魔法",
+    "category": "複合魔法/召喚",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 70.0
+      },
+      {
+        "skill": "召喚魔法",
+        "min": 30.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 70.0,
+    "cost": {
+      "mp": 40.0
+    },
+    "castTime": "220",
+    "delay": "550",
+    "description": "一定時間命令可能な二つの光弾を召喚して対象を攻撃する魔法\n※最大10発まで同時に召喚可能",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "『魔法少女リリカルなのは\nReflection』コラボ\nもえガチャ\n180327",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%BE%A4%B4%AD",
+    "mp": 40.0,
+    "reagent": "PNQ 1"
+  },
+  {
+    "id": "magic-035c0294aa-ff1752bb23-30-30",
+    "name": "カモン ジェネ子！！",
+    "kind": "魔法",
+    "category": "複合魔法/召喚",
+    "requirements": [
+      {
+        "skill": "召喚魔法",
+        "min": 30.0
+      },
+      {
+        "skill": "水泳",
+        "min": 30.0
+      }
+    ],
+    "successSkill": "召喚魔法",
+    "successRequired": 30.0,
+    "cost": {
+      "mp": 30.0
+    },
+    "castTime": "450",
+    "delay": "750",
+    "description": "美味しいチョコを使って頼れる仲間を呼び出す\n（株）エイシスはホワイト企業なので呼び出しは交代制なん\n※召喚魔法のスキル値でレベルが変動する\n使用アイテム : デトックス チョコ 3",
+    "range": "",
+    "transfer": "",
+    "acquisition": "クエスト報酬\n初出241119",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%BE%A4%B4%AD",
+    "mp": 30.0,
+    "reagent": "特殊"
+  },
+  {
+    "id": "magic-035c0294aa-09995e4e71-30-30",
+    "name": "サモン ノア ビット",
+    "kind": "魔法",
+    "category": "複合魔法/召喚",
+    "requirements": [
+      {
+        "skill": "召喚魔法",
+        "min": 30.0
+      },
+      {
+        "skill": "神秘魔法",
+        "min": 30.0
+      }
+    ],
+    "successSkill": "召喚魔法",
+    "successRequired": 30.0,
+    "cost": {
+      "mp": 20.0
+    },
+    "castTime": "450",
+    "delay": "750",
+    "description": "内蔵されたマナが切れるまで攻撃のサポートを行う",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "もえガチャ",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%BE%A4%B4%AD",
+    "mp": 20.0,
+    "reagent": "PNQ1"
+  },
+  {
+    "id": "magic-035c0294aa-9106c76946-80-30",
+    "name": "サモン ノア メガビット",
+    "kind": "魔法",
+    "category": "複合魔法/召喚",
+    "requirements": [
+      {
+        "skill": "召喚魔法",
+        "min": 80.0
+      },
+      {
+        "skill": "神秘魔法",
+        "min": 30.0
+      }
+    ],
+    "successSkill": "召喚魔法",
+    "successRequired": 80.0,
+    "cost": {
+      "mp": 46.0
+    },
+    "castTime": "450",
+    "delay": "750",
+    "description": "ノアの力で自立して動く中型の兵器\n内臓されたマナが切れるまで攻撃のサポートを行う\n※プレイヤーに対しては攻撃しない",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n初出220830",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%BE%A4%B4%AD",
+    "mp": 46.0,
+    "reagent": "PNQ2"
+  },
+  {
+    "id": "magic-035c0294aa-cab701723a-80-30",
+    "name": "サモン フューチャー ドロイド",
+    "kind": "魔法",
+    "category": "複合魔法/召喚",
+    "requirements": [
+      {
+        "skill": "召喚魔法",
+        "min": 80.0
+      },
+      {
+        "skill": "鍛冶",
+        "min": 30.0
+      }
+    ],
+    "successSkill": "召喚魔法",
+    "successRequired": 80.0,
+    "cost": {
+      "mp": 46.0
+    },
+    "castTime": "450",
+    "delay": "750",
+    "description": "光学兵器を備えた小型の戦闘用ロボを召喚する\nノア触媒をマナに変換してチャージすることができる\n※与えた触媒の種類と個数でMPのチャージ時間が変化する",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n初出241126",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%BE%A4%B4%AD",
+    "mp": 46.0,
+    "reagent": "PNQ"
+  },
+  {
+    "id": "magic-035c0294aa-49f537d540-50-30",
+    "name": "リコール マリオネット",
+    "kind": "魔法",
+    "category": "複合魔法/召喚",
+    "requirements": [
+      {
+        "skill": "神秘魔法",
+        "min": 50.0
+      },
+      {
+        "skill": "パフォーマンス",
+        "min": 30.0
+      }
+    ],
+    "successSkill": "神秘魔法",
+    "successRequired": 50.0,
+    "cost": {
+      "mp": 23.0
+    },
+    "castTime": "450",
+    "delay": "750",
+    "description": "傀儡子の手を召喚して対象を操り、術者の強化や敵の動きを制限させる",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "もえガチャ（夏袋）\n170801\nテクガチャ",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%BE%A4%B4%AD",
+    "mp": 23.0,
+    "reagent": "PD 2"
+  },
+  {
+    "id": "magic-035c0294aa-1557ce6a76-30-30",
+    "name": "式神召喚",
+    "kind": "魔法",
+    "category": "複合魔法/召喚",
+    "requirements": [
+      {
+        "skill": "召喚魔法",
+        "min": 30.0
+      },
+      {
+        "skill": "暗黒命令",
+        "min": 30.0
+      }
+    ],
+    "successSkill": "召喚魔法",
+    "successRequired": 30.0,
+    "cost": {
+      "mp": 20.0
+    },
+    "castTime": "200",
+    "delay": "500",
+    "description": "式札を触媒として式神を召喚する",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "もえガチャ（夏袋）\n160809",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%BE%A4%B4%AD",
+    "mp": 20.0,
+    "reagent": "PD 3"
+  },
+  {
+    "id": "magic-035c0294aa-c8b78b69ed-40-40",
+    "name": "サモン クロスビット",
+    "kind": "魔法",
+    "category": "複合魔法/召喚",
+    "requirements": [
+      {
+        "skill": "召喚魔法",
+        "min": 40.0
+      },
+      {
+        "skill": "神秘魔法",
+        "min": 40.0
+      }
+    ],
+    "successSkill": "召喚魔法",
+    "successRequired": 40.0,
+    "cost": {
+      "mp": 23.0
+    },
+    "castTime": "450",
+    "delay": "750",
+    "description": "十字型の浮遊武器を召喚する",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "『ありふれた職業で世界最強』\nコラボガチャ\n初出250422",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%BE%A4%B4%AD",
+    "mp": 23.0,
+    "reagent": "NP1"
+  },
+  {
+    "id": "magic-035c0294aa-f33a876d47-40-40",
+    "name": "サモン シャープクロー",
+    "kind": "魔法",
+    "category": "複合魔法/召喚",
+    "requirements": [
+      {
+        "skill": "神秘魔法",
+        "min": 40.0
+      },
+      {
+        "skill": "刀剣",
+        "min": 40.0
+      }
+    ],
+    "successSkill": "神秘魔法",
+    "successRequired": 40.0,
+    "cost": {
+      "mp": 18.0
+    },
+    "castTime": "450",
+    "delay": "750",
+    "description": "決して鈍らない鋭利さを備えた、鉤爪上の骨刀を作り出す\n使用アイテム : リザードマンの爪 1",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "『ゴブリンスレイヤー』 コラボ\nもえガチャ\n初出220802",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%BE%A4%B4%AD",
+    "mp": 18.0,
+    "reagent": "特殊"
+  },
+  {
+    "id": "magic-035c0294aa-952a5d36fa-40",
+    "name": "サモン ジンジャーブレッドマン",
+    "kind": "魔法",
+    "category": "複合魔法/召喚",
+    "requirements": [
+      {
+        "skill": "料理",
+        "min": 40.0
+      }
+    ],
+    "successSkill": "料理",
+    "successRequired": 40.0,
+    "cost": {
+      "mp": 23.0
+    },
+    "castTime": "450",
+    "delay": "750",
+    "description": "お菓子の精霊を召喚する\n発動に必要なBuff : 厨房師 マスタリー\n使用アイテム : ジンジャーブレッドマン 1",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n181211",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%BE%A4%B4%AD",
+    "mp": 23.0,
+    "reagent": "特殊"
+  },
+  {
+    "id": "magic-035c0294aa-f077eea1a6-40",
+    "name": "サモン チョコ キャット",
+    "kind": "魔法",
+    "category": "複合魔法/召喚",
+    "requirements": [
+      {
+        "skill": "料理",
+        "min": 40.0
+      }
+    ],
+    "successSkill": "料理",
+    "successRequired": 40.0,
+    "cost": {
+      "mp": 23.0
+    },
+    "castTime": "450",
+    "delay": "750",
+    "description": "チョコでできたあびにゃんを召喚する\n発動に必要なBuff : 厨房師 マスタリー\n使用アイテム : バレンタイン チョコレート 1\n※レシピ：料理0 砂糖+ラム+カカオで5個作成できます。",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n初出200204",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%BE%A4%B4%AD",
+    "mp": 23.0,
+    "reagent": "後述"
+  },
+  {
+    "id": "magic-035c0294aa-d3ca5e2195-80-40",
+    "name": "サモン ドラゴントゥースウォリアー",
+    "kind": "魔法",
+    "category": "複合魔法/召喚",
+    "requirements": [
+      {
+        "skill": "召喚魔法",
+        "min": 80.0
+      },
+      {
+        "skill": "牙",
+        "min": 40.0
+      }
+    ],
+    "successSkill": "召喚魔法",
+    "successRequired": 80.0,
+    "cost": {
+      "mp": 46.0
+    },
+    "castTime": "450",
+    "delay": "750",
+    "description": "爬虫類の全身骨格を召喚し、使役する\n使用アイテム : リザードマンの爪 3",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "『ゴブリンスレイヤー』 コラボ\nもえガチャ\n初出220802",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%BE%A4%B4%AD",
+    "mp": 46.0,
+    "reagent": "特殊"
+  },
+  {
+    "id": "magic-035c0294aa-68d29a00ac-40-40",
+    "name": "サモン ドローン",
+    "kind": "魔法",
+    "category": "複合魔法/召喚",
+    "requirements": [
+      {
+        "skill": "召喚魔法",
+        "min": 40.0
+      },
+      {
+        "skill": "神秘魔法",
+        "min": 40.0
+      }
+    ],
+    "successSkill": "召喚魔法",
+    "successRequired": 40.0,
+    "cost": {
+      "mp": 23.0
+    },
+    "castTime": "450",
+    "delay": "750",
+    "description": "命令を受けて自律飛行する飛行ロボット\n搭載されたカメラにより離れた位置の映像を見ることができる",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "もえガチャ",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%BE%A4%B4%AD",
+    "mp": 23.0,
+    "reagent": "PNQ1"
+  },
+  {
+    "id": "magic-035c0294aa-263f831f7b-60-40",
+    "name": "サモン ヒール スフィア",
+    "kind": "魔法",
+    "category": "複合魔法/召喚",
+    "requirements": [
+      {
+        "skill": "召喚魔法",
+        "min": 60.0
+      },
+      {
+        "skill": "回復魔法",
+        "min": 40.0
+      }
+    ],
+    "successSkill": "召喚魔法",
+    "successRequired": 60.0,
+    "cost": {
+      "mp": 34.0
+    },
+    "castTime": "450",
+    "delay": "750",
+    "description": "一定間隔で周囲に癒やしの効果がある光球を召喚する\n※一定時間が経過するか召喚者が離れると消える",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n180709",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%BE%A4%B4%AD",
+    "mp": 34.0,
+    "reagent": "PNQ 1"
+  },
+  {
+    "id": "magic-035c0294aa-9f778a567a-40",
+    "name": "サモン マイナーズ",
+    "kind": "魔法",
+    "category": "複合魔法/召喚",
+    "requirements": [
+      {
+        "skill": "召喚魔法",
+        "min": 40.0
+      }
+    ],
+    "successSkill": "召喚魔法",
+    "successRequired": 40.0,
+    "cost": {
+      "mp": 23.0
+    },
+    "castTime": "450",
+    "delay": "750",
+    "description": "鉱員達を召喚して採掘の手助けをしてもらう\n発動に必要なBuff : マインビショップ マスタリー",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n181218",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%BE%A4%B4%AD",
+    "mp": 23.0,
+    "reagent": "PD 2"
+  },
+  {
+    "id": "magic-035c0294aa-8924954f8d-90-40",
+    "name": "フレイム ピラー",
+    "kind": "魔法",
+    "category": "複合魔法/召喚",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "罠",
+        "min": 40.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 100.0
+    },
+    "castTime": "450",
+    "delay": "750",
+    "description": "対象の足元に魔法陣を展開して火柱による継続ダメージを与える",
+    "range": "",
+    "transfer": "",
+    "acquisition": "錬金の箱\n初出200428",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%BE%A4%B4%AD",
+    "mp": 100.0,
+    "reagent": "PNQ1"
+  },
+  {
+    "id": "magic-035c0294aa-9f29a99fe5-40",
+    "name": "リコール ノア スイーパー",
+    "kind": "魔法",
+    "category": "複合魔法/召喚",
+    "requirements": [
+      {
+        "skill": "神秘魔法",
+        "min": 40.0
+      }
+    ],
+    "successSkill": "神秘魔法",
+    "successRequired": 40.0,
+    "cost": {
+      "mp": 23.0
+    },
+    "castTime": "450",
+    "delay": "630",
+    "description": "周囲の敵を発見して、掃除してくれるロボットを呼び出す\n発動に必要なBuff : ハウスキーパー マスタリー",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n初出250909",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%BE%A4%B4%AD",
+    "mp": 23.0,
+    "reagent": "NP2"
+  },
+  {
+    "id": "magic-035c0294aa-5e92f7da04-50-40",
+    "name": "リコール マーシー ライト",
+    "kind": "魔法",
+    "category": "複合魔法/召喚",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 50.0
+      },
+      {
+        "skill": "召喚魔法",
+        "min": 40.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 50.0,
+    "cost": {
+      "mp": 23.0
+    },
+    "castTime": "450",
+    "delay": "520",
+    "description": "詠唱者を守ってくれる小さな精霊を召喚する",
+    "range": "",
+    "transfer": "×",
+    "acquisition": "複製\nサソリ系、クモ系\nアースワーム\nウィルオーウィスプ\nソウルオブルーイン\nベビーウォッチャー\nスカイウォッチャー\nグレイブンシャーマン\nイクシオンファナティック",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%BE%A4%B4%AD",
+    "mp": 23.0,
+    "reagent": "PD2"
+  },
+  {
+    "id": "magic-035c0294aa-ad48325f0b-40-50",
+    "name": "リコール マーシー ライト ��",
+    "kind": "魔法",
+    "category": "複合魔法/召喚",
+    "requirements": [
+      {
+        "skill": "召喚魔法",
+        "min": 40.0
+      },
+      {
+        "skill": "強化魔法",
+        "min": 50.0
+      }
+    ],
+    "successSkill": "召喚魔法",
+    "successRequired": 40.0,
+    "cost": {
+      "mp": 23.0
+    },
+    "castTime": "450",
+    "delay": "520",
+    "description": "詠唱者を守ってくれる小さな精霊を召喚する\n※召喚魔法スキルに連動したレベルのマーシー ライトを召喚できる\nレベルが上がるとさらに上位の回復魔法を使えるようになる\n発動に必要なBuff : エレメンタルナイト マスタリー",
+    "range": "",
+    "transfer": "",
+    "acquisition": "クエスト報酬\n初出240820",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%BE%A4%B4%AD",
+    "mp": 23.0,
+    "reagent": "PD2"
+  },
+  {
+    "id": "magic-035c0294aa-882e102523-50-40",
+    "name": "リコール モアイ",
+    "kind": "魔法",
+    "category": "複合魔法/召喚",
+    "requirements": [
+      {
+        "skill": "神秘魔法",
+        "min": 40.0
+      }
+    ],
+    "successSkill": "神秘魔法",
+    "successRequired": 40.0,
+    "cost": {
+      "mp": 28.0
+    },
+    "castTime": "450",
+    "delay": "750",
+    "description": "人面を模した謎の石造彫刻を敵の頭上へ召喚する",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n181009",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%BE%A4%B4%AD",
+    "mp": 28.0,
+    "reagent": "NP 3"
+  },
+  {
+    "id": "magic-035c0294aa-2208495f5f-40",
+    "name": "地獄の祭壇",
+    "kind": "魔法",
+    "category": "複合魔法/召喚",
+    "requirements": [
+      {
+        "skill": "召喚魔法",
+        "min": 40.0
+      }
+    ],
+    "successSkill": "召喚魔法",
+    "successRequired": 40.0,
+    "cost": {
+      "mp": 30.0
+    },
+    "castTime": "450",
+    "delay": "750",
+    "description": "儀式用の魔法陣を設置し、魔法陣で捉えた生贄の命を触媒にして悪魔召喚の儀式を行う\n※生贄とする魔物のレベルと自身の召喚魔法スキルが高いほど上位の悪魔を召喚する確率が上昇する\n発動に必要なBuff : ネクロマンサー マスタリー",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n初出210601\nテクガチャ",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%BE%A4%B4%AD",
+    "mp": 30.0,
+    "reagent": "EB3"
+  },
+  {
+    "id": "magic-035c0294aa-72703d29ab-40",
+    "name": "鳥獣戯画",
+    "kind": "魔法",
+    "category": "複合魔法/召喚",
+    "requirements": [
+      {
+        "skill": "複製",
+        "min": 40.0
+      }
+    ],
+    "successSkill": "複製",
+    "successRequired": 40.0,
+    "cost": {
+      "mp": 15.0
+    },
+    "castTime": "350",
+    "delay": "300",
+    "description": "魂を込めて描かれた絵には命が宿ると云われる\n※使用するには複製可能なペンが必要となります。\n発動に必要なBuff : グレート クリエイター マスタリー\n使用アイテム : 未記入のスクロール 1",
+    "range": "",
+    "transfer": "",
+    "acquisition": "もえガチャ\n170815",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%BE%A4%B4%AD",
+    "mp": 15.0,
+    "reagent": "特殊"
+  },
+  {
+    "id": "magic-035c0294aa-3e419550c3-90-50",
+    "name": "サモン アーマー ソルジャー",
+    "kind": "魔法",
+    "category": "複合魔法/召喚",
+    "requirements": [
+      {
+        "skill": "召喚魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "神秘魔法",
+        "min": 50.0
+      }
+    ],
+    "successSkill": "召喚魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 53.0
+    },
+    "castTime": "450",
+    "delay": "750",
+    "description": "鎧に兵士の魂を憑依させて忠実なる僕として使役する魔法",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n初出221129",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%BE%A4%B4%AD",
+    "mp": 53.0,
+    "reagent": "PD5"
+  },
+  {
+    "id": "magic-035c0294aa-020eb24402-80-50",
+    "name": "サモン スカルパス ロード",
+    "kind": "魔法",
+    "category": "複合魔法/召喚",
+    "requirements": [
+      {
+        "skill": "召喚魔法",
+        "min": 80.0
+      },
+      {
+        "skill": "死の魔法",
+        "min": 50.0
+      }
+    ],
+    "successSkill": "召喚魔法",
+    "successRequired": 80.0,
+    "cost": {
+      "mp": 46.0
+    },
+    "castTime": "450",
+    "delay": "750",
+    "description": "金色に輝くスカルパスの王を召喚する",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "黒の廟堂\nクリア報酬",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%BE%A4%B4%AD",
+    "mp": 46.0,
+    "reagent": "EB5"
+  },
+  {
+    "id": "magic-035c0294aa-c15d08ee4c-50",
+    "name": "サモン バディ",
+    "kind": "魔法",
+    "category": "複合魔法/召喚",
+    "requirements": [
+      {
+        "skill": "水泳",
+        "min": 50.0
+      }
+    ],
+    "successSkill": "水泳",
+    "successRequired": 50.0,
+    "cost": {
+      "mp": 28.0
+    },
+    "castTime": "350",
+    "delay": "650",
+    "description": "相棒を呼び出し 共に戦う\n※水中でのみ発動可能\n発動に必要なBuff : 海戦士 マスタリー",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "錬金-GENERATIONS\n錬金-第9弾",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%BE%A4%B4%AD",
+    "mp": 28.0,
+    "reagent": "魚の餌 10"
+  },
+  {
+    "id": "magic-035c0294aa-9d193573f7-50",
+    "name": "サモン ブラスト ファーネス",
+    "kind": "魔法",
+    "category": "複合魔法/召喚",
+    "requirements": [
+      {
+        "skill": "召喚魔法",
+        "min": 50.0
+      }
+    ],
+    "successSkill": "召喚魔法",
+    "successRequired": 50.0,
+    "cost": {
+      "mp": 28.0
+    },
+    "castTime": "450",
+    "delay": "750",
+    "description": "自分だけの魔法の溶鉱炉を召喚して利用することができる\n発動に必要なBuff : マイン ビショップ マスタリー",
+    "range": "",
+    "transfer": "",
+    "acquisition": "錬金の箱\n初出200428",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%BE%A4%B4%AD",
+    "mp": 28.0,
+    "reagent": "コークス1"
+  },
+  {
+    "id": "magic-035c0294aa-d8819b90fe-50-80",
+    "name": "リコール アイシクル ランス",
+    "kind": "魔法",
+    "category": "複合魔法/召喚",
+    "requirements": [
+      {
+        "skill": "神秘魔法",
+        "min": 50.0
+      },
+      {
+        "skill": "槍",
+        "min": 80.0
+      }
+    ],
+    "successSkill": "神秘魔法",
+    "successRequired": 50.0,
+    "cost": {
+      "mp": 28.0
+    },
+    "castTime": "480",
+    "delay": "780",
+    "description": "氷を触媒にして氷の魔槍を生成する魔法\n使用アイテム : 氷 10",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n初出231205",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%BE%A4%B4%AD",
+    "mp": 28.0,
+    "reagent": "氷10"
+  },
+  {
+    "id": "magic-035c0294aa-66614c842b-80-50",
+    "name": "影の尖兵召喚",
+    "kind": "魔法",
+    "category": "複合魔法/召喚",
+    "requirements": [
+      {
+        "skill": "召喚魔法",
+        "min": 80.0
+      },
+      {
+        "skill": "死の魔法",
+        "min": 50.0
+      }
+    ],
+    "successSkill": "召喚魔法",
+    "successRequired": 80.0,
+    "cost": {
+      "mp": 46.0
+    },
+    "castTime": "450",
+    "delay": "750",
+    "description": "影の尖兵を呼び出す",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "『ログ・ホライズン 円卓崩壊』コラボ\n初出もえガチャ210803",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%BE%A4%B4%AD",
+    "mp": 46.0,
+    "reagent": "EB5"
+  },
+  {
+    "id": "magic-035c0294aa-6711401e11-90-90-60",
+    "name": "サモン デーモン ベリアル",
+    "kind": "魔法",
+    "category": "複合魔法/召喚",
+    "requirements": [
+      {
+        "skill": "召喚魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "死の魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "暗黒命令",
+        "min": 60.0
+      }
+    ],
+    "successSkill": "召喚魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 99.0
+    },
+    "castTime": "450",
+    "delay": "750",
+    "description": "冥界より上位の悪魔を召喚する",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n初出230718",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%BE%A4%B4%AD",
+    "mp": 99.0,
+    "reagent": "EB10"
+  },
+  {
+    "id": "magic-035c0294aa-e0dc455158-80-60",
+    "name": "サモン ミニ レンジャー",
+    "kind": "魔法",
+    "category": "複合魔法/召喚",
+    "requirements": [
+      {
+        "skill": "召喚魔法",
+        "min": 80.0
+      },
+      {
+        "skill": "自然調和",
+        "min": 60.0
+      }
+    ],
+    "successSkill": "召喚魔法",
+    "successRequired": 80.0,
+    "cost": {
+      "mp": 46.0
+    },
+    "castTime": "450",
+    "delay": "750",
+    "description": "小さいけど頼りになる斥候を召喚するぞ！",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n初出251111",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%BE%A4%B4%AD",
+    "mp": 46.0,
+    "reagent": "EB5"
+  },
+  {
+    "id": "magic-035c0294aa-35aa1337a8-90-60",
+    "name": "リコール エレメンタル",
+    "kind": "魔法",
+    "category": "複合魔法/召喚",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "召喚魔法",
+        "min": 60.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 45.0
+    },
+    "castTime": "450",
+    "delay": "750",
+    "description": "詠唱者と共に戦ってくれる精霊を召喚する",
+    "range": "",
+    "transfer": "×",
+    "acquisition": "複製\nミストエレメンタル\nレインエレメンタル",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%BE%A4%B4%AD",
+    "mp": 45.0,
+    "reagent": "PD4"
+  },
+  {
+    "id": "magic-035c0294aa-d8170374fd-60-90",
+    "name": "リコール ユナイト エレメンタル",
+    "kind": "魔法",
+    "category": "複合魔法/召喚",
+    "requirements": [
+      {
+        "skill": "召喚魔法",
+        "min": 60.0
+      },
+      {
+        "skill": "強化魔法",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "召喚魔法",
+    "successRequired": 60.0,
+    "cost": {
+      "mp": 45.0
+    },
+    "castTime": "450",
+    "delay": "750",
+    "description": "詠唱者と共に戦ってくれる複数属性の精霊の集合体を召喚する\n発動に必要なBuff : エレメンタルナイト マスタリー",
+    "range": "",
+    "transfer": "",
+    "acquisition": "クエスト報酬\n初出240820",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%BE%A4%B4%AD",
+    "mp": 45.0,
+    "reagent": "PD4"
+  },
+  {
+    "id": "magic-035c0294aa-0deb27de43-90-70",
+    "name": "サモン オルタード モンスター",
+    "kind": "魔法",
+    "category": "複合魔法/召喚",
+    "requirements": [
+      {
+        "skill": "召喚魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "強化魔法",
+        "min": 70.0
+      }
+    ],
+    "successSkill": "召喚魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 53.0
+    },
+    "castTime": "450",
+    "delay": "750",
+    "description": "死者から生み出された凶暴な怪物を召喚する",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "錬金-第9弾",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%BE%A4%B4%AD",
+    "mp": 53.0,
+    "reagent": "EB5"
+  },
+  {
+    "id": "magic-035c0294aa-acd16f9fa0-70-70",
+    "name": "サモン キング マミー",
+    "kind": "魔法",
+    "category": "複合魔法/召喚",
+    "requirements": [
+      {
+        "skill": "召喚魔法",
+        "min": 70.0
+      },
+      {
+        "skill": "死の魔法",
+        "min": 70.0
+      }
+    ],
+    "successSkill": "召喚魔法",
+    "successRequired": 70.0,
+    "cost": {
+      "mp": 40.0
+    },
+    "castTime": "450",
+    "delay": "750",
+    "description": "魔界から驚異的な再生能力を持つミイラを呼び出す",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n160920",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%BE%A4%B4%AD",
+    "mp": 40.0,
+    "reagent": "EB 4"
+  },
+  {
+    "id": "magic-035c0294aa-6b7136b53d-90-70",
+    "name": "サモン ゴーストシップ",
+    "kind": "魔法",
+    "category": "複合魔法/召喚",
+    "requirements": [
+      {
+        "skill": "召喚魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "死の魔法",
+        "min": 70.0
+      }
+    ],
+    "successSkill": "召喚魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 53.0
+    },
+    "castTime": "450",
+    "delay": "750",
+    "description": "冥界を彷徨う幽霊船を召喚する",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "ミラクルサマーガチャ2020\n初出200804\nテクガチャ",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%BE%A4%B4%AD",
+    "mp": 53.0,
+    "reagent": "EB5"
+  },
+  {
+    "id": "magic-035c0294aa-77aca6de0c-70",
+    "name": "サモン ストロング ゾンビ",
+    "kind": "魔法",
+    "category": "複合魔法/召喚",
+    "requirements": [
+      {
+        "skill": "召喚魔法",
+        "min": 70.0
+      }
+    ],
+    "successSkill": "召喚魔法",
+    "successRequired": 70.0,
+    "cost": {
+      "mp": 40.0
+    },
+    "castTime": "450",
+    "delay": "750",
+    "description": "プレイヤーの死体を触媒に強力なゾンビを召喚する\n発動に必要なBuff : ネクロマンサー マスタリー",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "火竜神殿-宝箱\n錬金-第4弾",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%BE%A4%B4%AD",
+    "mp": 40.0,
+    "reagent": "-"
+  },
+  {
+    "id": "magic-035c0294aa-fd0cf1d603-70-70",
+    "name": "宝瓶宮の扉",
+    "kind": "魔法",
+    "category": "複合魔法/召喚",
+    "requirements": [
+      {
+        "skill": "召喚魔法",
+        "min": 70.0
+      },
+      {
+        "skill": "魔法熟練",
+        "min": 70.0
+      }
+    ],
+    "successSkill": "召喚魔法",
+    "successRequired": 70.0,
+    "cost": {
+      "mp": 40.0
+    },
+    "castTime": "450",
+    "delay": "750",
+    "description": "宝瓶宮の星霊アクエリアスを召喚する",
+    "range": "",
+    "transfer": "",
+    "acquisition": "『FAIRY TAIL』コラボ\nもえガチャ\n初出190129",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%BE%A4%B4%AD",
+    "mp": 40.0,
+    "reagent": "PNQ1"
+  },
+  {
+    "id": "magic-035c0294aa-7e650bbe82-80",
+    "name": "サモン ガシャドクロ",
+    "kind": "魔法",
+    "category": "複合魔法/召喚",
+    "requirements": [
+      {
+        "skill": "召喚魔法",
+        "min": 80.0
+      }
+    ],
+    "successSkill": "召喚魔法",
+    "successRequired": 80.0,
+    "cost": {
+      "mp": 46.0
+    },
+    "castTime": "450",
+    "delay": "750",
+    "description": "埋葬されなかった死者達の怨念が形となった巨大な骸骨を対象の足元に召喚する\n発動に必要なBuff : ネクロマンサー マスタリー",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n180814",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%BE%A4%B4%AD",
+    "mp": 46.0,
+    "reagent": "EB 5"
+  },
+  {
+    "id": "magic-035c0294aa-98f5b520bd-80-80",
+    "name": "サモン ミニ ソルジャー",
+    "kind": "魔法",
+    "category": "複合魔法/召喚",
+    "requirements": [
+      {
+        "skill": "召喚魔法",
+        "min": 80.0
+      },
+      {
+        "skill": "強化魔法",
+        "min": 80.0
+      }
+    ],
+    "successSkill": "召喚魔法",
+    "successRequired": 80.0,
+    "cost": {
+      "mp": 46.0
+    },
+    "castTime": "450",
+    "delay": "750",
+    "description": "小さいけど頼りになる兵士を召喚するぞ！",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n初出230912",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%BE%A4%B4%AD",
+    "mp": 46.0,
+    "reagent": "EB5"
+  },
+  {
+    "id": "magic-035c0294aa-115ddb55f9-80-80",
+    "name": "サモン メジェド",
+    "kind": "魔法",
+    "category": "複合魔法/召喚",
+    "requirements": [
+      {
+        "skill": "召喚魔法",
+        "min": 80.0
+      },
+      {
+        "skill": "死の魔法",
+        "min": 80.0
+      }
+    ],
+    "successSkill": "召喚魔法",
+    "successRequired": 80.0,
+    "cost": {
+      "mp": 20.0
+    },
+    "castTime": "450",
+    "delay": "750",
+    "description": "異界より打ち倒す者を呼び出す",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "もえガチャ\nテクガチャ",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%BE%A4%B4%AD",
+    "mp": 20.0,
+    "reagent": "EB5"
+  },
+  {
+    "id": "magic-035c0294aa-fd9a0a7685-80-90",
+    "name": "リコール フレイム インカーネーション",
+    "kind": "魔法",
+    "category": "複合魔法/召喚",
+    "requirements": [
+      {
+        "skill": "召喚魔法",
+        "min": 80.0
+      },
+      {
+        "skill": "強化魔法",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "召喚魔法",
+    "successRequired": 80.0,
+    "cost": {
+      "mp": 46.0
+    },
+    "castTime": "450",
+    "delay": "750",
+    "description": "圧倒的な火力で敵を焼き尽くす炎の化身を召喚する",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n初出230516",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%BE%A4%B4%AD",
+    "mp": 46.0,
+    "reagent": "PD5"
+  },
+  {
+    "id": "magic-035c0294aa-178acd623f-80-80",
+    "name": "黒天窮",
+    "kind": "魔法",
+    "category": "複合魔法/召喚",
+    "requirements": [
+      {
+        "skill": "死の魔法",
+        "min": 80.0
+      },
+      {
+        "skill": "暗黒命令",
+        "min": 80.0
+      }
+    ],
+    "successSkill": "死の魔法",
+    "successRequired": 80.0,
+    "cost": {
+      "mp": 46.0
+    },
+    "castTime": "450",
+    "delay": "750",
+    "description": "疑似的なミニブラックホールを出現させて全てを飲み込み消滅させる\n※対NPCのみ使用可能",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "『ありふれた職業で世界最強』\nコラボガチャ\n初出250422",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%BE%A4%B4%AD",
+    "mp": 46.0,
+    "reagent": "NQ3"
+  },
+  {
+    "id": "magic-035c0294aa-38dd3896dd-90",
+    "name": "サモン クラーケン",
+    "kind": "魔法",
+    "category": "複合魔法/召喚",
+    "requirements": [
+      {
+        "skill": "水泳",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "水泳",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 53.0
+    },
+    "castTime": "350",
+    "delay": "650",
+    "description": "海の怪物クラーケンを呼び出し使役することができる\n※地上で召喚した場合は移動速度が著しく低下する\n発動に必要なBuff : 海戦士 マスタリー",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n170718\nテクガチャ",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%BE%A4%B4%AD",
+    "mp": 53.0,
+    "reagent": "魚の餌 30"
+  },
+  {
+    "id": "magic-035c0294aa-84c049275b-90-90",
+    "name": "サモン ケーレス",
+    "kind": "魔法",
+    "category": "複合魔法/召喚",
+    "requirements": [
+      {
+        "skill": "召喚魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "回復魔法",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "召喚魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 53.0
+    },
+    "castTime": "450",
+    "delay": "750",
+    "description": "癒しの力を持つ豊穣の女神を呼び出す",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n(ミラクルサマーガチャ)\n初出230801",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%BE%A4%B4%AD",
+    "mp": 53.0,
+    "reagent": "EB10"
+  },
+  {
+    "id": "magic-035c0294aa-91ed66c51d-90-90",
+    "name": "サモン デビル プラント",
+    "kind": "魔法",
+    "category": "複合魔法/召喚",
+    "requirements": [
+      {
+        "skill": "召喚魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "栽培",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "召喚魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 53.0
+    },
+    "castTime": "450",
+    "delay": "750",
+    "description": "凶暴な魔界の食人植物を呼び出す\n使用アイテム : デビル プラントの種 1",
+    "range": "",
+    "transfer": "？",
+    "acquisition": "キマイラ討伐報酬",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%BE%A4%B4%AD",
+    "mp": 53.0,
+    "reagent": "特殊"
+  },
+  {
+    "id": "magic-035c0294aa-88a5a2a75a-90",
+    "name": "サモン ドラゴン ゾンビ",
+    "kind": "魔法",
+    "category": "複合魔法/召喚",
+    "requirements": [
+      {
+        "skill": "召喚魔法",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "召喚魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 53.0
+    },
+    "castTime": "450",
+    "delay": "750",
+    "description": "魔界からゾンビとなったドラゴンを呼び寄せる\n発動に必要なBuff : ネクロマンサー マスタリー",
+    "range": "",
+    "transfer": "×",
+    "acquisition": "黒の廟堂\nクリア/交換報酬",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%BE%A4%B4%AD",
+    "mp": 53.0,
+    "reagent": "EB5"
+  },
+  {
+    "id": "magic-035c0294aa-04543cce4b-90",
+    "name": "サモン プロセルピナ",
+    "kind": "魔法",
+    "category": "複合魔法/召喚",
+    "requirements": [
+      {
+        "skill": "召喚魔法",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "召喚魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 53.0
+    },
+    "castTime": "450",
+    "delay": "750",
+    "description": "生命力を生贄に冥府の女王を呼び出す\n※召喚中は徐々にHPが減少します\n発動に必要なBuff : ネクロマンサー マスタリー or 紺碧の賢者 マスタリー",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "大入り福袋2022（年始のみ）\n初出220101",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%BE%A4%B4%AD",
+    "mp": 53.0,
+    "reagent": "EB10"
+  },
+  {
+    "id": "magic-035c0294aa-88a6924b8a-90",
+    "name": "サモン ヘッドレス ナイト",
+    "kind": "魔法",
+    "category": "複合魔法/召喚",
+    "requirements": [
+      {
+        "skill": "召喚魔法",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "召喚魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 53.0
+    },
+    "castTime": "450",
+    "delay": "750",
+    "description": "冥界より雷を操る首無し騎士を召喚する\n発動に必要なBuff : ネクロマンサー マスタリー",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "錬金の箱\n初出200428",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%BE%A4%B4%AD",
+    "mp": 53.0,
+    "reagent": "EB5"
+  },
+  {
+    "id": "magic-035c0294aa-c931fac4e4-90",
+    "name": "死霊召喚",
+    "kind": "魔法",
+    "category": "複合魔法/召喚",
+    "requirements": [
+      {
+        "skill": "召喚魔法",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "召喚魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 53.0
+    },
+    "castTime": "300",
+    "delay": "600",
+    "description": "冥府から複数の死霊騎士を呼び出す\n発動に必要なBuff :\n戦闘データ <ハーデス>",
+    "range": "",
+    "transfer": "×",
+    "acquisition": "クエスト(ひっとの戦闘訓練)\nポイント報酬(前提装備)\n230523実装",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%BE%A4%B4%AD",
+    "mp": 53.0,
+    "reagent": "EB5"
+  },
+  {
+    "id": "magic-e59d1c41c2-b745dceda4-10-10",
+    "name": "キュア",
+    "kind": "魔法",
+    "category": "複合魔法/回復",
+    "requirements": [
+      {
+        "skill": "回復魔法",
+        "min": 10.0
+      },
+      {
+        "skill": "精神力",
+        "min": 10.0
+      }
+    ],
+    "successSkill": "回復魔法",
+    "successRequired": 10.0,
+    "cost": {
+      "mp": 9.0
+    },
+    "castTime": "133",
+    "delay": "202",
+    "description": "手から発する光によって対象の体力とスタミナを少し回復する\n直接触れる必要があるため、射程は短い",
+    "range": "",
+    "transfer": "×",
+    "acquisition": "『灰と幻想のグリムガル』コラボ\n七賢者の箱",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B2%F3%C9%FC",
+    "mp": 9.0,
+    "reagent": "ND2"
+  },
+  {
+    "id": "magic-e59d1c41c2-93a8ec57ba-40",
+    "name": "ウォーター アート",
+    "kind": "魔法",
+    "category": "複合魔法/回復",
+    "requirements": [
+      {
+        "skill": "パフォーマンス",
+        "min": 40.0
+      }
+    ],
+    "successSkill": "パフォーマンス",
+    "successRequired": 40.0,
+    "cost": {
+      "mp": 23.0
+    },
+    "castTime": "600",
+    "delay": "750",
+    "description": "周囲を和ませる 水を利用した芸術技\n発動に必要なBuff : 物好き マスタリー\n自分中心の範囲魔法",
+    "range": "-",
+    "transfer": "○",
+    "acquisition": "錬金-GENERATIONS\n錬金-第9弾",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B2%F3%C9%FC",
+    "mp": 23.0,
+    "reagent": "ミニ ウォーター ボトル1"
+  },
+  {
+    "id": "magic-e59d1c41c2-394ea9bbb7-70-40",
+    "name": "セルフ サクリファイス",
+    "kind": "魔法",
+    "category": "複合魔法/回復",
+    "requirements": [
+      {
+        "skill": "死の魔法",
+        "min": 70.0
+      },
+      {
+        "skill": "死体回収",
+        "min": 40.0
+      }
+    ],
+    "successSkill": "死の魔法",
+    "successRequired": 70.0,
+    "cost": {
+      "mp": 40.0
+    },
+    "castTime": "277",
+    "delay": "378",
+    "description": "自分のHPをPTメンバーに分け与える\n自分中心の範囲魔法(PTのみ)",
+    "range": "-",
+    "transfer": "○",
+    "acquisition": "赤の廟堂-宝箱\n錬金-第1弾",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B2%F3%C9%FC",
+    "mp": 40.0,
+    "reagent": "NQ2"
+  },
+  {
+    "id": "magic-e59d1c41c2-f062e661e8-60-40",
+    "name": "トワイライト・ヒーリング",
+    "kind": "魔法",
+    "category": "複合魔法/回復",
+    "requirements": [
+      {
+        "skill": "神秘魔法",
+        "min": 60.0
+      },
+      {
+        "skill": "回復魔法",
+        "min": 40.0
+      }
+    ],
+    "successSkill": "神秘魔法",
+    "successRequired": 60.0,
+    "cost": {
+      "mp": 34.0
+    },
+    "castTime": "223",
+    "delay": "312",
+    "description": "神に祈りを捧げることで、神の祝福を受けて周囲の味方の傷を癒す",
+    "range": "-",
+    "transfer": "×",
+    "acquisition": "クエスト報酬\n(D×Dコラボ)\n初出230207",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B2%F3%C9%FC",
+    "mp": 34.0,
+    "reagent": "NQ1"
+  },
+  {
+    "id": "magic-e59d1c41c2-ee14204ff9-70-40-40-40",
+    "name": "ヒーリング レイン",
+    "kind": "魔法",
+    "category": "複合魔法/回復",
+    "requirements": [
+      {
+        "skill": "回復魔法",
+        "min": 70.0
+      },
+      {
+        "skill": "魔法熟練",
+        "min": 40.0
+      },
+      {
+        "skill": "自然調和",
+        "min": 40.0
+      },
+      {
+        "skill": "暗黒命令",
+        "min": 40.0
+      }
+    ],
+    "successSkill": "回復魔法",
+    "successRequired": 70.0,
+    "cost": {
+      "mp": 40.0
+    },
+    "castTime": "250",
+    "delay": "450",
+    "description": "癒しの雨を降らせて、周囲にいる味方のHPを回復して、状態異常を1つ消す",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n初出250924",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B2%F3%C9%FC",
+    "mp": 40.0,
+    "reagent": "NQ2"
+  },
+  {
+    "id": "magic-e59d1c41c2-3408087e1b-60-40",
+    "name": "リアクティブ ヒール",
+    "kind": "魔法",
+    "category": "複合魔法/回復",
+    "requirements": [
+      {
+        "skill": "回復魔法",
+        "min": 60.0
+      },
+      {
+        "skill": "神秘魔法",
+        "min": 40.0
+      }
+    ],
+    "successSkill": "回復魔法",
+    "successRequired": 60.0,
+    "cost": {
+      "mp": 34.0
+    },
+    "castTime": "223",
+    "delay": "312",
+    "description": "ダメージを受けたことをトリガーとして発動するHP回復魔法",
+    "range": "24.8",
+    "transfer": "○",
+    "acquisition": "『ログ・ホライズン 円卓崩壊』コラボ\n初出もえガチャ210720",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B2%F3%C9%FC",
+    "mp": 34.0,
+    "reagent": "NQ1"
+  },
+  {
+    "id": "magic-e59d1c41c2-fc993105be-50-40",
+    "name": "リムーバル ポイズン",
+    "kind": "魔法",
+    "category": "複合魔法/回復",
+    "requirements": [
+      {
+        "skill": "回復魔法",
+        "min": 50.0
+      },
+      {
+        "skill": "暗黒命令",
+        "min": 40.0
+      }
+    ],
+    "successSkill": "回復魔法",
+    "successRequired": 50.0,
+    "cost": {
+      "mp": 28.0
+    },
+    "castTime": "205",
+    "delay": "290",
+    "description": "PTメンバーにかかっている毒効果を吸収する\n自分中心の範囲魔法(PTのみ)",
+    "range": "-",
+    "transfer": "○",
+    "acquisition": "錬金-GENERATIONS\n錬金-第9弾\n火竜神殿-宝箱",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B2%F3%C9%FC",
+    "mp": 28.0,
+    "reagent": "NP3"
+  },
+  {
+    "id": "magic-e59d1c41c2-61fe28f488-85-80-50-50-50",
+    "name": "オリジン・フォース",
+    "kind": "魔法",
+    "category": "複合魔法/回復",
+    "requirements": [
+      {
+        "skill": "回復魔法",
+        "min": 85.0
+      },
+      {
+        "skill": "神秘魔法",
+        "min": 80.0
+      },
+      {
+        "skill": "集中力",
+        "min": 50.0
+      },
+      {
+        "skill": "知能",
+        "min": 50.0
+      },
+      {
+        "skill": "精神力",
+        "min": 50.0
+      }
+    ],
+    "successSkill": "回復魔法",
+    "successRequired": 85.0,
+    "cost": {
+      "mp": 200.0
+    },
+    "castTime": "300",
+    "delay": "18250",
+    "description": "現実を改変する魔法\n連続使用はできない\n封印が施されており本来の力は使用できなくなっている\n発動に必要なBuff :\nアウリオール",
+    "range": "",
+    "transfer": "",
+    "acquisition": "レイド報酬(前提装備)",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B2%F3%C9%FC",
+    "mp": 200.0,
+    "reagent": "PNQ3"
+  },
+  {
+    "id": "magic-e59d1c41c2-6a5889ae78-50-50",
+    "name": "カルマ ドライブ",
+    "kind": "魔法",
+    "category": "複合魔法/回復",
+    "requirements": [
+      {
+        "skill": "回復魔法",
+        "min": 50.0
+      },
+      {
+        "skill": "強化魔法",
+        "min": 50.0
+      }
+    ],
+    "successSkill": "回復魔法",
+    "successRequired": 50.0,
+    "cost": {
+      "mp": 28.0
+    },
+    "castTime": "225",
+    "delay": "310",
+    "description": "効果中に対象の攻撃がHITすると、与えたダメージの10%分のMPが回復する",
+    "range": "",
+    "transfer": "×",
+    "acquisition": "『ログ・ホライズン 円卓崩壊』コラボ\n初出イベント報酬210727\n黒の廟堂クリア報酬",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B2%F3%C9%FC",
+    "mp": 28.0,
+    "reagent": "NP3"
+  },
+  {
+    "id": "magic-e59d1c41c2-624d80be10-50-50",
+    "name": "ディバイド マナ",
+    "kind": "魔法",
+    "category": "複合魔法/回復",
+    "requirements": [
+      {
+        "skill": "神秘魔法",
+        "min": 50.0
+      },
+      {
+        "skill": "魔法熟練",
+        "min": 50.0
+      }
+    ],
+    "successSkill": "神秘魔法",
+    "successRequired": 50.0,
+    "cost": {
+      "mp": 50.0
+    },
+    "castTime": "205",
+    "delay": "290",
+    "description": "自らのMPを味方に分け与える",
+    "range": "16.5",
+    "transfer": "○",
+    "acquisition": "火竜神殿-宝箱\n錬金-第4弾\n錬金-第6弾\nトレジャー マップ ＜ イプス峡谷 特殊1 ＞",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B2%F3%C9%FC",
+    "mp": 50.0,
+    "reagent": "NP3"
+  },
+  {
+    "id": "magic-e59d1c41c2-f88b336f19-70-50",
+    "name": "回天",
+    "kind": "魔法",
+    "category": "複合魔法/回復",
+    "requirements": [
+      {
+        "skill": "回復魔法",
+        "min": 70.0
+      },
+      {
+        "skill": "調教",
+        "min": 50.0
+      }
+    ],
+    "successSkill": "回復魔法",
+    "successRequired": 70.0,
+    "cost": {
+      "mp": 40.0
+    },
+    "castTime": "241",
+    "delay": "334",
+    "description": "PTメンバーと自分のペットを同時に回復できる魔法",
+    "range": "25.0",
+    "transfer": "×",
+    "acquisition": "ありふれた職業で世界最強 season3\nコラボクエスト報酬\n250430〜250520",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B2%F3%C9%FC",
+    "mp": 40.0,
+    "reagent": "NQ2"
+  },
+  {
+    "id": "magic-e59d1c41c2-42ba475bca-60-60",
+    "name": "譲天",
+    "kind": "魔法",
+    "category": "複合魔法/回復",
+    "requirements": [
+      {
+        "skill": "回復魔法",
+        "min": 60.0
+      },
+      {
+        "skill": "強化魔法",
+        "min": 60.0
+      }
+    ],
+    "successSkill": "回復魔法",
+    "successRequired": 60.0,
+    "cost": {
+      "mp": 34.0
+    },
+    "castTime": "223",
+    "delay": "312",
+    "description": "自分以外の対象のMPを回復させて、一時的に魔力を上昇させる",
+    "range": "21.0",
+    "transfer": "○",
+    "acquisition": "『ありふれた職業で世界最強』\nコラボガチャ\n初出250430",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B2%F3%C9%FC",
+    "mp": 34.0,
+    "reagent": "NQ1"
+  },
+  {
+    "id": "magic-e59d1c41c2-3375d8fe2e-70",
+    "name": "エナジー チャージ",
+    "kind": "魔法",
+    "category": "複合魔法/回復",
+    "requirements": [
+      {
+        "skill": "回復魔法",
+        "min": 70.0
+      }
+    ],
+    "successSkill": "回復魔法",
+    "successRequired": 70.0,
+    "cost": {
+      "mp": 40.0
+    },
+    "castTime": "241",
+    "delay": "334",
+    "description": "一定時間毎にSTが自動回復する\n発動に必要なBuff : アルケミスト マスタリー",
+    "range": "23.8",
+    "transfer": "○",
+    "acquisition": "錬金-Fancy\n錬金-Light",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B2%F3%C9%FC",
+    "mp": 40.0,
+    "reagent": "NQ2"
+  },
+  {
+    "id": "magic-e59d1c41c2-7cd3207ba3-70-70",
+    "name": "ノア・ヒール",
+    "kind": "魔法",
+    "category": "複合魔法/回復",
+    "requirements": [
+      {
+        "skill": "回復魔法",
+        "min": 70.0
+      },
+      {
+        "skill": "精神力",
+        "min": 70.0
+      }
+    ],
+    "successSkill": "回復魔法",
+    "successRequired": 70.0,
+    "cost": {
+      "mp": 40.0
+    },
+    "castTime": "241",
+    "delay": "334",
+    "description": "即効性は無いが、一定時間ごとにHPとSTが回復する",
+    "range": "23.5",
+    "transfer": "○",
+    "acquisition": "『ダンまち?』コラボ\nもえガチャ\n初出240213",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B2%F3%C9%FC",
+    "mp": 40.0,
+    "reagent": "NQ2"
+  },
+  {
+    "id": "magic-e59d1c41c2-e8f71c143e-90-70",
+    "name": "リフレッシュ オール",
+    "kind": "魔法",
+    "category": "複合魔法/回復",
+    "requirements": [
+      {
+        "skill": "回復魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "強化魔法",
+        "min": 70.0
+      }
+    ],
+    "successSkill": "回復魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 70.0
+    },
+    "castTime": "277",
+    "delay": "378",
+    "description": "魔力によってHPとSTを同時に大回復させる",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "錬金の箱\n初出200428",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B2%F3%C9%FC",
+    "mp": 70.0,
+    "reagent": "PNQ1"
+  },
+  {
+    "id": "magic-e59d1c41c2-db199a88e2-90-70",
+    "name": "焦天",
+    "kind": "魔法",
+    "category": "複合魔法/回復",
+    "requirements": [
+      {
+        "skill": "回復魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "魔法熟練",
+        "min": 70.0
+      }
+    ],
+    "successSkill": "回復魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 53.0
+    },
+    "castTime": "277",
+    "delay": "378",
+    "description": "対象のHPを特大回復させる魔法",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "『ありふれた職業で世界最強』\nコラボガチャ\n初出250430",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B2%F3%C9%FC",
+    "mp": 53.0,
+    "reagent": "PNQ1"
+  },
+  {
+    "id": "magic-e59d1c41c2-ac453398f0-90-80",
+    "name": "ウルティメイト エナジー",
+    "kind": "魔法",
+    "category": "複合魔法/回復",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "魔法熟練",
+        "min": 80.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 53.0
+    },
+    "castTime": "295",
+    "delay": "400",
+    "description": "一定時間 最大STとST自然回復量が大幅に上昇する",
+    "range": "24.8",
+    "transfer": "○",
+    "acquisition": "火竜神殿-宝箱\n錬金-第4弾",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B2%F3%C9%FC",
+    "mp": 53.0,
+    "reagent": "PNQ1"
+  },
+  {
+    "id": "magic-e59d1c41c2-0123b7137f-80-80",
+    "name": "オーロラ ヒール",
+    "kind": "魔法",
+    "category": "複合魔法/回復",
+    "requirements": [
+      {
+        "skill": "回復魔法",
+        "min": 80.0
+      },
+      {
+        "skill": "強化魔法",
+        "min": 80.0
+      }
+    ],
+    "successSkill": "回復魔法",
+    "successRequired": 80.0,
+    "cost": {
+      "mp": 46.0
+    },
+    "castTime": "250",
+    "delay": "900",
+    "description": "周囲一帯が七色のオーロラに包まれ広範囲を回復する魔法\n※個別ディレイ、魔法チャージ不可",
+    "range": "半径\n20.0",
+    "transfer": "○",
+    "acquisition": "『ログ・ホライズン 円卓崩壊』コラボ\n初出もえガチャ210720",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B2%F3%C9%FC",
+    "mp": 46.0,
+    "reagent": "NQ3"
+  },
+  {
+    "id": "magic-e59d1c41c2-9cc86df6e8-80-80",
+    "name": "ソールライト",
+    "kind": "魔法",
+    "category": "複合魔法/回復",
+    "requirements": [
+      {
+        "skill": "回復魔法",
+        "min": 80.0
+      },
+      {
+        "skill": "魔法熟練",
+        "min": 80.0
+      }
+    ],
+    "successSkill": "回復魔法",
+    "successRequired": 80.0,
+    "cost": {
+      "mp": 46.0
+    },
+    "castTime": "259",
+    "delay": "356",
+    "description": "対象の周囲を癒しの光で照らして大回復させる",
+    "range": "21.0",
+    "transfer": "○",
+    "acquisition": "『ダンまち?』コラボ\nもえガチャ\n初出240227",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B2%F3%C9%FC",
+    "mp": 46.0,
+    "reagent": "NQ3"
+  },
+  {
+    "id": "magic-e59d1c41c2-3d9d8c4fb5-80",
+    "name": "ムーンライト シンフォニー",
+    "kind": "魔法",
+    "category": "複合魔法/回復",
+    "requirements": [
+      {
+        "skill": "回復魔法",
+        "min": 80.0
+      }
+    ],
+    "successSkill": "回復魔法",
+    "successRequired": 80.0,
+    "cost": {
+      "mp": 46.0
+    },
+    "castTime": "259",
+    "delay": "356",
+    "description": "月の光が降り注ぎ、回復と同時に防御性能を向上させる\n発動に必要なBuff :\n月星の力",
+    "range": "約19",
+    "transfer": "",
+    "acquisition": "初出220101",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B2%F3%C9%FC",
+    "mp": 46.0,
+    "reagent": "-"
+  },
+  {
+    "id": "magic-e59d1c41c2-4e674ef256-90-90",
+    "name": "アクティベイション",
+    "kind": "魔法",
+    "category": "複合魔法/回復",
+    "requirements": [
+      {
+        "skill": "神秘魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "強化魔法",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "神秘魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 53.0
+    },
+    "castTime": "297",
+    "delay": "398",
+    "description": "肉体を活性化させ、一時的にスタミナ自然回復量を上昇させる",
+    "range": "-",
+    "transfer": "○",
+    "acquisition": "火竜神殿-宝箱\n錬金-第3.5弾\n錬金-第5弾\n練金-第5.5弾",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B2%F3%C9%FC",
+    "mp": 53.0,
+    "reagent": "PNQ1"
+  },
+  {
+    "id": "magic-e59d1c41c2-f5a0810ba5-90-90",
+    "name": "グループ リバイタル",
+    "kind": "魔法",
+    "category": "複合魔法/回復",
+    "requirements": [
+      {
+        "skill": "回復魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "魔法熟練",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "回復魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 53.0
+    },
+    "castTime": "297",
+    "delay": "398",
+    "description": "自分の近くにいるパーティメンバーのスタミナを回復する\n自分中心の範囲魔法(PTのみ)",
+    "range": "-",
+    "transfer": "○",
+    "acquisition": "火竜神殿-宝箱\n錬金-第4弾",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B2%F3%C9%FC",
+    "mp": 53.0,
+    "reagent": "PNQ1"
+  },
+  {
+    "id": "magic-e59d1c41c2-837714aac6-90",
+    "name": "サクリファイス リザレクション",
+    "kind": "魔法",
+    "category": "複合魔法/回復",
+    "requirements": [
+      {
+        "skill": "回復魔法",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "回復魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 180.0
+    },
+    "castTime": "480",
+    "delay": "660",
+    "description": "自分の命を犠牲にして範囲内にいるパーティーメンバー全員を蘇生させる\n発動に必要なBuff : テンプルナイト マスタリー",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n180724",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B2%F3%C9%FC",
+    "mp": 180.0,
+    "reagent": "PNQ1"
+  },
+  {
+    "id": "magic-e59d1c41c2-b14dd67eb8-90-90",
+    "name": "トワイライト・セイント・アフェクション",
+    "kind": "魔法",
+    "category": "複合魔法/回復",
+    "requirements": [
+      {
+        "skill": "神秘魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "回復魔法",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "神秘魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 53.0
+    },
+    "castTime": "300",
+    "delay": "950",
+    "description": "前方に巨大な回復フィールドを展開して、領域内の味方のHPを大幅に回復し、全てのステータスダウン効果を打ち消す\n※個別ディレイ、魔法チャージ不可",
+    "range": "15",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n(D×Dコラボ)\n初出230207",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B2%F3%C9%FC",
+    "mp": 53.0,
+    "reagent": "PNQ1"
+  },
+  {
+    "id": "magic-e59d1c41c2-b0fa78bd5e-90",
+    "name": "フォビドゥン ゲーム",
+    "kind": "魔法",
+    "category": "複合魔法/回復",
+    "requirements": [
+      {
+        "skill": "暗黒命令",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "暗黒命令",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 70.0
+    },
+    "castTime": "450",
+    "delay": "750",
+    "description": "楽しい楽しい 死体遊びの始まりなん＝ｗ＝♪\n発動に必要なBuff : ネクロマンサー マスタリー",
+    "range": "",
+    "transfer": "",
+    "acquisition": "クエスト報酬\n初出241119",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B2%F3%C9%FC",
+    "mp": 70.0,
+    "reagent": "EB10"
+  },
+  {
+    "id": "magic-e59d1c41c2-7032061613-90",
+    "name": "フォース オブ ネイチャー",
+    "kind": "魔法",
+    "category": "複合魔法/回復",
+    "requirements": [
+      {
+        "skill": "回復魔法",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "回復魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 53.0
+    },
+    "castTime": "277",
+    "delay": "378",
+    "description": "大自然の力を利用して癒しの効果を増幅し、パーティーメンバーにHPとSTの回復効果を付与する\n発動に必要なBuff : ドルイド マスタリー or 大自然の使者 or 森呪遣い",
+    "range": "半径\n22.5",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n180501",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B2%F3%C9%FC",
+    "mp": 53.0,
+    "reagent": "PNQ1"
+  },
+  {
+    "id": "magic-e59d1c41c2-835c287e1d-90",
+    "name": "リザレクション オール",
+    "kind": "魔法",
+    "category": "複合魔法/回復",
+    "requirements": [
+      {
+        "skill": "回復魔法",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "回復魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 120.0
+    },
+    "castTime": "480",
+    "delay": "660",
+    "description": "聖なる息吹で死者を完全な状態で蘇生させる\n発動に必要なBuff : 紺碧の賢者 マスタリー",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "錬金-第4弾\n練金-第5.5弾\n練金-第7弾\nトレジャー マップ ＜ イプス峡谷 特殊1 ＞\n錬金-Fancy",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B2%F3%C9%FC",
+    "mp": 120.0,
+    "reagent": "PNQ3"
+  },
+  {
+    "id": "magic-e59d1c41c2-cfe31ab4d4-90",
+    "name": "反魂の秘術",
+    "kind": "魔法",
+    "category": "複合魔法/回復",
+    "requirements": [
+      {
+        "skill": "回復魔法",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "回復魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 120.0
+    },
+    "castTime": "600",
+    "delay": "780",
+    "description": "光と闇の相反する力を操り、戦場に漂う死者達の魂を呼び戻し蘇らせることができる秘術\n蘇生した者は強大な力の副作用で一時的に生命力が低下する\n※魔法チャージ不可\n発動に必要なBuff : ネクロマンサー マスタリー",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n初出220614",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B2%F3%C9%FC",
+    "mp": 120.0,
+    "reagent": "PNQ3"
+  },
+  {
+    "id": "magic-e59d1c41c2-fce62c0f89-90",
+    "name": "天使の息吹",
+    "kind": "魔法",
+    "category": "複合魔法/回復",
+    "requirements": [
+      {
+        "skill": "回復魔法",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "回復魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 120.0
+    },
+    "castTime": "300",
+    "delay": "2500",
+    "description": "慈愛と天使の力で死んだペットを蘇生させることができる\n※但し、蘇生時に0.05レベル分の経験値を失う\n※『天使の息吹』を使用する度に装備中の『\nホワイト エンジェル ロッド\n』の耐久度が減少する\n発動に必要なBuff :\n慈愛の力",
+    "range": "",
+    "transfer": "×",
+    "acquisition": "もえガチャ\n(\n装備セット同梱\n)\n初出200908",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B2%F3%C9%FC",
+    "mp": 120.0,
+    "reagent": "PNQ3"
+  },
+  {
+    "id": "magic-e59d1c41c2-05f1b08a46-90",
+    "name": "天空の庭園",
+    "kind": "魔法",
+    "category": "複合魔法/回復",
+    "requirements": [
+      {
+        "skill": "回復魔法",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "回復魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 60.0
+    },
+    "castTime": "300",
+    "delay": "1200",
+    "description": "天空の庭園を召喚して広範囲にいる味方のHPとSTを大回復させる\n※個別ディレイ、魔法チャージ不可\n発動に必要なBuff :\n天空の加護",
+    "range": "20.0",
+    "transfer": "",
+    "acquisition": "もえガチャ(前提装備)\n初出260421",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B2%F3%C9%FC",
+    "mp": 60.0,
+    "reagent": "PNQ2"
+  },
+  {
+    "id": "magic-7154edc4d1-0ec17cb609-90-80-10",
+    "name": "アクア スフィア",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "集中力",
+        "min": 80.0
+      },
+      {
+        "skill": "死の魔法",
+        "min": 10.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 53.0
+    },
+    "castTime": "277",
+    "delay": "479",
+    "description": "空気中の水分を凝縮し、巨大な水球を生成して対象に放つ水魔法",
+    "range": "21.0",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n初出240101",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 53.0,
+    "reagent": "PNQ1",
+    "element": "水"
+  },
+  {
+    "id": "magic-7154edc4d1-a45829d08a-90-10",
+    "name": "ヘブンズ ジャッジメント",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "神秘魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "破壊魔法",
+        "min": 10.0
+      }
+    ],
+    "successSkill": "神秘魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 53.0
+    },
+    "castTime": "277",
+    "delay": "479",
+    "description": "天より降り注ぐ光の十字架に貫かれたものは動きを封じられてダメージを受ける\n※WarAgeでは魔法チャージ不可、気絶効果無効\n発動に必要なBuff : テンプルナイト マスタリー",
+    "range": "18.7",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n初出231114",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 53.0,
+    "reagent": "PNQ1",
+    "element": ""
+  },
+  {
+    "id": "magic-7154edc4d1-e02a7e3779-10-10",
+    "name": "マジック ミサイル",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 10.0
+      },
+      {
+        "skill": "魔法熟練",
+        "min": 10.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 10.0,
+    "cost": {
+      "mp": 9.0
+    },
+    "castTime": "133",
+    "delay": "202",
+    "description": "拳大の光弾を放つ魔法",
+    "range": "16.5",
+    "transfer": "",
+    "acquisition": "『灰と幻想のグリムガル』コラボ\n七賢者の箱",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 9.0,
+    "reagent": "ND2",
+    "element": "無"
+  },
+  {
+    "id": "magic-7154edc4d1-a9f330d52a-70-40-10",
+    "name": "聖光",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "神秘魔法",
+        "min": 70.0
+      },
+      {
+        "skill": "精神力",
+        "min": 40.0
+      },
+      {
+        "skill": "死の魔法",
+        "min": 10.0
+      }
+    ],
+    "successSkill": "神秘魔法",
+    "successRequired": 70.0,
+    "cost": {
+      "mp": 40.0
+    },
+    "castTime": "241",
+    "delay": "334",
+    "description": "聖なる光を発して対象にダメージを与え、さらに命中率と回避率を下げる",
+    "range": "20",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n(ゴブスレコラボ)\n初出220719",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 40.0,
+    "reagent": "NQ2",
+    "element": "無"
+  },
+  {
+    "id": "magic-7154edc4d1-c29c99d805-70-20",
+    "name": "火竜の煌炎",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 70.0
+      },
+      {
+        "skill": "神秘魔法",
+        "min": 20.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 70.0,
+    "cost": {
+      "mp": 40.0
+    },
+    "castTime": "241",
+    "delay": "334",
+    "description": "両手の炎を合わせて巨大な火球を作り放つ魔法",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "『FAIRY TAIL』コラボ\nもえガチャ\n初出190129",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 40.0,
+    "reagent": "NQ2",
+    "element": ""
+  },
+  {
+    "id": "magic-7154edc4d1-c9737b7b01-50-30",
+    "name": "ウィル・オ・ウィスプ",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "神秘魔法",
+        "min": 50.0
+      },
+      {
+        "skill": "鍛冶",
+        "min": 30.0
+      }
+    ],
+    "successSkill": "神秘魔法",
+    "successRequired": 50.0,
+    "cost": {
+      "mp": 28.0
+    },
+    "castTime": "205",
+    "delay": "290",
+    "description": "対象の詠唱を中断させて、詠唱不可の効果を付与する\n効果が消える隙に爆発によるダメージを与える\n※WarAgeでは詠唱不可の効果なし",
+    "range": "20.8",
+    "transfer": "○",
+    "acquisition": "『ダンまち?』コラボ\nもえガチャ\n初出240213",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 28.0,
+    "reagent": "NP3",
+    "element": "火"
+  },
+  {
+    "id": "magic-7154edc4d1-64facbb43f-30-70",
+    "name": "クリーピング シャドウ",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "死の魔法",
+        "min": 30.0
+      },
+      {
+        "skill": "魔法熟練",
+        "min": 70.0
+      }
+    ],
+    "successSkill": "死の魔法",
+    "successRequired": 30.0,
+    "cost": {
+      "mp": 18.0
+    },
+    "castTime": "169",
+    "delay": "246",
+    "description": "ソレはゆっくりと、しかし確実に貴方の後ろを追いかけてくる…",
+    "range": "20.5",
+    "transfer": "",
+    "acquisition": "クエスト報酬\n初出241119",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 18.0,
+    "reagent": "NP1",
+    "element": "無"
+  },
+  {
+    "id": "magic-7154edc4d1-4e208704d5-30-30",
+    "name": "シャドービート",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 30.0
+      },
+      {
+        "skill": "集中力",
+        "min": 30.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 30.0,
+    "cost": {
+      "mp": 18.0
+    },
+    "castTime": "169",
+    "delay": "246",
+    "description": "黒い塊を飛ばして超振動で攻撃をする魔法",
+    "range": "12.5",
+    "transfer": "",
+    "acquisition": "『灰と幻想のグリムガル』コラボ\n七賢者の箱",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 18.0,
+    "reagent": "NP1",
+    "element": "無"
+  },
+  {
+    "id": "magic-7154edc4d1-63b139ee78-30-30",
+    "name": "ファイアボルト",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 30.0
+      },
+      {
+        "skill": "強化魔法",
+        "min": 30.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 30.0,
+    "cost": {
+      "mp": 18.0
+    },
+    "castTime": "30",
+    "delay": "150",
+    "description": "威力は低いが稲妻のように速い炎を放つ速攻魔法\n※対NPCのみ使用可能",
+    "range": "16.8",
+    "transfer": "",
+    "acquisition": "『ダンまち?』コラボ\nダンまちイベント交換",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 18.0,
+    "reagent": "NP1",
+    "element": "火"
+  },
+  {
+    "id": "magic-7154edc4d1-12742c2c93-30-30",
+    "name": "マインド ボルト",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 30.0
+      },
+      {
+        "skill": "強化魔法",
+        "min": 30.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 30.0,
+    "cost": {
+      "mp": 18.0
+    },
+    "castTime": "169",
+    "delay": "246",
+    "description": "魂と肉体に同時にダメージを与える青白い憐火を放って敵を攻撃する魔法\n魔法ダメージとMPダメージを同時に与える",
+    "range": "22.8",
+    "transfer": "×",
+    "acquisition": "『ログ・ホライズン 円卓崩壊』コラボ\n初出イベント報酬210727",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 18.0,
+    "reagent": "NP1",
+    "element": "無"
+  },
+  {
+    "id": "magic-7154edc4d1-784b5da03e-30-30",
+    "name": "マナ ボール",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 30.0
+      },
+      {
+        "skill": "魔法熟練",
+        "min": 30.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 30.0,
+    "cost": {
+      "mp": 27.0
+    },
+    "castTime": "223",
+    "delay": "312",
+    "description": "触媒を消費せずに撃つことができる無属性魔法",
+    "range": "16.5",
+    "transfer": "○",
+    "acquisition": "錬金-第4弾\n錬金-第6弾\n火竜神殿-宝箱",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 27.0,
+    "reagent": "-",
+    "element": "無"
+  },
+  {
+    "id": "magic-7154edc4d1-b6bfb02482-30",
+    "name": "呪縛符",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "魔法熟練",
+        "min": 30.0
+      }
+    ],
+    "successSkill": "魔法熟練",
+    "successRequired": 30.0,
+    "cost": {
+      "mp": 18.0
+    },
+    "castTime": "250",
+    "delay": "350",
+    "description": "護符の効果で敵を拘束して動きを鈍らせる\n発動に必要なBuff :\n護符の力",
+    "range": "",
+    "transfer": "",
+    "acquisition": "もえガチャ(前提装備)\n初出260113",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 18.0,
+    "reagent": "PD1",
+    "element": ""
+  },
+  {
+    "id": "magic-7154edc4d1-6349a35bf9-50-40",
+    "name": "アイスメイク・氷欠泉",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 50.0
+      },
+      {
+        "skill": "死の魔法",
+        "min": 40.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 50.0,
+    "cost": {
+      "mp": 28.0
+    },
+    "castTime": "205",
+    "delay": "290",
+    "description": "地面から大量の氷を間欠泉のように噴き出させる魔法",
+    "range": "18.5",
+    "transfer": "○",
+    "acquisition": "『FAIRY TAIL』コラボ\nもえガチャ\n初出190205",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 28.0,
+    "reagent": "NP3",
+    "element": "水"
+  },
+  {
+    "id": "magic-7154edc4d1-2298183390-90-70-40",
+    "name": "セイクリッド レイ",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "回復魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "神秘魔法",
+        "min": 70.0
+      },
+      {
+        "skill": "集中力",
+        "min": 40.0
+      }
+    ],
+    "successSkill": "回復魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 100.0
+    },
+    "castTime": "277",
+    "delay": "479",
+    "description": "聖なる光を集約して 上空から敵を撃ち抜く\n※アンデット系には大ダメージを与える\n1秒間隔で1回のDoT扱い",
+    "range": "21.0",
+    "transfer": "○",
+    "acquisition": "錬金-第5弾\n練金-第5.5弾\n錬金-第6弾\nトレジャー マップ ＜ イプス峡谷 特殊1 ＞",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 100.0,
+    "reagent": "PNQ1",
+    "element": "無"
+  },
+  {
+    "id": "magic-7154edc4d1-bb26fc1c11-40",
+    "name": "タイダルブレス",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "水泳",
+        "min": 40.0
+      }
+    ],
+    "successSkill": "水泳",
+    "successRequired": 40.0,
+    "cost": {
+      "mp": 40.0
+    },
+    "castTime": "250",
+    "delay": "1000",
+    "description": "水の勢いで全てを押し流す海竜のブレス\n発動に必要なBuff :\n海竜の力",
+    "range": "",
+    "transfer": "",
+    "acquisition": "もえガチャ(前提装備)\n初出241203",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 40.0,
+    "reagent": "PNQ1",
+    "element": "水"
+  },
+  {
+    "id": "magic-7154edc4d1-eeb82b9783-60-40",
+    "name": "ダーク フレイム バースト",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 60.0
+      },
+      {
+        "skill": "暗黒命令",
+        "min": 40.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 60.0,
+    "cost": {
+      "mp": 34.0
+    },
+    "castTime": "223",
+    "delay": "312",
+    "description": "内なる魂に宿す闇の炎を操り対象を焼き尽す\n※威力は普通のバーストです",
+    "range": "21.5",
+    "transfer": "○",
+    "acquisition": "錬金-Fancy\n錬金-Light\n火竜神殿-宝箱",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 34.0,
+    "reagent": "NQ1",
+    "element": "無"
+  },
+  {
+    "id": "magic-7154edc4d1-885e52ff6b-60-40",
+    "name": "ツイスター",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 60.0
+      },
+      {
+        "skill": "知能",
+        "min": 40.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 60.0,
+    "cost": {
+      "mp": 34.0
+    },
+    "castTime": "223",
+    "delay": "312",
+    "description": "竜巻を発生させて 敵を上空へ巻き上げる\n上方ノックバック",
+    "range": "20.5",
+    "transfer": "○",
+    "acquisition": "錬金-第5弾\n練金-第5.5弾\n錬金-第6弾\nトレジャー マップ ＜ イプス峡谷 特殊1 ＞",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 34.0,
+    "reagent": "NQ1",
+    "element": "風"
+  },
+  {
+    "id": "magic-7154edc4d1-9a67d8b55a-70-40",
+    "name": "トゥルー ダーク",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "死の魔法",
+        "min": 70.0
+      },
+      {
+        "skill": "破壊魔法",
+        "min": 40.0
+      }
+    ],
+    "successSkill": "死の魔法",
+    "successRequired": 70.0,
+    "cost": {
+      "mp": 40.0
+    },
+    "castTime": "241",
+    "delay": "334",
+    "description": "無属性の闇が相手の肉体を崩壊させる",
+    "range": "20.5",
+    "transfer": "○",
+    "acquisition": "『オーバーロード』コラボ\n初出クエスト170905",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 40.0,
+    "reagent": "NQ2",
+    "element": "無"
+  },
+  {
+    "id": "magic-7154edc4d1-802301e743-40-40",
+    "name": "マジック ドレイン",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "死の魔法",
+        "min": 40.0
+      },
+      {
+        "skill": "神秘魔法",
+        "min": 40.0
+      }
+    ],
+    "successSkill": "死の魔法",
+    "successRequired": 40.0,
+    "cost": {
+      "mp": 0.0
+    },
+    "castTime": "277",
+    "delay": "877",
+    "description": "自分の周りにいる敵からMPを吸収する\n発動に必要なBuff : 紺碧の賢者 マスタリー\n自分中心の範囲魔法",
+    "range": "-",
+    "transfer": "○",
+    "acquisition": "錬金-第2弾\nピクシー ウィザード",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 0.0,
+    "reagent": "PNQ1",
+    "element": "無"
+  },
+  {
+    "id": "magic-7154edc4d1-26d5710c62-70-40",
+    "name": "レーザー キャノン",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "銃器",
+        "min": 70.0
+      },
+      {
+        "skill": "強化魔法",
+        "min": 40.0
+      }
+    ],
+    "successSkill": "銃器",
+    "successRequired": 70.0,
+    "cost": {
+      "mp": 33.0
+    },
+    "castTime": "130",
+    "delay": "1200",
+    "description": "魔法扱いの高出力レーザー砲をぶっ放し直線状の敵を殲滅する\n※攻撃力上昇で威力が変動する\n※銃本体の攻撃力は影響しない",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "錬金の箱\n第2弾",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 33.0,
+    "reagent": "-",
+    "element": ""
+  },
+  {
+    "id": "magic-7154edc4d1-a439db4bf6-70-40",
+    "name": "ヴァーミリオン ノヴァ",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 70.0
+      },
+      {
+        "skill": "死の魔法",
+        "min": 40.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 70.0,
+    "cost": {
+      "mp": 40.0
+    },
+    "castTime": "241",
+    "delay": "334",
+    "description": "対象を紅蓮の炎が包む",
+    "range": "20.5",
+    "transfer": "○",
+    "acquisition": "『オーバーロード』コラボ\n初出クエスト170905",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 40.0,
+    "reagent": "NQ2",
+    "element": "火"
+  },
+  {
+    "id": "magic-7154edc4d1-daf24941af-50-40",
+    "name": "沈黙",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "神秘魔法",
+        "min": 50.0
+      },
+      {
+        "skill": "強化魔法",
+        "min": 40.0
+      }
+    ],
+    "successSkill": "神秘魔法",
+    "successRequired": 50.0,
+    "cost": {
+      "mp": 28.0
+    },
+    "castTime": "205",
+    "delay": "290",
+    "description": "不思議な力で声を発することが出来ないようにする魔法\n※詠唱妨害と魔力が低下する効果を与える",
+    "range": "20",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n(ゴブスレコラボ)\n初出220719",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 28.0,
+    "reagent": "NP3",
+    "element": "無"
+  },
+  {
+    "id": "magic-7154edc4d1-72d5c08ed2-90-40",
+    "name": "黒炎陣",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "死の魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "精神力",
+        "min": 40.0
+      }
+    ],
+    "successSkill": "死の魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 53.0
+    },
+    "castTime": "277",
+    "delay": "378",
+    "description": "周囲を闇の炎で覆い全てを焼き払う古の魔法\n※魔法チャージ不可",
+    "range": "(6.5)",
+    "transfer": "×",
+    "acquisition": "宮殿(賢王)報酬",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 53.0,
+    "reagent": "PNQ1",
+    "element": "無"
+  },
+  {
+    "id": "magic-7154edc4d1-981a7b38e7-80-50-50",
+    "name": "イクセス ヒーリング",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "回復魔法",
+        "min": 80.0
+      },
+      {
+        "skill": "魔法熟練",
+        "min": 50.0
+      },
+      {
+        "skill": "暗黒命令",
+        "min": 50.0
+      }
+    ],
+    "successSkill": "回復魔法",
+    "successRequired": 80.0,
+    "cost": {
+      "mp": 46.0
+    },
+    "castTime": "259",
+    "delay": "356",
+    "description": "過剰に回復させることで肉体に負荷を与え、内部から肉体を破壊する魔法",
+    "range": "21.8",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n初出250304",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 46.0,
+    "reagent": "NQ3",
+    "element": "水"
+  },
+  {
+    "id": "magic-7154edc4d1-28d42a424e-50",
+    "name": "カオス バースト",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "生命力",
+        "min": 50.0
+      }
+    ],
+    "successSkill": "生命力",
+    "successRequired": 50.0,
+    "cost": {
+      "mp": 28.0
+    },
+    "castTime": "250",
+    "delay": "600",
+    "description": "圧縮された魔法の玉を放ち対象を混沌の炎で焼き尽くす\n※竜化状態の時のみ使用可能\n※生命力スキルは足りなくても発動可能\n発動に必要なBuff : ドラゴン フォース",
+    "range": "",
+    "transfer": "×",
+    "acquisition": "竜眼の指輪\n(もえガチャ\n初出190611)",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 28.0,
+    "reagent": "-",
+    "element": ""
+  },
+  {
+    "id": "magic-7154edc4d1-c406c7620c-50-90",
+    "name": "チェイン スペル",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 50.0
+      },
+      {
+        "skill": "集中力",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 50.0,
+    "cost": {
+      "mp": 14.0
+    },
+    "castTime": "365",
+    "delay": "290",
+    "description": "連続で魔法を撃ち続ける\n※最大5発まで撃てる 1発につきMP14を消費する",
+    "range": "20.5",
+    "transfer": "○",
+    "acquisition": "NPC販売(War奇跡)(※品)\n錬金-第8弾",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 14.0,
+    "reagent": "NP3",
+    "element": ""
+  },
+  {
+    "id": "magic-7154edc4d1-1e331df0c3-50",
+    "name": "ディレイ マジック",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 50.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 50.0,
+    "cost": {
+      "mp": 28.0
+    },
+    "castTime": "205",
+    "delay": "290",
+    "description": "詠唱完了から発動まで時間差で発動する魔法\n発動に必要なBuff : アルケミスト マスタリー",
+    "range": "約22",
+    "transfer": "○",
+    "acquisition": "錬金の箱\n第2弾",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 28.0,
+    "reagent": "NP3",
+    "element": "無"
+  },
+  {
+    "id": "magic-7154edc4d1-164387062e-70-50",
+    "name": "石弾",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 70.0
+      },
+      {
+        "skill": "強化魔法",
+        "min": 50.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 70.0,
+    "cost": {
+      "mp": 40.0
+    },
+    "castTime": "241",
+    "delay": "334",
+    "description": "砂粒を魔力で無数の礫に変化させて飛ばす魔法",
+    "range": "22",
+    "transfer": "○",
+    "acquisition": "『ゴブリンスレイヤー』 コラボ\nもえガチャ\n初出220726",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 40.0,
+    "reagent": "NQ2",
+    "element": "地"
+  },
+  {
+    "id": "magic-7154edc4d1-811d958271-60",
+    "name": "シリアル スペル",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 60.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 60.0,
+    "cost": {
+      "mp": 34.0
+    },
+    "castTime": "223",
+    "delay": "297",
+    "description": "連続で魔法弾を放ち爆煙に包み込む\n※2発目〜4発目は魔力の影響を受けない（破壊魔法スキルで効果が上昇する）\n発動に必要なBuff :アルケミスト マスタリー 又は 紺碧の賢者 マスタリー",
+    "range": "20.3",
+    "transfer": "×",
+    "acquisition": "200901実装\nアルケギルドランク3以上購入可能",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 34.0,
+    "reagent": "NQ1",
+    "element": "無"
+  },
+  {
+    "id": "magic-7154edc4d1-543b4aeb1a-60-60",
+    "name": "フツノミタマ",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "召喚魔法",
+        "min": 60.0
+      },
+      {
+        "skill": "暗黒命令",
+        "min": 60.0
+      }
+    ],
+    "successSkill": "召喚魔法",
+    "successRequired": 60.0,
+    "cost": {
+      "mp": 34.0
+    },
+    "castTime": "450",
+    "delay": "750",
+    "description": "重力結界を展開して、対象の動きを止め、最大HP20％分の魔法ダメージを与える\n※最大200ダメージを与える\n※対NPCのみ使用可能",
+    "range": "21.0",
+    "transfer": "○",
+    "acquisition": "『ダンまち?』コラボ\nもえガチャ\n初出240227",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 34.0,
+    "reagent": "NQ1",
+    "element": "無"
+  },
+  {
+    "id": "magic-7154edc4d1-8680a6d513-70-60",
+    "name": "ヘルフレイム",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 70.0
+      },
+      {
+        "skill": "死の魔法",
+        "min": 60.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 70.0,
+    "cost": {
+      "mp": 40.0
+    },
+    "castTime": "241",
+    "delay": "334",
+    "description": "小さな黒炎を放ち、黒炎が対象に触れると全身を一瞬で覆い尽くす",
+    "range": "22.8",
+    "transfer": "○",
+    "acquisition": "『オーバーロード』コラボ\n初出もえガチャ170926",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 40.0,
+    "reagent": "NQ2",
+    "element": "火"
+  },
+  {
+    "id": "magic-7154edc4d1-d946cbabce-90-60",
+    "name": "ライトニング・サークル",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "暗黒命令",
+        "min": 60.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 53.0
+    },
+    "castTime": "277",
+    "delay": "479",
+    "description": "前方に魔法陣を展開して範囲内の敵を無数の雷で殲滅する魔法\n※ターゲット不要、距離固定の範囲技\n※WarAgeでは魔法チャージ不可",
+    "range": "15",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n(D×Dコラボ)\n初出230207",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 53.0,
+    "reagent": "PNQ1",
+    "element": ""
+  },
+  {
+    "id": "magic-7154edc4d1-2d9026dc85-90-60",
+    "name": "ルーミング ダークネス",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "死の魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "暗黒命令",
+        "min": 60.0
+      }
+    ],
+    "successSkill": "死の魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 53.0
+    },
+    "castTime": "277",
+    "delay": "479",
+    "description": "漆黒の闇が相手を包み込み攻撃する魔法\n短間隔の4回のDoT・微量に浮かせる",
+    "range": "20.5",
+    "transfer": "○",
+    "acquisition": "錬金-第9弾",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 53.0,
+    "reagent": "PNQ1",
+    "element": "無"
+  },
+  {
+    "id": "magic-7154edc4d1-07e53c2b28-80-60",
+    "name": "レインボー ショット",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 80.0
+      },
+      {
+        "skill": "死の魔法",
+        "min": 60.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 80.0,
+    "cost": {
+      "mp": 46.0
+    },
+    "castTime": "259",
+    "delay": "356",
+    "description": "七色に輝く魔法の弾を放つ\n七種類の効果を同時に与える",
+    "range": "19.8",
+    "transfer": "○",
+    "acquisition": "錬金-第6弾\n練金-第7弾\n錬金-GENERATIONS\n火竜神殿-宝箱\n錬金-Fancy",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 46.0,
+    "reagent": "NQ3",
+    "element": "無"
+  },
+  {
+    "id": "magic-7154edc4d1-078316fb53-60",
+    "name": "氷結の息吹",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 60.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 60.0,
+    "cost": {
+      "mp": 34.0
+    },
+    "castTime": "277",
+    "delay": "378",
+    "description": "凍てつく息を放ち対象の精気を奪う\n発動に必要なBuff :\n雪女の加護",
+    "range": "",
+    "transfer": "",
+    "acquisition": "氷雪の帯\n(もえガチャ)\n初出210202",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 34.0,
+    "reagent": "NQ1",
+    "element": ""
+  },
+  {
+    "id": "magic-7154edc4d1-23cac64057-90-60",
+    "name": "雷霆召雷",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "召喚魔法",
+        "min": 60.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 51.0
+    },
+    "castTime": "277",
+    "delay": "479",
+    "description": "敵の頭上に雷雲を呼び出し攻撃する\n※水中詠唱＆発動不可、PresentAge以外では魔法チャージ不可\n召喚枠に干渉",
+    "range": "16.5",
+    "transfer": "○",
+    "acquisition": "錬金-第9弾\n錬金-Fancy",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 51.0,
+    "reagent": "PNQ1",
+    "element": "風"
+  },
+  {
+    "id": "magic-7154edc4d1-a63bfc7afb-90-70",
+    "name": "アイシクル ディザスター",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "知能",
+        "min": 70.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 51.0
+    },
+    "castTime": "277",
+    "delay": "479",
+    "description": "大気を凍らせ 無数の氷柱を敵の頭上に落とす\n※PresentAge以外では魔法チャージ不可\n範囲魔法・2秒で1回の単発DoT",
+    "range": "18.5",
+    "transfer": "○",
+    "acquisition": "錬金-GENERATIONS\n錬金-第9弾\n錬金-Light",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 51.0,
+    "reagent": "PNQ1",
+    "element": "水"
+  },
+  {
+    "id": "magic-7154edc4d1-ee63b4718b-70",
+    "name": "アクア エレメンタル バレット",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 70.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 70.0,
+    "cost": {
+      "mp": 40.0
+    },
+    "castTime": "241",
+    "delay": "334",
+    "description": "発動に必要なBuff : エレメンタルナイト マスタリー",
+    "range": "",
+    "transfer": "",
+    "acquisition": "クエスト報酬\n初出240820",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 40.0,
+    "reagent": "NQ2",
+    "element": "水？"
+  },
+  {
+    "id": "magic-7154edc4d1-052513d715-90-70",
+    "name": "アース エクスプロージョン",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "自然調和",
+        "min": 70.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 53.0
+    },
+    "castTime": "277",
+    "delay": "479",
+    "description": "大地を震わせ 地表からマグマを噴出させる",
+    "range": "19.0",
+    "transfer": "○",
+    "acquisition": "錬金-第8弾\n錬金-Light",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 53.0,
+    "reagent": "PNQ1",
+    "element": "地"
+  },
+  {
+    "id": "magic-7154edc4d1-c6d6f9c46f-70",
+    "name": "アース エレメンタル バレット",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 70.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 70.0,
+    "cost": {
+      "mp": 40.0
+    },
+    "castTime": "241",
+    "delay": "334",
+    "description": "発動に必要なBuff : エレメンタルナイト マスタリー",
+    "range": "",
+    "transfer": "",
+    "acquisition": "クエスト報酬\n初出240820",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 40.0,
+    "reagent": "NQ2",
+    "element": "地？"
+  },
+  {
+    "id": "magic-7154edc4d1-f3c2b21b4c-90-70",
+    "name": "イリュージョン ジャッジメント",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "神秘魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "魔法熟練",
+        "min": 70.0
+      }
+    ],
+    "successSkill": "神秘魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 53.0
+    },
+    "castTime": "477",
+    "delay": "479",
+    "description": "対象の上空に イリュージョンソードを出現させ\n天の裁きを 大地へ突き刺す\n範囲魔法・魔力非依存(短評参照)",
+    "range": "16.3",
+    "transfer": "○",
+    "acquisition": "錬金-第6弾\n練金-第7弾\nトレジャー マップ ＜ イプス峡谷 特殊1 ＞",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 53.0,
+    "reagent": "PNQ1",
+    "element": "無"
+  },
+  {
+    "id": "magic-7154edc4d1-d895ec932e-70",
+    "name": "ウインド エレメンタル バレット",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 70.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 70.0,
+    "cost": {
+      "mp": 40.0
+    },
+    "castTime": "241",
+    "delay": "334",
+    "description": "発動に必要なBuff : エレメンタルナイト マスタリー",
+    "range": "",
+    "transfer": "",
+    "acquisition": "クエスト報酬\n初出240820",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 40.0,
+    "reagent": "NQ2",
+    "element": "風？"
+  },
+  {
+    "id": "magic-7154edc4d1-2c4d0da7d3-70-70",
+    "name": "カースド ポイズン",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "死の魔法",
+        "min": 70.0
+      },
+      {
+        "skill": "暗黒命令",
+        "min": 70.0
+      }
+    ],
+    "successSkill": "死の魔法",
+    "successRequired": 70.0,
+    "cost": {
+      "mp": 40.0
+    },
+    "castTime": "261",
+    "delay": "354",
+    "description": "解毒ができない呪いの猛毒で 徐々に対象の身体を蝕み死へと追いやる",
+    "range": "20.5",
+    "transfer": "",
+    "acquisition": "錬金の箱\n初出200428",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 40.0,
+    "reagent": "NQ2",
+    "element": "属性"
+  },
+  {
+    "id": "magic-7154edc4d1-334fc2016f-70",
+    "name": "ファイア エレメンタル バレット",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 70.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 70.0,
+    "cost": {
+      "mp": 40.0
+    },
+    "castTime": "241",
+    "delay": "334",
+    "description": "火の精霊の力を借りて、炎を圧縮した魔法の弾を放つ\n発動に必要なBuff : エレメンタルナイト マスタリー",
+    "range": "",
+    "transfer": "",
+    "acquisition": "クエスト報酬\n初出240820",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 40.0,
+    "reagent": "NQ2",
+    "element": "火？"
+  },
+  {
+    "id": "magic-7154edc4d1-f320831253-90-90-90-90-70",
+    "name": "プチ寝落ち快眠波",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "回復魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "強化魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "神秘魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "調教",
+        "min": 70.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 150.0
+    },
+    "castTime": "250",
+    "delay": "18250",
+    "description": "万物を眠りに誘う心地よい波動を全方位に放つ妙技。\n熟睡中に肩こりや寝不足改善が見込めますが、眠りすぎに要注意。\n※強引な空間干渉により極地災害が発生します。",
+    "range": "半径\n26",
+    "transfer": "",
+    "acquisition": "クエスト報酬",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 150.0,
+    "reagent": "-",
+    "element": ""
+  },
+  {
+    "id": "magic-7154edc4d1-e5401049ab-70-70",
+    "name": "ホーリー ストライク",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "回復魔法",
+        "min": 70.0
+      },
+      {
+        "skill": "神秘魔法",
+        "min": 70.0
+      }
+    ],
+    "successSkill": "回復魔法",
+    "successRequired": 70.0,
+    "cost": {
+      "mp": 40.0
+    },
+    "castTime": "241",
+    "delay": "334",
+    "description": "アンデット系に対し、継続ダメージを与える\n6秒間隔で8回のDoT",
+    "range": "19.5",
+    "transfer": "○",
+    "acquisition": "火竜神殿-宝箱\n錬金-第2弾\n錬金-第5弾",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 40.0,
+    "reagent": "NQ1",
+    "element": "無"
+  },
+  {
+    "id": "magic-7154edc4d1-407923c3f1-70-70-70",
+    "name": "マジック アロー",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 70.0
+      },
+      {
+        "skill": "強化魔法",
+        "min": 70.0
+      },
+      {
+        "skill": "集中力",
+        "min": 70.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 70.0,
+    "cost": {
+      "mp": 40.0
+    },
+    "castTime": "241",
+    "delay": "334",
+    "description": "高密度の圧縮した魔力を放つ\n※盾による防御を貫通することができる",
+    "range": "20.5",
+    "transfer": "○",
+    "acquisition": "スクラップ ミスト\n錬金-第2弾\nピクシー ウィザード",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 40.0,
+    "reagent": "NQ2",
+    "element": "無"
+  },
+  {
+    "id": "magic-7154edc4d1-a097250a49-70-70",
+    "name": "メテオ シャワー",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 70.0
+      },
+      {
+        "skill": "神秘魔法",
+        "min": 70.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 70.0,
+    "cost": {
+      "mp": 40.0
+    },
+    "castTime": "241",
+    "delay": "334",
+    "description": "天空より無数の流星群を降らせて周囲にダメージを与える魔法\n発動に必要なBuff : ゾディアック サイン\n範囲魔法・短間隔の4回のDoT",
+    "range": "10.05",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n170620",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 40.0,
+    "reagent": "NQ1",
+    "element": "地"
+  },
+  {
+    "id": "magic-7154edc4d1-caa4caa1c3-90-70",
+    "name": "ロックブラスト",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "神秘魔法",
+        "min": 70.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 51.0
+    },
+    "castTime": "277",
+    "delay": "479",
+    "description": "大気中の塵を集めて巨大な岩を生成して放つ魔法",
+    "range": "21.5",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n181120",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 51.0,
+    "reagent": "PNQ1",
+    "element": ""
+  },
+  {
+    "id": "magic-7154edc4d1-239c86fbb5-90-80",
+    "name": "アイスメイク・銀世界",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "死の魔法",
+        "min": 80.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 51.0
+    },
+    "castTime": "277",
+    "delay": "479",
+    "description": "巨大な冷気を発生させて対象を一瞬で氷漬けにする魔法\n※効果中は受けるダメージが増加する\n※WarAgeでは魔法チャージ不可",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "『FAIRY TAIL』コラボ\nもえガチャ\n初出190205",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 51.0,
+    "reagent": "PNQ1",
+    "element": ""
+  },
+  {
+    "id": "magic-7154edc4d1-2e9b217924-90-80",
+    "name": "イクスティングイッシュ・スター",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "死の魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "精神力",
+        "min": 80.0
+      }
+    ],
+    "successSkill": "死の魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 53.0
+    },
+    "castTime": "277",
+    "delay": "479",
+    "description": "滅びの力による敵を消滅させるほど強力な魔法\n有益なbuffを消し去り、魔法耐性やガードを無視して大ダメージを与える",
+    "range": "20.5",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n(D×Dコラボ)\n初出230207",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 53.0,
+    "reagent": "PNQ",
+    "element": "-"
+  },
+  {
+    "id": "magic-7154edc4d1-5dbf3879d8-90-80",
+    "name": "ウインド インパルス",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "集中力",
+        "min": 80.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 51.0
+    },
+    "castTime": "277",
+    "delay": "479",
+    "description": "魔力で空気を極限まで圧縮して対象に放つ魔法",
+    "range": "20.5",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n170214",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 51.0,
+    "reagent": "PNQ1",
+    "element": "風"
+  },
+  {
+    "id": "magic-7154edc4d1-530463a84d-90-80",
+    "name": "エンシェント フレイム",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "強化魔法",
+        "min": 80.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 70.0
+    },
+    "castTime": "277",
+    "delay": "479",
+    "description": "超高温の蒼き炎の渦が全て焼き尽くす古の魔法",
+    "range": "17.5",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n初出190122\n錬金の箱\n（20200428）",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 70.0,
+    "reagent": "PNQ 1",
+    "element": "火"
+  },
+  {
+    "id": "magic-7154edc4d1-10ab32464f-80",
+    "name": "クリムゾン サン",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 80.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 80.0,
+    "cost": {
+      "mp": 46.0
+    },
+    "castTime": "259",
+    "delay": "356",
+    "description": "魔力で疑似太陽を生み出し、敵の頭上から落下させる魔法\n発動に必要なBuff :\n太陽の力",
+    "range": "19.0",
+    "transfer": "",
+    "acquisition": "太陽のポンチョ\n（大入り福袋2022）\n初出220101",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 46.0,
+    "reagent": "NQ3\nなし",
+    "element": "火"
+  },
+  {
+    "id": "magic-7154edc4d1-f159bee96e-90-80",
+    "name": "クリムゾン ライトニング",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "死の魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "破壊魔法",
+        "min": 80.0
+      }
+    ],
+    "successSkill": "死の魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 80.0
+    },
+    "castTime": "277",
+    "delay": "479",
+    "description": "血のような真紅の雷で周囲の敵を殲滅する魔法\n※対NPCのみ使用可能",
+    "range": "半径\n12.5",
+    "transfer": "○",
+    "acquisition": "テクガチャ\n初出251104",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 80.0,
+    "reagent": "PNQ1",
+    "element": "無"
+  },
+  {
+    "id": "magic-7154edc4d1-5afa17f0f1-80",
+    "name": "スターダスト インパクト",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "神秘魔法",
+        "min": 80.0
+      }
+    ],
+    "successSkill": "神秘魔法",
+    "successRequired": 80.0,
+    "cost": {
+      "mp": 46.0
+    },
+    "castTime": "277",
+    "delay": "479",
+    "description": "空から数多の星屑を対象めがけて降らせる魔法\n発動に必要なBuff :\n星屑の加護",
+    "range": "21.5",
+    "transfer": "×",
+    "acquisition": "もえガチャ\n初出190312",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 46.0,
+    "reagent": "NQ3",
+    "element": "地"
+  },
+  {
+    "id": "magic-7154edc4d1-81a346d459-80",
+    "name": "スノー ストーム",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 80.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 80.0,
+    "cost": {
+      "mp": 46.0
+    },
+    "castTime": "259",
+    "delay": "356",
+    "description": "天候を操り吹雪を呼び寄せ、周囲の敵を氷漬けにする魔法\n※WarAgeでは魔法チャージ不可\n発動に必要なBuff : ドルイド マスタリー or 大自然の使者 or 森呪遣い",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n181225\nテクガチャ",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 46.0,
+    "reagent": "NQ3",
+    "element": "水"
+  },
+  {
+    "id": "magic-7154edc4d1-25ac059827-90-80",
+    "name": "スパイラル テンペスト",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "集中力",
+        "min": 80.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 53.0
+    },
+    "castTime": "277",
+    "delay": "479",
+    "description": "螺旋状に渦巻く風の刃が敵を切り裂く風の魔法",
+    "range": "20.5？",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n初出250311",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 53.0,
+    "reagent": "PNQ1",
+    "element": "風"
+  },
+  {
+    "id": "magic-7154edc4d1-d0668122c5-80",
+    "name": "ダイアモンドダスト",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 80.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 80.0,
+    "cost": {
+      "mp": 46.0
+    },
+    "castTime": "259",
+    "delay": "356",
+    "description": "大気中の水蒸気を昇華させた氷の粒を放ち対象を凍らせる\n発動に必要なBuff :\n雪の女王",
+    "range": "",
+    "transfer": "",
+    "acquisition": "氷雪のサークレット\n（もえガチャ）\n初出201215）",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 46.0,
+    "reagent": "NQ3",
+    "element": "水"
+  },
+  {
+    "id": "magic-7154edc4d1-f1ba092e0f-90-80-80",
+    "name": "ダーク ジェイル",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "死の魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "神秘魔法",
+        "min": 80.0
+      },
+      {
+        "skill": "魔法熟練",
+        "min": 80.0
+      }
+    ],
+    "successSkill": "死の魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 80.0
+    },
+    "castTime": "350",
+    "delay": "600",
+    "description": "対象を闇の牢獄に捕らえて拘束し、重力による圧力で継続ダメージを与える\n※対NPCのみ使用可能",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n初出251223",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 80.0,
+    "reagent": "PNQ1",
+    "element": ""
+  },
+  {
+    "id": "magic-7154edc4d1-90aebaab1b-90-80",
+    "name": "テンペスト",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "強化魔法",
+        "min": 80.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 51.0
+    },
+    "castTime": "297",
+    "delay": "479",
+    "description": "巨大な竜巻を発生させて 全ても巻き込み吹き飛ばす\n※WarAgeでは魔法チャージ不可\n範囲魔法・短間隔の5回のDoT・上方ノックバック・魔力非依存",
+    "range": "15.5",
+    "transfer": "○",
+    "acquisition": "錬金-Light",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 51.0,
+    "reagent": "PNQ1",
+    "element": "風"
+  },
+  {
+    "id": "magic-7154edc4d1-7ae3dfd4ab-80",
+    "name": "パル フレア",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 80.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 80.0,
+    "cost": {
+      "mp": 46.0
+    },
+    "castTime": "259",
+    "delay": "356",
+    "description": "属性を変化させた青白い炎を放つ特殊な魔法\n呪文抵抗力による軽減を受けない\n発動に必要なBuff : アルケミスト マスタリー",
+    "range": "20.5",
+    "transfer": "○",
+    "acquisition": "火竜神殿-宝箱\n錬金-第3.5弾\n錬金-第5弾\n練金-第5.5弾",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 46.0,
+    "reagent": "NQ3",
+    "element": "無"
+  },
+  {
+    "id": "magic-7154edc4d1-cdea89ce7d-90-80",
+    "name": "パンプキン パンデミック",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "死の魔法",
+        "min": 80.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 53.0
+    },
+    "castTime": "277",
+    "delay": "479",
+    "description": "対象にカボチャ型の魔法弾を放ち爆発させることで周囲にカボチャの呪いを撒き散らす\n※カボチャの呪いは一定時間内に解除できないと死の魔法依存の大ダメージを受ける",
+    "range": "20.5",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n初出241029",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 53.0,
+    "reagent": "PNQ1",
+    "element": "無"
+  },
+  {
+    "id": "magic-7154edc4d1-03e5078d78-90-80",
+    "name": "ヘイルストーム",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "神秘魔法",
+        "min": 80.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 53.0
+    },
+    "castTime": "277",
+    "delay": "478",
+    "description": "雹嵐を発生させて雷と雹による範囲ダメージを与える水と風属性の複合魔法",
+    "range": "22.8",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n初出250819",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 53.0,
+    "reagent": "PNQ1",
+    "element": "水+風"
+  },
+  {
+    "id": "magic-7154edc4d1-5acfa03ebc-90-80",
+    "name": "メルト バースト",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "神秘魔法",
+        "min": 80.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 53.0
+    },
+    "castTime": "277",
+    "delay": "478",
+    "description": "大地の内部で溶けたマグマが臨界に達し、圧力の開放とともに地表へ噴き上がる地と火属性の複合魔法\n※対象の属性耐性を無視してダメージを与える、対NPCのみ使用可能\n発動に必要なBuff : アルケミスト マスタリー",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n初出260127",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 53.0,
+    "reagent": "PNQ1",
+    "element": "地+火"
+  },
+  {
+    "id": "magic-7154edc4d1-f9aa7121f4-80-80",
+    "name": "リアリティ・スラッシュ",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 80.0
+      },
+      {
+        "skill": "魔法熟練",
+        "min": 80.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 80.0,
+    "cost": {
+      "mp": 92.0
+    },
+    "castTime": "259",
+    "delay": "356",
+    "description": "消費MPは多いが、真空の刃が空間ごと切断する高威力の魔法\n※盾による防御を貫通することができる",
+    "range": "19.3",
+    "transfer": "○",
+    "acquisition": "『オーバーロード』コラボ\n初出もえガチャ170926",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 92.0,
+    "reagent": "NQ3",
+    "element": "無"
+  },
+  {
+    "id": "magic-7154edc4d1-cf818422fe-90-80",
+    "name": "嵐焔風塵",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "死の魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "破壊魔法",
+        "min": 80.0
+      }
+    ],
+    "successSkill": "死の魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 53.0
+    },
+    "castTime": "277",
+    "delay": "478",
+    "description": "巨大な火炎竜巻を発生させる風属性と火属性の複合魔法",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "『ありふれた職業で世界最強』\nコラボガチャ\n初出250507",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 53.0,
+    "reagent": "PNQ1",
+    "element": "風+火"
+  },
+  {
+    "id": "magic-7154edc4d1-6a12a3217b-90-90",
+    "name": "アイス ゾーン",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "神秘魔法",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 51.0
+    },
+    "castTime": "277",
+    "delay": "479",
+    "description": "大地ごと凍てつかせる絶対零度の氷結魔法\n※ターゲット不要、距離固定の範囲技\nWarAgeでは魔法チャージ不可",
+    "range": "射程10\n半径10",
+    "transfer": "○",
+    "acquisition": "錬金の箱\n第2弾",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 51.0,
+    "reagent": "PNQ1",
+    "element": "水"
+  },
+  {
+    "id": "magic-7154edc4d1-b62911a8ee-90-90-90",
+    "name": "アルゴノゥト・ファイアボルト",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "強化魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "集中力",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 80.0
+    },
+    "castTime": "350",
+    "delay": "1000",
+    "description": "アルゴノゥト効果でファイアボルトの威力を何倍にも高めた必殺の一撃\n※個別ディレイ",
+    "range": "22.8",
+    "transfer": "○",
+    "acquisition": "『ダンまち?』コラボ\nもえガチャ\n初出240213",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 80.0,
+    "reagent": "PNQ1",
+    "element": "火"
+  },
+  {
+    "id": "magic-7154edc4d1-3ce7ea93fe-90",
+    "name": "アルティメット バースト",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 0.0
+    },
+    "castTime": "450",
+    "delay": "750",
+    "description": "MPを全て消費して対象に大ダメージを与える究極魔法\n※消費したMPでダメージが変わる\n※魔法チャージ不可\n※Warageとその他Ageで効果が異なる\n発動に必要なBuff : 紺碧の賢者 マスタリー",
+    "range": "19.0",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n初出170606\nテクガチャ入り",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 0.0,
+    "reagent": "PNQ1",
+    "element": "無?"
+  },
+  {
+    "id": "magic-7154edc4d1-bf7efce6cc-90-90-90-90",
+    "name": "エレメンタル バースト",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "回復魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "強化魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "神秘魔法",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 120.0
+    },
+    "castTime": "277",
+    "delay": "479",
+    "description": "敵の周囲に四属性の魔法を同時に発動し、一点に集中させることで大爆発を引き起こす極大魔法",
+    "range": "21",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n初出220510",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 120.0,
+    "reagent": "PNQ4",
+    "element": "無"
+  },
+  {
+    "id": "magic-7154edc4d1-8900fef0c4-90-90",
+    "name": "オーバー ドライブ",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "魔法熟練",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 100.0
+    },
+    "castTime": "450",
+    "delay": "750",
+    "description": "暴走した魔力が周囲を焼き尽くす\n使用者は全てのMPを消費する\n※WarAgeでは魔法チャージ不可\n自分中心の範囲魔法",
+    "range": "-",
+    "transfer": "○",
+    "acquisition": "火竜神殿-宝箱\n錬金-第4弾\n錬金-第6弾",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 100.0,
+    "reagent": "PNQ1",
+    "element": "無"
+  },
+  {
+    "id": "magic-7154edc4d1-1d3783c695-90-90",
+    "name": "オールレンジ・フルバースト",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "知能",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 80.0
+    },
+    "castTime": "277",
+    "delay": "479",
+    "description": "全方位に展開した魔法陣から対象へ一斉に魔法を放ち殲滅する\n※WarAgeでは魔法チャージ不可",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n(D×Dコラボ)\n初出230221",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 80.0,
+    "reagent": "PNQ1",
+    "element": "無"
+  },
+  {
+    "id": "magic-7154edc4d1-5f917afa65-90-90-90",
+    "name": "カタストロフィ メテオライト",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "死の魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "集中力",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 80.0
+    },
+    "castTime": "277",
+    "delay": "478",
+    "description": "巨大な隕石を対象の頭上に落下させて、防御不可能な壊滅的ダメージを与える\n※対NPCのみ使用可能",
+    "range": "24.8",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n初出240423",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 80.0,
+    "reagent": "PNQ1",
+    "element": "地"
+  },
+  {
+    "id": "magic-7154edc4d1-681a8918be-90-90",
+    "name": "グラッブ ユア ハート",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "死の魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "回復魔法",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "死の魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 100.0
+    },
+    "castTime": "100",
+    "delay": "1200",
+    "description": "貴方の心を鷲掴み（物理）☆彡 やられた方はたまったもんぢゃない、痛くで動けない",
+    "range": "4.0",
+    "transfer": "",
+    "acquisition": "クエスト報酬\n初出241119",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 100.0,
+    "reagent": "PNQ1",
+    "element": ""
+  },
+  {
+    "id": "magic-7154edc4d1-eeab77f36a-90",
+    "name": "ダーク ディメンション",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "死の魔法",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "死の魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 70.0
+    },
+    "castTime": "277",
+    "delay": "479",
+    "description": "対象を暗黒空間に閉じ込めて空間ごと大爆発を引き起こす闇魔法\n発動に必要なBuff : ネクロマンサー マスタリー or イビルナイト マスタリー",
+    "range": "18.5",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n初出191029\nテクガチャ",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 70.0,
+    "reagent": "PNQ1",
+    "element": "無"
+  },
+  {
+    "id": "magic-7154edc4d1-06b3c39668-90-90",
+    "name": "ディバイン ストリーム",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "回復魔法",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 100.0
+    },
+    "castTime": "450",
+    "delay": "750",
+    "description": "聖なる 光柱を呼び出し 近づく者を滅する\n※水中詠唱＆発動不可、PresentAge以外では魔法チャージ不可\n範囲魔法・魔力非依存",
+    "range": "20.5",
+    "transfer": "○",
+    "acquisition": "錬金-GENERATIONS\n錬金-第9弾\nテクガチャ",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 100.0,
+    "reagent": "PNQ1",
+    "element": "無"
+  },
+  {
+    "id": "magic-7154edc4d1-e21cec3c6f-90",
+    "name": "ネガティブ バースト",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "死の魔法",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "死の魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 53.0
+    },
+    "castTime": "277",
+    "delay": "378",
+    "description": "自分を中心に闇色のドーム状の爆発を発生させて攻撃する魔法\n※WarAgeでは魔法チャージ不可\n発動に必要なBuff : ネクロマンサー マスタリー or イビルナイト マスタリー",
+    "range": "5.5",
+    "transfer": "○",
+    "acquisition": "『オーバーロード』コラボ\n初出もえガチャ170912",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 53.0,
+    "reagent": "PNQ1",
+    "element": "無"
+  },
+  {
+    "id": "magic-7154edc4d1-b6250ec257-90",
+    "name": "ビッグバン",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 100.0
+    },
+    "castTime": "277",
+    "delay": "999",
+    "description": "一点に圧縮した魔力を爆発的に膨張させて対象に大ダメージを与える\n5人のパーティーメンバーが近くにいる時のみ発動可能\n※（錬金及びガチャ）課金アイテムなので複合に記載。",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "練金-第7弾(褒章)",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 100.0,
+    "reagent": "PNQ1",
+    "element": "無"
+  },
+  {
+    "id": "magic-7154edc4d1-8d27932758-90-90",
+    "name": "ファイアー ストーム",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "魔法熟練",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 51.0
+    },
+    "castTime": "277",
+    "delay": "479",
+    "description": "巨大な火柱が敵を包み込み 全てを焼き尽くす",
+    "range": "17.5",
+    "transfer": "○",
+    "acquisition": "錬金-第5弾(特殊)\n練金-第5.5弾(特殊)\n錬金-第6弾\n錬金-GENERATIONS\n火竜神殿-宝箱",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 51.0,
+    "reagent": "PNQ1",
+    "element": "火"
+  },
+  {
+    "id": "magic-7154edc4d1-bf1510dfda-90",
+    "name": "フェアリーグリッター",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 100.0
+    },
+    "castTime": "277",
+    "delay": "479",
+    "description": "太陽と月と星の光をあつめて凝縮させる超高難度の魔法\n発動に必要なBuff :\nメイビス サポート",
+    "range": "19.0",
+    "transfer": "×",
+    "acquisition": "『FAIRY TAIL』コラボ\nメイビスに教えてもらう",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 100.0,
+    "reagent": "PNQ1",
+    "element": "無"
+  },
+  {
+    "id": "magic-7154edc4d1-ddd2468d78-90",
+    "name": "ベノム インフェルノ",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "死の魔法",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "死の魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 51.0
+    },
+    "castTime": "277",
+    "delay": "479",
+    "description": "冥府から召喚した猛毒の業火で焼き尽くす\n※ターゲット不要、距離固定の範囲技\n※WarAgeでは魔法チャージ不可\n発動に必要なBuff : ネクロマンサー マスタリー",
+    "range": "射程10\n半径8",
+    "transfer": "○",
+    "acquisition": "錬金の箱\n第2弾",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 51.0,
+    "reagent": "PNQ1",
+    "element": "地"
+  },
+  {
+    "id": "magic-7154edc4d1-5f8833322b-90-90",
+    "name": "ホーリー クロス",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "回復魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "集中力",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "回復魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 51.0
+    },
+    "castTime": "277",
+    "delay": "479",
+    "description": "聖なる十字架で敵に裁きを与える\n※WarAgeでは魔法チャージ不可",
+    "range": "20.55",
+    "transfer": "○",
+    "acquisition": "錬金-Light",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 51.0,
+    "reagent": "PNQ1",
+    "element": "無"
+  },
+  {
+    "id": "magic-7154edc4d1-12aadeeea0-90-90",
+    "name": "マルチプル バースト",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "集中力",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 53.0
+    },
+    "castTime": "277",
+    "delay": "318",
+    "description": "メガ バーストを3連続で放つ魔法",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "錬金の箱\n第2弾",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 53.0,
+    "reagent": "PNQ3",
+    "element": "火"
+  },
+  {
+    "id": "magic-7154edc4d1-cf87547fa0-90-90",
+    "name": "ルミノス・ウィンド",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "魔法熟練",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 53.0
+    },
+    "castTime": "400",
+    "delay": "700",
+    "description": "風を纏った光の玉を無数に呼び出して、対象に放つ高威力な風属性の魔法\n詠唱時と詠唱後に隙が生じやすい",
+    "range": "22.8",
+    "transfer": "○",
+    "acquisition": "『ダンまち?』コラボ\nもえガチャ\n初出240213",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 53.0,
+    "reagent": "PNQ1",
+    "element": "風"
+  },
+  {
+    "id": "magic-7154edc4d1-a6fba14d60-90-90",
+    "name": "失墜する天空",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "魔法熟練",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 0.0
+    },
+    "castTime": "300",
+    "delay": "9999",
+    "description": "超高熱源体を発生させ範囲内のあらゆる物を燃やし尽くし、溶かし尽くす\n発動時に数秒間の硬直時間が発生する\n※WarAgeでは効果が無い",
+    "range": "10.5",
+    "transfer": "○",
+    "acquisition": "『オーバーロード』コラボ\n初出もえガチャ170912",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 0.0,
+    "reagent": "PNQ3",
+    "element": "無"
+  },
+  {
+    "id": "magic-7154edc4d1-9295b0419b-90",
+    "name": "流星",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 53.0
+    },
+    "castTime": "277",
+    "delay": "378",
+    "description": "尾を引く大きな星を対象に向かって放つ魔法\n発動に必要なBuff : 星のきらめき",
+    "range": "20.5",
+    "transfer": "×",
+    "acquisition": "もえガチャ\n180904",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 53.0,
+    "reagent": "PNQ1",
+    "element": "無"
+  },
+  {
+    "id": "magic-7154edc4d1-046829e8fb-90-90",
+    "name": "神の杖",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "死の魔法",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 80.0
+    },
+    "castTime": "277",
+    "delay": "478",
+    "description": "魔力によって遥か上空より棒状の物質を目標めがけて超音速で落下させる禁忌の魔法\n※WarAgeでは魔法チャージ不可",
+    "range": "20.5",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n初出230110",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 80.0,
+    "reagent": "PNQ1",
+    "element": "無"
+  },
+  {
+    "id": "magic-7154edc4d1-211bcc297c-90",
+    "name": "神の雷",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "神秘魔法",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "神秘魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 51.0
+    },
+    "castTime": "277",
+    "delay": "478",
+    "description": "神に仕える者が神に祈りを捧げて、悪しき者に天罰を与える雷の魔法\n※WarAgeでは魔法チャージ不可\n発動に必要なBuff : テンプルナイト マスタリー",
+    "range": "20.8",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n181023\nテクガチャ",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 51.0,
+    "reagent": "PNQ1",
+    "element": "風"
+  },
+  {
+    "id": "magic-7154edc4d1-da4e43f93a-90-90-90-90",
+    "name": "神罰之焔",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "強化魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "神秘魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "回復魔法",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 120.0
+    },
+    "castTime": "300",
+    "delay": "3900",
+    "description": "数発分の蒼天を重力魔法によって圧縮させ、敵のみを焼き尽くす超広範囲の殲滅魔法\n※チャージ不可、個別ディレイ、対NPCのみ使用可能",
+    "range": "半径\n18.5",
+    "transfer": "○",
+    "acquisition": "『ありふれた職業で世界最強』\nコラボガチャ\n初出250422",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 120.0,
+    "reagent": "PNQ3",
+    "element": "火"
+  },
+  {
+    "id": "magic-7154edc4d1-88efb40473-90-90",
+    "name": "蒼天",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "魔法熟練",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 53.0
+    },
+    "castTime": "277",
+    "delay": "479",
+    "description": "巨大な蒼き炎の球を放つ火属性の最上級魔法",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "『ありふれた職業で世界最強』\nコラボガチャ\n初出250422",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 53.0,
+    "reagent": "PNQ1",
+    "element": "火"
+  },
+  {
+    "id": "magic-7154edc4d1-a95ea78fab-90",
+    "name": "雷嵐",
+    "kind": "魔法",
+    "category": "複合魔法/攻撃",
+    "requirements": [
+      {
+        "skill": "神秘魔法",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "神秘魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 53.0
+    },
+    "castTime": "277",
+    "delay": "479",
+    "description": "天候を操り雷雲を発生させて周囲に無数の雷を落とす\n発動に必要なBuff :\n戦闘データ <デュラハン>",
+    "range": "半径7",
+    "transfer": "×",
+    "acquisition": "クエスト(ひっとの戦闘訓練)\nポイント報酬(前提装備)\n230523実装",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%B9%B6%B7%E2",
+    "mp": 53.0,
+    "reagent": "PNQ1",
+    "element": ""
+  },
+  {
+    "id": "magic-9892901ca5-c78caede2d-30-10",
+    "name": "リコール グレート ドリンク",
+    "kind": "魔法",
+    "category": "複合魔法/補助",
+    "requirements": [
+      {
+        "skill": "神秘魔法",
+        "min": 30.0
+      },
+      {
+        "skill": "醸造",
+        "min": 10.0
+      }
+    ],
+    "successSkill": "神秘魔法",
+    "successRequired": 30.0,
+    "cost": {
+      "mp": 15.0
+    },
+    "castTime": "480",
+    "delay": "660",
+    "description": "コストをかけてより上質な飲み物を召喚する",
+    "range": "-",
+    "transfer": "○",
+    "acquisition": "錬金の箱\n第2弾",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CA%E4%BD%F5",
+    "mp": 15.0,
+    "reagent": "NP1"
+  },
+  {
+    "id": "magic-9892901ca5-1f184c2908-30-1-10",
+    "name": "リコール グレート レイション",
+    "kind": "魔法",
+    "category": "複合魔法/補助",
+    "requirements": [
+      {
+        "skill": "神秘魔法",
+        "min": 30.0
+      },
+      {
+        "skill": "料理",
+        "min": 10.0
+      }
+    ],
+    "successSkill": "神秘魔法",
+    "successRequired": 30.0,
+    "cost": {
+      "mp": 15.0
+    },
+    "castTime": "480",
+    "delay": "660",
+    "description": "コストをかけてより上質な食べ物を召喚する",
+    "range": "",
+    "transfer": "",
+    "acquisition": "錬金の箱\n初出200428",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CA%E4%BD%F5",
+    "mp": 15.0,
+    "reagent": "NP1"
+  },
+  {
+    "id": "magic-9892901ca5-9a0a28b895-40-20",
+    "name": "キャンディ シャワー",
+    "kind": "魔法",
+    "category": "複合魔法/補助",
+    "requirements": [
+      {
+        "skill": "料理",
+        "min": 40.0
+      },
+      {
+        "skill": "取引",
+        "min": 20.0
+      }
+    ],
+    "successSkill": "料理",
+    "successRequired": 40.0,
+    "cost": {
+      "mp": 23.0
+    },
+    "castTime": "300",
+    "delay": "750",
+    "description": "周囲のプレイヤーに半ば強制的に「 飴ちゃん 」を配る\n使用アイテム : リンゴ飴 1",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n初出200310",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CA%E4%BD%F5",
+    "mp": 23.0,
+    "reagent": "リンゴ飴1"
+  },
+  {
+    "id": "magic-9892901ca5-992586463f-20-20",
+    "name": "レゾリューション アルケミー",
+    "kind": "魔法",
+    "category": "複合魔法/補助",
+    "requirements": [
+      {
+        "skill": "神秘魔法",
+        "min": 20.0
+      },
+      {
+        "skill": "知能",
+        "min": 20.0
+      }
+    ],
+    "successSkill": "神秘魔法",
+    "successRequired": 20.0,
+    "cost": {
+      "mp": 13.0
+    },
+    "castTime": "450",
+    "delay": "750",
+    "description": "ピュア ノア キューブを「ノア キューブ」2個、「ノア パウダー」3個、「ノア ダスト」3個に分解する",
+    "range": "",
+    "transfer": "",
+    "acquisition": "錬金の箱\n初出200428",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CA%E4%BD%F5",
+    "mp": 13.0,
+    "reagent": "PNQ1"
+  },
+  {
+    "id": "magic-9892901ca5-0b754ef9b3-30-30",
+    "name": "アストラル バインド",
+    "kind": "魔法",
+    "category": "複合魔法/補助",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 30.0
+      },
+      {
+        "skill": "神秘魔法",
+        "min": 30.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 30.0,
+    "cost": {
+      "mp": 18.0
+    },
+    "castTime": "180",
+    "delay": "900",
+    "description": "目標にした敵を拘束し、移動を制限する魔法\n※個別ディレイ、魔法チャージ不可",
+    "range": "",
+    "transfer": "×",
+    "acquisition": "『ログ・ホライズン 円卓崩壊』コラボ\n初出イベント報酬210727\n黒の廟堂クリア報酬",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CA%E4%BD%F5",
+    "mp": 18.0,
+    "reagent": "NP1"
+  },
+  {
+    "id": "magic-9892901ca5-137b452410-30",
+    "name": "五行符",
+    "kind": "魔法",
+    "category": "複合魔法/補助",
+    "requirements": [
+      {
+        "skill": "魔法熟練",
+        "min": 30.0
+      }
+    ],
+    "successSkill": "魔法熟練",
+    "successRequired": 30.0,
+    "cost": {
+      "mp": 18.0
+    },
+    "castTime": "250",
+    "delay": "350",
+    "description": "護符の効果で5属性の効果が一時的に増加する\n発動に必要なBuff :\n護符の力",
+    "range": "",
+    "transfer": "",
+    "acquisition": "もえガチャ(前提装備)\n初出260113",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CA%E4%BD%F5",
+    "mp": 18.0,
+    "reagent": "PD1"
+  },
+  {
+    "id": "magic-9892901ca5-3b8c205a48-70-40",
+    "name": "イグザースト",
+    "kind": "魔法",
+    "category": "複合魔法/補助",
+    "requirements": [
+      {
+        "skill": "死の魔法",
+        "min": 70.0
+      },
+      {
+        "skill": "回復魔法",
+        "min": 40.0
+      }
+    ],
+    "successSkill": "死の魔法",
+    "successRequired": 70.0,
+    "cost": {
+      "mp": 40.0
+    },
+    "castTime": "261",
+    "delay": "354",
+    "description": "対象の全ての行動において、スタミナの消費が倍になる\n※対NPC戦では、移動速度が遅くなる効果も加わる",
+    "range": "21.5",
+    "transfer": "○",
+    "acquisition": "火竜神殿-宝箱\n錬金-第2弾\n錬金-第5弾\n練金-第5.5弾",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CA%E4%BD%F5",
+    "mp": 40.0,
+    "reagent": "NQ2"
+  },
+  {
+    "id": "magic-9892901ca5-d768ea9bcc-70-40",
+    "name": "エンジェリック スプリング",
+    "kind": "魔法",
+    "category": "複合魔法/補助",
+    "requirements": [
+      {
+        "skill": "神秘魔法",
+        "min": 70.0
+      },
+      {
+        "skill": "強化魔法",
+        "min": 40.0
+      }
+    ],
+    "successSkill": "神秘魔法",
+    "successRequired": 70.0,
+    "cost": {
+      "mp": 40.0
+    },
+    "castTime": "480",
+    "delay": "660",
+    "description": "聖なる力で一度だけPTメンバーの跳躍力を大幅に上昇させる\n自分中心の範囲魔法(PTのみ)",
+    "range": "-",
+    "transfer": "○",
+    "acquisition": "錬金-Fancy",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CA%E4%BD%F5",
+    "mp": 40.0,
+    "reagent": "NQ2"
+  },
+  {
+    "id": "magic-9892901ca5-641cc05bbd-60-40",
+    "name": "ディバイン グレイス",
+    "kind": "魔法",
+    "category": "複合魔法/補助",
+    "requirements": [
+      {
+        "skill": "神秘魔法",
+        "min": 60.0
+      },
+      {
+        "skill": "回復魔法",
+        "min": 40.0
+      }
+    ],
+    "successSkill": "神秘魔法",
+    "successRequired": 60.0,
+    "cost": {
+      "mp": 34.0
+    },
+    "castTime": "241",
+    "delay": "334",
+    "description": "装備中の呪いアイテムから呪いを祓う 天の恵み",
+    "range": "10.75\n？",
+    "transfer": "×",
+    "acquisition": "盗み-宝箱\n火竜神殿-宝箱",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CA%E4%BD%F5",
+    "mp": 34.0,
+    "reagent": "PNQ10"
+  },
+  {
+    "id": "magic-9892901ca5-58ee43aced-40-40",
+    "name": "ネゲート ミスト",
+    "kind": "魔法",
+    "category": "複合魔法/補助",
+    "requirements": [
+      {
+        "skill": "死の魔法",
+        "min": 40.0
+      },
+      {
+        "skill": "神秘魔法",
+        "min": 40.0
+      }
+    ],
+    "successSkill": "死の魔法",
+    "successRequired": 40.0,
+    "cost": {
+      "mp": 23.0
+    },
+    "castTime": "187",
+    "delay": "268",
+    "description": "黒い霧が対象を包み込み チャージされた魔法をかき消す\n※対Mobに対しては 魔力を下げる効果",
+    "range": "18.5",
+    "transfer": "○",
+    "acquisition": "火竜神殿-宝箱\n錬金-第7弾\n錬金-GENERATIONS",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CA%E4%BD%F5",
+    "mp": 23.0,
+    "reagent": "NP2"
+  },
+  {
+    "id": "magic-9892901ca5-c9050f8385-60-40",
+    "name": "フォース ステップ",
+    "kind": "魔法",
+    "category": "複合魔法/補助",
+    "requirements": [
+      {
+        "skill": "神秘魔法",
+        "min": 60.0
+      },
+      {
+        "skill": "強化魔法",
+        "min": 40.0
+      }
+    ],
+    "successSkill": "神秘魔法",
+    "successRequired": 60.0,
+    "cost": {
+      "mp": 34.0
+    },
+    "castTime": "223",
+    "delay": "312",
+    "description": "対象の攻撃ディレイを短縮し、与えるダメージを少し増加させる魔法",
+    "range": "24.8",
+    "transfer": "○",
+    "acquisition": "『ログ・ホライズン 円卓崩壊』コラボ\n初出もえガチャ210720",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CA%E4%BD%F5",
+    "mp": 34.0,
+    "reagent": "NQ1"
+  },
+  {
+    "id": "magic-9892901ca5-5c38d989f7-40-40",
+    "name": "プロモーション・ナイト",
+    "kind": "魔法",
+    "category": "複合魔法/補助",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 40.0
+      },
+      {
+        "skill": "物まね",
+        "min": 40.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 40.0,
+    "cost": {
+      "mp": 23.0
+    },
+    "castTime": "207",
+    "delay": "288",
+    "description": "一時的に戦士の力を得ることで回避と移動速度を上昇させるが、魔力と防御力が低下する\n※他のプロモーション効果と重複しない",
+    "range": "-",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n(D×Dコラボ)\n初出230207",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CA%E4%BD%F5",
+    "mp": 23.0,
+    "reagent": "NP2"
+  },
+  {
+    "id": "magic-9892901ca5-7c92ecd006-40-40",
+    "name": "プロモーション・ビショップ",
+    "kind": "魔法",
+    "category": "複合魔法/補助",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 40.0
+      },
+      {
+        "skill": "物まね",
+        "min": 40.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 40.0,
+    "cost": {
+      "mp": 23.0
+    },
+    "castTime": "207",
+    "delay": "288",
+    "description": "一時的に僧侶の力を得ることで魔力と破壊魔法を上昇させるが、攻撃力と防御力が低下する\n※他のプロモーション効果と重複しない",
+    "range": "-",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n(D×Dコラボ)\n初出230207",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CA%E4%BD%F5",
+    "mp": 23.0,
+    "reagent": "NP2"
+  },
+  {
+    "id": "magic-9892901ca5-9e09034feb-40-40",
+    "name": "プロモーション・ルーク",
+    "kind": "魔法",
+    "category": "複合魔法/補助",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 40.0
+      },
+      {
+        "skill": "物まね",
+        "min": 40.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 40.0,
+    "cost": {
+      "mp": 23.0
+    },
+    "castTime": "207",
+    "delay": "288",
+    "description": "一時的に戦車の力を得ることで攻撃力と防御力を上昇させるが、回避と移動速度が低下する\n※他のプロモーション効果と重複しない",
+    "range": "-",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n(D×Dコラボ)\n初出230207",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CA%E4%BD%F5",
+    "mp": 23.0,
+    "reagent": "NP2"
+  },
+  {
+    "id": "magic-9892901ca5-435914bfb0-70-40",
+    "name": "ポイズン ブレイド",
+    "kind": "魔法",
+    "category": "複合魔法/補助",
+    "requirements": [
+      {
+        "skill": "神秘魔法",
+        "min": 70.0
+      },
+      {
+        "skill": "死の魔法",
+        "min": 40.0
+      }
+    ],
+    "successSkill": "神秘魔法",
+    "successRequired": 70.0,
+    "cost": {
+      "mp": 33.0
+    },
+    "castTime": "241",
+    "delay": "334",
+    "description": "武器に毒を宿らせ 土属性を追加する\n※プレイヤーのメイン攻撃のみに属性を付加する",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "火竜神殿-宝箱\n錬金-第4弾\n練金-第5.5弾",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CA%E4%BD%F5",
+    "mp": 33.0,
+    "reagent": "NQ2"
+  },
+  {
+    "id": "magic-9892901ca5-0e7a6bb537-60-40",
+    "name": "マジックウォード・ホーリー",
+    "kind": "魔法",
+    "category": "複合魔法/補助",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 60.0
+      },
+      {
+        "skill": "回復魔法",
+        "min": 40.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 60.0,
+    "cost": {
+      "mp": 34.0
+    },
+    "castTime": "223",
+    "delay": "312",
+    "description": "耐無属性を大幅に上昇させる",
+    "range": "-",
+    "transfer": "",
+    "acquisition": "『オーバーロード』コラボ\n初出クエスト170905",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CA%E4%BD%F5",
+    "mp": 34.0,
+    "reagent": "NQ1"
+  },
+  {
+    "id": "magic-9892901ca5-fd06008035-70-40",
+    "name": "邪鬼封印",
+    "kind": "魔法",
+    "category": "複合魔法/補助",
+    "requirements": [
+      {
+        "skill": "神秘魔法",
+        "min": 70.0
+      },
+      {
+        "skill": "召喚魔法",
+        "min": 40.0
+      }
+    ],
+    "successSkill": "神秘魔法",
+    "successRequired": 70.0,
+    "cost": {
+      "mp": 40.0
+    },
+    "castTime": "300",
+    "delay": "600",
+    "description": "邪悪な魔物を五行の力で封印して動きを止める\n※ダメージで解除される\n※プレイヤーに使用できない",
+    "range": "21.5",
+    "transfer": "○",
+    "acquisition": "もえガチャ",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CA%E4%BD%F5",
+    "mp": 40.0,
+    "reagent": "NQ2"
+  },
+  {
+    "id": "magic-9892901ca5-1123b9a9c5-60-40",
+    "name": "酩酊",
+    "kind": "魔法",
+    "category": "複合魔法/補助",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 60.0
+      },
+      {
+        "skill": "酩酊",
+        "min": 40.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 60.0,
+    "cost": {
+      "mp": 34.0
+    },
+    "castTime": "223",
+    "delay": "312",
+    "description": "魔法で強化した酒を空気中に散布し、周囲の敵を昏睡状態にする\n※昏睡中は受けるダメージが少し増加する\n必要酩酊度 6",
+    "range": "12",
+    "transfer": "○",
+    "acquisition": "『ゴブリンスレイヤー』 コラボ\nもえガチャ\n初出220726",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CA%E4%BD%F5",
+    "mp": 34.0,
+    "reagent": "特殊"
+  },
+  {
+    "id": "magic-9892901ca5-d6ee38d4a2-80-50",
+    "name": "アクセラレイション",
+    "kind": "魔法",
+    "category": "複合魔法/補助",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 80.0
+      },
+      {
+        "skill": "神秘魔法",
+        "min": 50.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 80.0,
+    "cost": {
+      "mp": 46.0
+    },
+    "castTime": "259",
+    "delay": "356",
+    "description": "PTメンバーの反応速度を高めて 攻撃速度を上昇させる\n自分中心の範囲魔法(PTのみ)",
+    "range": "-",
+    "transfer": "○",
+    "acquisition": "錬金-第7弾\n錬金-第8弾\nトレジャー マップ ＜ イプス峡谷 特殊1 ＞",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CA%E4%BD%F5",
+    "mp": 46.0,
+    "reagent": "NQ3"
+  },
+  {
+    "id": "magic-9892901ca5-56a86f92a4-60-50",
+    "name": "アジリティ インプルーブ",
+    "kind": "魔法",
+    "category": "複合魔法/補助",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 60.0
+      },
+      {
+        "skill": "回復魔法",
+        "min": 50.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 60.0,
+    "cost": {
+      "mp": 34.0
+    },
+    "castTime": "243",
+    "delay": "332",
+    "description": "肉体を活性化させ 反応速度を高める\n※明日の筋肉痛に注意である\n※自分限定で回避・攻撃速度・移動速度を上昇させるが、効果中はSTが減り続ける",
+    "range": "-",
+    "transfer": "",
+    "acquisition": "クエスト報酬\n初出241119",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CA%E4%BD%F5",
+    "mp": 34.0,
+    "reagent": "NQ1"
+  },
+  {
+    "id": "magic-9892901ca5-ca42d2bcea-80-50",
+    "name": "エクスプロード ブレイド",
+    "kind": "魔法",
+    "category": "複合魔法/補助",
+    "requirements": [
+      {
+        "skill": "神秘魔法",
+        "min": 80.0
+      },
+      {
+        "skill": "薬調合",
+        "min": 50.0
+      }
+    ],
+    "successSkill": "神秘魔法",
+    "successRequired": 80.0,
+    "cost": {
+      "mp": 46.0
+    },
+    "castTime": "259",
+    "delay": "356",
+    "description": "攻撃と同時に対象を爆炎が包み込む",
+    "range": "-",
+    "transfer": "○",
+    "acquisition": "錬金-Light\n火竜神殿-宝箱",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CA%E4%BD%F5",
+    "mp": 46.0,
+    "reagent": "GEP1"
+  },
+  {
+    "id": "magic-9892901ca5-b8dc9ddede-50-50",
+    "name": "キーン エッジ",
+    "kind": "魔法",
+    "category": "複合魔法/補助",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 50.0
+      },
+      {
+        "skill": "魔法熟練",
+        "min": 50.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 50.0,
+    "cost": {
+      "mp": 28.0
+    },
+    "castTime": "225",
+    "delay": "310",
+    "description": "味方単体の武器の攻撃力を上昇させる補助魔法\n効果を受けた武器はうっすらと白い光を放ち、持続時間が長い",
+    "range": "",
+    "transfer": "×",
+    "acquisition": "『ログ・ホライズン 円卓崩壊』コラボ\n初出イベント報酬210727\n黒の廟堂クリア報酬",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CA%E4%BD%F5",
+    "mp": 28.0,
+    "reagent": "NP3"
+  },
+  {
+    "id": "magic-9892901ca5-8f310719ca-50-50",
+    "name": "ギャザリング ペット",
+    "kind": "魔法",
+    "category": "複合魔法/補助",
+    "requirements": [
+      {
+        "skill": "神秘魔法",
+        "min": 50.0
+      },
+      {
+        "skill": "調教",
+        "min": 50.0
+      }
+    ],
+    "successSkill": "神秘魔法",
+    "successRequired": 50.0,
+    "cost": {
+      "mp": 28.0
+    },
+    "castTime": "480",
+    "delay": "660",
+    "description": "遠く離れたペットを瞬時に自分の元へ呼び寄せる\n※一定以上離れていた場合は呼び寄せることができない",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n初出220913",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CA%E4%BD%F5",
+    "mp": 28.0,
+    "reagent": "NP3"
+  },
+  {
+    "id": "magic-9892901ca5-0665f0d8c9-70-50",
+    "name": "クイックサンド",
+    "kind": "魔法",
+    "category": "複合魔法/補助",
+    "requirements": [
+      {
+        "skill": "召喚魔法",
+        "min": 70.0
+      },
+      {
+        "skill": "自然調和",
+        "min": 50.0
+      }
+    ],
+    "successSkill": "召喚魔法",
+    "successRequired": 70.0,
+    "cost": {
+      "mp": 40.0
+    },
+    "castTime": "450",
+    "delay": "750",
+    "description": "砂地獄を足元に召喚する\n召喚枠に干渉",
+    "range": "-",
+    "transfer": "○",
+    "acquisition": "NPC販売(War奇跡)(※品)\n錬金-第7弾\n錬金-GENERATIONS",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CA%E4%BD%F5",
+    "mp": 40.0,
+    "reagent": "NQ2"
+  },
+  {
+    "id": "magic-9892901ca5-5c95df9437-70-50",
+    "name": "グループ クイックニング",
+    "kind": "魔法",
+    "category": "複合魔法/補助",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 70.0
+      },
+      {
+        "skill": "知能",
+        "min": 50.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 70.0,
+    "cost": {
+      "mp": 40.0
+    },
+    "castTime": "241",
+    "delay": "334",
+    "description": "PTメンバーの動体視力を強化し 回避率を上げる\n自分中心の範囲魔法(PTのみ)",
+    "range": "-",
+    "transfer": "○",
+    "acquisition": "錬金-Fancy\n火竜神殿-宝箱",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CA%E4%BD%F5",
+    "mp": 40.0,
+    "reagent": "NQ2"
+  },
+  {
+    "id": "magic-9892901ca5-e5e8493bfc-80-50",
+    "name": "グループ ブラッド ラッシュ",
+    "kind": "魔法",
+    "category": "複合魔法/補助",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 80.0
+      },
+      {
+        "skill": "知能",
+        "min": 50.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 80.0,
+    "cost": {
+      "mp": 46.0
+    },
+    "castTime": "279",
+    "delay": "376",
+    "description": "体内の血液を沸騰させ PTメンバーの最大HPを上げる\n自分中心の範囲魔法(PTのみ)",
+    "range": "-",
+    "transfer": "○",
+    "acquisition": "錬金-Fancy\n火竜神殿-宝箱",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CA%E4%BD%F5",
+    "mp": 46.0,
+    "reagent": "NQ3"
+  },
+  {
+    "id": "magic-9892901ca5-2b95f27ef2-80-50",
+    "name": "シー ウィークネス",
+    "kind": "魔法",
+    "category": "複合魔法/補助",
+    "requirements": [
+      {
+        "skill": "死の魔法",
+        "min": 80.0
+      },
+      {
+        "skill": "破壊魔法",
+        "min": 50.0
+      }
+    ],
+    "successSkill": "死の魔法",
+    "successRequired": 80.0,
+    "cost": {
+      "mp": 46.0
+    },
+    "castTime": "279",
+    "delay": "376",
+    "description": "周囲の敵の弱点を暴き、メイン攻撃を受けた時の被クリティカル率を上昇させる",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n初出190917",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CA%E4%BD%F5",
+    "mp": 46.0,
+    "reagent": "NQ3"
+  },
+  {
+    "id": "magic-9892901ca5-d8c7e82d8b-50-50",
+    "name": "スタグネイション",
+    "kind": "魔法",
+    "category": "複合魔法/補助",
+    "requirements": [
+      {
+        "skill": "死の魔法",
+        "min": 50.0
+      },
+      {
+        "skill": "神秘魔法",
+        "min": 50.0
+      }
+    ],
+    "successSkill": "死の魔法",
+    "successRequired": 50.0,
+    "cost": {
+      "mp": 28.0
+    },
+    "castTime": "225",
+    "delay": "310",
+    "description": "対象が感じる時間の流れを遅らせて 対象の行動や攻撃間隔を延ばす",
+    "range": "23.5",
+    "transfer": "○",
+    "acquisition": "錬金-Fancy",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CA%E4%BD%F5",
+    "mp": 28.0,
+    "reagent": "NP3"
+  },
+  {
+    "id": "magic-9892901ca5-6ee016916b-70-50",
+    "name": "ソーンバインド ホステージ",
+    "kind": "魔法",
+    "category": "複合魔法/補助",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 70.0
+      },
+      {
+        "skill": "神秘魔法",
+        "min": 50.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 70.0,
+    "cost": {
+      "mp": 40.0
+    },
+    "castTime": "250",
+    "delay": "1200",
+    "description": "茨のような輝きが対象にまとわりつく魔法\n茨は物理攻撃に反応して弾けて対象に追加ダメージを与える\n※個別ディレイ、魔法チャージ不可",
+    "range": "",
+    "transfer": "×",
+    "acquisition": "『ログ・ホライズン 円卓崩壊』コラボ\n初出イベント報酬210803\n黒の廟堂クリア報酬",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CA%E4%BD%F5",
+    "mp": 40.0,
+    "reagent": "NQ2"
+  },
+  {
+    "id": "magic-9892901ca5-00cb39c4c3-70-50",
+    "name": "パーフェクト・ウォリアー",
+    "kind": "魔法",
+    "category": "複合魔法/補助",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 70.0
+      },
+      {
+        "skill": "神秘魔法",
+        "min": 50.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 70.0,
+    "cost": {
+      "mp": 40.0
+    },
+    "castTime": "241",
+    "delay": "334",
+    "description": "攻撃力、命中、防御力が少し上昇する\nウォーリアー マスタリーが必要な技をマスタリー無しで発動できるが、魔法が使用できない\n※ジャンプで解除可能",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "『オーバーロード』コラボ\n初出クエスト170905",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CA%E4%BD%F5",
+    "mp": 40.0,
+    "reagent": "NQ2"
+  },
+  {
+    "id": "magic-9892901ca5-4950cce1a0-90-50",
+    "name": "マジック プロテクション",
+    "kind": "魔法",
+    "category": "複合魔法/補助",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "知能",
+        "min": 50.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 53.0
+    },
+    "castTime": "297",
+    "delay": "398",
+    "description": "PTメンバーの呪文抵抗力を少し上昇させる",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n181218",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CA%E4%BD%F5",
+    "mp": 53.0,
+    "reagent": "PNQ 1"
+  },
+  {
+    "id": "magic-9892901ca5-cd029cccc8-60-60",
+    "name": "エアリアル",
+    "kind": "魔法",
+    "category": "複合魔法/補助",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 60.0
+      },
+      {
+        "skill": "自然調和",
+        "min": 60.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 60.0,
+    "cost": {
+      "mp": 34.0
+    },
+    "castTime": "243",
+    "delay": "332",
+    "description": "風を身に纏い、攻撃力、防御力、移動速度、風属性の効果を上昇させる",
+    "range": "-",
+    "transfer": "○",
+    "acquisition": "『ダンまち?』コラボ\nもえガチャ\n初出240220",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CA%E4%BD%F5",
+    "mp": 34.0,
+    "reagent": ""
+  },
+  {
+    "id": "magic-9892901ca5-5fd703080d-80-60",
+    "name": "グレーター ハードニング",
+    "kind": "魔法",
+    "category": "複合魔法/補助",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 80.0
+      },
+      {
+        "skill": "魔法熟練",
+        "min": 60.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 80.0,
+    "cost": {
+      "mp": 46.0
+    },
+    "castTime": "259",
+    "delay": "356",
+    "description": "自分の防御力を大幅に上昇させる",
+    "range": "-",
+    "transfer": "○",
+    "acquisition": "『オーバーロード』コラボ\n初出もえガチャ170905\nテクガチャ",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CA%E4%BD%F5",
+    "mp": 46.0,
+    "reagent": "NQ3"
+  },
+  {
+    "id": "magic-9892901ca5-a9cd9b21aa-80-60",
+    "name": "コンシールメント マジック",
+    "kind": "魔法",
+    "category": "複合魔法/補助",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 80.0
+      },
+      {
+        "skill": "神秘魔法",
+        "min": 60.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 80.0,
+    "cost": {
+      "mp": 46.0
+    },
+    "castTime": "279",
+    "delay": "376",
+    "description": "周囲の味方の姿を数秒間の間だけ隠ぺいする",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "錬金の箱\n第2弾",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CA%E4%BD%F5",
+    "mp": 46.0,
+    "reagent": "NQ3"
+  },
+  {
+    "id": "magic-9892901ca5-5840bc39a3-60-60",
+    "name": "セルフ ブローバック",
+    "kind": "魔法",
+    "category": "複合魔法/補助",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 60.0
+      },
+      {
+        "skill": "攻撃回避",
+        "min": 60.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 60.0,
+    "cost": {
+      "mp": 34.0
+    },
+    "castTime": "243",
+    "delay": "332",
+    "description": "風の精霊に自分を後方に大きく吹き飛ばしてもらう\n発動に必要なBuff : エレメンタルナイト マスタリー",
+    "range": "-",
+    "transfer": "",
+    "acquisition": "クエスト報酬\n初出240820",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CA%E4%BD%F5",
+    "mp": 34.0,
+    "reagent": "NQ1"
+  },
+  {
+    "id": "magic-9892901ca5-383e7377f5-90-60",
+    "name": "ダークネス フォグ",
+    "kind": "魔法",
+    "category": "複合魔法/補助",
+    "requirements": [
+      {
+        "skill": "死の魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "召喚魔法",
+        "min": 60.0
+      }
+    ],
+    "successSkill": "死の魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 53.0
+    },
+    "castTime": "297",
+    "delay": "398",
+    "description": "暗黒の霧を召喚し、周囲の敵の攻撃力を低下させる\n※効果中は技や魔法による攻撃力上昇を打ち消す\n自分中心の範囲魔法",
+    "range": "-",
+    "transfer": "○",
+    "acquisition": "火竜神殿-宝箱\n錬金-第3.5弾\n錬金-第5弾\n練金-第5.5弾",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CA%E4%BD%F5",
+    "mp": 53.0,
+    "reagent": "PNQ1"
+  },
+  {
+    "id": "magic-9892901ca5-b156cf38c8-80-60",
+    "name": "ディスアピア スペル",
+    "kind": "魔法",
+    "category": "複合魔法/補助",
+    "requirements": [
+      {
+        "skill": "死の魔法",
+        "min": 80.0
+      },
+      {
+        "skill": "回復魔法",
+        "min": 60.0
+      }
+    ],
+    "successSkill": "死の魔法",
+    "successRequired": 80.0,
+    "cost": {
+      "mp": 46.0
+    },
+    "castTime": "259",
+    "delay": "356",
+    "description": "光と闇の相反する力で自分にかかっているBUFF/DEBUFFが消失、一定時間無効化する\n※解除不可の効果を除く\n※ジャンプで解除可能",
+    "range": "-",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n初出241001",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CA%E4%BD%F5",
+    "mp": 46.0,
+    "reagent": "NQ3"
+  },
+  {
+    "id": "magic-9892901ca5-bee2d59e5f-90-60",
+    "name": "神の王冠",
+    "kind": "魔法",
+    "category": "複合魔法/補助",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "回復魔法",
+        "min": 60.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 53.0
+    },
+    "castTime": "297",
+    "delay": "398",
+    "description": "自分以外のキャラクターの全属性耐性を50％上昇させる",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "『FAIRY TAIL』コラボ\nもえガチャ\n初出190212",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CA%E4%BD%F5",
+    "mp": 53.0,
+    "reagent": "PNQ1"
+  },
+  {
+    "id": "magic-9892901ca5-d47ff7adfb-90-60",
+    "name": "神の騎士",
+    "kind": "魔法",
+    "category": "複合魔法/補助",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "神秘魔法",
+        "min": 60.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 53.0
+    },
+    "castTime": "297",
+    "delay": "398",
+    "description": "自分以外のキャラクターの身体能力(攻撃、命中、回避、防御)を10％上昇させる",
+    "range": "24.8",
+    "transfer": "○",
+    "acquisition": "『FAIRY TAIL』コラボ\nもえガチャ\n初出190212",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CA%E4%BD%F5",
+    "mp": 53.0,
+    "reagent": "PNQ1"
+  },
+  {
+    "id": "magic-9892901ca5-27524ccadd-70-70",
+    "name": "エリクシール",
+    "kind": "魔法",
+    "category": "複合魔法/補助",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 70.0
+      },
+      {
+        "skill": "魔法熟練",
+        "min": 70.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 70.0,
+    "cost": {
+      "mp": 40.0
+    },
+    "castTime": "241",
+    "delay": "334",
+    "description": "回復魔法の効果を上昇させる魔法",
+    "range": "24.8",
+    "transfer": "○",
+    "acquisition": "『ログ・ホライズン 円卓崩壊』コラボ\n初出もえガチャ210720",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CA%E4%BD%F5",
+    "mp": 40.0,
+    "reagent": "NQ2"
+  },
+  {
+    "id": "magic-9892901ca5-6ff6181354-80-70",
+    "name": "エレメンタル ブレイク",
+    "kind": "魔法",
+    "category": "複合魔法/補助",
+    "requirements": [
+      {
+        "skill": "死の魔法",
+        "min": 80.0
+      },
+      {
+        "skill": "魔法熟練",
+        "min": 70.0
+      }
+    ],
+    "successSkill": "死の魔法",
+    "successRequired": 80.0,
+    "cost": {
+      "mp": 46.0
+    },
+    "castTime": "259",
+    "delay": "356",
+    "description": "闇の力により魔法耐久度を低下させる",
+    "range": "22.5",
+    "transfer": "○",
+    "acquisition": "ミスト エレメンタル\nレイン エレメンタル\n錬金-第2弾",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CA%E4%BD%F5",
+    "mp": 46.0,
+    "reagent": "NQ3"
+  },
+  {
+    "id": "magic-9892901ca5-6e896bbba5-70",
+    "name": "カラミティ フォース",
+    "kind": "魔法",
+    "category": "複合魔法/補助",
+    "requirements": [
+      {
+        "skill": "死の魔法",
+        "min": 70.0
+      }
+    ],
+    "successSkill": "死の魔法",
+    "successRequired": 70.0,
+    "cost": {
+      "mp": 40.0
+    },
+    "castTime": "241",
+    "delay": "334",
+    "description": "暗黒の力を武器に纏わせて攻撃力と攻撃速度を増加させる\n発動に必要なBuff : イビルナイト マスタリー",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n初出221011",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CA%E4%BD%F5",
+    "mp": 40.0,
+    "reagent": "NQ2"
+  },
+  {
+    "id": "magic-9892901ca5-ba97fd6d32-80-70",
+    "name": "スピリチュアル ボディ",
+    "kind": "魔法",
+    "category": "複合魔法/補助",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 80.0
+      },
+      {
+        "skill": "神秘魔法",
+        "min": 70.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 80.0,
+    "cost": {
+      "mp": 46.0
+    },
+    "castTime": "259",
+    "delay": "356",
+    "description": "神秘の力で自分の身体を覆い、対象に与えたダメージの一部をSTに変換して吸収する",
+    "range": "",
+    "transfer": "",
+    "acquisition": "錬金の箱\n初出200428",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CA%E4%BD%F5",
+    "mp": 46.0,
+    "reagent": "NQ3"
+  },
+  {
+    "id": "magic-9892901ca5-3e1b4879db-90-70",
+    "name": "デボーテッド エイド",
+    "kind": "魔法",
+    "category": "複合魔法/補助",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "魔法熟練",
+        "min": 70.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 53.0
+    },
+    "castTime": "277",
+    "delay": "378",
+    "description": "自分以外の対象の身体能力を少しの間だけ大幅に引き上げる",
+    "range": "10.8?",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n161101",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CA%E4%BD%F5",
+    "mp": 53.0,
+    "reagent": "PNQ1"
+  },
+  {
+    "id": "magic-9892901ca5-345ccc6376-90-70",
+    "name": "ブラッティ ブレイド",
+    "kind": "魔法",
+    "category": "複合魔法/補助",
+    "requirements": [
+      {
+        "skill": "死の魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "牙",
+        "min": 70.0
+      }
+    ],
+    "successSkill": "死の魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 53.0
+    },
+    "castTime": "297",
+    "delay": "398",
+    "description": "武器に闇の力を宿らせ 対象の体力を奪う魔剣に変える\n※両手剣によるメイン攻撃にのみ効果がある",
+    "range": "-",
+    "transfer": "○",
+    "acquisition": "錬金-第4弾\n練金-第5.5弾\n錬金-第8弾\nトレジャー マップ ＜ イプス峡谷 特殊1 ＞",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CA%E4%BD%F5",
+    "mp": 53.0,
+    "reagent": "PNQ1"
+  },
+  {
+    "id": "magic-9892901ca5-a52f70f111-70-70",
+    "name": "プロモーション・クイーン",
+    "kind": "魔法",
+    "category": "複合魔法/補助",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 70.0
+      },
+      {
+        "skill": "物まね",
+        "min": 70.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 70.0,
+    "cost": {
+      "mp": 40.0
+    },
+    "castTime": "241",
+    "delay": "334",
+    "description": "一時的に女王の力を得ることで攻撃力、魔力、回避、防御力、移動速度が上昇する\n※他のプロモーション効果と重複しない",
+    "range": "-",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n(D×Dコラボ)\n初出230214",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CA%E4%BD%F5",
+    "mp": 40.0,
+    "reagent": "NQ2"
+  },
+  {
+    "id": "magic-9892901ca5-ffae8092a8-70-70",
+    "name": "リインフォース",
+    "kind": "魔法",
+    "category": "複合魔法/補助",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 70.0
+      },
+      {
+        "skill": "暗黒命令",
+        "min": 70.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 70.0,
+    "cost": {
+      "mp": 40.0
+    },
+    "castTime": "241",
+    "delay": "334",
+    "description": "力を求め、内なる闇を開放し、一時的に身体能力を強化できるか、力の反動でSTとMPの消費量が増加する",
+    "range": "-",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n初出240716",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CA%E4%BD%F5",
+    "mp": 40.0,
+    "reagent": "NQ2"
+  },
+  {
+    "id": "magic-9892901ca5-e593373c69-70-70",
+    "name": "擬竜",
+    "kind": "魔法",
+    "category": "複合魔法/補助",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 70.0
+      },
+      {
+        "skill": "筋力",
+        "min": 70.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 70.0,
+    "cost": {
+      "mp": 40.0
+    },
+    "castTime": "241",
+    "delay": "334",
+    "description": "肉体が一回り大きくなるほど筋肉が盛り上がり、膂力などが増強される\n※キャラサイズ、攻撃力、与えるダメージが10％程度増加する",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "『ゴブリンスレイヤー』 コラボ\nもえガチャ\n初出220802",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CA%E4%BD%F5",
+    "mp": 40.0,
+    "reagent": "NQ2"
+  },
+  {
+    "id": "magic-9892901ca5-be3ff45848-80-80",
+    "name": "ウルティメイト マナ",
+    "kind": "魔法",
+    "category": "複合魔法/補助",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 80.0
+      },
+      {
+        "skill": "回復魔法",
+        "min": 80.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 80.0,
+    "cost": {
+      "mp": 46.0
+    },
+    "castTime": "279",
+    "delay": "376",
+    "description": "一定時間 最大MPとMP自然回復量が大幅に上昇する",
+    "range": "25.0",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n初出260428",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CA%E4%BD%F5",
+    "mp": 46.0,
+    "reagent": "NQ3"
+  },
+  {
+    "id": "magic-9892901ca5-0480978041-80",
+    "name": "エレメント シールド",
+    "kind": "魔法",
+    "category": "複合魔法/補助",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 80.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 80.0,
+    "cost": {
+      "mp": 46.0
+    },
+    "castTime": "259",
+    "delay": "356",
+    "description": "魔法攻撃を効果時間中、5回まで半減する\n発動に必要なBuff : エレメンタルナイト マスタリー",
+    "range": "",
+    "transfer": "",
+    "acquisition": "クエスト報酬\n初出240820",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CA%E4%BD%F5",
+    "mp": 46.0,
+    "reagent": "NQ3"
+  },
+  {
+    "id": "magic-9892901ca5-d509552f2a-80",
+    "name": "ナイト オブ カース",
+    "kind": "魔法",
+    "category": "複合魔法/補助",
+    "requirements": [
+      {
+        "skill": "召喚魔法",
+        "min": 80.0
+      }
+    ],
+    "successSkill": "召喚魔法",
+    "successRequired": 80.0,
+    "cost": {
+      "mp": 46.0
+    },
+    "castTime": "279",
+    "delay": "376",
+    "description": "アンデットを闇の力で 夜の間だけ強化することができる\n※夜以外の時間帯では能力が大幅に低下してしまう\n発動に必要なBuff : ネクロマンサー マスタリー",
+    "range": "23.5",
+    "transfer": "○",
+    "acquisition": "錬金-第9弾\n火竜神殿-宝箱",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CA%E4%BD%F5",
+    "mp": 46.0,
+    "reagent": "NQ3"
+  },
+  {
+    "id": "magic-9892901ca5-d13ecd695a-80",
+    "name": "フォース シールド",
+    "kind": "魔法",
+    "category": "複合魔法/補助",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 80.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 80.0,
+    "cost": {
+      "mp": 46.0
+    },
+    "castTime": "259",
+    "delay": "356",
+    "description": "物理攻撃を効果時間中、5回まで半減する\n発動に必要なBuff : エレメンタルナイト マスタリー",
+    "range": "",
+    "transfer": "",
+    "acquisition": "クエスト報酬\n初出240820",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CA%E4%BD%F5",
+    "mp": 46.0,
+    "reagent": "NQ3"
+  },
+  {
+    "id": "magic-9892901ca5-f81b451abe-80-80",
+    "name": "プリズム エフェクト",
+    "kind": "魔法",
+    "category": "複合魔法/補助",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 80.0
+      },
+      {
+        "skill": "神秘魔法",
+        "min": 80.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 80.0,
+    "cost": {
+      "mp": 39.0
+    },
+    "castTime": "279",
+    "delay": "376",
+    "description": "七色に輝くオーラを纏うことで7種類のステータスが少し上昇する",
+    "range": "18.5",
+    "transfer": "○",
+    "acquisition": "お試しガチャ(150825)\nテクガチャ",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CA%E4%BD%F5",
+    "mp": 39.0,
+    "reagent": "NQ3"
+  },
+  {
+    "id": "magic-9892901ca5-adad8e4364-90-80",
+    "name": "リアクティブ アーマー",
+    "kind": "魔法",
+    "category": "複合魔法/補助",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "神秘魔法",
+        "min": 80.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 53.0
+    },
+    "castTime": "297",
+    "delay": "398",
+    "description": "一定時間、直接攻撃で受けるダメージを25%軽減し、その軽減したダメージを攻撃者へ反撃する\n※5回ダメージを受けると効果が解除される",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n初出260616",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CA%E4%BD%F5",
+    "mp": 53.0,
+    "reagent": "PNQ1"
+  },
+  {
+    "id": "magic-9892901ca5-008956a475-90-80",
+    "name": "リバース ヒール",
+    "kind": "魔法",
+    "category": "複合魔法/補助",
+    "requirements": [
+      {
+        "skill": "回復魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "神秘魔法",
+        "min": 80.0
+      }
+    ],
+    "successSkill": "回復魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 51.0
+    },
+    "castTime": "297",
+    "delay": "499",
+    "description": "一定時間、自分が受けたダメージと同じ値だけHPを回復する\n※3回ダメージを受けると効果が解除される",
+    "range": "20.8",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n初出260616",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CA%E4%BD%F5",
+    "mp": 51.0,
+    "reagent": "PNQ1"
+  },
+  {
+    "id": "magic-9892901ca5-2204c80175-90-90",
+    "name": "アクムレイト マナ",
+    "kind": "魔法",
+    "category": "複合魔法/補助",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "素手",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 30.0
+    },
+    "castTime": "750",
+    "delay": "1200",
+    "description": "拳にマナを集中させて 一時的に攻撃力を高める\n最大(4段階)までマナを溜めることで 強力な一撃を発動することができる",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "錬金-第7弾\n錬金-第8弾\nトレジャー マップ ＜ イプス峡谷 特殊1 ＞",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CA%E4%BD%F5",
+    "mp": 30.0,
+    "reagent": "PNQ1"
+  },
+  {
+    "id": "magic-9892901ca5-1c312b137a-90-90",
+    "name": "インフィニティ フォース",
+    "kind": "魔法",
+    "category": "複合魔法/補助",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "魔法熟練",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 53.0
+    },
+    "castTime": "250",
+    "delay": "2400",
+    "description": "味方1人の能力リミッターを解除し、全体的なステータスアップとSTを無制限に使用できる状態にする魔法\nしかし反動で効果が切れる際にSTを全て失う\n※個別ディレイ、魔法チャージ不可",
+    "range": "24.8",
+    "transfer": "○",
+    "acquisition": "『ログ・ホライズン 円卓崩壊』コラボ\n初出もえガチャ210720",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CA%E4%BD%F5",
+    "mp": 53.0,
+    "reagent": "PNQ1"
+  },
+  {
+    "id": "magic-9892901ca5-50ae851550-90-90",
+    "name": "ウチデノコヅチ",
+    "kind": "魔法",
+    "category": "複合魔法/補助",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "神秘魔法",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 80.0
+    },
+    "castTime": "450",
+    "delay": "36000",
+    "description": "自分以外のPTメンバーの攻撃力、命中、回避、防御力、魔力を15%引き上げる\n※個別ディレイ、魔法チャージ不可",
+    "range": "半径\n22.0",
+    "transfer": "○",
+    "acquisition": "『 ダンまち?』コラボ\nもえガチャ\n初出240213",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CA%E4%BD%F5",
+    "mp": 80.0,
+    "reagent": "PNQ3"
+  },
+  {
+    "id": "magic-9892901ca5-55a44de2d0-90",
+    "name": "エレメンタル インクリース",
+    "kind": "魔法",
+    "category": "複合魔法/補助",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 53.0
+    },
+    "castTime": "297",
+    "delay": "398",
+    "description": "精霊の力を増幅させて呪文抵抗力を約50％上昇させる補助魔法\n発動に必要なBuff : 紺碧の賢者 マスタリー",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n初出220607",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CA%E4%BD%F5",
+    "mp": 53.0,
+    "reagent": "PNQ1"
+  },
+  {
+    "id": "magic-9892901ca5-9a615df508-90-90",
+    "name": "グレーター フルポテンシャル",
+    "kind": "魔法",
+    "category": "複合魔法/補助",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "回復魔法",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 53.0
+    },
+    "castTime": "277",
+    "delay": "378",
+    "description": "自身の身体能力を上昇させる",
+    "range": "-",
+    "transfer": "○",
+    "acquisition": "『オーバーロード』コラボ\n初出もえガチャ170905\nテクガチャ",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CA%E4%BD%F5",
+    "mp": 53.0,
+    "reagent": "PNQ1"
+  },
+  {
+    "id": "magic-9892901ca5-4b7559012c-90-90-90",
+    "name": "トリニティ エンハンス",
+    "kind": "魔法",
+    "category": "複合魔法/補助",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "神秘魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "回復魔法",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 53.0
+    },
+    "castTime": "297",
+    "delay": "398",
+    "description": "強化・神秘・回復魔法の同時発動で、攻撃力が20%上昇、攻撃ディレイが20%短縮、与えたダメージの20%分のHPを回復する",
+    "range": "25.5",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n初出250819",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CA%E4%BD%F5",
+    "mp": 53.0,
+    "reagent": "PNQ1"
+  },
+  {
+    "id": "magic-9892901ca5-a358ecbae4-90",
+    "name": "ブラッド カーニバル",
+    "kind": "魔法",
+    "category": "複合魔法/補助",
+    "requirements": [
+      {
+        "skill": "死の魔法",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "死の魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 120.0
+    },
+    "castTime": "297",
+    "delay": "499",
+    "description": "効果時間内に近接両手武器によるアタックで敵に特大ダメージを与える\n※効果中は命中が上昇して、アタックのディレイが短縮される\n発動に必要なBuff : イビルナイト マスタリー",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n初出260127",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CA%E4%BD%F5",
+    "mp": 120.0,
+    "reagent": "PNQ1"
+  },
+  {
+    "id": "magic-9892901ca5-df4744c0c0-90",
+    "name": "マルチプル エンハンス",
+    "kind": "魔法",
+    "category": "複合魔法/補助",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 53.0
+    },
+    "castTime": "297",
+    "delay": "398",
+    "description": "味方の攻撃力、命中、回避、防御、最大スタミナを同時に約10％上昇させる補助魔法\n※自分には使用できません。\n発動に必要なBuff : アルケミストマスタリー or 錬金術師",
+    "range": "24.5",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n初出220517",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CA%E4%BD%F5",
+    "mp": 53.0,
+    "reagent": "PNQ1"
+  },
+  {
+    "id": "magic-9892901ca5-604a506aff-90-90-90-90-90-90",
+    "name": "究極巨神タイターン",
+    "kind": "魔法",
+    "category": "複合魔法/補助",
+    "requirements": [
+      {
+        "skill": "パフォーマンス",
+        "min": 90.0
+      },
+      {
+        "skill": "着こなし",
+        "min": 90.0
+      },
+      {
+        "skill": "攻撃回避",
+        "min": 90.0
+      },
+      {
+        "skill": "物まね",
+        "min": 90.0
+      },
+      {
+        "skill": "装飾細工",
+        "min": 90.0
+      },
+      {
+        "skill": "裁縫",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "パフォーマンス",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 5.0
+    },
+    "castTime": "300",
+    "delay": "1500",
+    "description": "真のヒーローのみが呼び出すことができるロボット\nタイターンを操り 悪を討て！",
+    "range": "-",
+    "transfer": "○",
+    "acquisition": "錬金-第8弾",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CA%E4%BD%F5",
+    "mp": 5.0,
+    "reagent": "PNQ10"
+  },
+  {
+    "id": "magic-bf15a92c52-ec7594bc2d-70-70-10",
+    "name": "聖壁",
+    "kind": "魔法",
+    "category": "複合魔法/防御",
+    "requirements": [
+      {
+        "skill": "回復魔法",
+        "min": 70.0
+      },
+      {
+        "skill": "神秘魔法",
+        "min": 70.0
+      },
+      {
+        "skill": "死の魔法",
+        "min": 10.0
+      }
+    ],
+    "successSkill": "回復魔法",
+    "successRequired": 70.0,
+    "cost": {
+      "mp": 40.0
+    },
+    "castTime": "300",
+    "delay": "2500",
+    "description": "聖なる光の壁を展開して一定値までダメージを無効化する\n※個別ディレイ、魔法チャージ不可\n※味方プレイヤーに対してのみ使用可能",
+    "range": "10.5",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n(ゴブスレコラボ)\n初出220719",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CB%C9%B8%E6",
+    "mp": 40.0,
+    "reagent": "NQ2"
+  },
+  {
+    "id": "magic-bf15a92c52-61fe0c7a45-80-30",
+    "name": "セイクリッド ウォール",
+    "kind": "魔法",
+    "category": "複合魔法/防御",
+    "requirements": [
+      {
+        "skill": "神秘魔法",
+        "min": 80.0
+      },
+      {
+        "skill": "召喚魔法",
+        "min": 30.0
+      }
+    ],
+    "successSkill": "神秘魔法",
+    "successRequired": 80.0,
+    "cost": {
+      "mp": 100.0
+    },
+    "castTime": "259",
+    "delay": "356",
+    "description": "光の防護壁を自分の周囲に召喚して、物理ダメージを軽減する\n※効果中は移動速度が低下する",
+    "range": "-",
+    "transfer": "○",
+    "acquisition": "錬金-第5弾\n練金-第5.5弾\n錬金-第6弾\nトレジャー マップ ＜ イプス峡谷 特殊1 ＞",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CB%C9%B8%E6",
+    "mp": 100.0,
+    "reagent": "PNQ1"
+  },
+  {
+    "id": "magic-bf15a92c52-7d418b1706-30",
+    "name": "星屑のベール",
+    "kind": "魔法",
+    "category": "複合魔法/防御",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 30.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 30.0,
+    "cost": {
+      "mp": 18.0
+    },
+    "castTime": "189",
+    "delay": "266",
+    "description": "無数の星屑が対象の周囲を囲み物理ダメージを20％軽減する\n発動に必要なBuff : 星のお守り",
+    "range": "24.8",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n181023",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CB%C9%B8%E6",
+    "mp": 18.0,
+    "reagent": "NP1"
+  },
+  {
+    "id": "magic-bf15a92c52-04bd4a3dd1-30",
+    "name": "身代符",
+    "kind": "魔法",
+    "category": "複合魔法/防御",
+    "requirements": [
+      {
+        "skill": "魔法熟練",
+        "min": 30.0
+      }
+    ],
+    "successSkill": "魔法熟練",
+    "successRequired": 30.0,
+    "cost": {
+      "mp": 18.0
+    },
+    "castTime": "250",
+    "delay": "350",
+    "description": "護符の効果で1度だけダメージを大幅に軽減できる\n発動に必要なBuff :\n護符の力",
+    "range": "",
+    "transfer": "",
+    "acquisition": "もえガチャ(前提装備)\n初出260113",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CB%C9%B8%E6",
+    "mp": 18.0,
+    "reagent": "PD1"
+  },
+  {
+    "id": "magic-bf15a92c52-8244ba1cc0-90-40",
+    "name": "アイス リフレクション",
+    "kind": "魔法",
+    "category": "複合魔法/防御",
+    "requirements": [
+      {
+        "skill": "神秘魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "呪文抵抗力",
+        "min": 40.0
+      }
+    ],
+    "successSkill": "神秘魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 53.0
+    },
+    "castTime": "277",
+    "delay": "378",
+    "description": "水属性の魔法を跳ね返す特殊な結界を張ることが出来る",
+    "range": "-",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n161213",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CB%C9%B8%E6",
+    "mp": 53.0,
+    "reagent": "PNQ1"
+  },
+  {
+    "id": "magic-bf15a92c52-8fb4260c95-90-40",
+    "name": "アース リフレクション",
+    "kind": "魔法",
+    "category": "複合魔法/防御",
+    "requirements": [
+      {
+        "skill": "神秘魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "呪文抵抗力",
+        "min": 40.0
+      }
+    ],
+    "successSkill": "神秘魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 53.0
+    },
+    "castTime": "277",
+    "delay": "378",
+    "description": "地属性の魔法を跳ね返す特殊な結界を張ることが出来る",
+    "range": "-",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n170124",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CB%C9%B8%E6",
+    "mp": 53.0,
+    "reagent": "PNQ1"
+  },
+  {
+    "id": "magic-bf15a92c52-bce765ae9e-90-40",
+    "name": "サンダー リフレクション",
+    "kind": "魔法",
+    "category": "複合魔法/防御",
+    "requirements": [
+      {
+        "skill": "神秘魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "呪文抵抗力",
+        "min": 40.0
+      }
+    ],
+    "successSkill": "神秘魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 53.0
+    },
+    "castTime": "277",
+    "delay": "378",
+    "description": "風属性の魔法を跳ね返す特殊な結界を張ることが出来る",
+    "range": "-",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n170124",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CB%C9%B8%E6",
+    "mp": 53.0,
+    "reagent": "PNQ1"
+  },
+  {
+    "id": "magic-bf15a92c52-737cde5906-90-40",
+    "name": "ファイアー リフレクション",
+    "kind": "魔法",
+    "category": "複合魔法/防御",
+    "requirements": [
+      {
+        "skill": "神秘魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "呪文抵抗力",
+        "min": 40.0
+      }
+    ],
+    "successSkill": "神秘魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 53.0
+    },
+    "castTime": "277",
+    "delay": "378",
+    "description": "火属性の魔法を跳ね返す特殊な結界を張ることが出来る",
+    "range": "-",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n161213",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CB%C9%B8%E6",
+    "mp": 53.0,
+    "reagent": "PNQ1"
+  },
+  {
+    "id": "magic-bf15a92c52-cae2959df3-80-50",
+    "name": "グレーター マジックシールド",
+    "kind": "魔法",
+    "category": "複合魔法/防御",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 80.0
+      },
+      {
+        "skill": "神秘魔法",
+        "min": 50.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 80.0,
+    "cost": {
+      "mp": 46.0
+    },
+    "castTime": "259",
+    "delay": "356",
+    "description": "数秒間、対象が受ける魔法を無効化する",
+    "range": "24.8",
+    "transfer": "○",
+    "acquisition": "『オーバーロード』コラボ\n初出もえガチャ170905\nテクガチャ",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CB%C9%B8%E6",
+    "mp": 46.0,
+    "reagent": "NQ3"
+  },
+  {
+    "id": "magic-bf15a92c52-19d43ee6a2-50-50",
+    "name": "セーフティ ソウル",
+    "kind": "魔法",
+    "category": "複合魔法/防御",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 50.0
+      },
+      {
+        "skill": "回復魔法",
+        "min": 50.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 50.0,
+    "cost": {
+      "mp": 28.0
+    },
+    "castTime": "225",
+    "delay": "310",
+    "description": "死体を防御魔法で保護することで蘇生時の事故を未然に防ぐ\n※行動でキャンセル",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "錬金の箱\n第2弾",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CB%C9%B8%E6",
+    "mp": 28.0,
+    "reagent": "NP3"
+  },
+  {
+    "id": "magic-bf15a92c52-db310ad957-90-60",
+    "name": "プロテクト ウォール",
+    "kind": "魔法",
+    "category": "複合魔法/防御",
+    "requirements": [
+      {
+        "skill": "召喚魔法",
+        "min": 90.0
+      },
+      {
+        "skill": "回復魔法",
+        "min": 60.0
+      }
+    ],
+    "successSkill": "召喚魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 53.0
+    },
+    "castTime": "277",
+    "delay": "577",
+    "description": "自分の周りに光の壁を召喚し、敵を退ける\n※発動中に攻撃を行うと解除されます\n自分中心の範囲魔法・ノックバック",
+    "range": "-",
+    "transfer": "○",
+    "acquisition": "ミスト ワンダラー\n錬金-第2弾",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CB%C9%B8%E6",
+    "mp": 53.0,
+    "reagent": "-"
+  },
+  {
+    "id": "magic-bf15a92c52-40c6c8dbf3-70-70",
+    "name": "マルチプル バリア",
+    "kind": "魔法",
+    "category": "複合魔法/防御",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 70.0
+      },
+      {
+        "skill": "神秘魔法",
+        "min": 70.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 70.0,
+    "cost": {
+      "mp": 40.0
+    },
+    "castTime": "241",
+    "delay": "334",
+    "description": "多重障壁を展開して5回まで物理ダメージと魔法ダメージを半減させる",
+    "range": "-",
+    "transfer": "○",
+    "acquisition": "錬金の箱\n第2弾",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CB%C9%B8%E6",
+    "mp": 40.0,
+    "reagent": "NQ2"
+  },
+  {
+    "id": "magic-bf15a92c52-d5b331ac62-70-70",
+    "name": "光の障壁",
+    "kind": "魔法",
+    "category": "複合魔法/防御",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 70.0
+      },
+      {
+        "skill": "神秘魔法",
+        "min": 70.0
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 70.0,
+    "cost": {
+      "mp": 40.0
+    },
+    "castTime": "241",
+    "delay": "334",
+    "description": "対象を覆う光が20未満のダメージを無効化する\n※20以上のダメージを受けると解除される",
+    "range": "",
+    "transfer": "○",
+    "acquisition": "もえガチャ\n初出220208",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CB%C9%B8%E6",
+    "mp": 40.0,
+    "reagent": "NQ2"
+  },
+  {
+    "id": "magic-bf15a92c52-0bcc633cde-80-80",
+    "name": "ディバイン プルーミッジ",
+    "kind": "魔法",
+    "category": "複合魔法/防御",
+    "requirements": [
+      {
+        "skill": "回復魔法",
+        "min": 80.0
+      },
+      {
+        "skill": "神秘魔法",
+        "min": 80.0
+      }
+    ],
+    "successSkill": "回復魔法",
+    "successRequired": 80.0,
+    "cost": {
+      "mp": 46.0
+    },
+    "castTime": "259",
+    "delay": "356",
+    "description": "光の羽衣を纏い さまざまな負の効果から身を守る",
+    "range": "24.8",
+    "transfer": "○",
+    "acquisition": "NPC販売(War奇跡)(※品)\n錬金-第7弾\n錬金-第8弾\nトレジャー マップ ＜ イプス峡谷 特殊1 ＞",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CB%C9%B8%E6",
+    "mp": 46.0,
+    "reagent": "NQ3"
+  },
+  {
+    "id": "magic-bf15a92c52-6518167314-90",
+    "name": "シャイニング フォース",
+    "kind": "魔法",
+    "category": "複合魔法/防御",
+    "requirements": [
+      {
+        "skill": "神秘魔法",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "神秘魔法",
+    "successRequired": 90.0,
+    "cost": {
+      "mp": 53.0
+    },
+    "castTime": "277",
+    "delay": "999",
+    "description": "聖なる光のオーラを纏い ダメージを軽減する\n発動に必要なBuff : テンプルナイト マスタリー",
+    "range": "-",
+    "transfer": "○",
+    "acquisition": "錬金-第8弾\n錬金-Fancy\n錬金-Light",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%CB%E2%CB%A1%29/%CA%A3%B9%E7/%CB%C9%B8%E6",
+    "mp": 53.0,
+    "reagent": "PNQ1"
   }
 ];
   window.MOE_SKILL_SIM_KNOWLEDGE = {masteries, techniques, magic, source: {
@@ -26192,6 +37993,21 @@
     "銃器": 10,
     "音楽": 9,
     "魔法熟練": 10
+  },
+  "masteryBuffHandling": "v1.21.0: active masteries use buff slots via state.other; numeric effects are not inferred",
+  "magic": "MoERead 熟練(魔法) 表内魔法",
+  "magicCategories": {
+    "神秘魔法": 20,
+    "強化魔法": 22,
+    "回復魔法": 21,
+    "破壊魔法": 23,
+    "複合魔法/召喚": 62,
+    "複合魔法/回復": 30,
+    "複合魔法/補助": 64,
+    "複合魔法/防御": 15,
+    "複合魔法/攻撃": 92,
+    "死の魔法": 21,
+    "召喚魔法": 24
   }
 }};
 })();
