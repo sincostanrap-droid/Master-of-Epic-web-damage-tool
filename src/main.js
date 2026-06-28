@@ -1063,12 +1063,44 @@ function skillKnowledgeEvaluateRequirement(req) {
   return {skill, current, min, max, ok, shortage};
 }
 
+function skillKnowledgeMasteryTierInfo(item) {
+  const tiers = Array.isArray(item.tiers) ? item.tiers.slice().sort((a,b) => (+a.min || 0) - (+b.min || 0)) : [];
+  if (!tiers.length) return null;
+
+  const reqSkills = (item.requirements || []).map(r => r.skill || r.name).filter(Boolean);
+  const achieved = tiers.filter(tier =>
+    reqSkills.every(skill => skillKnowledgeCurrentValue(skill) >= (+tier.min || 0))
+  ).slice(-1)[0] || null;
+
+  const next = tiers.find(tier =>
+    !reqSkills.every(skill => skillKnowledgeCurrentValue(skill) >= (+tier.min || 0))
+  ) || null;
+
+  let nextShortage = 0;
+  let nextEvaluated = [];
+  if (next) {
+    nextEvaluated = reqSkills.map(skill => {
+      const current = skillKnowledgeCurrentValue(skill);
+      const min = +next.min || 0;
+      return {skill, current, min, shortage: Math.max(0, min - current), ok: current >= min};
+    });
+    nextShortage = nextEvaluated.reduce((s, r) => s + r.shortage, 0);
+  }
+
+  return {tiers, achieved, next, nextShortage, nextEvaluated};
+}
+
 function skillKnowledgeEvaluate(item) {
   const reqs = Array.isArray(item.requirements) ? item.requirements : [];
   const evaluated = reqs.map(skillKnowledgeEvaluateRequirement);
   const missing = evaluated.filter(r => !r.ok);
   const totalShortage = missing.reduce((s, r) => s + (+r.shortage || 0), 0);
-  const available = missing.length === 0;
+  let available = missing.length === 0;
+
+  const tierInfo = skillKnowledgeMasteryTierInfo(item);
+  if (tierInfo) {
+    available = !!tierInfo.achieved;
+  }
 
   let success = null;
   if (item.successSkill || item.successRequired) {
@@ -1079,8 +1111,10 @@ function skillKnowledgeEvaluate(item) {
     success = {skill, current, required, rate, estimated:true};
   }
 
-  const status = available ? "available" : (totalShortage <= 10 ? "near" : "missing");
-  return {item, evaluated, missing, totalShortage, available, success, status};
+  let status = available ? "available" : (totalShortage <= 10 ? "near" : "missing");
+  if (tierInfo && !tierInfo.achieved && tierInfo.nextShortage <= 10) status = "near";
+
+  return {item, evaluated, missing, totalShortage, available, success, status, tierInfo};
 }
 
 function skillKnowledgeCategories() {
@@ -1160,10 +1194,27 @@ function skillKnowledgeItemHtml(ev, type) {
     ? `<div class="skillKnowledgeSuccess">成功率${ev.success.estimated ? "（推定）" : ""}: ${fmt(ev.success.rate, 1)}% <span class="mutedText">(${escapeHtml(ev.success.skill)} ${fmt(ev.success.current, 1)}/${fmt(ev.success.required, 1)})</span></div>`
     : "";
 
+  const tierInfo = ev.tierInfo;
+  let tierHtml = "";
+  if (tierInfo) {
+    if (tierInfo.achieved) {
+      const nextText = tierInfo.next
+        ? ` / 次: ${escapeHtml(tierInfo.next.name || "")} まで ${fmt(tierInfo.nextShortage, 1)}`
+        : " / 最高ランク";
+      tierHtml = `<div class="skillKnowledgeTier">発動: <b>${escapeHtml(tierInfo.achieved.name || "")}</b> (${fmt(tierInfo.achieved.min, 0)}〜)${nextText}</div>`;
+    } else if (tierInfo.next) {
+      tierHtml = `<div class="skillKnowledgeTier">未発動: ${escapeHtml(tierInfo.next.name || "")} まで ${fmt(tierInfo.nextShortage, 1)}</div>`;
+    }
+  }
+
   const extra = [];
   if (item.mp !== undefined) extra.push(`MP ${item.mp}`);
   if (item.reagent) extra.push(`触媒 ${item.reagent}`);
+  if (item.effect) extra.push(String(item.effect).replace(/\n+/g, " / "));
   const extraHtml = extra.length ? `<div class="skillKnowledgeExtra">${escapeHtml(extra.join(" / "))}</div>` : "";
+  const prereq = Array.isArray(item.prerequisiteTechniques) && item.prerequisiteTechniques.length
+    ? `<div class="skillKnowledgeNote">前提テク: ${escapeHtml(item.prerequisiteTechniques.join(" / "))}</div>`
+    : "";
   const note = item.note ? `<div class="skillKnowledgeNote">${escapeHtml(item.note)}</div>` : "";
 
   return `<article class="skillKnowledgeItem ${skillKnowledgeStatusClass(ev.status)}">
@@ -1171,10 +1222,12 @@ function skillKnowledgeItemHtml(ev, type) {
       <b>${escapeHtml(item.name || "名称未入力")}</b>
       <span>${skillKnowledgeStatusLabel(ev.status)}</span>
     </div>
-    <div class="skillKnowledgeMeta">${escapeHtml(item.category || type)} / ${escapeHtml(item.kind || type)}</div>
+    <div class="skillKnowledgeMeta">${escapeHtml(item.category || type)} / ${escapeHtml(item.kind || type)}${item.code ? ` / ${escapeHtml(item.code)}` : ""}</div>
+    ${tierHtml}
     <div class="skillKnowledgeReq">${reqText}</div>
     ${success}
     ${extraHtml}
+    ${prereq}
     ${note}
   </article>`;
 }
@@ -1209,7 +1262,7 @@ function renderSkillKnowledge() {
 
   const summary = byId("skillKnowledgeSummary");
   if (summary) {
-    const sampleNote = `<span class="skillKnowledgeSampleNote">v1.20はサンプルデータです</span>`;
+    const sampleNote = `<span class="skillKnowledgeSampleNote">マスタリー実データ / テク・魔法はサンプル</span>`;
     summary.innerHTML = `${shown}/${total}件表示 / 使用可能 ${okCount}件 ${sampleNote}`;
   }
 }

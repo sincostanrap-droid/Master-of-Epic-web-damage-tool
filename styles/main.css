@@ -3288,3 +3288,11 @@
     display: block;
   }
 }
+
+
+/* v1.20.1: 複合シップ/マスタリーの段階表示 */
+.skillKnowledgeTier {
+  margin-top: 3px;
+  font-size: 12px;
+  font-weight: 600;
+}
