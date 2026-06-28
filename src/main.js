@@ -5844,11 +5844,124 @@ function idbRowFromStructuredItem(item, page=null, raw="") {
   };
 }
 
+
+let IDB_LAST_DEBUG_INFO = null;
+
+function idbDebugPrimitiveSummary(value, out=[], path="", seen=new WeakSet(), depth=0) {
+  if (value == null || depth > 8 || out.length > 260) return out;
+
+  if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
+    const s = String(value);
+    if (
+      /必要|スキル|skill|required|require|need|level|value|刀剣|素手|こんぼう|棍棒|槍|銃器|弓|投げ|牙|キック|罠|攻撃間隔|有効レンジ|射程|damage|range|interval/i.test(`${path} ${s}`)
+    ) {
+      out.push(`${path}: ${s}`);
+    }
+    return out;
+  }
+
+  if (typeof value !== "object") return out;
+  if (seen.has(value)) return out;
+  seen.add(value);
+
+  if (Array.isArray(value)) {
+    value.forEach((v, i) => idbDebugPrimitiveSummary(v, out, `${path}[${i}]`, seen, depth + 1));
+    return out;
+  }
+
+  Object.entries(value).forEach(([key, val]) => {
+    if (/ziggy|route|errors|auth|flash|csrf|image|icon|created_at|updated_at/i.test(key)) return;
+    idbDebugPrimitiveSummary(val, out, path ? `${path}.${key}` : key, seen, depth + 1);
+  });
+  return out;
+}
+
+function idbDebugInfoFor(raw, parsed=null) {
+  const page = idbExtractInertiaDataPage(raw);
+  const item = idbStructuredItemFromPage(page);
+  const row = parsed?.row || null;
+  const props = page?.props || {};
+  const usefulProps = {};
+  [
+    "weapon",
+    "defense",
+    "defence",
+    "shield",
+    "requiredSkills",
+    "required_skills",
+    "requirements",
+    "requires",
+    "requireSkills",
+    "require_skills",
+    "weaponRequirements",
+    "weapon_requirements",
+    "skillRequirements",
+    "skill_requirements",
+    "itemSkillRequirements",
+    "item_skill_requirements",
+    "skills"
+  ].forEach(key => {
+    if (props[key] != null) usefulProps[key] = props[key];
+  });
+
+  return {
+    parserVersion: "v1.18.10-debug-no-hardcode",
+    source: parsed?.source || "",
+    component: page?.component || "",
+    itemId: item?.id ?? item?.item_id ?? "",
+    itemName: item?.name ?? "",
+    itemKeys: item ? Object.keys(item) : [],
+    propsKeys: props ? Object.keys(props) : [],
+    parsed: row ? {
+      name: row.name,
+      slot: row.slot,
+      weaponDamage: row.weaponDamage,
+      weaponAttackInterval: row.weaponAttackInterval,
+      weaponRange: row.weaponRange,
+      weaponReq: row.weaponReq
+    } : null,
+    usefulProps,
+    skillLikePrimitivePaths: idbDebugPrimitiveSummary({props: usefulProps, item})
+  };
+}
+
+async function copyIdbDebugInfo() {
+  const raw = byId("idbPasteBox")?.value || "";
+  if (!raw) {
+    setIdbWorkerStatus("解析詳細: まだHTML/貼り付け内容がありません。先にURLから取得してください。", true);
+    return;
+  }
+
+  try {
+    const parsed = (() => {
+      try { return parseIdbEquipmentFromPaste(raw); } catch { return null; }
+    })();
+    const info = idbDebugInfoFor(raw, parsed);
+    IDB_LAST_DEBUG_INFO = info;
+    const text = JSON.stringify(info, null, 2);
+
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+      setIdbWorkerStatus("解析詳細をコピーしました。SGKウェポンの結果と一緒に貼ってください。");
+      return;
+    }
+
+    const paste = byId("idbPasteBox");
+    if (paste) paste.value = `${raw}\n\n--- IDB DEBUG INFO ---\n${text}`;
+    setIdbWorkerStatus("クリップボードへコピーできないため、貼り付け欄の末尾に解析詳細を追加しました。");
+  } catch (e) {
+    setIdbWorkerStatus(`解析詳細の作成に失敗: ${e.message || e}`, true);
+  }
+}
+
+
 function parseIdbStructuredPage(raw) {
   const page = idbExtractInertiaDataPage(raw);
   const item = idbStructuredItemFromPage(page);
   if (!item) return null;
-  return idbRowFromStructuredItem(item, page, raw);
+  const parsed = idbRowFromStructuredItem(item, page, raw);
+  IDB_LAST_DEBUG_INFO = idbDebugInfoFor(raw, parsed);
+  return parsed;
 }
 
 
@@ -5913,6 +6026,7 @@ function idbEquipmentPreviewHtml(parsed) {
   const parts = [
     `<b>${escapeHtml(r.name || "名称未取得")}</b>`,
     `推定部位: ${escapeHtml(r.slot || "-")}`,
+    parsed.source ? `解析方式: ${escapeHtml(parsed.source)}` : "",
     parsed.equipPart ? `公式DB上の装備部位: ${escapeHtml(parsed.equipPart)}` : "",
     +r.weaponDamage ? `武器ダメージ: ${fmt(+r.weaponDamage, 1)}` : "",
     +r.weaponAttackInterval ? `攻撃間隔: ${fmt(+r.weaponAttackInterval, 1)}` : "",
