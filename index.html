@@ -64,7 +64,7 @@ MoE固有の主な仮定:
 </head>
 <body>
 <h1>Master of Epic 物理ダメージ計算webツール</h1>
-<p id="appBuildStamp" class="small appBuildStamp">スキルシミュレータ拡張版 v1.21.2</p>
+<p id="appBuildStamp" class="small appBuildStamp">スキルシミュレータ拡張版 v1.21.3</p>
 <section class="heroCard">
   <div>
     <div class="heroBadge">MoE / Physical Damage Calculator</div>
@@ -1202,20 +1202,24 @@ MoE固有の主な仮定:
     <label>保存済みプリセット<select id="presetSelect"></select></label>
     <button onclick="loadNamedPreset()">読み込み</button>
     <button onclick="deleteNamedPreset()">削除</button>
+    <button type="button" onclick="recoverNamedPresets()">保存データを探す</button>
+    <button type="button" onclick="exportNamedPresets()">プリセットをバックアップ</button>
+    <button type="button" onclick="importNamedPresets()">バックアップを読み込み</button>
   </div>
+  <div id="presetStatus" class="small presetStatus">プリセットを確認中...</div>
 
   <p class="small">
-    プリセットはこのブラウザに保存されます。TSVは表計算ソフトで編集しやすい形式です。
-    バックアップを残したい時は、JSON出力も一緒に保存しておくと安心です。
+    プリセットはこのブラウザに保存されます。表示されない場合は「保存データを探す」を押してください。
+    バックアップを残したい時は「プリセットをバックアップ」を使うと安心です。
   </p>
   <textarea id="configBox" placeholder="JSONまたはTSVをここに貼り付けて読み込み可能"></textarea>
 </section>
 
-<script src="./src/storage/shareUrl.js?v=1.21.2" defer></script>
-<script src="./src/storage/importExport.js?v=1.21.2" defer></script>
-<script src="./src/calc/core.js?v=1.21.2" defer></script>
-<script src="./src/data/skillSimKnowledge.js?v=1.21.2" defer></script>
-<script src="./src/main.js?v=1.21.2" defer></script>
-<script src="./src/optimizer/core.js?v=1.21.2" defer></script>
+<script src="./src/storage/shareUrl.js?v=1.21.3" defer></script>
+<script src="./src/storage/importExport.js?v=1.21.3" defer></script>
+<script src="./src/calc/core.js?v=1.21.3" defer></script>
+<script src="./src/data/skillSimKnowledge.js?v=1.21.3" defer></script>
+<script src="./src/main.js?v=1.21.3" defer></script>
+<script src="./src/optimizer/core.js?v=1.21.3" defer></script>
 </body>
 </html>
