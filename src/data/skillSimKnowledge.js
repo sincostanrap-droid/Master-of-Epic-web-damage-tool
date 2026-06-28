@@ -1,12 +1,10 @@
 /*
   skillSimKnowledge.js
 
-  スキルシミュレータ用のマスタリー / テクニック / 魔法データです。
-
-  v1.20.1:
-  - マスタリーは、ユーザー提供の MoERead「シップ/複合」HTMLをもとに自前データ化。
-  - 1次/2次/3次シップは、同一マスタリー内の tiers として保持します。
-  - テクニック/魔法はまだサンプルです。今後、別データとして追加します。
+  v1.20.7:
+  - ユーザー提供の MoERead 熟練(技) HTMLから、冒頭の表内テクニックのみを自前データ化。
+  - 短評セクションや関連テクニック欄は取り込まない。
+  - 魔法データはまだサンプルです。
 
   注意:
   - 外部サイトのコードは転載せず、アップロードされた表から必要な構造データを生成しています。
@@ -1914,106 +1912,1499 @@
 ];
 
   const techniques = [
-    {
-      id: "tech-kicker",
-      name: "サイド キック",
-      category: "キック",
-      kind: "テクニック",
-      requirements: [{skill:"キック", min:20}],
-      successSkill: "キック",
-      successRequired: 20,
-      note: "サンプル。"
+  {
+    "id": "tech-fd3663265a-0051ec459e-1",
+    "name": "メディテーション",
+    "kind": "テクニック",
+    "category": "魔法熟練",
+    "requirements": [
+      {
+        "skill": "魔法熟練",
+        "min": 1.0
+      }
+    ],
+    "successSkill": "魔法熟練",
+    "successRequired": 1.0,
+    "cost": {
+      "st": 5.0
     },
-    {
-      id: "tech-shield-guard",
-      name: "シールド ガード",
-      category: "盾",
-      kind: "テクニック",
-      requirements: [{skill:"盾", min:10}],
-      successSkill: "盾",
-      successRequired: 10,
-      note: "サンプル。"
+    "castTime": "500",
+    "delay": "1400",
+    "description": "精神を強く集中させて マナ・ポイント(MP)の回復速度を速める\n※発動時間中は少しずつスタミナ(ST)を消費する\n発動時間中(約8.4秒)は 移動以外の行動はできない\n一歩でも動くと効果は解除される。 →\nまとめ\n参照",
+    "transfer": "○",
+    "acquisition": "NPC販売\nガープ\nレイス(魔法使い)\nオークプリースト",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%B5%BB%29/%CB%E2%CB%A1%BD%CF%CE%FD"
+  },
+  {
+    "id": "tech-fd3663265a-65135bb329-10",
+    "name": "リジェクト マジック",
+    "kind": "テクニック",
+    "category": "魔法熟練",
+    "requirements": [
+      {
+        "skill": "魔法熟練",
+        "min": 10.0
+      }
+    ],
+    "successSkill": "魔法熟練",
+    "successRequired": 10.0,
+    "cost": {
+      "st": 9.0
     },
-    {
-      id: "tech-berserk",
-      name: "バーサーク",
-      category: "戦闘技術",
-      kind: "テクニック",
-      requirements: [{skill:"戦闘技術", min:40}],
-      successSkill: "戦闘技術",
-      successRequired: 40,
-      note: "サンプル。"
+    "castTime": "100",
+    "delay": "600",
+    "description": "自分にかかっている有益な効果を一つ打ち消すことができる",
+    "transfer": "×",
+    "acquisition": "170418実装\n異端者\nスカルパスメイジ\nレッドライン\nサイドワインダー？\nウォーターウンディーネ（イプス・ガルムともDrop確認）\nピクシー シャドウ / ステンノ/ プロミネンス ワイバーン\n※ 複製不可",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%B5%BB%29/%CB%E2%CB%A1%BD%CF%CE%FD"
+  },
+  {
+    "id": "tech-fd3663265a-1c36041cd4-20",
+    "name": "ホーリー ブレス",
+    "kind": "テクニック",
+    "category": "魔法熟練",
+    "requirements": [
+      {
+        "skill": "魔法熟練",
+        "min": 20.0
+      }
+    ],
+    "successSkill": "魔法熟練",
+    "successRequired": 20.0,
+    "cost": {
+      "st": 15.0
     },
-    {
-      id: "tech-cannon",
-      name: "キャノン ディスチャージ",
-      category: "銃器",
-      kind: "テクニック",
-      requirements: [{skill:"銃器", min:90}],
-      successSkill: "銃器",
-      successRequired: 90,
-      note: "サンプル。"
-    }
-  ];
+    "castTime": "170",
+    "delay": "1549",
+    "description": "一定時間 魔力が増加する",
+    "transfer": "○",
+    "acquisition": "NPC販売\n異端者\nスカルパスメイジ\nレッドライン",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%B5%BB%29/%CB%E2%CB%A1%BD%CF%CE%FD"
+  },
+  {
+    "id": "tech-fd3663265a-d0d951a27a-30",
+    "name": "マジック ブースト",
+    "kind": "テクニック",
+    "category": "魔法熟練",
+    "requirements": [
+      {
+        "skill": "魔法熟練",
+        "min": 30.0
+      }
+    ],
+    "successSkill": "魔法熟練",
+    "successRequired": 30.0,
+    "cost": {
+      "st": 15.0
+    },
+    "castTime": "69",
+    "delay": "869",
+    "description": "魔法が届く範囲を広げる\n本来の魔法の射程に関わらず +3.0(固定)",
+    "transfer": "○",
+    "acquisition": "NPC販売\n異端者\nスカルパスメイジ\nレッドライン",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%B5%BB%29/%CB%E2%CB%A1%BD%CF%CE%FD"
+  },
+  {
+    "id": "tech-fd3663265a-daf1068605-40",
+    "name": "マナ プレッシャー",
+    "kind": "テクニック",
+    "category": "魔法熟練",
+    "requirements": [
+      {
+        "skill": "魔法熟練",
+        "min": 40.0
+      }
+    ],
+    "successSkill": "魔法熟練",
+    "successRequired": 40.0,
+    "cost": {
+      "st": 19.0
+    },
+    "castTime": "90",
+    "delay": "1890",
+    "description": "効果が切れるまでの間、MPの消費量が軽減される\nMP消費量が82％になる",
+    "transfer": "○",
+    "acquisition": "NPC販売\n異端者\nスカルパスメイジ\nウォーターウンディーネ",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%B5%BB%29/%CB%E2%CB%A1%BD%CF%CE%FD"
+  },
+  {
+    "id": "tech-fd3663265a-36ec7a6cfa-50",
+    "name": "スペル エクステンション",
+    "kind": "テクニック",
+    "category": "魔法熟練",
+    "requirements": [
+      {
+        "skill": "魔法熟練",
+        "min": 50.0
+      }
+    ],
+    "successSkill": "魔法熟練",
+    "successRequired": 50.0,
+    "cost": {
+      "st": 23.0
+    },
+    "castTime": "90",
+    "delay": "1890",
+    "description": "スペルブックに魔法をチャージしておける時間を延長する",
+    "transfer": "○",
+    "acquisition": "NPC販売\n異端者\nスカルパスメイジ\nウォーターウンディーネ",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%B5%BB%29/%CB%E2%CB%A1%BD%CF%CE%FD"
+  },
+  {
+    "id": "tech-fd3663265a-2f13f76dbb-60",
+    "name": "ホールド",
+    "kind": "テクニック",
+    "category": "魔法熟練",
+    "requirements": [
+      {
+        "skill": "魔法熟練",
+        "min": 60.0
+      }
+    ],
+    "successSkill": "魔法熟練",
+    "successRequired": 60.0,
+    "cost": {
+      "st": 28.0
+    },
+    "castTime": "50",
+    "delay": "550",
+    "description": "敵からの攻撃で 魔法の詠唱を妨害されにくくなる\n発動すると一瞬足が止まる",
+    "transfer": "×",
+    "acquisition": "NPC販売(夜間キャンプ)\nサイドワインダー\nウォーターウンディーネ",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%B5%BB%29/%CB%E2%CB%A1%BD%CF%CE%FD"
+  },
+  {
+    "id": "tech-fd3663265a-4397b556fa-70",
+    "name": "ホーリー リカバー",
+    "kind": "テクニック",
+    "category": "魔法熟練",
+    "requirements": [
+      {
+        "skill": "魔法熟練",
+        "min": 70.0
+      }
+    ],
+    "successSkill": "魔法熟練",
+    "successRequired": 70.0,
+    "cost": {
+      "st": 50.0
+    },
+    "castTime": "150",
+    "delay": "10950",
+    "description": "聖なる力が全身を包み込み マナ・ポイント(MP)が回復する\n発動すると足が止まる。ディレイは約3分",
+    "transfer": "×",
+    "acquisition": "NPC販売(ヌブール村)\nサイドワインダー",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%B5%BB%29/%CB%E2%CB%A1%BD%CF%CE%FD"
+  },
+  {
+    "id": "tech-fd3663265a-044e1d5143-80",
+    "name": "キャスティング ムーブ",
+    "kind": "テクニック",
+    "category": "魔法熟練",
+    "requirements": [
+      {
+        "skill": "魔法熟練",
+        "min": 80.0
+      }
+    ],
+    "successSkill": "魔法熟練",
+    "successRequired": 80.0,
+    "cost": {
+      "st": 38.0
+    },
+    "castTime": "90",
+    "delay": "1890",
+    "description": "詠唱中の移動速度を速める\n詠唱中の移動速度が1.2倍になる\nブックチャージには効果が無い\n一部の魔法(召喚系など)には効果が無い",
+    "transfer": "×",
+    "acquisition": "サイドワインダー\nマジックゴーレム\nサベージドルイド\nウォーターウンディーネ",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%B5%BB%29/%CB%E2%CB%A1%BD%CF%CE%FD"
+  },
+  {
+    "id": "tech-fd3663265a-946aa55f66-90",
+    "name": "ラピッド キャスト",
+    "kind": "テクニック",
+    "category": "魔法熟練",
+    "requirements": [
+      {
+        "skill": "魔法熟練",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "魔法熟練",
+    "successRequired": 90.0,
+    "cost": {
+      "st": 44.0
+    },
+    "castTime": "150",
+    "delay": "1750",
+    "description": "魔法の詠唱を大幅に短縮することができる\n※効果継続中はマナ・ポイント(MP)の消費量が増える\nジャンプをすると効果が解除される\n詠唱時間を35%短縮/MP消費量は150%になる\nマナプレッシャーと併用で消費量120%",
+    "transfer": "×",
+    "acquisition": "サイドワインダー\nマジックゴーレム\nブラッド ゴーレム\nサベージドルイド\nサベージナイト\nサベージランサーロード\nサベージドルイドロード\nウォーターウンディーネ",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%B5%BB%29/%CB%E2%CB%A1%BD%CF%CE%FD"
+  },
+  {
+    "id": "tech-aa99c6c930-21308be16f-1",
+    "name": "プリーチ",
+    "kind": "テクニック",
+    "category": "戦闘技術",
+    "requirements": [
+      {
+        "skill": "戦闘技術",
+        "min": 1.0
+      }
+    ],
+    "successSkill": "戦闘技術",
+    "successRequired": 1.0,
+    "cost": {
+      "st": 5.0
+    },
+    "castTime": "130",
+    "delay": "670",
+    "description": "敵をなだめて戦意を喪失させる\n※ 対人戦では相手の戦闘状態を解除する\n→\nタゲ切り技",
+    "transfer": "○",
+    "acquisition": "NPC販売\nオークガード\nアマゾネスガード",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%B5%BB%29/%C0%EF%C6%AE%B5%BB%BD%D1",
+    "move": "×",
+    "range": "6.3"
+  },
+  {
+    "id": "tech-aa99c6c930-7ba6fab490-10",
+    "name": "タックル",
+    "kind": "テクニック",
+    "category": "戦闘技術",
+    "requirements": [
+      {
+        "skill": "戦闘技術",
+        "min": 10.0
+      }
+    ],
+    "successSkill": "戦闘技術",
+    "successRequired": 10.0,
+    "cost": {
+      "st": 8.0
+    },
+    "castTime": "130",
+    "delay": "630",
+    "description": "敵に体当たりを喰らわせ 後退させる\nダメージは発生しないが弱い詠唱妨害効果がある",
+    "transfer": "○",
+    "acquisition": "NPC販売\nオークガード\nアマゾネスガード",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%B5%BB%29/%C0%EF%C6%AE%B5%BB%BD%D1",
+    "move": "○",
+    "range": "6.3"
+  },
+  {
+    "id": "tech-aa99c6c930-56c7e5c7af-20",
+    "name": "タウント",
+    "kind": "テクニック",
+    "category": "戦闘技術",
+    "requirements": [
+      {
+        "skill": "戦闘技術",
+        "min": 20.0
+      }
+    ],
+    "successSkill": "戦闘技術",
+    "successRequired": 20.0,
+    "cost": {
+      "st": 11.0
+    },
+    "castTime": "165",
+    "delay": "815",
+    "description": "敵を挑発し 自分に注意を惹きつける\nダメージは発生しないが弱い詠唱妨害効果がある\n→\n挑発技",
+    "transfer": "○",
+    "acquisition": "NPC販売\nオークガード\nアマゾネスガード",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%B5%BB%29/%C0%EF%C6%AE%B5%BB%BD%D1",
+    "move": "○",
+    "range": "9.3"
+  },
+  {
+    "id": "tech-aa99c6c930-fcea76b9c3-30",
+    "name": "バーサーク",
+    "kind": "テクニック",
+    "category": "戦闘技術",
+    "requirements": [
+      {
+        "skill": "戦闘技術",
+        "min": 30.0
+      }
+    ],
+    "successSkill": "戦闘技術",
+    "successRequired": 30.0,
+    "cost": {
+      "st": 15.0
+    },
+    "castTime": "150",
+    "delay": "1350",
+    "description": "一時的に暴走状態になり攻撃力と攻撃スピードが高まる\n※ バーサーク状態の間は、HP/MP/STの自然回復量が低下する\nジャンプで解除される\n素手を除く「アタック」のみ ディレイ13%短縮",
+    "transfer": "○",
+    "acquisition": "NPC販売\nオークガード\nアマゾネスガード",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%B5%BB%29/%C0%EF%C6%AE%B5%BB%BD%D1",
+    "move": "○",
+    "range": "-"
+  },
+  {
+    "id": "tech-aa99c6c930-2a4e4e14cd-40",
+    "name": "エクゾシズム",
+    "kind": "テクニック",
+    "category": "戦闘技術",
+    "requirements": [
+      {
+        "skill": "戦闘技術",
+        "min": 40.0
+      }
+    ],
+    "successSkill": "戦闘技術",
+    "successRequired": 40.0,
+    "cost": {
+      "st": 19.0
+    },
+    "castTime": "140",
+    "delay": "790",
+    "description": "邪悪な気を祓い 自分にかけられた最も新しいステータスダウン効果を1つ無効にする\n※ 毒・呪い・スタン・眠り・DoTダメージは解除できません\n→\n解除法一覧",
+    "transfer": "○",
+    "acquisition": "NPC販売\nオークガード\nアマゾネスガード",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%B5%BB%29/%C0%EF%C6%AE%B5%BB%BD%D1",
+    "move": "○",
+    "range": "-"
+  },
+  {
+    "id": "tech-aa99c6c930-58bf155e49-50",
+    "name": "ナイト マインド",
+    "kind": "テクニック",
+    "category": "戦闘技術",
+    "requirements": [
+      {
+        "skill": "戦闘技術",
+        "min": 50.0
+      }
+    ],
+    "successSkill": "戦闘技術",
+    "successRequired": 50.0,
+    "cost": {
+      "st": 23.0
+    },
+    "castTime": "150",
+    "delay": "1650",
+    "description": "攻撃の命中率を大幅に上昇させる",
+    "transfer": "○",
+    "acquisition": "NPC販売\nオークガード\nアマゾネスガード\nギガース",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%B5%BB%29/%C0%EF%C6%AE%B5%BB%BD%D1",
+    "move": "○",
+    "range": "-"
+  },
+  {
+    "id": "tech-aa99c6c930-31cc2f00f6-60",
+    "name": "バーサーク オール",
+    "kind": "テクニック",
+    "category": "戦闘技術",
+    "requirements": [
+      {
+        "skill": "戦闘技術",
+        "min": 60.0
+      }
+    ],
+    "successSkill": "戦闘技術",
+    "successRequired": 60.0,
+    "cost": {
+      "st": 28.0
+    },
+    "castTime": "200",
+    "delay": "2200",
+    "description": "一時的に暴走状態になり、攻撃力を大幅に上昇させるが、\n代償として回避が大幅に減少する\nパーティメンバー全員をバーサーク状態にする\n効果中はACが大幅に減少する\nジャンプで解除される\nバーサーク\nとは異なり、HP/ST/MP自然回復は有り",
+    "transfer": "×",
+    "acquisition": "NPC販売(夜間キャンプ)\n行商人 ジョン(エルビン渓谷)\nオークガード\nアマゾネスガード",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%B5%BB%29/%C0%EF%C6%AE%B5%BB%BD%D1",
+    "move": "×",
+    "range": "-"
+  },
+  {
+    "id": "tech-aa99c6c930-382273115c-70",
+    "name": "カンフー ソウル",
+    "kind": "テクニック",
+    "category": "戦闘技術",
+    "requirements": [
+      {
+        "skill": "戦闘技術",
+        "min": 70.0
+      }
+    ],
+    "successSkill": "戦闘技術",
+    "successRequired": 70.0,
+    "cost": {
+      "st": 33.0
+    },
+    "castTime": "150",
+    "delay": "1350",
+    "description": "メイン攻撃のクリティカル発生率を上昇させる\n※ 効果中は呪文抵抗力と回避が低下します。\nジャンプで解除される",
+    "transfer": "×",
+    "acquisition": "ボビーイムサマス\nサベージナイト\nウォーターウンディーネ\nギガース\nグレート\nレスラー（ニューター男）\n拳僧兵\n棍僧兵",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%B5%BB%29/%C0%EF%C6%AE%B5%BB%BD%D1",
+    "move": "○",
+    "range": "-"
+  },
+  {
+    "id": "tech-aa99c6c930-6bc0e120a0-80",
+    "name": "サムライ ハート",
+    "kind": "テクニック",
+    "category": "戦闘技術",
+    "requirements": [
+      {
+        "skill": "戦闘技術",
+        "min": 80.0
+      }
+    ],
+    "successSkill": "戦闘技術",
+    "successRequired": 80.0,
+    "cost": {
+      "st": 38.0
+    },
+    "castTime": "150",
+    "delay": "1650",
+    "description": "敵の防御力を 一定時間大幅に減少させる",
+    "transfer": "×",
+    "acquisition": "タルタロッサバレット\nタルタロッサスラッシュ\n拳僧兵\n棍僧兵",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%B5%BB%29/%C0%EF%C6%AE%B5%BB%BD%D1",
+    "move": "○",
+    "range": "6.8"
+  },
+  {
+    "id": "tech-aa99c6c930-2d9af034d4-90",
+    "name": "センス オブ ワンダー",
+    "kind": "テクニック",
+    "category": "戦闘技術",
+    "requirements": [
+      {
+        "skill": "戦闘技術",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "戦闘技術",
+    "successRequired": 90.0,
+    "cost": {
+      "st": 45.0
+    },
+    "castTime": "150",
+    "delay": "1750",
+    "description": "移動しながら発動できない一部の攻撃を 移動しながらでも繰り出せるようにする",
+    "transfer": "×",
+    "acquisition": "タルタロッサバレット\nサベージ ナイト\nサベージランサーロード\nウォーターウンディーネ\nギガース\nブラッド ゴーレム\n拳僧兵\n棍僧兵",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%B5%BB%29/%C0%EF%C6%AE%B5%BB%BD%D1",
+    "move": "○",
+    "range": "-"
+  },
+  {
+    "id": "tech-e5e6cb266e-925248fa6b-10",
+    "name": "ガード ブレイカー",
+    "kind": "テクニック",
+    "category": "槍",
+    "requirements": [
+      {
+        "skill": "槍",
+        "min": 10.0
+      }
+    ],
+    "successSkill": "槍",
+    "successRequired": 10.0,
+    "cost": {
+      "st": 11.0
+    },
+    "castTime": "95\n(42-48)",
+    "delay": "950",
+    "description": "ガードの隙間をぬって 無理やりダメージを与える\nガード貫通技",
+    "transfer": "×",
+    "acquisition": "NPC販売",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%B5%BB%29/%C1%E4",
+    "power": "0.95\n(0.8)",
+    "move": "×"
+  },
+  {
+    "id": "tech-e5e6cb266e-1875a0d57b-20",
+    "name": "タイダル スピアー",
+    "kind": "テクニック",
+    "category": "槍",
+    "requirements": [
+      {
+        "skill": "槍",
+        "min": 20.0
+      }
+    ],
+    "successSkill": "槍",
+    "successRequired": 20.0,
+    "cost": {
+      "st": 15.0
+    },
+    "castTime": "105\n(60-66)",
+    "delay": "900\n※",
+    "description": "後退した後に前方に踏み込み攻撃する",
+    "transfer": "×",
+    "acquisition": "NPC販売",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%B5%BB%29/%C1%E4",
+    "power": "1.2\n(0.95)",
+    "move": "△"
+  },
+  {
+    "id": "tech-e5e6cb266e-fca6da52eb-40",
+    "name": "ポール シフト",
+    "kind": "テクニック",
+    "category": "槍",
+    "requirements": [
+      {
+        "skill": "槍",
+        "min": 40.0
+      }
+    ],
+    "successSkill": "槍",
+    "successRequired": 40.0,
+    "cost": {
+      "st": 19.0
+    },
+    "castTime": "110\n(42-48)",
+    "delay": "1100\n※",
+    "description": "槍を利用して前方向に飛び上がる",
+    "transfer": "×",
+    "acquisition": "NPC販売",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%B5%BB%29/%C1%E4",
+    "power": "-",
+    "move": "○"
+  },
+  {
+    "id": "tech-e5e6cb266e-3d62950379-50",
+    "name": "ドラゴン テイル",
+    "kind": "テクニック",
+    "category": "槍",
+    "requirements": [
+      {
+        "skill": "槍",
+        "min": 50.0
+      }
+    ],
+    "successSkill": "槍",
+    "successRequired": 50.0,
+    "cost": {
+      "st": 23.0
+    },
+    "castTime": "120\n(78-84)",
+    "delay": "1100",
+    "description": "対象の防具と ガードの隙間を狙って攻撃する\n※成功すると敵はスタン状態になる\nガードブレイク技",
+    "transfer": "×",
+    "acquisition": "NPC販売",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%B5%BB%29/%C1%E4",
+    "power": "1.05\n(0.85)",
+    "move": "○"
+  },
+  {
+    "id": "tech-e5e6cb266e-cbeeef692b-60",
+    "name": "ペネトレイション",
+    "kind": "テクニック",
+    "category": "槍",
+    "requirements": [
+      {
+        "skill": "槍",
+        "min": 60.0
+      }
+    ],
+    "successSkill": "槍",
+    "successRequired": 60.0,
+    "cost": {
+      "st": 28.0
+    },
+    "castTime": "125\n(66-72)",
+    "delay": "1200",
+    "description": "ダメージは低いが、離れた敵にまで届く貫通攻撃を与える\n前方に細い帯状の範囲技",
+    "transfer": "×",
+    "acquisition": "NPC販売(夜間キャンプ)\nサベージ ランサー\nサベージ ナイト\nサベージ ランサーロード\nウォーター ウンディーネ\nギガース",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%B5%BB%29/%C1%E4",
+    "power": "0.95\n(0.8)",
+    "move": "○"
+  },
+  {
+    "id": "tech-e5e6cb266e-dea5378a13-70",
+    "name": "ハラキリ スピアー",
+    "kind": "テクニック",
+    "category": "槍",
+    "requirements": [
+      {
+        "skill": "槍",
+        "min": 70.0
+      }
+    ],
+    "successSkill": "槍",
+    "successRequired": 70.0,
+    "cost": {
+      "st": 33.0
+    },
+    "castTime": "106\n(36-41)",
+    "delay": "1000",
+    "description": "自分の腹を貫通させて 後ろの敵に奇襲攻撃を与える\n後方範囲技\n自分自身にも反動ダメージ有",
+    "transfer": "×",
+    "acquisition": "NPC販売(夜間キャンプ/ヌブール村)\nサベージ ランサー\nサベージ ナイト\nサベージ ランサーロード\nギガース",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%B5%BB%29/%C1%E4",
+    "power": "1.5\n(1.35)",
+    "move": "×"
+  },
+  {
+    "id": "tech-e5e6cb266e-861a5bc2a9-80",
+    "name": "ドラゴン フォール",
+    "kind": "テクニック",
+    "category": "槍",
+    "requirements": [
+      {
+        "skill": "槍",
+        "min": 80.0
+      }
+    ],
+    "successSkill": "槍",
+    "successRequired": 80.0,
+    "cost": {
+      "st": 38.0
+    },
+    "castTime": "181",
+    "delay": "1070\n※",
+    "description": "大ジャンプを行い 落下中に\n空中制動して頭上から槍を突き立てる\n着弾点中心の小範囲技",
+    "transfer": "×",
+    "acquisition": "サベージ ランサー\nサベージ ナイト\nサベージ ランサーロード\nウォーター ウンディーネ\nギガース",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%B5%BB%29/%C1%E4",
+    "power": "1.6\n(1.45)",
+    "move": "△"
+  },
+  {
+    "id": "tech-e5e6cb266e-8374e70dc8-90",
+    "name": "デドリー ホロウ",
+    "kind": "テクニック",
+    "category": "槍",
+    "requirements": [
+      {
+        "skill": "槍",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "槍",
+    "successRequired": 90.0,
+    "cost": {
+      "st": 45.0
+    },
+    "castTime": "175\n(24-30)",
+    "delay": "690",
+    "description": "ダメージを与えながら前方に突進する\n連撃技。途中でミスると技の発動は終了する。\n1発目単体攻撃、2発目以降は範囲攻撃。",
+    "transfer": "×",
+    "acquisition": "サベージ ランサー\nサベージ ナイト\nサベージ ランサーロード\nサベージ ドルイドロード\nギガース\nブラッド ゴーレム",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%B5%BB%29/%C1%E4",
+    "power": "下記\n参照",
+    "move": "△"
+  },
+  {
+    "id": "tech-76c0a472f3-e0c6e51574-20",
+    "name": "チャージド ブラント",
+    "kind": "テクニック",
+    "category": "こんぼう",
+    "requirements": [
+      {
+        "skill": "こんぼう",
+        "min": 20.0
+      }
+    ],
+    "successSkill": "こんぼう",
+    "successRequired": 20.0,
+    "cost": {
+      "st": 11.0
+    },
+    "castTime": "170\n(78-84)",
+    "delay": "1100",
+    "description": "力を溜めて敵を激しく叩きつけることにより\nガード技を無視してダメージを貫通させる\n※成功すると 敵をスタンさせることができる\nガードブレイク技\n※スタン中は被ダメージ1割減",
+    "transfer": "×",
+    "acquisition": "NPC販売\nオークガード\nアマゾネスガード\nバルカーガード",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%B5%BB%29/%A4%B3%A4%F3%A4%DC%A4%A6",
+    "power": "1.35\n(1.15)",
+    "move": "×"
+  },
+  {
+    "id": "tech-76c0a472f3-a0419ef751-40",
+    "name": "スニーク アタック",
+    "kind": "テクニック",
+    "category": "こんぼう",
+    "requirements": [
+      {
+        "skill": "こんぼう",
+        "min": 40.0
+      }
+    ],
+    "successSkill": "こんぼう",
+    "successRequired": 40.0,
+    "cost": {
+      "st": 19.0
+    },
+    "castTime": "145\n(54-60)",
+    "delay": "650",
+    "description": "敵の側面や背後から忍び寄り 不意打ちで敵を眠らせる\n昏睡状態は一定時間経過で解除される\n※昏睡中は被ダメージ1割減",
+    "transfer": "×",
+    "acquisition": "NPC販売\nオークガード\nアマゾネスガード\nバルカーガード",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%B5%BB%29/%A4%B3%A4%F3%A4%DC%A4%A6",
+    "power": "1.05\n(0.95)",
+    "move": "○"
+  },
+  {
+    "id": "tech-76c0a472f3-18ef21e7e6-50",
+    "name": "ニート クラッシャー",
+    "kind": "テクニック",
+    "category": "こんぼう",
+    "requirements": [
+      {
+        "skill": "こんぼう",
+        "min": 50.0
+      }
+    ],
+    "successSkill": "こんぼう",
+    "successRequired": 50.0,
+    "cost": {
+      "st": 23.0
+    },
+    "castTime": "130\n(60-66)",
+    "delay": "980",
+    "description": "対象の装備の耐久度を大幅に消耗させる攻撃を繰り出す。\nこの技を食らった者は、働いて修理代を稼がなければならない。",
+    "transfer": "×",
+    "acquisition": "NPC販売\nオークガード\nアマゾネスガード\nバルカーガード\nギガース系",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%B5%BB%29/%A4%B3%A4%F3%A4%DC%A4%A6",
+    "power": "1.25\n(1.0)",
+    "move": "×"
+  },
+  {
+    "id": "tech-76c0a472f3-d2d0fdea18-60",
+    "name": "ウェポン ディザーム",
+    "kind": "テクニック",
+    "category": "こんぼう",
+    "requirements": [
+      {
+        "skill": "こんぼう",
+        "min": 60.0
+      }
+    ],
+    "successSkill": "こんぼう",
+    "successRequired": 60.0,
+    "cost": {
+      "st": 28.0
+    },
+    "castTime": "155\n(60-66)",
+    "delay": "620",
+    "description": "敵の装備している武器を叩き落す\nこの技を受けたプレイヤーは、\n1秒くらいの間、右と左スロットの装備を付け替えできなくなる",
+    "transfer": "×",
+    "acquisition": "NPC販売(夜間キャンプ/ヌブール村)\nオークガード\nアマゾネスガード\nギガース系",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%B5%BB%29/%A4%B3%A4%F3%A4%DC%A4%A6",
+    "power": "1.0\n(0.8)",
+    "move": "×"
+  },
+  {
+    "id": "tech-76c0a472f3-e8aa5ede8b-70",
+    "name": "ヴォーテックス ホイール",
+    "kind": "テクニック",
+    "category": "こんぼう",
+    "requirements": [
+      {
+        "skill": "こんぼう",
+        "min": 70.0
+      }
+    ],
+    "successSkill": "こんぼう",
+    "successRequired": 70.0,
+    "cost": {
+      "st": 33.0
+    },
+    "castTime": "140\n(72-78)",
+    "delay": "1100",
+    "description": "その場で回転することにより 周りの敵にダメージを与えて吹き飛ばす\n自分中心の範囲攻撃\nノックバック効果",
+    "transfer": "×",
+    "acquisition": "NPC販売(夜間キャンプ/ヌブール村)",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%B5%BB%29/%A4%B3%A4%F3%A4%DC%A4%A6",
+    "power": "1.1\n(0.9)",
+    "move": "×"
+  },
+  {
+    "id": "tech-76c0a472f3-743cea7434-80",
+    "name": "ディスロケーション",
+    "kind": "テクニック",
+    "category": "こんぼう",
+    "requirements": [
+      {
+        "skill": "こんぼう",
+        "min": 80.0
+      }
+    ],
+    "successSkill": "こんぼう",
+    "successRequired": 80.0,
+    "cost": {
+      "st": 36.0
+    },
+    "castTime": "135\n(48-54)",
+    "delay": "1100",
+    "description": "敵の骨格を揺るがすダメージを与え HP・MPの自然回復を阻止する",
+    "transfer": "×",
+    "acquisition": "イクシオンタイクーン\nタルタロッサパラディン\nギガースマッドネス\nギガースツイン",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%B5%BB%29/%A4%B3%A4%F3%A4%DC%A4%A6",
+    "power": "1.45\n(1.15)",
+    "move": "×"
+  },
+  {
+    "id": "tech-76c0a472f3-b84caa66b6-90",
+    "name": "クウェイク ビート",
+    "kind": "テクニック",
+    "category": "こんぼう",
+    "requirements": [
+      {
+        "skill": "こんぼう",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "こんぼう",
+    "successRequired": 90.0,
+    "cost": {
+      "st": 39.0
+    },
+    "castTime": "200",
+    "delay": "1000\n※",
+    "description": "両手用のこんぼうで地面を強打し 地響きを起こす\n※周囲にいる者のバランス感覚を奪う\n自分中心の広範囲に連続ノックバック効果\n両手用棍棒を装備時のみ使用可能",
+    "transfer": "×",
+    "acquisition": "ギガース系\nキングザブール\nサベージナイト\nサベージランサーロード\nサベージドルイドロード\nウォーターウンディーネ\nブラッド ゴーレム",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%B5%BB%29/%A4%B3%A4%F3%A4%DC%A4%A6",
+    "power": "-",
+    "move": "×"
+  },
+  {
+    "id": "tech-76c0a472f3-f9618056e1-90",
+    "name": "ライジング インパクト",
+    "kind": "テクニック",
+    "category": "こんぼう",
+    "requirements": [
+      {
+        "skill": "こんぼう",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "こんぼう",
+    "successRequired": 90.0,
+    "cost": {
+      "st": 45.0
+    },
+    "castTime": "200",
+    "delay": "1200",
+    "description": "地面を伝わる衝撃が対象の足元を隆起させダメージを与える技\n使用アイテム：原初の粉 1",
+    "transfer": "×",
+    "acquisition": "ChaosAge天の門 報酬",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%B5%BB%29/%A4%B3%A4%F3%A4%DC%A4%A6",
+    "power": "1.4\n(1.0)",
+    "move": "×"
+  },
+  {
+    "id": "tech-203575cfb7-338d6b76fe-20",
+    "name": "チャージド スラッシュ",
+    "kind": "テクニック",
+    "category": "刀剣",
+    "requirements": [
+      {
+        "skill": "刀剣",
+        "min": 20.0
+      }
+    ],
+    "successSkill": "刀剣",
+    "successRequired": 20.0,
+    "cost": {
+      "st": 15.0
+    },
+    "castTime": "155\n(90-96)",
+    "delay": "1100",
+    "description": "力を溜めて激しく敵に斬りつけることにより\nガード技を無視してダメージを貫通させる\n※成功すると 敵をスタンさせることができる\nガードブレイク技",
+    "transfer": "×",
+    "acquisition": "NPC販売\nオークガード\nアマゾネスガード",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%B5%BB%29/%C5%E1%B7%F5",
+    "power": "1.25\n(1.05)",
+    "move": "×"
+  },
+  {
+    "id": "tech-203575cfb7-c124b582d6-40",
+    "name": "ダイイング スタブ",
+    "kind": "テクニック",
+    "category": "刀剣",
+    "requirements": [
+      {
+        "skill": "刀剣",
+        "min": 40.0
+      }
+    ],
+    "successSkill": "刀剣",
+    "successRequired": 40.0,
+    "cost": {
+      "st": 21.0
+    },
+    "castTime": "140\n(48-54)",
+    "delay": "900",
+    "description": "対象をえぐるようにして突き刺し 巨大な傷口を作る\n※斬った後もダメージが続く\n追加効果でDoT",
+    "transfer": "×",
+    "acquisition": "NPC販売\nオークガード\nアマゾネスガード",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%B5%BB%29/%C5%E1%B7%F5",
+    "power": "0.85+α\n(0.75+α)",
+    "move": "×"
+  },
+  {
+    "id": "tech-203575cfb7-e4605ab214-50",
+    "name": "ニューロン ストライク",
+    "kind": "テクニック",
+    "category": "刀剣",
+    "requirements": [
+      {
+        "skill": "刀剣",
+        "min": 50.0
+      }
+    ],
+    "successSkill": "刀剣",
+    "successRequired": 50.0,
+    "cost": {
+      "st": 23.0
+    },
+    "castTime": "195\n→165\n(\n96-102\n)→(84-90)",
+    "delay": "1300\n→1150",
+    "description": "剣で斬りつけて属性防御値を下げる\n移動発動可だが、モーションが長い",
+    "transfer": "×",
+    "acquisition": "NPC販売\nオークガード\nアマゾネスガード",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%B5%BB%29/%C5%E1%B7%F5",
+    "power": "1.15\n(1.0)",
+    "move": "○"
+  },
+  {
+    "id": "tech-203575cfb7-1a940985b4-60",
+    "name": "エクセキューション",
+    "kind": "テクニック",
+    "category": "刀剣",
+    "requirements": [
+      {
+        "skill": "刀剣",
+        "min": 60.0
+      }
+    ],
+    "successSkill": "刀剣",
+    "successRequired": 60.0,
+    "cost": {
+      "st": 28.0
+    },
+    "castTime": "240\n→210\n(\n114-120\n)→(102-108)",
+    "delay": "590",
+    "description": "ジャンプ斬りで敵の脳天を叩き割り 大ダメージを与える\n※技発動中は無防備になる\nモーション中は被ダメージ増",
+    "transfer": "×",
+    "acquisition": "NPC販売(夜間キャンプ)\nオークガード\nアマゾネスガード",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%B5%BB%29/%C5%E1%B7%F5",
+    "power": "1.8\n(1.6)",
+    "move": "×"
+  },
+  {
+    "id": "tech-203575cfb7-1574e47f31-70",
+    "name": "ソニック ストライク",
+    "kind": "テクニック",
+    "category": "刀剣",
+    "requirements": [
+      {
+        "skill": "刀剣",
+        "min": 70.0
+      }
+    ],
+    "successSkill": "刀剣",
+    "successRequired": 70.0,
+    "cost": {
+      "st": 33.0
+    },
+    "castTime": "200\n(90-96)",
+    "delay": "820\n→1230",
+    "description": "手にしている剣を投げて 離れた敵を攻撃する\n※投げた武器は失ってしまう\n壊れるのではなく消滅。シップ剣も消える\n※投げた武器の耐久は大幅に減少する",
+    "transfer": "×",
+    "acquisition": "NPC販売(夜間キャンプ/ヌブール村)\nタルタロッサエアー\nイクシオンウォリアー",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%B5%BB%29/%C5%E1%B7%F5",
+    "power": "1.5\n(1.3)",
+    "move": "×"
+  },
+  {
+    "id": "tech-203575cfb7-27261701c9-80",
+    "name": "ヴァルキリー ブレイド",
+    "kind": "テクニック",
+    "category": "刀剣",
+    "requirements": [
+      {
+        "skill": "刀剣",
+        "min": 80.0
+      }
+    ],
+    "successSkill": "刀剣",
+    "successRequired": 80.0,
+    "cost": {
+      "st": 38.0
+    },
+    "castTime": "140\n(36-42)",
+    "delay": "1100",
+    "description": "力一杯敵を切りつけ 大ダメージを与える。\n※武器の損傷も大きくなる\n武器損傷：通常攻撃10回分/Fizzle時9回分",
+    "transfer": "×",
+    "acquisition": "タルタロッサスラッシュ\nサベージランサーロード\nギガース\nウォーターウンディーネ",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%B5%BB%29/%C5%E1%B7%F5",
+    "power": "1.45\n(1.25)",
+    "move": "×"
+  },
+  {
+    "id": "tech-203575cfb7-01e080bd7e-80",
+    "name": "ウィンド エッジ",
+    "kind": "テクニック",
+    "category": "刀剣",
+    "requirements": [
+      {
+        "skill": "刀剣",
+        "min": 80.0
+      }
+    ],
+    "successSkill": "刀剣",
+    "successRequired": 80.0,
+    "cost": {
+      "st": 38.0
+    },
+    "castTime": "120\n()",
+    "delay": "1100",
+    "description": "風の刃を飛ばし、遠くにいる敵を斬りつけることができる技\n使用アイテム：原初の粉 1",
+    "transfer": "×",
+    "acquisition": "ChaosAge火の門 報酬",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%B5%BB%29/%C5%E1%B7%F5",
+    "power": "0.8\n(?)",
+    "move": "?"
+  },
+  {
+    "id": "tech-203575cfb7-1f7f0f3eb3-90",
+    "name": "ソード ダンス",
+    "kind": "テクニック",
+    "category": "刀剣",
+    "requirements": [
+      {
+        "skill": "刀剣",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "刀剣",
+    "successRequired": 90.0,
+    "cost": {
+      "st": 45.0
+    },
+    "castTime": "125\n(18-24)",
+    "delay": "1280\n※",
+    "description": "装備している武器で敵の直接攻撃をはじき返し ダメージを与える\n物理攻撃の範囲は前方扇状のレンジ3.5\n武器損傷：通常攻撃2回分/Fizzle時1回分",
+    "transfer": "×",
+    "acquisition": "タルタロッサスラッシュ\nサベージナイト\nサベージランサーロード\nギガース\nウォーターウンディーネ\nシャドウナイト",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%B5%BB%29/%C5%E1%B7%F5",
+    "power": "0.9\n(0.6)",
+    "move": "△"
+  },
+  {
+    "id": "tech-4dd9294514-72f6879545-1",
+    "name": "シールド ガード",
+    "kind": "テクニック",
+    "category": "盾",
+    "requirements": [
+      {
+        "skill": "盾",
+        "min": 1.0
+      }
+    ],
+    "successSkill": "盾",
+    "successRequired": 1.0,
+    "cost": {
+      "st": 5.0
+    },
+    "castTime": "75",
+    "delay": "490",
+    "description": "物理攻撃を防ぎ ダメージを減らす",
+    "transfer": "○",
+    "acquisition": "NPC販売",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%B5%BB%29/%BD%E2",
+    "move": "×",
+    "melee": "○",
+    "ranged": "○",
+    "magicGuard": "×"
+  },
+  {
+    "id": "tech-4dd9294514-0840749a7e-10",
+    "name": "スパイク アタック",
+    "kind": "テクニック",
+    "category": "盾",
+    "requirements": [
+      {
+        "skill": "盾",
+        "min": 10.0
+      }
+    ],
+    "successSkill": "盾",
+    "successRequired": 10.0,
+    "cost": {
+      "st": 11.0
+    },
+    "castTime": "125\n(48-54)",
+    "delay": "1200",
+    "description": "装備した盾で敵を強打する\n※盾のACが高いほど大ダメージを与えます\n攻撃技",
+    "transfer": "×",
+    "acquisition": "NPC販売\n荒くれ グレイブン\n用心棒 グレイブン\nヘテラ\nガーディアン",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%B5%BB%29/%BD%E2",
+    "move": "×",
+    "melee": "-",
+    "ranged": "-",
+    "magicGuard": "-"
+  },
+  {
+    "id": "tech-4dd9294514-bf3feac03e-20",
+    "name": "バッシュ",
+    "kind": "テクニック",
+    "category": "盾",
+    "requirements": [
+      {
+        "skill": "盾",
+        "min": 20.0
+      }
+    ],
+    "successSkill": "盾",
+    "successRequired": 20.0,
+    "cost": {
+      "st": 15.0
+    },
+    "castTime": "135",
+    "delay": "790",
+    "description": "盾で敵の直接攻撃を跳ね除けて、敵を無防備（被クリティカル率上昇）にさせる\nガード判定が長い\n強制的に一瞬で後ろを向かせる\n被クリティカル率上昇の効果時間は短い",
+    "transfer": "○",
+    "acquisition": "NPC販売\nオーク ガード\nアマゾネス ガード\nバルカー ガード",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%B5%BB%29/%BD%E2",
+    "move": "×",
+    "melee": "○",
+    "ranged": "×",
+    "magicGuard": "×"
+  },
+  {
+    "id": "tech-4dd9294514-e51a3a193a-30",
+    "name": "スタン ガード",
+    "kind": "テクニック",
+    "category": "盾",
+    "requirements": [
+      {
+        "skill": "盾",
+        "min": 30.0
+      }
+    ],
+    "successSkill": "盾",
+    "successRequired": 30.0,
+    "cost": {
+      "st": 15.0
+    },
+    "castTime": "135",
+    "delay": "1200",
+    "description": "直接攻撃を防ぎ ダメージを減らす\n※成功すると敵はスタン状態になる\n※スタン中は被ダメージ1割減",
+    "transfer": "○",
+    "acquisition": "NPC販売",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%B5%BB%29/%BD%E2",
+    "move": "×",
+    "melee": "○",
+    "ranged": "×",
+    "magicGuard": "×"
+  },
+  {
+    "id": "tech-4dd9294514-4658bdf487-40",
+    "name": "インパクト ステップ",
+    "kind": "テクニック",
+    "category": "盾",
+    "requirements": [
+      {
+        "skill": "盾",
+        "min": 40.0
+      }
+    ],
+    "successSkill": "盾",
+    "successRequired": 40.0,
+    "cost": {
+      "st": 21.0
+    },
+    "castTime": "110",
+    "delay": "900",
+    "description": "盾で敵の直接攻撃を弾き飛ばし、間合いを広げる\nガード成功すると、相手にノックバック効果\nノックバック距離が大きい",
+    "transfer": "○",
+    "acquisition": "NPC販売\nオーク ガード\nアマゾネス ガード\nバルカー ガード",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%B5%BB%29/%BD%E2",
+    "move": "○",
+    "melee": "○",
+    "ranged": "×",
+    "magicGuard": "×"
+  },
+  {
+    "id": "tech-4dd9294514-a9a2f6ae40-50",
+    "name": "バンデット ガード",
+    "kind": "テクニック",
+    "category": "盾",
+    "requirements": [
+      {
+        "skill": "盾",
+        "min": 50.0
+      }
+    ],
+    "successSkill": "盾",
+    "successRequired": 50.0,
+    "cost": {
+      "st": 23.0
+    },
+    "castTime": "120",
+    "delay": "1400",
+    "description": "敵が放った遠距離攻撃を盾で受け止めて、放ってきた弾を強奪する。\nガードブレイクを受けない\n（現状ではガードブレイク属性の遠隔物理技がない）",
+    "transfer": "○",
+    "acquisition": "NPC販売",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%B5%BB%29/%BD%E2",
+    "move": "○",
+    "melee": "×",
+    "ranged": "○",
+    "magicGuard": "×"
+  },
+  {
+    "id": "tech-4dd9294514-bb7912e660-60",
+    "name": "カミカゼ",
+    "kind": "テクニック",
+    "category": "盾",
+    "requirements": [
+      {
+        "skill": "盾",
+        "min": 60.0
+      }
+    ],
+    "successSkill": "盾",
+    "successRequired": 60.0,
+    "cost": {
+      "st": 27.0
+    },
+    "castTime": "240",
+    "delay": "1290",
+    "description": "盾に身を隠し ガードしたまま移動する\n直接攻撃のみガード可能\n※成功すると敵はスタン状態になる\nモーション終わり際にはガード判定が消える\n※スタン中は被ダメージ1割減",
+    "transfer": "×",
+    "acquisition": "NPC販売(夜間キャンプ)\nオーク ガード\nアマゾネス ガード\nバルカー ガード",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%B5%BB%29/%BD%E2",
+    "move": "○",
+    "melee": "○",
+    "ranged": "×",
+    "magicGuard": "×"
+  },
+  {
+    "id": "tech-4dd9294514-12086d127e-70",
+    "name": "リベンジ ガード",
+    "kind": "テクニック",
+    "category": "盾",
+    "requirements": [
+      {
+        "skill": "盾",
+        "min": 70.0
+      }
+    ],
+    "successSkill": "盾",
+    "successRequired": 70.0,
+    "cost": {
+      "st": 33.0
+    },
+    "castTime": "110",
+    "delay": "1400",
+    "description": "自分に向けて打たれた直接攻撃と魔法のダメージを 盾で跳ね返す\nガードに成功した近接物理攻撃を反射する\n魔法はAvoidした場合のみ反射する\n矢などの飛び道具は跳ね返せない",
+    "transfer": "×",
+    "acquisition": "NPC販売(夜間キャンプ/ヌブール村)",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%B5%BB%29/%BD%E2",
+    "move": "×",
+    "melee": "○",
+    "ranged": "×",
+    "magicGuard": "▲"
+  },
+  {
+    "id": "tech-4dd9294514-ce013c3add-80",
+    "name": "マジック ガード",
+    "kind": "テクニック",
+    "category": "盾",
+    "requirements": [
+      {
+        "skill": "盾",
+        "min": 80.0
+      }
+    ],
+    "successSkill": "盾",
+    "successRequired": 80.0,
+    "cost": {
+      "st": 33.0
+    },
+    "castTime": "201",
+    "delay": "1150",
+    "description": "自分に向かって放たれた魔法を 盾で吸収する\n※完全回避に成功すると、敵が放った魔法のコストを吸収する\n魔法をAvoidした時のみ、MP吸収の効果が発生する\n全属性耐性が大幅に上昇するBuffも付く\nガードブレイクを受けない\n（現状ではガードブレイク属性の魔法がない）\nガードロストは盾無しで魔法を受けた場合のみ",
+    "transfer": "×",
+    "acquisition": "タルタロッサ ナイト\nタルタロッサ パラディン\nキング ザブール\nシャドウナイト",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%B5%BB%29/%BD%E2",
+    "move": "○",
+    "melee": "×",
+    "ranged": "×",
+    "magicGuard": "○"
+  },
+  {
+    "id": "tech-4dd9294514-99504cbb43-90",
+    "name": "シールディング オーラ",
+    "kind": "テクニック",
+    "category": "盾",
+    "requirements": [
+      {
+        "skill": "盾",
+        "min": 90.0
+      }
+    ],
+    "successSkill": "盾",
+    "successRequired": 90.0,
+    "cost": {
+      "st": 36.0
+    },
+    "castTime": "130",
+    "delay": "1000",
+    "description": "シールドガードのオーラを発し\n近くにいる仲間を守る\n味方のAC・抵抗を大幅に上昇させる範囲Buff\n非ガード技(ガードブレイクを受けない)",
+    "transfer": "×",
+    "acquisition": "サベージ ナイト\nサベージ ランサーロード\nサベージ ドルイドロード\nギガース\nウォーター ウンディーネ\nキング ザブール\nバジリスク マザー\nブラッド ゴーレム",
+    "source": "MoERead",
+    "sourceUrl": "https://moeread.stars.ne.jp/?%A5%B9%A5%AD%A5%EB/%BD%CF%CE%FD%28%B5%BB%29/%BD%E2",
+    "move": "○",
+    "melee": "△",
+    "ranged": "△",
+    "magicGuard": "△"
+  }
+];
 
   const magic = [
-    {
-      id: "magic-minor-burst",
-      name: "マイナー バースト",
-      category: "破壊魔法",
-      kind: "魔法",
-      requirements: [{skill:"破壊魔法", min:1}],
-      successSkill: "破壊魔法",
-      successRequired: 1,
-      mp: 5,
-      reagent: "ノア ダスト",
-      note: "サンプル。"
-    },
-    {
-      id: "magic-healing",
-      name: "ヒーリング",
-      category: "回復魔法",
-      kind: "魔法",
-      requirements: [{skill:"回復魔法", min:10}],
-      successSkill: "回復魔法",
-      successRequired: 10,
-      mp: 9,
-      reagent: "ノア ダスト",
-      note: "サンプル。"
-    },
-    {
-      id: "magic-buff",
-      name: "エンライテン",
-      category: "強化魔法",
-      kind: "魔法",
-      requirements: [{skill:"強化魔法", min:20}],
-      successSkill: "強化魔法",
-      successRequired: 20,
-      mp: 11,
-      reagent: "ノア ダスト",
-      note: "サンプル。"
-    },
-    {
-      id: "magic-mesmerize",
-      name: "メスメライズ",
-      category: "神秘魔法",
-      kind: "魔法",
-      requirements: [{skill:"神秘魔法", min:40}],
-      successSkill: "神秘魔法",
-      successRequired: 40,
-      mp: 23,
-      reagent: "ノア パウダー",
-      note: "サンプル。"
-    }
-  ];
+  {
+    "id": "magic-minor-burst",
+    "name": "マイナー バースト",
+    "category": "破壊魔法",
+    "kind": "魔法",
+    "requirements": [
+      {
+        "skill": "破壊魔法",
+        "min": 1
+      }
+    ],
+    "successSkill": "破壊魔法",
+    "successRequired": 1,
+    "mp": 5,
+    "reagent": "ノア ダスト",
+    "note": "サンプル。"
+  },
+  {
+    "id": "magic-healing",
+    "name": "ヒーリング",
+    "category": "回復魔法",
+    "kind": "魔法",
+    "requirements": [
+      {
+        "skill": "回復魔法",
+        "min": 10
+      }
+    ],
+    "successSkill": "回復魔法",
+    "successRequired": 10,
+    "mp": 9,
+    "reagent": "ノア ダスト",
+    "note": "サンプル。"
+  },
+  {
+    "id": "magic-buff",
+    "name": "エンライテン",
+    "category": "強化魔法",
+    "kind": "魔法",
+    "requirements": [
+      {
+        "skill": "強化魔法",
+        "min": 20
+      }
+    ],
+    "successSkill": "強化魔法",
+    "successRequired": 20,
+    "mp": 11,
+    "reagent": "ノア ダスト",
+    "note": "サンプル。"
+  },
+  {
+    "id": "magic-mesmerize",
+    "name": "メスメライズ",
+    "category": "神秘魔法",
+    "kind": "魔法",
+    "requirements": [
+      {
+        "skill": "神秘魔法",
+        "min": 40
+      }
+    ],
+    "successSkill": "神秘魔法",
+    "successRequired": 40,
+    "mp": 23,
+    "reagent": "ノア パウダー",
+    "note": "サンプル。"
+  }
+];
 
   window.MOE_SKILL_SIM_KNOWLEDGE = {
     masteries,
     techniques,
     magic,
     source: {
-      masteries: "MoERead シップ/複合",
-      url: "https://moeread.stars.ne.jp/?シップ/複合"
-    }
+  "masteries": "MoERead シップ/複合",
+  "url": "https://moeread.stars.ne.jp/?シップ/複合",
+  "techniques": "MoERead 熟練(技) 表内テクニック",
+  "techniqueCategories": {
+    "魔法熟練": 10,
+    "戦闘技術": 10,
+    "槍": 8,
+    "こんぼう": 8,
+    "刀剣": 8,
+    "盾": 10
+  }
+}
   };
 })();

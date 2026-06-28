@@ -3166,13 +3166,21 @@ function skillKnowledgeItemHtml(ev, type) {
   const tierButtons = item.kind === "マスタリー" ? skillKnowledgeMasteryTierButtons(item) : "";
 
   const extra = [];
+  if (item.cost?.st !== undefined) extra.push(`ST ${fmt(item.cost.st, 0)}`);
+  if (item.cost?.mp !== undefined) extra.push(`MP ${fmt(item.cost.mp, 0)}`);
   if (item.mp !== undefined) extra.push(`MP ${item.mp}`);
+  if (item.castTime) extra.push(`発動 ${String(item.castTime).replace(/\n+/g, " ")}`);
+  if (item.delay) extra.push(`Delay ${String(item.delay).replace(/\n+/g, " ")}`);
+  if (item.power) extra.push(`威力 ${String(item.power).replace(/\n+/g, " ")}`);
+  if (item.range) extra.push(`射程 ${String(item.range).replace(/\n+/g, " ")}`);
+  if (item.move) extra.push(`移動 ${String(item.move).replace(/\n+/g, " ")}`);
   if (item.reagent) extra.push(`触媒 ${item.reagent}`);
   if (item.effect) extra.push(String(item.effect).replace(/\n+/g, " / "));
   const extraHtml = extra.length ? `<div class="skillKnowledgeExtra">${escapeHtml(extra.join(" / "))}</div>` : "";
   const prereq = Array.isArray(item.prerequisiteTechniques) && item.prerequisiteTechniques.length
     ? `<div class="skillKnowledgeNote">前提テク: ${escapeHtml(item.prerequisiteTechniques.join(" / "))}</div>`
     : "";
+  const desc = item.description ? `<div class="skillKnowledgeNote">${escapeHtml(String(item.description).replace(/\n+/g, " / "))}</div>` : "";
   const note = item.note ? `<div class="skillKnowledgeNote">${escapeHtml(item.note)}</div>` : "";
 
   return `<article class="skillKnowledgeItem ${skillKnowledgeStatusClass(ev.status)}">
@@ -3187,6 +3195,7 @@ function skillKnowledgeItemHtml(ev, type) {
     ${success}
     ${extraHtml}
     ${prereq}
+    ${desc}
     ${note}
   </article>`;
 }
@@ -3232,7 +3241,7 @@ function renderSkillKnowledge() {
     const dataSource = data.source?.masteries || "不明";
     const usingFallback = dataSource === "内蔵フォールバック";
     const sampleNote = `<span class="skillKnowledgeSampleNote">${usingFallback ? "内蔵マスタリー使用" : "マスタリー実データ"} / テク・魔法はサンプル</span>`;
-    summary.innerHTML = `${shown}/${total}件表示 / 使用可能 ${okCount}件 ${sampleNote}<br><span class="small mutedText">Build v1.20.6 / マスタリー ${data.masteries.length}件 / テク ${data.techniques.length}件 / 魔法 ${data.magic.length}件 / ソース: ${escapeHtml(dataSource)}</span>`;
+    summary.innerHTML = `${shown}/${total}件表示 / 使用可能 ${okCount}件 ${sampleNote}<br><span class="small mutedText">Build v1.20.7 / マスタリー ${data.masteries.length}件 / テク ${data.techniques.length}件 / 魔法 ${data.magic.length}件 / ソース: ${escapeHtml(dataSource)}</span>`;
   }
 }
 
