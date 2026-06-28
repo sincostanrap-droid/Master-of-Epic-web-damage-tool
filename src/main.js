@@ -1963,9 +1963,9 @@ function currentForWeaponReq(req) {
 function weaponReqRowsWithSkillSimCurrent(rows) {
   return normalizeWeaponReqRowsForEquipment(rows).map(r => ({
     ...r,
-    name: validSkillSimSkillName(r.name),
-    current: currentForWeaponReq(r)
-  }));
+    name: validSkillSimSkillName(r.name, ""),
+    current: r.name ? skillSimValue(r.name) : 0
+  })).filter(r => r.name);
 }
 
 function updateWeaponReqAutoCurrentDisplays() {
@@ -1976,16 +1976,20 @@ function updateWeaponReqAutoCurrentDisplays() {
 }
 
 function normalizeWeaponReqRowsForEquipment(rows) {
-  const normalized = (Array.isArray(rows) ? rows : []).map(r => ({
-    name: validSkillSimSkillName(r.name || r.skill || "こんぼう"),
-    // current は旧データ互換用に保持するだけ。実計算ではスキルシミュレータの現在値を使う。
-    current: parseFloat(r.current) || 0,
-    required: parseFloat(r.required) || 0
-  })).filter(r => r.name || r.current || r.required);
+  const normalized = (Array.isArray(rows) ? rows : []).map(r => {
+    const rawName = r.name || r.skill || "";
+    return {
+      // 重要: 不明なスキル名を「こんぼう」に丸めない。
+      // UIのselect用デフォルトとは別に、取り込み/保存データでは不明名を落とす。
+      name: validSkillSimSkillName(rawName, ""),
+      current: parseFloat(r.current) || 0,
+      required: parseFloat(r.required) || 0
+    };
+  }).filter(r => r.name && (r.required || r.current));
 
   const map = new Map();
   normalized.forEach(r => {
-    const key = r.name || "使用条件";
+    const key = r.name;
     const prev = map.get(key);
     if (!prev || (+r.required || 0) > (+prev.required || 0)) map.set(key, r);
   });
@@ -5258,16 +5262,27 @@ function idbNormalizeSkillNameForTool(name) {
   const noSpace = s.replace(/\s+/g, "");
   const alias = {
     "刀剣": "刀剣",
+    "刀剣スキル": "刀剣",
+    "刀剣skill": "刀剣",
     "こんぼう": "こんぼう",
     "棍棒": "こんぼう",
+    "棍棒スキル": "こんぼう",
     "槍": "槍",
+    "槍スキル": "槍",
     "素手": "素手",
+    "素手スキル": "素手",
     "弓": "弓",
+    "弓スキル": "弓",
     "銃器": "銃器",
+    "銃器スキル": "銃器",
     "投げ": "投げ",
+    "投げスキル": "投げ",
     "罠": "罠",
+    "罠スキル": "罠",
     "牙": "牙",
+    "牙スキル": "牙",
     "キック": "キック",
+    "キックスキル": "キック",
     "戦闘技術": "戦闘技術",
     "盾": "盾",
     "着こなし": "着こなし",
@@ -5275,7 +5290,18 @@ function idbNormalizeSkillNameForTool(name) {
   };
   if (alias[noSpace]) return alias[noSpace];
 
-  return SKILL_SIM_ALL.find(x => noSpace.includes(x.replace(/\s+/g, ""))) || s;
+  // 「必要スキル 刀剣」「刀剣 1.0」などの文字列からは拾う。
+  const matches = SKILL_SIM_ALL
+    .slice()
+    .sort((a, b) => b.length - a.length)
+    .filter(x => new RegExp(`(^|[^ぁ-んァ-ヶ一-龠A-Za-z0-9])${idbEscapeRegExp(x)}([^ぁ-んァ-ヶ一-龠A-Za-z0-9]|$)`).test(s));
+  if (matches.length === 1) return matches[0];
+
+  if (/棍棒/.test(s) && matches.length === 0) return "こんぼう";
+
+  // ここで raw string を返すと、後段のUI正規化で「こんぼう」に化ける。
+  // 不明な値は空にして捨てる。
+  return "";
 }
 
 function idbEscapeRegExp(s) {
@@ -5957,6 +5983,8 @@ function idbParserSelfTest() {
 
   const weaponPageMulti3 = `<div id="app" data-page="{&quot;component&quot;:&quot;Public/Items/Weapons/Show&quot;,&quot;props&quot;:{&quot;weapon&quot;:{&quot;id&quot;:4856,&quot;name&quot;:&quot;SGK ウェポン&quot;,&quot;equip&quot;:&quot;右手 2HAND&quot;,&quot;damage&quot;:89,&quot;attack_interval&quot;:690,&quot;effective_range&quot;:7.1,&quot;requiredSkill1&quot;:&quot;刀剣&quot;,&quot;need_level1&quot;:100,&quot;requiredSkill2&quot;:&quot;素手&quot;,&quot;need_level2&quot;:100,&quot;requiredSkill3&quot;:&quot;槍&quot;,&quot;need_level3&quot;:100,&quot;description&quot;:&quot;武器カテゴリ説明にこんぼうという語が混じっても必要スキルへ混ぜない&quot;}}}"></div>`;
 
+  const copperKnifePage = `<div id="app" data-page="{&quot;component&quot;:&quot;Public/Items/Weapons/Show&quot;,&quot;props&quot;:{&quot;weapon&quot;:{&quot;id&quot;:282,&quot;name&quot;:&quot;カッパー ナイフ&quot;,&quot;equip&quot;:&quot;右手 左手&quot;,&quot;damage&quot;:2.2,&quot;effective_range&quot;:3.6,&quot;requiredSkill&quot;:&quot;刀剣&quot;,&quot;need_level&quot;:1,&quot;type&quot;:&quot;Weapon&quot;,&quot;info&quot;:&quot;説明文にこんぼうという語が混じっても必要スキルにはしない&quot;,&quot;add_statuses&quot;:[{&quot;name&quot;:&quot;命中&quot;,&quot;pivot&quot;:{&quot;value&quot;:5}}]}}}"></div>`;
+
   const samples = [
 `ジャイアント ドラゴンフライ
 装備部位
@@ -5991,7 +6019,8 @@ inertiaPage,
 weaponPageDirect,
 weaponPageNested,
 weaponPageMulti2,
-weaponPageMulti3
+weaponPageMulti3,
+copperKnifePage
   ];
   return samples.map(s => {
     const parsed = parseIdbEquipmentFromPaste(s).row;
