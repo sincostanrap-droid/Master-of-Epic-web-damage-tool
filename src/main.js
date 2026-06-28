@@ -3665,6 +3665,7 @@ function normalizeCompositeRows(rows) {
   return (Array.isArray(rows) ? rows : []).map(r => {
     const out = {
       enabled: !!r.enabled,
+      fixed: !!r.fixed,
       excluded: !!r.excluded,
       slot: r.slot !== false,
       name: r.name || "装備以外Buff",
@@ -4184,7 +4185,7 @@ function checkboxCell(row, prop) {
     renderTagLinkSummary();
     calc();
   };
-  const td = makeCell("td");
+  const td = makeCell("td", {class:"checkCell"});
   td.appendChild(cb);
   return td;
 }
@@ -4202,7 +4203,24 @@ function excludeCheckboxCell(row, renderFn=null) {
     renderTagLinkSummary();
     calc();
   };
-  const td = makeCell("td", {class:"excludeCell"});
+  const td = makeCell("td", {class:"checkCell excludeCell"});
+  td.appendChild(cb);
+  return td;
+}
+
+
+function fixedCheckboxCell(row) {
+  const cb = makeCell("input", {
+    type:"checkbox",
+    checked: !!row.fixed,
+    title:"最適化時にこのBuffの状態を固定します"
+  });
+  cb.onchange = () => {
+    row.fixed = cb.checked;
+    renderTagLinkSummary();
+    calc();
+  };
+  const td = makeCell("td", {class:"checkCell fixedCell"});
   td.appendChild(cb);
   return td;
 }
@@ -4598,7 +4616,7 @@ function renderCompositeTable() {
   state.composite = normalizeCompositeRows(state.composite);
 
   if (!state.composite.length) {
-    renderEmptyRow(tbody, 18, "まだ装備以外Buffがありません。「Buff行を追加」から追加してください。");
+    renderEmptyRow(tbody, 19, "まだ装備以外Buffがありません。「Buff行を追加」から追加してください。");
     return;
   }
 
@@ -4606,8 +4624,10 @@ function renderCompositeTable() {
     const frag = document.createDocumentFragment();
     const tr = document.createElement("tr");
     if (row.excluded) tr.classList.add("excludedRow");
+    if (row.fixed) tr.classList.add("fixedRow");
     tr.appendChild(checkboxCell(row, "enabled"));
     tr.appendChild(checkboxCell(row, "slot"));
+    tr.appendChild(fixedCheckboxCell(row));
     tr.appendChild(excludeCheckboxCell(row, renderCompositeTable));
 
     const name = makeCell("input", {value: row.name || ""});
@@ -4628,6 +4648,7 @@ function renderCompositeTable() {
 
     const detailTr = makeCompositeExtraDetailRow(row);
     if (row.excluded) detailTr.classList.add("excludedRow");
+    if (row.fixed) detailTr.classList.add("fixedRow");
     tr.appendChild(compositeExtraCell(row, detailTr));
 
     const note = makeCell("input", {value: row.note || ""});
@@ -4643,7 +4664,7 @@ function renderCompositeTable() {
 
 function addCompositeRow(kind="blank") {
   const row = {
-    enabled:true, slot:true, excluded:false, name:"装備以外Buff", tags:"",
+    enabled:true, slot:true, fixed:false, excluded:false, name:"装備以外Buff", tags:"",
     attackPct:0, magicPct:0, speedPct:0,
     flatAttack:0, flatMagic:0, flatSpeed:0,
     convMagicRate:0, convSpeedRate:0,
@@ -5104,7 +5125,7 @@ function equipmentUseCell(row, idx) {
     renderEquipmentTable();
     calc();
   };
-  const td = makeCell("td");
+  const td = makeCell("td", {class:"checkCell"});
   td.appendChild(cb);
   return td;
 }
@@ -5557,7 +5578,7 @@ function renderNumericTable(type) {
   tbody.innerHTML = "";
   if (!state[type].length) {
     const label = type === "dmg" ? "与ダメ行" : type === "special" ? "特攻行" : "外枠補正行";
-    const colspan = type === "dmg" ? 8 : type === "post" ? 8 : 7;
+    const colspan = type === "dmg" ? 9 : type === "post" ? 9 : 8;
     renderEmptyRow(tbody, colspan, `${label}はありません。必要な場合だけ行を追加してください。`);
     return;
   }
@@ -5565,8 +5586,10 @@ function renderNumericTable(type) {
   state[type].forEach((row, idx) => {
     const tr = document.createElement("tr");
     if (row.excluded) tr.classList.add("excludedRow");
+    if (row.fixed) tr.classList.add("fixedRow");
     tr.appendChild(checkboxCell(row, "enabled"));
     tr.appendChild(checkboxCell(row, "slot"));
+    tr.appendChild(fixedCheckboxCell(row));
     tr.appendChild(excludeCheckboxCell(row, () => renderNumericTable(type)));
 
     const name = makeCell("input", {value: row.name || ""});
@@ -5600,8 +5623,8 @@ function addRow(type) {
   if (type === "magicFlat") state.magicFlat.push({enabled:true, slot:true, name:"新規魔力", value:0, note:""});
   if (type === "atk") state.atk.push({enabled:true, slot:true, name:"新規攻撃力", value:0, note:""});
   if (type === "dmg") state.dmg.push({enabled:true, slot:true, name:"新規与ダメ", value:0, category:"", note:""});
-  if (type === "special") state.special.push({enabled:true, slot:false, excluded:false, name:"新規特攻", value:1.5, note:""});
-  if (type === "post") state.post.push({enabled:true, slot:false, excluded:false, name:"新規外枠", tags:"", value:1, note:""});
+  if (type === "special") state.special.push({enabled:true, slot:false, fixed:false, excluded:false, name:"新規特攻", value:1.5, note:""});
+  if (type === "post") state.post.push({enabled:true, slot:false, fixed:false, excluded:false, name:"新規外枠", tags:"", value:1, note:""});
   renderAll();
   calc();
 }
@@ -5612,13 +5635,14 @@ function renderOtherTable() {
   if (!tbody) return;
   tbody.innerHTML = "";
   if (!state.other.length) {
-    renderEmptyRow(tbody, 6, "その他バフ行はありません。バフ枠だけ数えたいものがある場合に追加してください。");
+    renderEmptyRow(tbody, 7, "その他バフ行はありません。バフ枠だけ数えたいものがある場合に追加してください。");
     return;
   }
 
   state.other.forEach((row, idx) => {
     const tr = document.createElement("tr");
     if (row.excluded) tr.classList.add("excludedRow");
+    if (row.fixed) tr.classList.add("fixedRow");
 
     const enabled = makeCell("input", {type:"checkbox", checked: !!row.enabled});
     enabled.onchange = () => {
@@ -5626,7 +5650,8 @@ function renderOtherTable() {
       if (enabled.checked && row.excluded) row.excluded = false;
       renderOtherTable(); renderTagLinkSummary(); calc();
     };
-    tr.appendChild(makeCell("td")).appendChild(enabled);
+    tr.appendChild(makeCell("td", {class:"checkCell"})).appendChild(enabled);
+    tr.appendChild(fixedCheckboxCell(row));
     tr.appendChild(excludeCheckboxCell(row, renderOtherTable));
 
     const name = makeCell("input", {value: row.name || ""});
@@ -5646,7 +5671,7 @@ function renderOtherTable() {
 }
 
 function addOtherRow() {
-  state.other.push({enabled:true, excluded:false, name:"その他バフ", tags:"", note:""});
+  state.other.push({enabled:true, fixed:false, excluded:false, name:"その他バフ", tags:"", note:""});
   renderOtherTable();
   calc();
 }

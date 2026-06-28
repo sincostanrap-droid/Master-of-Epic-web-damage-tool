@@ -64,7 +64,7 @@ MoE固有の主な仮定:
 </head>
 <body>
 <h1>Master of Epic 物理ダメージ計算webツール</h1>
-<p id="appBuildStamp" class="small appBuildStamp">スキルシミュレータ拡張版 v1.21.8</p>
+<p id="appBuildStamp" class="small appBuildStamp">スキルシミュレータ拡張版 v1.21.9</p>
 <section class="heroCard">
   <div>
     <div class="heroBadge">MoE / Physical Damage Calculator</div>
@@ -920,7 +920,7 @@ MoE固有の主な仮定:
     <table id="compositeBuffTable" class="compactTable compositeTable">
       <thead>
         <tr>
-          <th>使用</th><th>枠</th><th>除外</th><th>名称</th><th>競合グループ</th>
+          <th class="checkCol">使用</th><th class="checkCol">枠</th><th class="checkCol">固定</th><th class="checkCol">除外</th><th>名称</th><th>競合グループ</th>
           <th>攻撃力%</th><th>魔力%</th><th>速度%</th>
           <th>攻撃力+</th><th>魔力+</th><th>速度+</th>
           <th>魔力→攻撃力%</th><th>速度→攻撃力%</th>
@@ -964,7 +964,7 @@ MoE固有の主な仮定:
   <h2>外枠補正（最後に掛かる補正）</h2>
   <p class="small">ネヤ補正、被ダメ増加、パンチングマシン補正など、最後にまとめて掛ける補正を入力します。バフ枠に入るものだけ「枠」をONにしてください。</p>
   <table id="postBuffTable" class="compactTable">
-    <thead><tr><th>使用</th><th>枠</th><th>除外</th><th>名称</th><th>競合グループ</th><th>倍率</th><th>メモ / ソース</th><th>削除</th></tr></thead>
+    <thead><tr><th class="checkCol">使用</th><th class="checkCol">枠</th><th class="checkCol">固定</th><th class="checkCol">除外</th><th>名称</th><th>競合グループ</th><th>倍率</th><th>メモ / ソース</th><th>削除</th></tr></thead>
     <tbody></tbody>
   </table>
   <button onclick="addRow('post')">外枠行を追加</button>
@@ -974,7 +974,7 @@ MoE固有の主な仮定:
   <h2>その他バフ（枠だけ数える）</h2>
   <p class="small">ダメージには影響しないけれど、24枠には入るBuffを登録します。</p>
   <table id="otherBuffTable" class="compactTable">
-    <thead><tr><th>使用</th><th>除外</th><th>名称</th><th>競合グループ</th><th>メモ / ソース</th><th>削除</th></tr></thead>
+    <thead><tr><th class="checkCol">使用</th><th class="checkCol">固定</th><th class="checkCol">除外</th><th>名称</th><th>競合グループ</th><th>メモ / ソース</th><th>削除</th></tr></thead>
     <tbody></tbody>
   </table>
   <button onclick="addOtherRow()">その他バフ行を追加</button>
@@ -1212,11 +1212,11 @@ MoE固有の主な仮定:
   <textarea id="configBox" placeholder="JSONまたはTSVをここに貼り付けて読み込み可能"></textarea>
 </section>
 
-<script src="./src/storage/shareUrl.js?v=1.21.8" defer></script>
-<script src="./src/storage/importExport.js?v=1.21.8" defer></script>
-<script src="./src/calc/core.js?v=1.21.8" defer></script>
-<script src="./src/data/skillSimKnowledge.js?v=1.21.8" defer></script>
-<script src="./src/main.js?v=1.21.8" defer></script>
-<script src="./src/optimizer/core.js?v=1.21.8" defer></script>
+<script src="./src/storage/shareUrl.js?v=1.21.9" defer></script>
+<script src="./src/storage/importExport.js?v=1.21.9" defer></script>
+<script src="./src/calc/core.js?v=1.21.9" defer></script>
+<script src="./src/data/skillSimKnowledge.js?v=1.21.9" defer></script>
+<script src="./src/main.js?v=1.21.9" defer></script>
+<script src="./src/optimizer/core.js?v=1.21.9" defer></script>
 </body>
 </html>

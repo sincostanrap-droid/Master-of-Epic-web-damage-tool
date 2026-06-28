@@ -3566,3 +3566,27 @@
 .excludedRow input,
 .excludedRow select,
 .excludedRow button { filter: grayscale(.25); }
+
+
+/* v1.21.9: Buff固定/除外チェック幅調整 */
+.compactTable th.checkCol,
+.compactTable td.checkCell,
+.compactTable td.excludeCell,
+.compactTable td.fixedCell {
+  width: 2.4rem;
+  min-width: 2.4rem;
+  max-width: 2.4rem;
+  padding-left: 4px;
+  padding-right: 4px;
+  text-align: center;
+  white-space: nowrap;
+}
+.compactTable td.checkCell input[type="checkbox"],
+.compactTable td.excludeCell input[type="checkbox"],
+.compactTable td.fixedCell input[type="checkbox"] {
+  margin: 0;
+}
+.fixedRow {
+  outline: 1px dashed rgba(80, 80, 80, .25);
+  outline-offset: -2px;
+}
