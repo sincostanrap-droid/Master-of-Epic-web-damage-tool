@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Master of Epic 公式DBスプレッドシート → ツール用カタログ生成
- * v0.1.0
+ * v0.1.3
  *
  * 既定ではユーザーが作成した公開スプレッドシートから items_all / add_status / equip_buff を取得し、
  * src/data/generated/equipmentCatalog.generated.js と buffCatalog.generated.js を生成します。
@@ -16,6 +16,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
 
+const GENERATOR_VERSION = 'v1.23.11';
 const DEFAULT_SPREADSHEET_ID = '10nHr68XojjuxxJrpLBENrDWUB4TywMGy8CTe9lzclSE';
 
 const CONFIG = {
@@ -113,7 +114,7 @@ async function loadSheet(sheetName) {
   }
 
   const url = `https://docs.google.com/spreadsheets/d/${CONFIG.spreadsheetId}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(sheetName)}`;
-  const res = await fetch(url, { headers: { 'User-Agent': 'MoE equipment catalog generator/0.1.0' } });
+  const res = await fetch(url, { headers: { 'User-Agent': 'MoE equipment catalog generator/0.1.1' } });
   const text = await res.text();
   if (!res.ok) throw new Error(`${sheetName}: HTTP ${res.status} ${text.slice(0, 120)}`);
   if (/^\s*</.test(text)) throw new Error(`${sheetName}: CSVではなくHTMLが返りました。共有設定かシート名を確認してください。`);
@@ -168,18 +169,205 @@ function mapSlot(equip, category) {
   return '';
 }
 
+const OFFICIAL_ADD_STATUS_TO_TOOL_STAT = Object.freeze({
+  "攻撃力": "attack",
+  "魔力": "magic",
+  "移動速度": "speed",
+  "速度": "speed",
+
+  "最大HP": "extraHP",
+  "HP": "extraHP",
+  "最大ＭＰ": "extraMP",
+  "最大MP": "extraMP",
+  "MP": "extraMP",
+  "最大ＳＴ": "extraST",
+  "最大ST": "extraST",
+  "ST": "extraST",
+  "防御力": "extraAC",
+  "アーマークラス": "extraAC",
+  "AC": "extraAC",
+  "最大重量": "extraMaxWeight",
+  "重量": "extraMaxWeight",
+  "命中": "extraHit",
+  "回避": "extraAvoid",
+
+  "攻撃ディレイ": "extraAttackDelay",
+  "魔法ディレイ": "extraMagicDelay",
+
+  "耐火属性": "extraFireRes",
+  "火耐性": "extraFireRes",
+  "火属性抵抗": "extraFireRes",
+  "耐水属性": "extraWaterRes",
+  "水耐性": "extraWaterRes",
+  "水属性抵抗": "extraWaterRes",
+  "耐地属性": "extraEarthRes",
+  "地耐性": "extraEarthRes",
+  "地属性抵抗": "extraEarthRes",
+  "耐風属性": "extraWindRes",
+  "風耐性": "extraWindRes",
+  "風属性抵抗": "extraWindRes",
+  "耐無属性": "extraNeutralRes",
+  "無耐性": "extraNeutralRes",
+  "無属性抵抗": "extraNeutralRes",
+
+  "BREATH": "extraBreath",
+  "HEARING": "extraHearing",
+  "SEEING": "extraSeeing",
+  "SMELLING": "extraSmelling",
+  "満腹度": "extraFullness",
+  "潤喉度": "extraThirst",
+  "盗み補正": "extraSteal",
+  "ピッキング失敗回数補正": "extraLockpickingFail",
+  "牙攻撃補正": "extraFangAttack",
+  "釣りゲージ長": "extraFishingGaugeLength",
+  "釣りヒットゾーン": "extraFishingHitZone",
+  "鍛冶グレードゾーン": "extraSmithingGradeZone",
+  "鍛冶ゲージ滑り": "extraSmithingGaugeSlip",
+  "鍛冶ヒットゾーン": "extraSmithingHitZone",
+  "大工グレードゾーン": "extraCarpentryGradeZone",
+  "大工ゲージ滑り": "extraCarpentryGaugeSlip",
+  "大工ヒットゾーン": "extraCarpentryHitZone",
+  "裁縫グレードゾーン": "extraTailoringGradeZone",
+  "裁縫ゲージ滑り": "extraTailoringGaugeSlip",
+  "裁縫ヒットゾーン": "extraTailoringHitZone",
+  "装飾細工グレードゾーン": "extraDecorationGradeZone",
+  "装飾細工ゲージ滑り": "extraDecorationGaugeSlip",
+  "装飾細工ヒットゾーン": "extraDecorationHitZone",
+  "料理グレードゾーン": "extraCookingGradeZone",
+  "料理ゲージ滑り": "extraCookingGaugeSlip",
+  "料理ヒットゾーン": "extraCookingHitZone",
+  "醸造グレードゾーン": "extraBrewingGradeZone",
+  "醸造ゲージ滑り": "extraBrewingGaugeSlip",
+  "醸造ヒットゾーン": "extraBrewingHitZone",
+  "薬調合グレードゾーン": "extraAlchemyGradeZone",
+  "薬調合ゲージ滑り": "extraAlchemyGaugeSlip",
+  "薬調合ヒットゾーン": "extraAlchemyHitZone",
+  "複製グレードゾーン": "extraReplicationGradeZone",
+  "複製ゲージ滑り": "extraReplicationGaugeSlip",
+  "複製ヒットゾーン": "extraReplicationHitZone",
+  "美容ゲージ滑り": "extraBeautyGaugeSlip",
+  "美容ヒットゾーン": "extraBeautyHitZone"
+});
+
+const OFFICIAL_ADD_STATUS_KNOWN_IGNORED = Object.freeze(new Set([]));
+
+const TOOL_STAT_DISPLAY_NAMES = Object.freeze({
+  attack: "攻撃力",
+  magic: "魔力",
+  speed: "移動速度",
+  extraAC: "AC",
+  extraHP: "HP",
+  extraMP: "MP",
+  extraST: "ST",
+  extraMaxWeight: "最大重量",
+  extraHit: "命中",
+  extraAvoid: "回避",
+  extraAttackDelay: "攻撃ディレイ",
+  extraMagicDelay: "魔法ディレイ",
+  extraFireRes: "耐火属性",
+  extraWaterRes: "耐水属性",
+  extraEarthRes: "耐地属性",
+  extraWindRes: "耐風属性",
+  extraNeutralRes: "耐無属性",
+  extraBreath: "BREATH",
+  extraHearing: "HEARING",
+  extraSeeing: "SEEING",
+  extraSmelling: "SMELLING",
+  extraFullness: "満腹度",
+  extraThirst: "潤喉度",
+  extraSteal: "盗み補正",
+  extraLockpickingFail: "ピッキング失敗回数補正",
+  extraFangAttack: "牙攻撃補正",
+  extraFishingGaugeLength: "釣りゲージ長",
+  extraFishingHitZone: "釣りヒットゾーン",
+  extraSmithingGradeZone: "鍛冶グレードゾーン",
+  extraSmithingGaugeSlip: "鍛冶ゲージ滑り",
+  extraSmithingHitZone: "鍛冶ヒットゾーン",
+  extraCarpentryGradeZone: "大工グレードゾーン",
+  extraCarpentryGaugeSlip: "大工ゲージ滑り",
+  extraCarpentryHitZone: "大工ヒットゾーン",
+  extraTailoringGradeZone: "裁縫グレードゾーン",
+  extraTailoringGaugeSlip: "裁縫ゲージ滑り",
+  extraTailoringHitZone: "裁縫ヒットゾーン",
+  extraDecorationGradeZone: "装飾細工グレードゾーン",
+  extraDecorationGaugeSlip: "装飾細工ゲージ滑り",
+  extraDecorationHitZone: "装飾細工ヒットゾーン",
+  extraCookingGradeZone: "料理グレードゾーン",
+  extraCookingGaugeSlip: "料理ゲージ滑り",
+  extraCookingHitZone: "料理ヒットゾーン",
+  extraBrewingGradeZone: "醸造グレードゾーン",
+  extraBrewingGaugeSlip: "醸造ゲージ滑り",
+  extraBrewingHitZone: "醸造ヒットゾーン",
+  extraAlchemyGradeZone: "薬調合グレードゾーン",
+  extraAlchemyGaugeSlip: "薬調合ゲージ滑り",
+  extraAlchemyHitZone: "薬調合ヒットゾーン",
+  extraReplicationGradeZone: "複製グレードゾーン",
+  extraReplicationGaugeSlip: "複製ゲージ滑り",
+  extraReplicationHitZone: "複製ヒットゾーン",
+  extraBeautyGaugeSlip: "美容ゲージ滑り",
+  extraBeautyHitZone: "美容ヒットゾーン"
+});
+
+function normalizeOfficialAddStatusName(name) {
+  return str(name)
+    .replace(/[＋]/g, '+')
+    .replace(/[－−―]/g, '-')
+    .replace(/[：]/g, ':')
+    .replace(/[％]/g, '%')
+    .replace(/　/g, ' ')
+    .replace(/\s+/g, '')
+    .replace(/^最大HP$/i, '最大HP')
+    .replace(/^最大MP$/i, '最大MP')
+    .replace(/^最大ST$/i, '最大ST')
+    .trim();
+}
+
+function isKnownIgnoredStatus(name) {
+  const n = normalizeOfficialAddStatusName(name);
+  return !n || n === 'なし' || OFFICIAL_ADD_STATUS_KNOWN_IGNORED.has(n);
+}
+
+
+function deriveUtilityAddStatusKey(normalizedName) {
+  const n = normalizedName || '';
+  const craftMap = {
+    '鍛冶': 'Smithing',
+    '大工': 'Carpentry',
+    '裁縫': 'Tailoring',
+    '装飾細工': 'Decoration',
+    '料理': 'Cooking',
+    '醸造': 'Brewing',
+    '薬調合': 'Alchemy',
+    '複製': 'Replication',
+  };
+  for (const [jp, en] of Object.entries(craftMap)) {
+    if (n === `${jp}グレードゾーン`) return `extra${en}GradeZone`;
+    if (n === `${jp}ゲージ滑り`) return `extra${en}GaugeSlip`;
+    if (n === `${jp}ヒットゾーン`) return `extra${en}HitZone`;
+  }
+  if (n === '美容ゲージ滑り') return 'extraBeautyGaugeSlip';
+  if (n === '美容ヒットゾーン') return 'extraBeautyHitZone';
+  if (n === '釣りゲージ長') return 'extraFishingGaugeLength';
+  if (n === '釣りヒットゾーン') return 'extraFishingHitZone';
+  return '';
+}
+
 function statusProp(name) {
-  const n = str(name);
+  const n = normalizeOfficialAddStatusName(name);
+  if (!n || n === 'なし' || isKnownIgnoredStatus(n)) return '';
+  const utilityStatusKey = deriveUtilityAddStatusKey(n);
+  if (utilityStatusKey) return utilityStatusKey;
+  if (OFFICIAL_ADD_STATUS_TO_TOOL_STAT[n]) return OFFICIAL_ADD_STATUS_TO_TOOL_STAT[n];
   if (/攻撃力/.test(n)) return 'attack';
   if (/魔力/.test(n)) return 'magic';
   if (/移動速度|速度/.test(n)) return 'speed';
-  if (/最大HP|HP/.test(n)) return 'extraHP';
-  if (/最大MP|MP/.test(n)) return 'extraMP';
-  if (/最大ST|ST/.test(n)) return 'extraST';
+  if (/最大?HP/.test(n)) return 'extraHP';
+  if (/最大?MP/.test(n)) return 'extraMP';
+  if (/最大?ST/.test(n)) return 'extraST';
+  if (/防御力|アーマークラス|AC/.test(n)) return 'extraAC';
   if (/最大重量|重量/.test(n)) return 'extraMaxWeight';
   if (/命中/.test(n)) return 'extraHit';
   if (/回避/.test(n)) return 'extraAvoid';
-  if (/防御力|アーマークラス|AC/.test(n)) return 'extraAC';
   if (/攻撃ディレイ/.test(n)) return 'extraAttackDelay';
   if (/魔法ディレイ/.test(n)) return 'extraMagicDelay';
   if (/耐火属性|火耐性|火属性抵抗/.test(n)) return 'extraFireRes';
@@ -187,8 +375,55 @@ function statusProp(name) {
   if (/耐地属性|地耐性|地属性抵抗/.test(n)) return 'extraEarthRes';
   if (/耐風属性|風耐性|風属性抵抗/.test(n)) return 'extraWindRes';
   if (/耐無属性|無耐性|無属性抵抗/.test(n)) return 'extraNeutralRes';
+  if (/BREATH/.test(n)) return 'extraBreath';
+  if (/HEARING/.test(n)) return 'extraHearing';
+  if (/SEEING/.test(n)) return 'extraSeeing';
+  if (/SMELLING/.test(n)) return 'extraSmelling';
+  if (/満腹度/.test(n)) return 'extraFullness';
+  if (/潤喉度/.test(n)) return 'extraThirst';
+  if (/盗み補正/.test(n)) return 'extraSteal';
+  if (/ピッキング失敗回数補正/.test(n)) return 'extraLockpickingFail';
+  if (/牙攻撃補正/.test(n)) return 'extraFangAttack';
+  if (/釣りゲージ長/.test(n)) return 'extraFishingGaugeLength';
+  if (/釣りヒットゾーン/.test(n)) return 'extraFishingHitZone';
+  if (/鍛冶グレードゾーン/.test(n)) return 'extraSmithingGradeZone';
+  if (/鍛冶ゲージ滑り/.test(n)) return 'extraSmithingGaugeSlip';
+  if (/鍛冶ヒットゾーン/.test(n)) return 'extraSmithingHitZone';
+  if (/大工グレードゾーン/.test(n)) return 'extraCarpentryGradeZone';
+  if (/大工ゲージ滑り/.test(n)) return 'extraCarpentryGaugeSlip';
+  if (/大工ヒットゾーン/.test(n)) return 'extraCarpentryHitZone';
+  if (/裁縫グレードゾーン/.test(n)) return 'extraTailoringGradeZone';
+  if (/裁縫ゲージ滑り/.test(n)) return 'extraTailoringGaugeSlip';
+  if (/裁縫ヒットゾーン/.test(n)) return 'extraTailoringHitZone';
+  if (/装飾細工グレードゾーン/.test(n)) return 'extraDecorationGradeZone';
+  if (/装飾細工ゲージ滑り/.test(n)) return 'extraDecorationGaugeSlip';
+  if (/装飾細工ヒットゾーン/.test(n)) return 'extraDecorationHitZone';
+  if (/料理グレードゾーン/.test(n)) return 'extraCookingGradeZone';
+  if (/料理ゲージ滑り/.test(n)) return 'extraCookingGaugeSlip';
+  if (/料理ヒットゾーン/.test(n)) return 'extraCookingHitZone';
+  if (/醸造グレードゾーン/.test(n)) return 'extraBrewingGradeZone';
+  if (/醸造ゲージ滑り/.test(n)) return 'extraBrewingGaugeSlip';
+  if (/醸造ヒットゾーン/.test(n)) return 'extraBrewingHitZone';
+  if (/薬調合グレードゾーン/.test(n)) return 'extraAlchemyGradeZone';
+  if (/薬調合ゲージ滑り/.test(n)) return 'extraAlchemyGaugeSlip';
+  if (/薬調合ヒットゾーン/.test(n)) return 'extraAlchemyHitZone';
+  if (/複製グレードゾーン/.test(n)) return 'extraReplicationGradeZone';
+  if (/複製ゲージ滑り/.test(n)) return 'extraReplicationGaugeSlip';
+  if (/複製ヒットゾーン/.test(n)) return 'extraReplicationHitZone';
+  if (/美容ゲージ滑り/.test(n)) return 'extraBeautyGaugeSlip';
+  if (/美容ヒットゾーン/.test(n)) return 'extraBeautyHitZone';
   return '';
 }
+
+function addToCountMap(map, key, value=1) {
+  if (!key) return;
+  map.set(key, (map.get(key) || 0) + value);
+}
+
+function mapToSortedObject(map) {
+  return Object.fromEntries(Array.from(map.entries()).sort((a, b) => String(a[0]).localeCompare(String(b[0]), 'ja')));
+}
+
 
 function weaponReq(row) {
   const skill = str(row.requiredSkill);
@@ -208,11 +443,19 @@ function toCatalog(items, addStatuses, equipBuffs) {
     const key = `${cat}:${str(st.item_id)}`;
     if (!statusMap.has(key)) statusMap.set(key, []);
     const value = num(st.value);
-    if (!str(st.status_name) || !value || str(st.status_name) === 'なし') continue;
+    const statusName = str(st.status_name);
+    if (!statusName || !value || statusName === 'なし') continue;
+    const statKey = statusProp(statusName);
+    const ignored = isKnownIgnoredStatus(statusName);
     statusMap.get(key).push({
       statusId: str(st.status_id),
-      name: str(st.status_name),
+      name: statusName,
+      normalizedName: normalizeOfficialAddStatusName(statusName),
+      statKey,
+      statLabel: statKey ? TOOL_STAT_DISPLAY_NAMES[statKey] || statKey : '',
       value,
+      mapped: !!statKey,
+      ignored,
     });
   }
 
@@ -257,9 +500,11 @@ function toCatalog(items, addStatuses, equipBuffs) {
     const itemKey = `${cat}:${id}`;
     const statuses = statusMap.get(itemKey) || [];
     const extraStats = {};
+    const unmappedAddStatuses = [];
     for (const st of statuses) {
-      const prop = statusProp(st.name);
+      const prop = st.statKey || statusProp(st.name);
       if (prop) extraStats[prop] = +(extraStats[prop] || 0) + st.value;
+      else if (!st.ignored) unmappedAddStatuses.push(`${st.name} ${st.value >= 0 ? '+' : ''}${st.value}`);
     }
 
     const buffRefs = buffMap.get(itemKey) || [];
@@ -291,6 +536,7 @@ function toCatalog(items, addStatuses, equipBuffs) {
       technicId: num(row.technic_id),
       addStatuses: statuses,
       addStatusText: str(row.add_status_text),
+      unmappedAddStatuses,
       extraStats,
       buffRefs,
       equipBuff: firstBuff ? { id: firstBuff.id, name: firstBuff.name, info: firstBuff.info } : null,
@@ -307,6 +553,7 @@ function toCatalog(items, addStatuses, equipBuffs) {
 
 async function main() {
   parseArgs();
+  console.log(`[generator] ${GENERATOR_VERSION}`);
   console.log(`[load] ${CONFIG.inputDir ? CONFIG.inputDir : CONFIG.sourceSheetUrl}`);
   const [items, addStatuses, equipBuffs] = await Promise.all([
     loadSheet(SHEETS.items),
@@ -315,9 +562,29 @@ async function main() {
   ]);
   console.log(`[rows] items=${items.length} add_status=${addStatuses.length} equip_buff=${equipBuffs.length}`);
   const { equipment, buffs } = toCatalog(items, addStatuses, equipBuffs);
+  const mappedStatusCounts = new Map();
+  const ignoredStatusCounts = new Map();
+  const unmappedStatusCounts = new Map();
+  equipment.forEach(item => {
+    (item.addStatuses || []).forEach(st => {
+      if (st.statKey) addToCountMap(mappedStatusCounts, `${st.name} -> ${st.statKey}`);
+      else if (st.ignored) addToCountMap(ignoredStatusCounts, st.name);
+      else addToCountMap(unmappedStatusCounts, st.name);
+    });
+  });
   await fs.mkdir(CONFIG.outDir, { recursive: true });
   const generatedAt = new Date().toISOString();
-  const meta = { generatedAt, sourceSheetUrl: CONFIG.sourceSheetUrl, equipmentCount: equipment.length, buffCount: buffs.length };
+  const meta = {
+    generatedAt,
+    sourceSheetUrl: CONFIG.sourceSheetUrl,
+    equipmentCount: equipment.length,
+    buffCount: buffs.length,
+    addStatusKeyMap: OFFICIAL_ADD_STATUS_TO_TOOL_STAT,
+    knownIgnoredAddStatuses: Array.from(OFFICIAL_ADD_STATUS_KNOWN_IGNORED).sort((a, b) => String(a).localeCompare(String(b), 'ja')),
+    mappedStatusCounts: mapToSortedObject(mappedStatusCounts),
+    ignoredStatusCounts: mapToSortedObject(ignoredStatusCounts),
+    unmappedStatusCounts: mapToSortedObject(unmappedStatusCounts),
+  };
   await fs.writeFile(path.join(CONFIG.outDir, 'equipmentCatalog.generated.js'),
     `// Generated by tools/build-equipment-catalog-from-google-sheet.mjs\n// ${generatedAt}\nwindow.MOE_EQUIPMENT_CATALOG_META = ${jsonForJs(meta)};\nwindow.MOE_EQUIPMENT_CATALOG_GENERATED = ${jsonForJs(equipment)};\n`,
     'utf8');
@@ -326,6 +593,16 @@ async function main() {
     'utf8');
   console.log(`[write] ${CONFIG.outDir}/equipmentCatalog.generated.js (${equipment.length} items)`);
   console.log(`[write] ${CONFIG.outDir}/buffCatalog.generated.js (${buffs.length} buffs)`);
+  const ignored = Object.keys(meta.ignoredStatusCounts || {});
+  if (ignored.length) {
+    console.log(`[info] 既知の非対象add_status: ${ignored.length}種類 / ${Object.values(meta.ignoredStatusCounts).reduce((a, b) => a + b, 0)}件`);
+  }
+  const unmapped = Object.keys(meta.unmappedStatusCounts || {});
+  if (unmapped.length) {
+    console.warn(`[warn] 未対応add_status: ${unmapped.join(', ')}`);
+  } else {
+    console.log('[ok] 計算対象add_status はすべてツール内部ステータスキーへ変換できました');
+  }
 }
 
 main().catch(err => {

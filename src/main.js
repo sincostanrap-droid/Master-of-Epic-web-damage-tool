@@ -5,8 +5,8 @@
   onclick属性から呼ばれる関数があるため、現時点では module ではなく通常scriptとして読み込みます。
 */
 
-const APP_VERSION = "v1.23.6";
-const APP_VERSION_NOTE = "装備カタログ生成・検索追加";
+const APP_VERSION = "v1.23.11";
+const APP_VERSION_NOTE = "長音符正規化修正";
 
 /* 種族係数。攻撃力係数と魔力係数は別管理。 */
 const RACE_COEFFS = {
@@ -115,6 +115,46 @@ const BUFF_ONLY_EXTRA_STAT_DEFS = [
   {prop:"extraCritRatePct", equipProp:"equipBuffExtraCritRatePct", label:"クリ率%", step:"0.1"}
 ];
 
+const UTILITY_EXTRA_STAT_DEFS = [
+  {prop:"extraBreath", equipProp:"equipBuffExtraBreath", label:"BREATH", step:"0.1"},
+  {prop:"extraHearing", equipProp:"equipBuffExtraHearing", label:"HEARING", step:"0.1"},
+  {prop:"extraSeeing", equipProp:"equipBuffExtraSeeing", label:"SEEING", step:"0.1"},
+  {prop:"extraSmelling", equipProp:"equipBuffExtraSmelling", label:"SMELLING", step:"0.1"},
+  {prop:"extraFullness", equipProp:"equipBuffExtraFullness", label:"満腹度", step:"0.1"},
+  {prop:"extraThirst", equipProp:"equipBuffExtraThirst", label:"潤喉度", step:"0.1"},
+  {prop:"extraSteal", equipProp:"equipBuffExtraSteal", label:"盗み補正", step:"0.1"},
+  {prop:"extraLockpickingFail", equipProp:"equipBuffExtraLockpickingFail", label:"ピッキング失敗回数補正", step:"0.1"},
+  {prop:"extraFangAttack", equipProp:"equipBuffExtraFangAttack", label:"牙攻撃補正", step:"0.1"},
+  {prop:"extraFishingGaugeLength", equipProp:"equipBuffExtraFishingGaugeLength", label:"釣りゲージ長", step:"0.1"},
+  {prop:"extraFishingHitZone", equipProp:"equipBuffExtraFishingHitZone", label:"釣りヒットゾーン", step:"0.1"},
+  {prop:"extraSmithingGradeZone", equipProp:"equipBuffExtraSmithingGradeZone", label:"鍛冶グレードゾーン", step:"0.1"},
+  {prop:"extraSmithingGaugeSlip", equipProp:"equipBuffExtraSmithingGaugeSlip", label:"鍛冶ゲージ滑り", step:"0.1"},
+  {prop:"extraSmithingHitZone", equipProp:"equipBuffExtraSmithingHitZone", label:"鍛冶ヒットゾーン", step:"0.1"},
+  {prop:"extraCarpentryGradeZone", equipProp:"equipBuffExtraCarpentryGradeZone", label:"大工グレードゾーン", step:"0.1"},
+  {prop:"extraCarpentryGaugeSlip", equipProp:"equipBuffExtraCarpentryGaugeSlip", label:"大工ゲージ滑り", step:"0.1"},
+  {prop:"extraCarpentryHitZone", equipProp:"equipBuffExtraCarpentryHitZone", label:"大工ヒットゾーン", step:"0.1"},
+  {prop:"extraTailoringGradeZone", equipProp:"equipBuffExtraTailoringGradeZone", label:"裁縫グレードゾーン", step:"0.1"},
+  {prop:"extraTailoringGaugeSlip", equipProp:"equipBuffExtraTailoringGaugeSlip", label:"裁縫ゲージ滑り", step:"0.1"},
+  {prop:"extraTailoringHitZone", equipProp:"equipBuffExtraTailoringHitZone", label:"裁縫ヒットゾーン", step:"0.1"},
+  {prop:"extraDecorationGradeZone", equipProp:"equipBuffExtraDecorationGradeZone", label:"装飾細工グレードゾーン", step:"0.1"},
+  {prop:"extraDecorationGaugeSlip", equipProp:"equipBuffExtraDecorationGaugeSlip", label:"装飾細工ゲージ滑り", step:"0.1"},
+  {prop:"extraDecorationHitZone", equipProp:"equipBuffExtraDecorationHitZone", label:"装飾細工ヒットゾーン", step:"0.1"},
+  {prop:"extraCookingGradeZone", equipProp:"equipBuffExtraCookingGradeZone", label:"料理グレードゾーン", step:"0.1"},
+  {prop:"extraCookingGaugeSlip", equipProp:"equipBuffExtraCookingGaugeSlip", label:"料理ゲージ滑り", step:"0.1"},
+  {prop:"extraCookingHitZone", equipProp:"equipBuffExtraCookingHitZone", label:"料理ヒットゾーン", step:"0.1"},
+  {prop:"extraBrewingGradeZone", equipProp:"equipBuffExtraBrewingGradeZone", label:"醸造グレードゾーン", step:"0.1"},
+  {prop:"extraBrewingGaugeSlip", equipProp:"equipBuffExtraBrewingGaugeSlip", label:"醸造ゲージ滑り", step:"0.1"},
+  {prop:"extraBrewingHitZone", equipProp:"equipBuffExtraBrewingHitZone", label:"醸造ヒットゾーン", step:"0.1"},
+  {prop:"extraAlchemyGradeZone", equipProp:"equipBuffExtraAlchemyGradeZone", label:"薬調合グレードゾーン", step:"0.1"},
+  {prop:"extraAlchemyGaugeSlip", equipProp:"equipBuffExtraAlchemyGaugeSlip", label:"薬調合ゲージ滑り", step:"0.1"},
+  {prop:"extraAlchemyHitZone", equipProp:"equipBuffExtraAlchemyHitZone", label:"薬調合ヒットゾーン", step:"0.1"},
+  {prop:"extraReplicationGradeZone", equipProp:"equipBuffExtraReplicationGradeZone", label:"複製グレードゾーン", step:"0.1"},
+  {prop:"extraReplicationGaugeSlip", equipProp:"equipBuffExtraReplicationGaugeSlip", label:"複製ゲージ滑り", step:"0.1"},
+  {prop:"extraReplicationHitZone", equipProp:"equipBuffExtraReplicationHitZone", label:"複製ヒットゾーン", step:"0.1"},
+  {prop:"extraBeautyGaugeSlip", equipProp:"equipBuffExtraBeautyGaugeSlip", label:"美容ゲージ滑り", step:"0.1"},
+  {prop:"extraBeautyHitZone", equipProp:"equipBuffExtraBeautyHitZone", label:"美容ヒットゾーン", step:"0.1"}
+];
+
 function normalizeExtraMode(mode) {
   if (mode === true) return "equipBuff";
   if (mode === false || mode === undefined || mode === null) return "base";
@@ -132,9 +172,9 @@ function uniqueDefs(defs) {
 
 function extraFieldDefsFor(mode="base") {
   mode = normalizeExtraMode(mode);
-  if (mode === "base") return BASE_EXTRA_STAT_DEFS;
-  if (mode === "buff" || mode === "equipBuff") return BUFF_FLAT_EXTRA_STAT_DEFS.concat(BUFF_PCT_EXTRA_STAT_DEFS, BUFF_ONLY_EXTRA_STAT_DEFS);
-  if (mode === "summary") return uniqueDefs(BASE_EXTRA_STAT_DEFS.concat(BUFF_FLAT_EXTRA_STAT_DEFS, BUFF_PCT_EXTRA_STAT_DEFS, BUFF_ONLY_EXTRA_STAT_DEFS));
+  if (mode === "base") return BASE_EXTRA_STAT_DEFS.concat(UTILITY_EXTRA_STAT_DEFS);
+  if (mode === "buff" || mode === "equipBuff") return BUFF_FLAT_EXTRA_STAT_DEFS.concat(UTILITY_EXTRA_STAT_DEFS, BUFF_PCT_EXTRA_STAT_DEFS, BUFF_ONLY_EXTRA_STAT_DEFS);
+  if (mode === "summary") return uniqueDefs(BASE_EXTRA_STAT_DEFS.concat(BUFF_FLAT_EXTRA_STAT_DEFS, UTILITY_EXTRA_STAT_DEFS, BUFF_PCT_EXTRA_STAT_DEFS, BUFF_ONLY_EXTRA_STAT_DEFS));
   return BASE_EXTRA_STAT_DEFS;
 }
 
@@ -152,6 +192,272 @@ function emptyExtraStats() {
   const out = {};
   extraFieldDefsFor("summary").forEach(d => out[d.prop] = 0);
   return out;
+}
+
+/*
+ * 公式DB add_status 名 → ツール内部ステータスキー対応表。
+ * 公式DBから生成したカタログと、公式DB HTML貼り付け取り込みの両方で使う。
+ * 値は装備行のプロパティ名に合わせる。新しいadd_status名が増えた場合は、
+ * tools/build-equipment-catalog-from-google-sheet.mjs の対応表も同時に更新する。
+ */
+const OFFICIAL_ADD_STATUS_TO_TOOL_STAT = Object.freeze({
+  "攻撃力": "attack",
+  "魔力": "magic",
+  "移動速度": "speed",
+  "速度": "speed",
+
+  "最大HP": "extraHP",
+  "HP": "extraHP",
+  "最大ＭＰ": "extraMP",
+  "最大MP": "extraMP",
+  "MP": "extraMP",
+  "最大ＳＴ": "extraST",
+  "最大ST": "extraST",
+  "ST": "extraST",
+  "防御力": "extraAC",
+  "アーマークラス": "extraAC",
+  "AC": "extraAC",
+  "最大重量": "extraMaxWeight",
+  "重量": "extraMaxWeight",
+  "命中": "extraHit",
+  "回避": "extraAvoid",
+
+  "攻撃ディレイ": "extraAttackDelay",
+  "魔法ディレイ": "extraMagicDelay",
+
+  "耐火属性": "extraFireRes",
+  "火耐性": "extraFireRes",
+  "火属性抵抗": "extraFireRes",
+  "耐水属性": "extraWaterRes",
+  "水耐性": "extraWaterRes",
+  "水属性抵抗": "extraWaterRes",
+  "耐地属性": "extraEarthRes",
+  "地耐性": "extraEarthRes",
+  "地属性抵抗": "extraEarthRes",
+  "耐風属性": "extraWindRes",
+  "風耐性": "extraWindRes",
+  "風属性抵抗": "extraWindRes",
+  "耐無属性": "extraNeutralRes",
+  "無耐性": "extraNeutralRes",
+  "無属性抵抗": "extraNeutralRes",
+
+  "BREATH": "extraBreath",
+  "HEARING": "extraHearing",
+  "SEEING": "extraSeeing",
+  "SMELLING": "extraSmelling",
+  "満腹度": "extraFullness",
+  "潤喉度": "extraThirst",
+  "盗み補正": "extraSteal",
+  "ピッキング失敗回数補正": "extraLockpickingFail",
+  "牙攻撃補正": "extraFangAttack",
+  "釣りゲージ長": "extraFishingGaugeLength",
+  "釣りヒットゾーン": "extraFishingHitZone",
+
+  "鍛冶グレードゾーン": "extraSmithingGradeZone",
+  "鍛冶ゲージ滑り": "extraSmithingGaugeSlip",
+  "鍛冶ヒットゾーン": "extraSmithingHitZone",
+  "大工グレードゾーン": "extraCarpentryGradeZone",
+  "大工ゲージ滑り": "extraCarpentryGaugeSlip",
+  "大工ヒットゾーン": "extraCarpentryHitZone",
+  "裁縫グレードゾーン": "extraTailoringGradeZone",
+  "裁縫ゲージ滑り": "extraTailoringGaugeSlip",
+  "裁縫ヒットゾーン": "extraTailoringHitZone",
+  "装飾細工グレードゾーン": "extraDecorationGradeZone",
+  "装飾細工ゲージ滑り": "extraDecorationGaugeSlip",
+  "装飾細工ヒットゾーン": "extraDecorationHitZone",
+  "料理グレードゾーン": "extraCookingGradeZone",
+  "料理ゲージ滑り": "extraCookingGaugeSlip",
+  "料理ヒットゾーン": "extraCookingHitZone",
+  "醸造グレードゾーン": "extraBrewingGradeZone",
+  "醸造ゲージ滑り": "extraBrewingGaugeSlip",
+  "醸造ヒットゾーン": "extraBrewingHitZone",
+  "薬調合グレードゾーン": "extraAlchemyGradeZone",
+  "薬調合ゲージ滑り": "extraAlchemyGaugeSlip",
+  "薬調合ヒットゾーン": "extraAlchemyHitZone",
+  "複製グレードゾーン": "extraReplicationGradeZone",
+  "複製ゲージ滑り": "extraReplicationGaugeSlip",
+  "複製ヒットゾーン": "extraReplicationHitZone",
+  "美容ゲージ滑り": "extraBeautyGaugeSlip",
+  "美容ヒットゾーン": "extraBeautyHitZone"
+});
+
+/*
+ * 公式DBには物理ダメージ計算に使わない生産/生活/感覚系 add_status も含まれる。
+ * これらは未対応エラーではなく「既知の非対象」として扱い、装備登録時の数値反映から除外する。
+ */
+const OFFICIAL_ADD_STATUS_KNOWN_IGNORED = Object.freeze(new Set([]));
+
+const TOOL_STAT_DISPLAY_NAMES = Object.freeze({
+  attack: "攻撃力",
+  magic: "魔力",
+  speed: "移動速度",
+  extraAC: "AC",
+  extraHP: "HP",
+  extraMP: "MP",
+  extraST: "ST",
+  extraMaxWeight: "最大重量",
+  extraHit: "命中",
+  extraAvoid: "回避",
+  extraAttackDelay: "攻撃ディレイ",
+  extraMagicDelay: "魔法ディレイ",
+  extraFireRes: "耐火属性",
+  extraWaterRes: "耐水属性",
+  extraEarthRes: "耐地属性",
+  extraWindRes: "耐風属性",
+  extraNeutralRes: "耐無属性",
+  extraBreath: "BREATH",
+  extraHearing: "HEARING",
+  extraSeeing: "SEEING",
+  extraSmelling: "SMELLING",
+  extraFullness: "満腹度",
+  extraThirst: "潤喉度",
+  extraSteal: "盗み補正",
+  extraLockpickingFail: "ピッキング失敗回数補正",
+  extraFangAttack: "牙攻撃補正",
+  extraFishingGaugeLength: "釣りゲージ長",
+  extraFishingHitZone: "釣りヒットゾーン",
+  extraSmithingGradeZone: "鍛冶グレードゾーン",
+  extraSmithingGaugeSlip: "鍛冶ゲージ滑り",
+  extraSmithingHitZone: "鍛冶ヒットゾーン",
+  extraCarpentryGradeZone: "大工グレードゾーン",
+  extraCarpentryGaugeSlip: "大工ゲージ滑り",
+  extraCarpentryHitZone: "大工ヒットゾーン",
+  extraTailoringGradeZone: "裁縫グレードゾーン",
+  extraTailoringGaugeSlip: "裁縫ゲージ滑り",
+  extraTailoringHitZone: "裁縫ヒットゾーン",
+  extraDecorationGradeZone: "装飾細工グレードゾーン",
+  extraDecorationGaugeSlip: "装飾細工ゲージ滑り",
+  extraDecorationHitZone: "装飾細工ヒットゾーン",
+  extraCookingGradeZone: "料理グレードゾーン",
+  extraCookingGaugeSlip: "料理ゲージ滑り",
+  extraCookingHitZone: "料理ヒットゾーン",
+  extraBrewingGradeZone: "醸造グレードゾーン",
+  extraBrewingGaugeSlip: "醸造ゲージ滑り",
+  extraBrewingHitZone: "醸造ヒットゾーン",
+  extraAlchemyGradeZone: "薬調合グレードゾーン",
+  extraAlchemyGaugeSlip: "薬調合ゲージ滑り",
+  extraAlchemyHitZone: "薬調合ヒットゾーン",
+  extraReplicationGradeZone: "複製グレードゾーン",
+  extraReplicationGaugeSlip: "複製ゲージ滑り",
+  extraReplicationHitZone: "複製ヒットゾーン",
+  extraBeautyGaugeSlip: "美容ゲージ滑り",
+  extraBeautyHitZone: "美容ヒットゾーン"
+});
+
+function normalizeOfficialAddStatusName(name) {
+  return String(name || "")
+    .replace(/[＋]/g, "+")
+    .replace(/[－−―ー]/g, "-")
+    .replace(/[：]/g, ":")
+    .replace(/[％]/g, "%")
+    .replace(/　/g, " ")
+    .replace(/\s+/g, "")
+    .replace(/^最大HP$/i, "最大HP")
+    .replace(/^最大MP$/i, "最大MP")
+    .replace(/^最大ST$/i, "最大ST")
+    .trim();
+}
+
+function isKnownIgnoredOfficialAddStatus(name) {
+  const normalized = normalizeOfficialAddStatusName(name);
+  return !normalized || normalized === "なし" || OFFICIAL_ADD_STATUS_KNOWN_IGNORED.has(normalized);
+}
+
+
+function deriveUtilityAddStatusKey(normalizedName) {
+  const n = normalizedName || "";
+  const craftMap = {
+    "鍛冶": "Smithing",
+    "大工": "Carpentry",
+    "裁縫": "Tailoring",
+    "装飾細工": "Decoration",
+    "料理": "Cooking",
+    "醸造": "Brewing",
+    "薬調合": "Alchemy",
+    "複製": "Replication",
+  };
+  for (const [jp, en] of Object.entries(craftMap)) {
+    if (n === `${jp}グレードゾーン`) return `extra${en}GradeZone`;
+    if (n === `${jp}ゲージ滑り`) return `extra${en}GaugeSlip`;
+    if (n === `${jp}ヒットゾーン`) return `extra${en}HitZone`;
+  }
+  if (n === "美容ゲージ滑り") return "extraBeautyGaugeSlip";
+  if (n === "美容ヒットゾーン") return "extraBeautyHitZone";
+  if (n === "釣りゲージ長") return "extraFishingGaugeLength";
+  if (n === "釣りヒットゾーン") return "extraFishingHitZone";
+  return "";
+}
+
+function toolStatKeyForOfficialAddStatus(name) {
+  const normalized = normalizeOfficialAddStatusName(name);
+  if (!normalized || normalized === "なし" || isKnownIgnoredOfficialAddStatus(normalized)) return "";
+  const utilityStatusKey = deriveUtilityAddStatusKey(normalized);
+  if (utilityStatusKey) return utilityStatusKey;
+  if (OFFICIAL_ADD_STATUS_TO_TOOL_STAT[normalized]) return OFFICIAL_ADD_STATUS_TO_TOOL_STAT[normalized];
+  if (/攻撃力/.test(normalized)) return "attack";
+  if (/魔力/.test(normalized)) return "magic";
+  if (/移動速度|速度/.test(normalized)) return "speed";
+  if (/最大?HP/.test(normalized)) return "extraHP";
+  if (/最大?MP/.test(normalized)) return "extraMP";
+  if (/最大?ST/.test(normalized)) return "extraST";
+  if (/防御力|アーマークラス|AC/.test(normalized)) return "extraAC";
+  if (/最大重量|重量/.test(normalized)) return "extraMaxWeight";
+  if (/命中/.test(normalized)) return "extraHit";
+  if (/回避/.test(normalized)) return "extraAvoid";
+  if (/攻撃ディレイ/.test(normalized)) return "extraAttackDelay";
+  if (/魔法ディレイ/.test(normalized)) return "extraMagicDelay";
+  if (/耐火属性|火耐性|火属性抵抗/.test(normalized)) return "extraFireRes";
+  if (/耐水属性|水耐性|水属性抵抗/.test(normalized)) return "extraWaterRes";
+  if (/耐地属性|地耐性|地属性抵抗/.test(normalized)) return "extraEarthRes";
+  if (/耐風属性|風耐性|風属性抵抗/.test(normalized)) return "extraWindRes";
+  if (/耐無属性|無耐性|無属性抵抗/.test(normalized)) return "extraNeutralRes";
+  if (/BREATH/.test(normalized)) return "extraBreath";
+  if (/HEARING/.test(normalized)) return "extraHearing";
+  if (/SEEING/.test(normalized)) return "extraSeeing";
+  if (/SMELLING/.test(normalized)) return "extraSmelling";
+  if (/満腹度/.test(normalized)) return "extraFullness";
+  if (/潤喉度/.test(normalized)) return "extraThirst";
+  if (/盗み補正/.test(normalized)) return "extraSteal";
+  if (/ピッキング失敗回数補正/.test(normalized)) return "extraLockpickingFail";
+  if (/牙攻撃補正/.test(normalized)) return "extraFangAttack";
+  if (/釣りゲージ長/.test(normalized)) return "extraFishingGaugeLength";
+  if (/釣りヒットゾーン/.test(normalized)) return "extraFishingHitZone";
+  if (/鍛冶グレードゾーン/.test(normalized)) return "extraSmithingGradeZone";
+  if (/鍛冶ゲージ滑り/.test(normalized)) return "extraSmithingGaugeSlip";
+  if (/鍛冶ヒットゾーン/.test(normalized)) return "extraSmithingHitZone";
+  if (/大工グレードゾーン/.test(normalized)) return "extraCarpentryGradeZone";
+  if (/大工ゲージ滑り/.test(normalized)) return "extraCarpentryGaugeSlip";
+  if (/大工ヒットゾーン/.test(normalized)) return "extraCarpentryHitZone";
+  if (/裁縫グレードゾーン/.test(normalized)) return "extraTailoringGradeZone";
+  if (/裁縫ゲージ滑り/.test(normalized)) return "extraTailoringGaugeSlip";
+  if (/裁縫ヒットゾーン/.test(normalized)) return "extraTailoringHitZone";
+  if (/装飾細工グレードゾーン/.test(normalized)) return "extraDecorationGradeZone";
+  if (/装飾細工ゲージ滑り/.test(normalized)) return "extraDecorationGaugeSlip";
+  if (/装飾細工ヒットゾーン/.test(normalized)) return "extraDecorationHitZone";
+  if (/料理グレードゾーン/.test(normalized)) return "extraCookingGradeZone";
+  if (/料理ゲージ滑り/.test(normalized)) return "extraCookingGaugeSlip";
+  if (/料理ヒットゾーン/.test(normalized)) return "extraCookingHitZone";
+  if (/醸造グレードゾーン/.test(normalized)) return "extraBrewingGradeZone";
+  if (/醸造ゲージ滑り/.test(normalized)) return "extraBrewingGaugeSlip";
+  if (/醸造ヒットゾーン/.test(normalized)) return "extraBrewingHitZone";
+  if (/薬調合グレードゾーン/.test(normalized)) return "extraAlchemyGradeZone";
+  if (/薬調合ゲージ滑り/.test(normalized)) return "extraAlchemyGaugeSlip";
+  if (/薬調合ヒットゾーン/.test(normalized)) return "extraAlchemyHitZone";
+  if (/複製グレードゾーン/.test(normalized)) return "extraReplicationGradeZone";
+  if (/複製ゲージ滑り/.test(normalized)) return "extraReplicationGaugeSlip";
+  if (/複製ヒットゾーン/.test(normalized)) return "extraReplicationHitZone";
+  if (/美容ゲージ滑り/.test(normalized)) return "extraBeautyGaugeSlip";
+  if (/美容ヒットゾーン/.test(normalized)) return "extraBeautyHitZone";
+  return "";
+}
+
+function addToolStatValue(row, statKey, value) {
+  const key = String(statKey || "");
+  const v = parseFloat(value) || 0;
+  if (!key || !v) return false;
+  if (!(key in row)) return false;
+  row[key] = +(row[key] || 0) + v;
+  return true;
 }
 
 function extraStatsHasEffect(row, mode="base") {
@@ -221,6 +527,44 @@ const QUICK_EFFECT_DEFS = [
   {key:"neutralResFlat", category:"追加ステータス", label:"耐無属性+", valueLabel:"値", unit:"", scopes:["base","equipBuff","buff"]},
   {key:"attackDelayFlat", category:"追加ステータス", label:"攻撃ディレイ+", valueLabel:"値", unit:"", scopes:["base","equipBuff","buff"]},
   {key:"magicDelayFlat", category:"追加ステータス", label:"魔法ディレイ+", valueLabel:"値", unit:"", scopes:["base","equipBuff","buff"]},
+
+  {key:"utilBreath", category:"生活/生産ステータス", label:"BREATH+", valueLabel:"値", unit:"", scopes:["base","equipBuff","buff"]},
+  {key:"utilHearing", category:"生活/生産ステータス", label:"HEARING+", valueLabel:"値", unit:"", scopes:["base","equipBuff","buff"]},
+  {key:"utilSeeing", category:"生活/生産ステータス", label:"SEEING+", valueLabel:"値", unit:"", scopes:["base","equipBuff","buff"]},
+  {key:"utilSmelling", category:"生活/生産ステータス", label:"SMELLING+", valueLabel:"値", unit:"", scopes:["base","equipBuff","buff"]},
+  {key:"utilFullness", category:"生活/生産ステータス", label:"満腹度+", valueLabel:"値", unit:"", scopes:["base","equipBuff","buff"]},
+  {key:"utilThirst", category:"生活/生産ステータス", label:"潤喉度+", valueLabel:"値", unit:"", scopes:["base","equipBuff","buff"]},
+  {key:"utilSteal", category:"生活/生産ステータス", label:"盗み補正+", valueLabel:"値", unit:"", scopes:["base","equipBuff","buff"]},
+  {key:"utilLockpickingFail", category:"生活/生産ステータス", label:"ピッキング失敗回数補正+", valueLabel:"値", unit:"", scopes:["base","equipBuff","buff"]},
+  {key:"utilFangAttack", category:"生活/生産ステータス", label:"牙攻撃補正+", valueLabel:"値", unit:"", scopes:["base","equipBuff","buff"]},
+  {key:"utilFishingGaugeLength", category:"生活/生産ステータス", label:"釣りゲージ長+", valueLabel:"値", unit:"", scopes:["base","equipBuff","buff"]},
+  {key:"utilFishingHitZone", category:"生活/生産ステータス", label:"釣りヒットゾーン+", valueLabel:"値", unit:"", scopes:["base","equipBuff","buff"]},
+  {key:"utilSmithingGradeZone", category:"生活/生産ステータス", label:"鍛冶グレードゾーン+", valueLabel:"値", unit:"", scopes:["base","equipBuff","buff"]},
+  {key:"utilSmithingGaugeSlip", category:"生活/生産ステータス", label:"鍛冶ゲージ滑り+", valueLabel:"値", unit:"", scopes:["base","equipBuff","buff"]},
+  {key:"utilSmithingHitZone", category:"生活/生産ステータス", label:"鍛冶ヒットゾーン+", valueLabel:"値", unit:"", scopes:["base","equipBuff","buff"]},
+  {key:"utilCarpentryGradeZone", category:"生活/生産ステータス", label:"大工グレードゾーン+", valueLabel:"値", unit:"", scopes:["base","equipBuff","buff"]},
+  {key:"utilCarpentryGaugeSlip", category:"生活/生産ステータス", label:"大工ゲージ滑り+", valueLabel:"値", unit:"", scopes:["base","equipBuff","buff"]},
+  {key:"utilCarpentryHitZone", category:"生活/生産ステータス", label:"大工ヒットゾーン+", valueLabel:"値", unit:"", scopes:["base","equipBuff","buff"]},
+  {key:"utilTailoringGradeZone", category:"生活/生産ステータス", label:"裁縫グレードゾーン+", valueLabel:"値", unit:"", scopes:["base","equipBuff","buff"]},
+  {key:"utilTailoringGaugeSlip", category:"生活/生産ステータス", label:"裁縫ゲージ滑り+", valueLabel:"値", unit:"", scopes:["base","equipBuff","buff"]},
+  {key:"utilTailoringHitZone", category:"生活/生産ステータス", label:"裁縫ヒットゾーン+", valueLabel:"値", unit:"", scopes:["base","equipBuff","buff"]},
+  {key:"utilDecorationGradeZone", category:"生活/生産ステータス", label:"装飾細工グレードゾーン+", valueLabel:"値", unit:"", scopes:["base","equipBuff","buff"]},
+  {key:"utilDecorationGaugeSlip", category:"生活/生産ステータス", label:"装飾細工ゲージ滑り+", valueLabel:"値", unit:"", scopes:["base","equipBuff","buff"]},
+  {key:"utilDecorationHitZone", category:"生活/生産ステータス", label:"装飾細工ヒットゾーン+", valueLabel:"値", unit:"", scopes:["base","equipBuff","buff"]},
+  {key:"utilCookingGradeZone", category:"生活/生産ステータス", label:"料理グレードゾーン+", valueLabel:"値", unit:"", scopes:["base","equipBuff","buff"]},
+  {key:"utilCookingGaugeSlip", category:"生活/生産ステータス", label:"料理ゲージ滑り+", valueLabel:"値", unit:"", scopes:["base","equipBuff","buff"]},
+  {key:"utilCookingHitZone", category:"生活/生産ステータス", label:"料理ヒットゾーン+", valueLabel:"値", unit:"", scopes:["base","equipBuff","buff"]},
+  {key:"utilBrewingGradeZone", category:"生活/生産ステータス", label:"醸造グレードゾーン+", valueLabel:"値", unit:"", scopes:["base","equipBuff","buff"]},
+  {key:"utilBrewingGaugeSlip", category:"生活/生産ステータス", label:"醸造ゲージ滑り+", valueLabel:"値", unit:"", scopes:["base","equipBuff","buff"]},
+  {key:"utilBrewingHitZone", category:"生活/生産ステータス", label:"醸造ヒットゾーン+", valueLabel:"値", unit:"", scopes:["base","equipBuff","buff"]},
+  {key:"utilAlchemyGradeZone", category:"生活/生産ステータス", label:"薬調合グレードゾーン+", valueLabel:"値", unit:"", scopes:["base","equipBuff","buff"]},
+  {key:"utilAlchemyGaugeSlip", category:"生活/生産ステータス", label:"薬調合ゲージ滑り+", valueLabel:"値", unit:"", scopes:["base","equipBuff","buff"]},
+  {key:"utilAlchemyHitZone", category:"生活/生産ステータス", label:"薬調合ヒットゾーン+", valueLabel:"値", unit:"", scopes:["base","equipBuff","buff"]},
+  {key:"utilReplicationGradeZone", category:"生活/生産ステータス", label:"複製グレードゾーン+", valueLabel:"値", unit:"", scopes:["base","equipBuff","buff"]},
+  {key:"utilReplicationGaugeSlip", category:"生活/生産ステータス", label:"複製ゲージ滑り+", valueLabel:"値", unit:"", scopes:["base","equipBuff","buff"]},
+  {key:"utilReplicationHitZone", category:"生活/生産ステータス", label:"複製ヒットゾーン+", valueLabel:"値", unit:"", scopes:["base","equipBuff","buff"]},
+  {key:"utilBeautyGaugeSlip", category:"生活/生産ステータス", label:"美容ゲージ滑り+", valueLabel:"値", unit:"", scopes:["base","equipBuff","buff"]},
+  {key:"utilBeautyHitZone", category:"生活/生産ステータス", label:"美容ヒットゾーン+", valueLabel:"値", unit:"", scopes:["base","equipBuff","buff"]},
 
   {key:"maxWeightPct", category:"追加ステータス%", label:"最大重量%", valueLabel:"%", unit:"%", scopes:["equipBuff","buff"]},
   {key:"critRatePct", category:"追加ステータス%", label:"クリ率%", valueLabel:"%", unit:"%", scopes:["equipBuff","buff"]},
@@ -387,6 +731,54 @@ function quickEffectTargetName(def, targetValue) {
   return "";
 }
 
+const QUICK_EFFECT_EXTRA_STAT_MAP = Object.freeze({
+  utilBreath:"extraBreath",
+  utilHearing:"extraHearing",
+  utilSeeing:"extraSeeing",
+  utilSmelling:"extraSmelling",
+  utilFullness:"extraFullness",
+  utilThirst:"extraThirst",
+  utilSteal:"extraSteal",
+  utilLockpickingFail:"extraLockpickingFail",
+  utilFangAttack:"extraFangAttack",
+  utilFishingGaugeLength:"extraFishingGaugeLength",
+  utilFishingHitZone:"extraFishingHitZone",
+  utilSmithingGradeZone:"extraSmithingGradeZone",
+  utilSmithingGaugeSlip:"extraSmithingGaugeSlip",
+  utilSmithingHitZone:"extraSmithingHitZone",
+  utilCarpentryGradeZone:"extraCarpentryGradeZone",
+  utilCarpentryGaugeSlip:"extraCarpentryGaugeSlip",
+  utilCarpentryHitZone:"extraCarpentryHitZone",
+  utilTailoringGradeZone:"extraTailoringGradeZone",
+  utilTailoringGaugeSlip:"extraTailoringGaugeSlip",
+  utilTailoringHitZone:"extraTailoringHitZone",
+  utilDecorationGradeZone:"extraDecorationGradeZone",
+  utilDecorationGaugeSlip:"extraDecorationGaugeSlip",
+  utilDecorationHitZone:"extraDecorationHitZone",
+  utilCookingGradeZone:"extraCookingGradeZone",
+  utilCookingGaugeSlip:"extraCookingGaugeSlip",
+  utilCookingHitZone:"extraCookingHitZone",
+  utilBrewingGradeZone:"extraBrewingGradeZone",
+  utilBrewingGaugeSlip:"extraBrewingGaugeSlip",
+  utilBrewingHitZone:"extraBrewingHitZone",
+  utilAlchemyGradeZone:"extraAlchemyGradeZone",
+  utilAlchemyGaugeSlip:"extraAlchemyGaugeSlip",
+  utilAlchemyHitZone:"extraAlchemyHitZone",
+  utilReplicationGradeZone:"extraReplicationGradeZone",
+  utilReplicationGaugeSlip:"extraReplicationGaugeSlip",
+  utilReplicationHitZone:"extraReplicationHitZone",
+  utilBeautyGaugeSlip:"extraBeautyGaugeSlip",
+  utilBeautyHitZone:"extraBeautyHitZone"
+});
+
+function extraStatDefByProp(prop) {
+  return extraFieldDefsFor("summary").find(def => def.prop === prop) || null;
+}
+
+function quickEffectExtraStatDef(key) {
+  return extraStatDefByProp(QUICK_EFFECT_EXTRA_STAT_MAP[key]);
+}
+
 function applyQuickEffectToRow(row, context, key, value, name="", scope="auto") {
   const v = parseFloat(value);
   if (!Number.isFinite(v)) {
@@ -397,6 +789,23 @@ function applyQuickEffectToRow(row, context, key, value, name="", scope="auto") 
   const displayOnly = ["skillPlus", "elementDamagePct", "custom"].includes(key);
   if (displayOnly) {
     pushDisplayEffect(row, key, v, quickEffectTargetName(def, name), def.unit || "", "display");
+    return true;
+  }
+
+  const extraDef = quickEffectExtraStatDef(key);
+  if (extraDef) {
+    if (context === "composite") {
+      row[extraDef.prop] = +(row[extraDef.prop] || 0) + v;
+      return true;
+    }
+    if (scope === "base") {
+      row[extraDef.prop] = +(row[extraDef.prop] || 0) + v;
+      return true;
+    }
+    row.equipBuffEnabled = true;
+    if (!row.equipBuffName) row.equipBuffName = row.name ? `${row.name} のBuff` : "装備Buff";
+    const equipProp = extraDef.equipProp || extraDef.prop;
+    row[equipProp] = +(row[equipProp] || 0) + v;
     return true;
   }
 
@@ -751,8 +1160,8 @@ function makeExtraStatsEditor(row, title, mode="base", onUpdate=null) {
   const help = document.createElement("p");
   help.className = "small extraStatsHelp";
   help.textContent = mode === "base"
-    ? "HP/MP/ST/最大重量/命中/回避/AC/各属性耐性/ディレイなどを直接入力できます。"
-    : "Buffで増えるHP/MP/ST/最大重量/命中/回避/AC/各属性耐性/ディレイ/軽減/クリ率などを直接入力できます。";
+    ? "HP/MP/ST/最大重量/命中/回避/AC/耐性/ディレイ/生産・生活系などを直接入力できます。"
+    : "Buffで増えるHP/MP/ST/最大重量/命中/回避/AC/耐性/ディレイ/軽減/クリ率/生産・生活系などを直接入力できます。";
   wrap.appendChild(help);
 
   const activeDefs = extraFieldDefsFor(mode).filter(def => extraStatHasValue(row, def, mode));
@@ -5830,35 +6239,51 @@ function integratedOptimizerSettings() {
   return settings;
 }
 
+const OPTIMIZER_MINIMIZE_OBJECTIVES = Object.freeze(new Set([
+  "slotsMin",
+  "extraAttackDelay",
+  "extraMagicDelay",
+  "extraLockpickingFail",
+  "extraSmithingGaugeSlip",
+  "extraCarpentryGaugeSlip",
+  "extraTailoringGaugeSlip",
+  "extraDecorationGaugeSlip",
+  "extraCookingGaugeSlip",
+  "extraBrewingGaugeSlip",
+  "extraAlchemyGaugeSlip",
+  "extraReplicationGaugeSlip",
+  "extraBeautyGaugeSlip"
+]));
+
 function optimizerObjectiveRawValue(m, objective) {
   if (objective === "attack") return m.atk;
   if (objective === "magic") return m.stats.magic;
+  if (objective === "speed") return m.stats.speed;
   if (objective === "slotsMin") return m.slots?.total || 0;
   if (String(objective || "").startsWith("extra")) return +(m.extraStats?.[objective] || 0);
   return m.finalDamage;
 }
 
+function optimizerObjectiveIsMinimize(objective) {
+  return OPTIMIZER_MINIMIZE_OBJECTIVES.has(String(objective || ""));
+}
+
 function optimizerMetricValue(m, objective) {
-  if (objective === "slotsMin") return -optimizerObjectiveRawValue(m, objective);
-  return optimizerObjectiveRawValue(m, objective);
+  const raw = optimizerObjectiveRawValue(m, objective);
+  return optimizerObjectiveIsMinimize(objective) ? -raw : raw;
 }
 
 function optimizerObjectiveLabel(objective) {
-  return ({
-    damage:"最大ダメージ",
-    attack:"最大攻撃力",
-    magic:"最大魔力",
-    slotsMin:"枠数最小",
-    extraAC:"最大AC",
-    extraHP:"最大HP",
-    extraST:"最大ST",
-    extraHit:"最大命中",
-    extraAvoid:"最大回避",
-    extraAttackDelay:"最大攻撃ディレイ",
-    extraMagicDelay:"最大魔法ディレイ",
-    extraDamageReducePct:"最大被ダメ軽減",
-    extraCritRatePct:"最大クリ率"
-  })[objective] || "なし";
+  const base = ({
+    damage:"ダメージ",
+    attack:"攻撃力",
+    magic:"魔力",
+    speed:"移動速度",
+    slotsMin:"枠数"
+  })[objective] || (String(objective || "").startsWith("extra") ? (TOOL_STAT_DISPLAY_NAMES[objective] || objective) : "なし");
+  if (objective === "slotsMin") return "枠数最小";
+  if (base === "なし") return base;
+  return `${optimizerObjectiveIsMinimize(objective) ? "最小" : "最大"}${base}`;
 }
 
 const OPTIMIZER_INVALID_SCORE = -1000000000000;
@@ -5961,8 +6386,8 @@ function optimizerTargetRankForPrimary(m, settings) {
   if (!t) return [optimizerMetricValue(m, settings?.objective || "damage")];
 
   const value = optimizerObjectiveRawValue(m, t.objective);
-  if (t.objective === "slotsMin") {
-    // 枠数最小だけは「目標以下なら到達」とする。
+  if (optimizerObjectiveIsMinimize(t.objective)) {
+    // 最小化系: 目標以下を最優先。到達後は目標値に近いほどよい。
     if (value <= t.target) return [1, -Math.abs(value - t.target)];
     return [0, -value];
   }
@@ -8516,29 +8941,13 @@ function idbStatusValue(status) {
   return parseFloat(v) || 0;
 }
 
-function idbApplyStructuredStatus(row, name, value) {
+function idbApplyStructuredStatus(row, name, value, statKey="") {
   const n = String(name || "").trim();
   const v = parseFloat(value) || 0;
-  if (!n || !v || n === "なし") return;
+  if (!n || !v || isKnownIgnoredOfficialAddStatus(n)) return;
 
-  const add = prop => row[prop] = +(row[prop] || 0) + v;
-  if (/攻撃力/.test(n)) return add("attack");
-  if (/魔力/.test(n)) return add("magic");
-  if (/移動速度|速度/.test(n)) return add("speed");
-  if (/最大HP|HP/.test(n)) return add("extraHP");
-  if (/最大MP|MP/.test(n)) return add("extraMP");
-  if (/最大ST|ST/.test(n)) return add("extraST");
-  if (/最大重量|重量/.test(n)) return add("extraMaxWeight");
-  if (/命中/.test(n)) return add("extraHit");
-  if (/回避/.test(n)) return add("extraAvoid");
-  if (/防御力|アーマークラス|AC/.test(n)) return add("extraAC");
-  if (/攻撃ディレイ/.test(n)) return add("extraAttackDelay");
-  if (/魔法ディレイ/.test(n)) return add("extraMagicDelay");
-  if (/耐火属性|火耐性|火属性抵抗/.test(n)) return add("extraFireRes");
-  if (/耐水属性|水耐性|水属性抵抗/.test(n)) return add("extraWaterRes");
-  if (/耐地属性|地耐性|地属性抵抗/.test(n)) return add("extraEarthRes");
-  if (/耐風属性|風耐性|風属性抵抗/.test(n)) return add("extraWindRes");
-  if (/耐無属性|無耐性|無属性抵抗/.test(n)) return add("extraNeutralRes");
+  const key = statKey || toolStatKeyForOfficialAddStatus(n);
+  if (addToolStatValue(row, key, v)) return;
 
   pushDisplayEffect(row, "custom", v, n, "", "display");
 }
@@ -9167,7 +9576,7 @@ function idbRowFromStructuredItem(item, page=null, raw="") {
 
   const addStatuses = item.add_statuses || item.addStatuses || item.add_status || [];
   if (Array.isArray(addStatuses)) {
-    addStatuses.forEach(st => idbApplyStructuredStatus(row, st.name, idbStatusValue(st)));
+    addStatuses.forEach(st => idbApplyStructuredStatus(row, st.name, idbStatusValue(st), st.statKey));
   }
 
   idbSupplementStructuredWeapon(row, item, raw, page);
@@ -9585,7 +9994,10 @@ function catalogSlotOptions(items) {
 function catalogStatOptions(items) {
   const names = new Set();
   items.forEach(item => {
-    (item.addStatuses || []).forEach(st => st?.name && names.add(st.name));
+    (item.addStatuses || []).forEach(st => {
+      if (st?.statKey) names.add(st.statKey);
+      else if (st?.name) names.add(st.name);
+    });
     if (item.extraStats) Object.entries(item.extraStats).forEach(([k, v]) => +v && names.add(k));
   });
   const list = Array.from(names).sort((a, b) => String(a).localeCompare(String(b), "ja"));
@@ -9593,26 +10005,7 @@ function catalogStatOptions(items) {
 }
 
 function catalogDisplayStatName(name) {
-  const map = {
-    attack: "攻撃力",
-    magic: "魔力",
-    speed: "速度",
-    extraAC: "AC",
-    extraHP: "HP",
-    extraMP: "MP",
-    extraST: "ST",
-    extraMaxWeight: "最大重量",
-    extraHit: "命中",
-    extraAvoid: "回避",
-    extraAttackDelay: "攻撃ディレイ",
-    extraMagicDelay: "魔法ディレイ",
-    extraFireRes: "火耐性",
-    extraWaterRes: "水耐性",
-    extraEarthRes: "地耐性",
-    extraWindRes: "風耐性",
-    extraNeutralRes: "無耐性"
-  };
-  return map[name] || name;
+  return TOOL_STAT_DISPLAY_NAMES[name] || name;
 }
 
 function catalogItemMatches(item, filter) {
@@ -9623,7 +10016,7 @@ function catalogItemMatches(item, filter) {
   if (filter.withBuff && !(item.equipBuff?.name || (item.buffRefs || []).length)) return false;
   if (filter.stat) {
     const stat = filter.stat;
-    const hit = (item.addStatuses || []).some(s => String(s?.name || "") === stat) || !!+(item.extraStats?.[stat] || 0);
+    const hit = (item.addStatuses || []).some(s => String(s?.name || "") === stat || String(s?.statKey || "") === stat) || !!+(item.extraStats?.[stat] || 0);
     if (!hit) return false;
   }
   return true;
@@ -9704,7 +10097,7 @@ function catalogEquipmentToRow(item) {
       if (prop in row) row[prop] = +(row[prop] || 0) + (+value || 0);
     });
   }
-  (item.addStatuses || []).forEach(st => idbApplyStructuredStatus(row, st.name, st.value));
+  (item.addStatuses || []).forEach(st => idbApplyStructuredStatus(row, st.name, st.value, st.statKey));
   if (item.category !== "weapon" && +item.armorClass) row.extraAC = +(row.extraAC || 0) + (+item.armorClass || 0);
 
   const buff = item.equipBuff?.name ? item.equipBuff : (item.buffRefs || []).map(catalogFindBuffById).find(Boolean);
@@ -10688,11 +11081,44 @@ function renderRaceTable() {
 
 
 
+function optimizerObjectiveOptionDefs() {
+  const basic = [
+    {value:"damage", label:"最大ダメージ"},
+    {value:"attack", label:"最大攻撃力"},
+    {value:"magic", label:"最大魔力"},
+    {value:"speed", label:"最大移動速度"},
+    {value:"slotsMin", label:"枠数最小"}
+  ];
+  const extras = extraFieldDefsFor("summary")
+    .filter(def => !["attack", "magic", "speed"].includes(def.prop))
+    .map(def => ({value:def.prop, label:optimizerObjectiveLabel(def.prop)}));
+  const seen = new Set();
+  return basic.concat(extras).filter(opt => {
+    if (!opt.value || seen.has(opt.value)) return false;
+    seen.add(opt.value);
+    return true;
+  });
+}
+
+function ensureOptimizerObjectiveOptions() {
+  ["optimizerObjective", "optimizerSecondaryObjective"].forEach(id => {
+    const select = byId(id);
+    if (!select) return;
+    const existing = new Set(Array.from(select.options || []).map(opt => opt.value));
+    optimizerObjectiveOptionDefs().forEach(opt => {
+      if (existing.has(opt.value)) return;
+      select.appendChild(new Option(opt.label, opt.value));
+      existing.add(opt.value);
+    });
+  });
+}
+
 function initializeBrowserApp() {
   loadIdbWorkerEndpoint();
 
   setupTabLayout();
   setupEquipmentFilterControls();
+  ensureOptimizerObjectiveOptions();
 
   document.querySelectorAll("input,select").forEach(el => {
     el.addEventListener("input", calc);
