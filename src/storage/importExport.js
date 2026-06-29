@@ -959,7 +959,7 @@ function normalizeImportedConfig(raw) {
 
   if (raw.inputs && raw.state) return raw;
 
-  const stateLikeKeys = ["weaponReq", "skillSim", "equipment", "composite", "pct", "flat", "conv", "dmg", "special", "post", "other"];
+  const stateLikeKeys = ["weaponReq", "skillSim", "attackDps", "equipment", "composite", "pct", "flat", "conv", "dmg", "special", "post", "other"];
   if (stateLikeKeys.some(k => raw[k] !== undefined)) {
     return {inputs: collectInputs(), state: raw};
   }
@@ -993,6 +993,7 @@ function applyConfig(cfg) {
 
     state.weaponReq = normalizeWeaponReqRows(incoming.weaponReq, normalized.inputs || {});
     state.skillSim = normalizeSkillSim(incoming.skillSim);
+    state.attackDps = normalizeAttackDpsState(incoming.attackDps);
     state.composite = Array.isArray(incoming.composite) ? normalizeCompositeRows(incoming.composite) : state.composite;
     state.equipment = normalizeEquipmentRows(incoming.equipment);
 

@@ -3674,3 +3674,96 @@
   margin: 2px 0 6px;
   opacity: .82;
 }
+
+
+/* v1.23.0: アタックDPS α */
+.attackDpsPanel {
+  display: grid;
+  gap: 16px;
+}
+.attackDpsHeader {
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+.attackDpsHeader h2 {
+  margin: 0 0 4px;
+}
+.attackDpsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+}
+.attackDpsGrid fieldset {
+  border: 1px solid var(--border, #ddd);
+  border-radius: 12px;
+  padding: 12px;
+}
+.attackDpsGrid legend {
+  font-weight: 700;
+  padding: 0 6px;
+}
+.attackDpsGrid label {
+  display: grid;
+  gap: 4px;
+  margin: 8px 0;
+}
+.attackDpsGrid label.checkLine {
+  grid-template-columns: auto 1fr;
+  align-items: center;
+}
+.attackDpsGrid input,
+.attackDpsGrid select {
+  width: 100%;
+}
+.attackDpsNote {
+  line-height: 1.65;
+}
+.attackDpsWarnings,
+.attackDpsOk {
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+}
+.attackDpsWarnings {
+  background: rgba(255, 193, 7, 0.14);
+  border: 1px solid rgba(255, 193, 7, 0.45);
+}
+.attackDpsOk {
+  background: rgba(25, 135, 84, 0.10);
+  border: 1px solid rgba(25, 135, 84, 0.30);
+}
+.attackDpsResultGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 10px;
+}
+.attackDpsCard {
+  border: 1px solid var(--border, #ddd);
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: var(--card-bg, rgba(255,255,255,0.55));
+  display: grid;
+  gap: 3px;
+}
+.attackDpsCard span {
+  font-size: 0.86rem;
+  opacity: 0.78;
+}
+.attackDpsCard b {
+  font-size: 1.3rem;
+}
+.attackDpsCard small {
+  opacity: 0.75;
+}
+.attackDpsFormula {
+  margin-top: 12px;
+  border: 1px solid var(--border, #ddd);
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+.attackDpsFormula div {
+  margin: 5px 0;
+}

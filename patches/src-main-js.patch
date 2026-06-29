@@ -1,0 +1,377 @@
+--- /mnt/data/main.orig.js	2026-06-29 03:11:31.713006640 +0000
++++ /mnt/data/moe_attack_dps_alpha/src/main.js	2026-06-29 03:16:43.122508960 +0000
+@@ -3552,6 +3552,44 @@
+ }
+ 
+ 
++
++function defaultAttackDpsState() {
++  return {
++    damageSource: "current",
++    manualDamage: 100,
++    weaponDelaySource: "currentWeapon",
++    manualWeaponDelay: 300,
++    equipmentBuffDelay: 0,
++    attackDelayBuff: 0,
++    stDelayBonus: -10,
++    manualAttackBonus: true,
++    criticalCancel: true,
++    damageFrame: 45,
++    nonCancelMotionFrames: 90,
++    fps: 60,
++    simSeconds: 30,
++    hitRatePct: 100
++  };
++}
++
++function normalizeAttackDpsState(raw) {
++  const d = defaultAttackDpsState();
++  const src = raw && typeof raw === "object" ? raw : {};
++  const out = {...d, ...src};
++  out.damageSource = out.damageSource === "manual" ? "manual" : "current";
++  out.weaponDelaySource = out.weaponDelaySource === "manual" ? "manual" : "currentWeapon";
++  ["manualDamage", "manualWeaponDelay", "equipmentBuffDelay", "attackDelayBuff", "stDelayBonus", "damageFrame", "nonCancelMotionFrames", "fps", "simSeconds", "hitRatePct"].forEach(k => {
++    out[k] = parseFloat(out[k]);
++    if (!Number.isFinite(out[k])) out[k] = d[k];
++  });
++  out.fps = Math.max(1, out.fps || d.fps);
++  out.simSeconds = Math.max(1, out.simSeconds || d.simSeconds);
++  out.hitRatePct = Math.max(0, Math.min(100, out.hitRatePct));
++  out.manualAttackBonus = out.manualAttackBonus !== false;
++  out.criticalCancel = out.criticalCancel !== false;
++  return out;
++}
++
+ const DEFAULT_STATE = () => ({
+   weaponReq: [
+     {name: "武器スキル", current: 0, required: 0}
+@@ -3559,6 +3597,7 @@
+   composite: [],
+   pct: [],
+   skillSim: defaultSkillSimState(),
++  attackDps: defaultAttackDpsState(),
+   equipment: defaultEquipmentRows(),
+   flat: [],
+   conv: [],
+@@ -6944,8 +6983,305 @@
+ 
+ 
+ 
++function attackDpsState() {
++  state.attackDps = normalizeAttackDpsState(state.attackDps);
++  return state.attackDps;
++}
++
++function setAttackDpsField(key, value, type="number") {
++  const cfg = attackDpsState();
++  if (type === "checkbox") cfg[key] = !!value;
++  else if (type === "select") cfg[key] = value;
++  else {
++    const n = parseFloat(value);
++    cfg[key] = Number.isFinite(n) ? n : 0;
++  }
++  calc();
++}
++
++function bindAttackDpsControls() {
++  const cfg = attackDpsState();
++  const bindNumber = (id, key) => {
++    const el = byId(id);
++    if (!el) return;
++    el.value = cfg[key] ?? 0;
++    el.oninput = e => setAttackDpsField(key, e.target.value, "number");
++  };
++  const bindSelect = (id, key) => {
++    const el = byId(id);
++    if (!el) return;
++    el.value = cfg[key];
++    el.onchange = e => setAttackDpsField(key, e.target.value, "select");
++  };
++  const bindCheckbox = (id, key) => {
++    const el = byId(id);
++    if (!el) return;
++    el.checked = !!cfg[key];
++    el.onchange = e => setAttackDpsField(key, e.target.checked, "checkbox");
++  };
++
++  bindSelect("attackDpsDamageSource", "damageSource");
++  bindNumber("attackDpsManualDamage", "manualDamage");
++  bindSelect("attackDpsWeaponDelaySource", "weaponDelaySource");
++  bindNumber("attackDpsManualWeaponDelay", "manualWeaponDelay");
++  bindNumber("attackDpsEquipBuffDelay", "equipmentBuffDelay");
++  bindNumber("attackDpsAttackDelayBuff", "attackDelayBuff");
++  bindNumber("attackDpsStDelayBonus", "stDelayBonus");
++  bindCheckbox("attackDpsManualAttackBonus", "manualAttackBonus");
++  bindCheckbox("attackDpsCriticalCancel", "criticalCancel");
++  bindNumber("attackDpsDamageFrame", "damageFrame");
++  bindNumber("attackDpsNonCancelMotionFrames", "nonCancelMotionFrames");
++  bindNumber("attackDpsFps", "fps");
++  bindNumber("attackDpsSimSeconds", "simSeconds");
++  bindNumber("attackDpsHitRatePct", "hitRatePct");
++
++  const copy = byId("attackDpsCopyCurrent");
++  if (copy) copy.onclick = copyCurrentToAttackDps;
++}
++
++function createAttackDpsTab(panel) {
++  const wrap = document.createElement("section");
++  wrap.id = "attackDpsRoot";
++  wrap.className = "attackDpsPanel";
++  wrap.innerHTML = `
++    <div class="attackDpsHeader">
++      <div>
++        <h2>アタックDPS α</h2>
++        <p class="small">通常アタック向けの参考値です。現代運用を想定して、初期値はクリティカル100% + クリティカル時モーションキャンセルONにしています。</p>
++      </div>
++      <button type="button" id="attackDpsCopyCurrent">現在構成を手入力欄へ反映</button>
++    </div>
++
++    <div class="attackDpsGrid">
++      <fieldset>
++        <legend>1発ダメージ</legend>
++        <label>ダメージ参照
++          <select id="attackDpsDamageSource">
++            <option value="current">計算タブの予想ダメージ</option>
++            <option value="manual">手入力</option>
++          </select>
++        </label>
++        <label>手入力ダメージ
++          <input id="attackDpsManualDamage" type="number" step="1">
++        </label>
++        <label>命中率%
++          <input id="attackDpsHitRatePct" type="number" step="0.1" min="0" max="100">
++        </label>
++      </fieldset>
++
++      <fieldset>
++        <legend>ディレイ短縮</legend>
++        <label>武器ディレイ参照
++          <select id="attackDpsWeaponDelaySource">
++            <option value="currentWeapon">現在の計算武器</option>
++            <option value="manual">手入力</option>
++          </select>
++        </label>
++        <label>手入力 武器ディレイ
++          <input id="attackDpsManualWeaponDelay" type="number" step="0.1">
++        </label>
++        <label>装備+攻撃ディレイBuff枠
++          <input id="attackDpsEquipBuffDelay" type="number" step="0.1">
++          <span class="small">-60で上限</span>
++        </label>
++        <label>アタック短縮Buff枠
++          <input id="attackDpsAttackDelayBuff" type="number" step="0.1">
++        </label>
++        <label>ST補正%
++          <input id="attackDpsStDelayBonus" type="number" step="0.1">
++          <span class="small">ST200以上なら -10 想定</span>
++        </label>
++        <label class="checkLine">
++          <input id="attackDpsManualAttackBonus" type="checkbox">
++          手動アタック補正 -10% を適用
++        </label>
++      </fieldset>
++
++      <fieldset>
++        <legend>モーション</legend>
++        <label>ダメージ発生フレーム
++          <input id="attackDpsDamageFrame" type="number" step="1">
++        </label>
++        <label>非キャンセル時の行動不能フレーム
++          <input id="attackDpsNonCancelMotionFrames" type="number" step="1">
++        </label>
++        <label>FPS
++          <input id="attackDpsFps" type="number" step="1" min="1">
++        </label>
++        <label class="checkLine">
++          <input id="attackDpsCriticalCancel" type="checkbox">
++          クリティカル時モーションキャンセルを適用
++        </label>
++      </fieldset>
++
++      <fieldset>
++        <legend>表示</legend>
++        <label>初撃込みDPSの計測秒数
++          <input id="attackDpsSimSeconds" type="number" step="1" min="1">
++        </label>
++        <div class="attackDpsNote small">
++          α版ではディレイ欄の数値を「60.3 ≒ 1秒」、つまり「ディレイ × 0.01658 秒」として秒換算します。発生フレームはFPSで秒換算します。遠隔武器の弾着・距離・入力遅延・ラグ・対象デバフ変動は未考慮です。
++        </div>
++      </fieldset>
++    </div>
++
++    <div id="attackDpsResult" class="attackDpsResult"></div>
++  `;
++  panel.appendChild(wrap);
++  bindAttackDpsControls();
++}
++
++function copyCurrentToAttackDps() {
++  try {
++    syncSelectedWeaponToHiddenInputs();
++    syncRaceCoeff();
++    syncBaseMagic();
++    syncAttackTypeUI();
++    const inputs = collectInputs();
++    inputs.raceCoeff = byId("raceCoeff")?.value || inputs.raceCoeff;
++    inputs.techMultiplier = byId("techMultiplier")?.value || inputs.techMultiplier;
++    const metrics = computeMetrics(expandSkillSimMasteryBuffState(state), inputs);
++    const cfg = attackDpsState();
++    cfg.manualDamage = Math.max(0, Math.floor(metrics.finalDamage || 0));
++    const weapon = selectedWeaponForCalc(state);
++    if (weapon && +weapon.weaponAttackInterval > 0) cfg.manualWeaponDelay = +weapon.weaponAttackInterval;
++    if (metrics?.extraStats && Number.isFinite(+metrics.extraStats.extraAttackDelay)) {
++      cfg.equipmentBuffDelay = +metrics.extraStats.extraAttackDelay || 0;
++    }
++    bindAttackDpsControls();
++    renderAttackDpsTab(metrics);
++    calc();
++  } catch (e) {
++    alert("現在構成の反映に失敗しました: " + (e?.message || e));
++  }
++}
++
++function attackDpsClampPercentForMultiplier(v, min=-99.9, max=999) {
++  const n = parseFloat(v) || 0;
++  return Math.max(min, Math.min(max, n));
++}
++
++function computeAttackDpsAlpha(metrics=null) {
++  const cfg = attackDpsState();
++  const warnings = [];
++  const weapon = selectedWeaponForCalc(state);
++
++  const currentDamage = metrics && Number.isFinite(+metrics.finalDamage) ? Math.floor(+metrics.finalDamage) : 0;
++  const damage = cfg.damageSource === "current" ? currentDamage : Math.max(0, +cfg.manualDamage || 0);
++  if (cfg.damageSource === "current" && !(damage > 0)) warnings.push("計算タブの予想ダメージが0です。手入力ダメージに切り替えるか、計算条件を確認してください。");
++
++  const currentWeaponDelay = weapon && +weapon.weaponAttackInterval > 0 ? +weapon.weaponAttackInterval : 0;
++  const weaponDelay = cfg.weaponDelaySource === "currentWeapon" ? currentWeaponDelay : Math.max(0, +cfg.manualWeaponDelay || 0);
++  if (cfg.weaponDelaySource === "currentWeapon" && !(weaponDelay > 0)) warnings.push("現在の計算武器に攻撃間隔がありません。装備詳細に攻撃間隔を入れるか、手入力に切り替えてください。");
++
++  const equipBuffRaw = +cfg.equipmentBuffDelay || 0;
++  const equipBuffCapped = Math.max(-60, equipBuffRaw);
++  if (equipBuffRaw < -60) warnings.push("装備+攻撃ディレイBuff枠は -60 に丸めています。");
++
++  const attackDelayBuff = attackDpsClampPercentForMultiplier(cfg.attackDelayBuff);
++  const stBonus = attackDpsClampPercentForMultiplier(cfg.stDelayBonus);
++  const manualBonus = cfg.manualAttackBonus ? -10 : 0;
++
++  const delayMultiplier =
++    (100 + equipBuffCapped) / 100 *
++    (100 + attackDelayBuff) / 100 *
++    (100 + stBonus) / 100 *
++    (100 + manualBonus) / 100;
++
++  const shortenedDelay = Math.max(0, weaponDelay * delayMultiplier);
++  // MoE wiki等の記述では、ディレイ欄の数値は 60.3 ≒ 1秒。
++  // つまり 実秒 ≒ ディレイ値 * 0.01658。
++  const ATTACK_DPS_DELAY_SECONDS_PER_POINT = 0.01658;
++  const delaySec = shortenedDelay * ATTACK_DPS_DELAY_SECONDS_PER_POINT;
++  const fps = Math.max(1, +cfg.fps || 60);
++  const damageFrame = Math.max(0, +cfg.damageFrame || 0);
++  const nonCancelFrames = Math.max(0, +cfg.nonCancelMotionFrames || 0);
++  const damageFrameSec = damageFrame / fps;
++  const motionLockSec = cfg.criticalCancel
++    ? damageFrameSec
++    : Math.max(damageFrameSec, nonCancelFrames / fps);
++
++  if (!(damageFrame > 0)) warnings.push("ダメージ発生フレームが0です。モーション差の比較には手入力が必要です。");
++  if (!cfg.criticalCancel && !(nonCancelFrames > 0)) warnings.push("非キャンセル計算では行動不能フレームを入れてください。");
++
++  const periodSec = Math.max(delaySec, motionLockSec);
++  if (!(periodSec > 0)) warnings.push("アタック周期が0です。武器ディレイまたはモーションフレームを入力してください。");
++
++  const simSeconds = Math.max(1, +cfg.simSeconds || 30);
++  const hitRate = Math.max(0, Math.min(1, (+cfg.hitRatePct || 0) / 100));
++  const firstHitSec = damageFrameSec > 0 ? damageFrameSec : periodSec;
++  const hitCount = periodSec > 0 && firstHitSec > 0 && firstHitSec <= simSeconds
++    ? Math.floor((simSeconds - firstHitSec) / periodSec + 1 + 1e-9)
++    : 0;
++  const expectedTotalDamage = damage * hitRate * hitCount;
++
++  return {
++    cfg, weapon, damage, currentDamage, weaponDelay, currentWeaponDelay,
++    equipBuffRaw, equipBuffCapped, attackDelayBuff, stBonus, manualBonus,
++    delayMultiplier, shortenedDelay, delaySec, fps, damageFrame, damageFrameSec,
++    motionLockSec, periodSec, simSeconds, hitRate, hitCount, expectedTotalDamage,
++    continuousDps: periodSec > 0 ? damage * hitRate / periodSec : NaN,
++    windowDps: simSeconds > 0 ? expectedTotalDamage / simSeconds : NaN,
++    attacksPerMinute: periodSec > 0 ? 60 / periodSec : NaN,
++    warnings
++  };
++}
++
++function attackDpsResultCard(label, value, note="") {
++  return `<div class="attackDpsCard"><span>${escapeHtml(label)}</span><b>${escapeHtml(value)}</b>${note ? `<small>${escapeHtml(note)}</small>` : ""}</div>`;
++}
++
++function renderAttackDpsResult(metrics=null) {
++  const el = byId("attackDpsResult");
++  if (!el) return;
++  const r = computeAttackDpsAlpha(metrics);
++  const warnHtml = r.warnings.length
++    ? `<div class="attackDpsWarnings">${r.warnings.map(w => `<div>⚠ ${escapeHtml(w)}</div>`).join("")}</div>`
++    : `<div class="attackDpsOk">α版の計算に必要な最低限の値は入っています。</div>`;
++
++  const weaponText = r.weapon
++    ? `${(r.weapon.slot || "武器").replace(/^武器: /, "")} ${r.weapon.name || "名称未入力"}`
++    : "手入力/未選択";
++
++  const cards = [
++    attackDpsResultCard("1発ダメージ", fmt(r.damage, 0), r.cfg.damageSource === "current" ? "計算タブ参照" : "手入力"),
++    attackDpsResultCard("短縮後ディレイ", fmt(r.shortenedDelay, 2), `${fmt(r.delaySec, 3)} 秒`),
++    attackDpsResultCard("ダメージ発生", `${fmt(r.damageFrame, 0)} F`, `${fmt(r.damageFrameSec, 3)} 秒`),
++    attackDpsResultCard("実アタック周期", fmt(r.periodSec, 3) + " 秒", r.cfg.criticalCancel ? "クリキャン前提" : "非キャンセル"),
++    attackDpsResultCard("継続DPS", fmt(r.continuousDps, 2), `命中率 ${fmt(r.hitRate * 100, 1)}%`),
++    attackDpsResultCard(`${fmt(r.simSeconds, 0)}秒DPS`, fmt(r.windowDps, 2), `${r.hitCount} hit / 初撃込み`),
++    attackDpsResultCard("1分あたり攻撃回数", fmt(r.attacksPerMinute, 2), "理論値")
++  ].join("");
++
++  el.innerHTML = `
++    ${warnHtml}
++    <div class="attackDpsResultGrid">${cards}</div>
++    <details class="attackDpsFormula" open>
++      <summary>計算内訳</summary>
++      <div>計算武器: ${escapeHtml(weaponText)} / 武器ディレイ ${fmt(r.weaponDelay, 2)}${r.cfg.weaponDelaySource === "currentWeapon" ? "（現在武器）" : "（手入力）"}</div>
++      <div>装備+Buff枠: raw ${fmt(r.equipBuffRaw, 2)} → 適用 ${fmt(r.equipBuffCapped, 2)} / アタック短縮Buff ${fmt(r.attackDelayBuff, 2)} / ST補正 ${fmt(r.stBonus, 2)} / 手動補正 ${fmt(r.manualBonus, 2)}</div>
++      <div>短縮後ディレイ = 武器ディレイ × ${fmt(r.delayMultiplier, 4)} = ${fmt(r.shortenedDelay, 3)}（${fmt(r.delaySec, 3)}秒）</div>
++      <div>周期 = max(短縮後ディレイ秒 ${fmt(r.delaySec, 3)}, ${r.cfg.criticalCancel ? "ダメージ発生秒" : "行動不能秒"} ${fmt(r.motionLockSec, 3)}) = ${fmt(r.periodSec, 3)}秒</div>
++      <div>${fmt(r.simSeconds,0)}秒内ヒット数 = ${r.hitCount} / 期待総ダメージ = ${fmt(r.expectedTotalDamage, 0)}</div>
++    </details>
++  `;
++}
++
++function renderAttackDpsTab(metrics=null) {
++  const panel = document.querySelector('[data-tab-panel="attackDps"]');
++  if (!panel) return;
++  if (!panel.dataset.attackDpsReady) {
++    panel.dataset.attackDpsReady = "1";
++    createAttackDpsTab(panel);
++  }
++  state.attackDps = normalizeAttackDpsState(state.attackDps);
++  renderAttackDpsResult(metrics);
++}
++
++
+ const MAIN_TABS = [
+   {id:"calc", label:"計算", hint:"基本設定、サマリー、分析、実測差分、最適化計算をここにまとめています。"},
++  {id:"attackDps", label:"アタックDPS α", hint:"通常アタックのクリティカルキャンセル前提DPSを参考値として計算します。単発ダメージ、ディレイ短縮、モーション発生フレームを分けて扱います。"},
+   {id:"skill", label:"スキルシミュレータ", hint:"スキル合計850、残りポイント、種族別の簡易ステータスを確認します。計算側へはボタンを押した時だけ反映します。"},
+   {id:"equipment", label:"装備登録", hint:"武器・防具・装飾候補、装備Buff、AC/HP/命中などの追加ステータスを部位ごとのカテゴリで登録します。候補追加はここで行います。"},
+   {id:"buffs", label:"Buff登録", hint:"装備以外のBuff、外枠補正、その他バフを登録します。"},
+@@ -9034,6 +9370,7 @@
+   renderOtherTable();
+   renderTagLinkSummary();
+   renderShowcaseTab();
++  renderAttackDpsTab();
+ }
+ 
+ /* 種族プルダウンから攻撃力係数hidden値を同期する。 */
+@@ -9322,6 +9659,7 @@
+   updateWeaponSkillModHint(m);
+   updatePredictedAtkUI(m);
+   renderShowcaseTab(m);
++  renderAttackDpsTab(m);
+ 
+   const pctStatLine = m.pctStats.steps.length
+     ? `<p>割合ステータスBuff: ${m.pctStats.steps.map(s => `${s.name}+${s.percent}% → ${labelOf(s.key)} ${s.after.toFixed(3)}`).join(" / ")}</p>`
