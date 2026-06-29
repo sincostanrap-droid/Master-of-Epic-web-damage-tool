@@ -1,8 +1,6 @@
-diff --git a/mnt/data/importExport.orig.js b/src/storage/importExport.js
-index 3798b39..f789345 100644
---- a/mnt/data/importExport.orig.js
-+++ b/src/storage/importExport.js
-@@ -959,7 +959,7 @@ function normalizeImportedConfig(raw) {
+--- /mnt/data/importExport.orig.js	2026-06-29 03:11:31.729211688 +0000
++++ /mnt/data/moe_attack_dps_alpha/src/storage/importExport.js	2026-06-29 03:20:44.000000000 +0000
+@@ -959,7 +959,7 @@
  
    if (raw.inputs && raw.state) return raw;
  
@@ -11,7 +9,7 @@ index 3798b39..f789345 100644
    if (stateLikeKeys.some(k => raw[k] !== undefined)) {
      return {inputs: collectInputs(), state: raw};
    }
-@@ -993,6 +993,7 @@ function applyConfig(cfg) {
+@@ -993,6 +993,7 @@
  
      state.weaponReq = normalizeWeaponReqRows(incoming.weaponReq, normalized.inputs || {});
      state.skillSim = normalizeSkillSim(incoming.skillSim);

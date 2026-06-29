@@ -1,8 +1,6 @@
-diff --git a/mnt/data/main.orig.css b/styles/main.css
-index 8c9c325..c6b72a6 100644
---- a/mnt/data/main.orig.css
-+++ b/styles/main.css
-@@ -3674,3 +3674,273 @@
+--- /mnt/data/main.orig.css	2026-06-29 03:11:31.721082502 +0000
++++ /mnt/data/moe_attack_dps_alpha/styles/main.css	2026-06-29 04:26:49.298522581 +0000
+@@ -3674,3 +3674,302 @@
    margin: 2px 0 6px;
    opacity: .82;
  }
@@ -275,4 +273,33 @@ index 8c9c325..c6b72a6 100644
 +#postBuffTable input[type="number"] {
 +  width: 6ch !important;
 +  max-width: 6ch !important;
++}
++
++
++/* v1.23.4: Buff登録の操作列を広げ、上下移動/削除ボタンが隠れないようにする */
++#compositeBuffTable.compactTable {
++  min-width: 1230px !important;
++}
++#compositeBuffTable th:nth-child(19),
++#compositeBuffTable td:nth-child(19),
++#compositeBuffTable td.actionCell {
++  width: 86px !important;
++  min-width: 86px !important;
++  max-width: 86px !important;
++  overflow: visible !important;
++}
++#compositeBuffTable .actionsWrap {
++  display: inline-grid !important;
++  grid-template-columns: 22px 22px 22px;
++  gap: 3px;
++  width: 72px;
++  min-width: 72px;
++}
++#compositeBuffTable .actionsWrap button {
++  width: 22px;
++  min-width: 22px;
++  height: 22px;
++  padding: 0;
++  margin: 0;
++  line-height: 1;
 +}

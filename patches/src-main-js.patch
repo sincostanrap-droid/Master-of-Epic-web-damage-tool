@@ -1,18 +1,16 @@
-diff --git a/mnt/data/main.orig.js b/src/main.js
-index a8f8b28..a2b2e04 100644
---- a/mnt/data/main.orig.js
-+++ b/src/main.js
+--- /mnt/data/main.orig.js	2026-06-29 03:11:31.713006640 +0000
++++ /mnt/data/moe_attack_dps_alpha/src/main.js	2026-06-29 04:26:49.297851204 +0000
 @@ -5,6 +5,9 @@
    onclick属性から呼ばれる関数があるため、現時点では module ではなく通常scriptとして読み込みます。
  */
  
-+const APP_VERSION = "v1.23.3";
-+const APP_VERSION_NOTE = "UI調整・自動反映修正";
++const APP_VERSION = "v1.23.4";
++const APP_VERSION_NOTE = "Buff削除ボタン表示修正";
 +
  /* 種族係数。攻撃力係数と魔力係数は別管理。 */
  const RACE_COEFFS = {
    newtar: 0.20,
-@@ -81,6 +84,7 @@ const BUFF_FLAT_EXTRA_STAT_DEFS = [
+@@ -81,6 +84,7 @@
    {prop:"extraMaxWeight", equipProp:"equipBuffExtraMaxWeight", label:"最大重量", step:"0.1"},
    {prop:"extraHit", equipProp:"equipBuffExtraHit", label:"命中", step:"0.1"},
    {prop:"extraAvoid", equipProp:"equipBuffExtraAvoid", label:"回避", step:"0.1"},
@@ -20,7 +18,7 @@ index a8f8b28..a2b2e04 100644
    {prop:"extraMagicDelay", equipProp:"equipBuffExtraMagicDelay", label:"魔法ディレイ", step:"0.1"},
    {prop:"extraFireRes", equipProp:"equipBuffExtraFireRes", label:"火耐性", step:"0.1"},
    {prop:"extraWaterRes", equipProp:"equipBuffExtraWaterRes", label:"水耐性", step:"0.1"},
-@@ -751,10 +755,18 @@ function makeExtraStatsEditor(row, title, mode="base", onUpdate=null) {
+@@ -751,10 +755,18 @@
      : "Buffで増えるHP/MP/ST/最大重量/命中/回避/AC/各属性耐性/ディレイ/軽減/クリ率などを直接入力できます。";
    wrap.appendChild(help);
  
@@ -41,7 +39,7 @@ index a8f8b28..a2b2e04 100644
    activeDefs.forEach(def => activeGrid.appendChild(extraStatNumberInput(row, def, mode, onUpdate)));
    wrap.appendChild(activeGrid);
  
-@@ -994,7 +1006,7 @@ function normalizeSkillSim(raw) {
+@@ -994,7 +1006,7 @@
      race: incoming.race || "newtar",
      cap: incoming.cap === undefined || incoming.cap === "" ? 850 : (+incoming.cap || 850),
      weaponSkill: incoming.weaponSkill || "こんぼう",
@@ -50,7 +48,7 @@ index a8f8b28..a2b2e04 100644
      skills: {...base.skills, ...(incoming.skills || {})}
    };
    // 旧版・外部データ互換。内部名が異なるものを現行UIのスキル名へ寄せる。
-@@ -1049,8 +1061,7 @@ function skillSimDerived() {
+@@ -1049,8 +1061,7 @@
  function syncSkillSimToCalcInputs(force=false, updateWeaponReqName=false) {
    if (!state || !state.skillSim) return false;
    state.skillSim = normalizeSkillSim(state.skillSim);
@@ -60,7 +58,7 @@ index a8f8b28..a2b2e04 100644
    const d = skillSimDerived();
  
    if (byId("raceSelect")) byId("raceSelect").value = state.skillSim.race || "newtar";
-@@ -3343,7 +3354,7 @@ function renderSkillKnowledge() {
+@@ -3343,7 +3354,7 @@
      const dataSource = data.source?.masteries || "不明";
      const usingFallback = dataSource === "内蔵データ";
      const sampleNote = `<span class="skillKnowledgeSampleNote">${usingFallback ? "内蔵マスタリー使用" : "マスタリー実データ"} / テク・魔法はサンプル</span>`;
@@ -69,7 +67,7 @@ index a8f8b28..a2b2e04 100644
    }
  }
  
-@@ -3457,23 +3468,27 @@ function renderSkillSim() {
+@@ -3457,23 +3468,27 @@
    };
  
    const weapon = byId("skillSimWeaponSkill");
@@ -110,7 +108,7 @@ index a8f8b28..a2b2e04 100644
  
    const root = byId("skillSimGroups");
    root.innerHTML = "";
-@@ -3522,8 +3537,7 @@ function updateSkillSimSummary() {
+@@ -3522,8 +3537,7 @@
      `筋力 → ${fmt(skillSimValue("筋力"), 1)}`,
      `精神力 → ${fmt(skillSimValue("精神力"), 1)}`,
      `酩酊度 → ${fmt(d.drunk, 1)}`,
@@ -120,7 +118,7 @@ index a8f8b28..a2b2e04 100644
    ].map(x => `<div>${x}</div>`).join("");
  
    const masterySummaryEl = byId("skillSimSummary");
-@@ -3552,6 +3566,46 @@ function resetSkillSim() {
+@@ -3552,6 +3566,46 @@
  }
  
  
@@ -167,7 +165,7 @@ index a8f8b28..a2b2e04 100644
  const DEFAULT_STATE = () => ({
    weaponReq: [
      {name: "武器スキル", current: 0, required: 0}
-@@ -3559,6 +3613,7 @@ const DEFAULT_STATE = () => ({
+@@ -3559,6 +3613,7 @@
    composite: [],
    pct: [],
    skillSim: defaultSkillSimState(),
@@ -175,7 +173,7 @@ index a8f8b28..a2b2e04 100644
    equipment: defaultEquipmentRows(),
    flat: [],
    conv: [],
-@@ -3861,7 +3916,7 @@ function compositeGroupScore(r) {
+@@ -3861,7 +3916,7 @@
    score += (+r.extraAvoid || 0) * 8 + (+r.extraAvoidPct || 0) * 14;
    score += ((+r.extraFireRes || 0) + (+r.extraWaterRes || 0) + (+r.extraEarthRes || 0) + (+r.extraWindRes || 0) + (+r.extraNeutralRes || 0)) * 2;
    score += ((+r.extraFireResPct || 0) + (+r.extraWaterResPct || 0) + (+r.extraEarthResPct || 0) + (+r.extraWindResPct || 0) + (+r.extraNeutralResPct || 0)) * 4;
@@ -184,7 +182,7 @@ index a8f8b28..a2b2e04 100644
    score += (+r.extraMagicDelay || 0) * 4 + (+r.extraMagicDelayPct || 0) * 6;
    score += (+r.extraDamageReducePct || 0) * 120;
    score += (+r.extraCritRatePct || 0) * 80;
-@@ -6944,9 +6999,435 @@ function applyIntegratedOptimizerResult(index) {
+@@ -6944,9 +6999,435 @@
  
  
  
@@ -621,7 +619,7 @@ index a8f8b28..a2b2e04 100644
    {id:"equipment", label:"装備登録", hint:"武器・防具・装飾候補、装備Buff、AC/HP/命中などの追加ステータスを部位ごとのカテゴリで登録します。候補追加はここで行います。"},
    {id:"buffs", label:"Buff登録", hint:"装備以外のBuff、外枠補正、その他バフを登録します。"},
    {id:"groups", label:"競合グループ", hint:"同一グループで重複しないBuffを確認します。"},
-@@ -6970,7 +7451,9 @@ function activateMainTab(id) {
+@@ -6970,7 +7451,9 @@
  function setupTabLayout() {
    const nav = byId("mainTabNav");
    const panelsWrap = byId("mainTabPanels");
@@ -632,7 +630,7 @@ index a8f8b28..a2b2e04 100644
  
    nav.dataset.ready = "1";
    nav.setAttribute("role", "tablist");
-@@ -9034,6 +9517,7 @@ function renderAll() {
+@@ -9034,6 +9517,7 @@
    renderOtherTable();
    renderTagLinkSummary();
    renderShowcaseTab();
@@ -640,7 +638,7 @@ index a8f8b28..a2b2e04 100644
  }
  
  /* 種族プルダウンから攻撃力係数hidden値を同期する。 */
-@@ -9322,6 +9806,7 @@ function calc() {
+@@ -9322,6 +9806,7 @@
    updateWeaponSkillModHint(m);
    updatePredictedAtkUI(m);
    renderShowcaseTab(m);

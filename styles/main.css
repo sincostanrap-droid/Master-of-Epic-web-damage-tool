@@ -3944,3 +3944,32 @@ button[onclick*="applySkillSimToCalc"],
   width: 6ch !important;
   max-width: 6ch !important;
 }
+
+
+/* v1.23.4: Buff登録の操作列を広げ、上下移動/削除ボタンが隠れないようにする */
+#compositeBuffTable.compactTable {
+  min-width: 1230px !important;
+}
+#compositeBuffTable th:nth-child(19),
+#compositeBuffTable td:nth-child(19),
+#compositeBuffTable td.actionCell {
+  width: 86px !important;
+  min-width: 86px !important;
+  max-width: 86px !important;
+  overflow: visible !important;
+}
+#compositeBuffTable .actionsWrap {
+  display: inline-grid !important;
+  grid-template-columns: 22px 22px 22px;
+  gap: 3px;
+  width: 72px;
+  min-width: 72px;
+}
+#compositeBuffTable .actionsWrap button {
+  width: 22px;
+  min-width: 22px;
+  height: 22px;
+  padding: 0;
+  margin: 0;
+  line-height: 1;
+}
