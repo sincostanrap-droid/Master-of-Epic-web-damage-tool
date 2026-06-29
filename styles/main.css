@@ -3974,3 +3974,60 @@ button[onclick*="applySkillSimToCalc"],
   margin: 0;
   line-height: 1;
 }
+
+/* v1.23.6: 装備カタログ検索 */
+.catalogToolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  align-items: end;
+  margin: 10px 0;
+  padding: 10px;
+}
+.catalogToolbar label {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 12px;
+  min-width: 120px;
+}
+.catalogToolbar label.inlineCheck {
+  flex-direction: row;
+  align-items: center;
+  min-width: auto;
+  padding-bottom: 4px;
+}
+.catalogToolbar input[type="search"] {
+  width: min(34vw, 320px);
+  min-width: 180px;
+}
+.catalogToolbar select {
+  max-width: 180px;
+}
+.catalogTableWrap {
+  overflow-x: auto;
+  max-width: 100%;
+}
+.catalogTable {
+  min-width: 980px;
+  table-layout: fixed;
+}
+.catalogTable th:nth-child(1), .catalogTable td:nth-child(1) { width: 190px; }
+.catalogTable th:nth-child(2), .catalogTable td:nth-child(2) { width: 78px; }
+.catalogTable th:nth-child(3), .catalogTable td:nth-child(3) { width: 90px; }
+.catalogTable th:nth-child(4), .catalogTable td:nth-child(4) { width: 150px; }
+.catalogTable th:nth-child(5), .catalogTable td:nth-child(5) { width: 200px; }
+.catalogTable th:nth-child(6), .catalogTable td:nth-child(6) { width: 220px; }
+.catalogTable th:nth-child(7), .catalogTable td:nth-child(7) { width: 70px; }
+.catalogTable th:nth-child(8), .catalogTable td:nth-child(8) { width: 112px; }
+.catalogTable td {
+  vertical-align: top;
+  white-space: normal;
+  word-break: break-word;
+}
+.catalogBuffCell {
+  font-size: 12px;
+}
+.catalogHelp {
+  margin-top: 10px;
+}

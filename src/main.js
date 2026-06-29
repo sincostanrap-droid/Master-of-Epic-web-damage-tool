@@ -5,8 +5,8 @@
   onclick属性から呼ばれる関数があるため、現時点では module ではなく通常scriptとして読み込みます。
 */
 
-const APP_VERSION = "v1.23.5";
-const APP_VERSION_NOTE = "README実態反映";
+const APP_VERSION = "v1.23.6";
+const APP_VERSION_NOTE = "装備カタログ生成・検索追加";
 
 /* 種族係数。攻撃力係数と魔力係数は別管理。 */
 const RACE_COEFFS = {
@@ -3658,6 +3658,7 @@ function escapeHtml(s) {
     "'": "&#39;"
   }[ch]));
 }
+function escapeAttr(s) { return escapeHtml(s); }
 /**
  * DOM要素生成ヘルパー。
  * テーブル描画関数内で input/select/button を大量に作るため、記述量を減らしている。
@@ -7429,6 +7430,7 @@ const MAIN_TABS = [
   {id:"attackDps", label:"アタックDPS α", hint:"通常アタックのクリティカルキャンセル前提DPSを参考値として計算します。単発ダメージ、ディレイ短縮、モーション発生フレームを分けて扱います。"},
   {id:"skill", label:"スキルシミュレータ", hint:"スキル合計850、残りポイント、種族別の簡易ステータスを確認します。計算タブへは常時自動反映します。"},
   {id:"equipment", label:"装備登録", hint:"武器・防具・装飾候補、装備Buff、AC/HP/命中などの追加ステータスを部位ごとのカテゴリで登録します。候補追加はここで行います。"},
+  {id:"catalog", label:"装備カタログ α", hint:"Git上の生成カタログから装備を検索し、必要なものだけ装備登録へ追加します。カタログ上にあるだけでは計算対象になりません。"},
   {id:"buffs", label:"Buff登録", hint:"装備以外のBuff、外枠補正、その他バフを登録します。"},
   {id:"groups", label:"競合グループ", hint:"同一グループで重複しないBuffを確認します。"},
   {id:"showcase", label:"見せびらかし", hint:"現在構成のダメージ、ステータス、装備、Buffを一覧表示します。"},
@@ -7446,6 +7448,7 @@ function activateMainTab(id) {
     panel.hidden = panel.dataset.tabPanel !== valid;
   });
   localStorage.setItem("moeDamageSimActiveTab", valid);
+  if (valid === "catalog") renderCatalogTab();
 }
 
 function setupTabLayout() {
@@ -9486,6 +9489,349 @@ function addIdbEquipmentCandidate() {
 }
 
 
+const CATALOG_SCRIPT_URLS = [
+  "src/data/generated/equipmentCatalog.generated.js",
+  "src/data/generated/buffCatalog.generated.js"
+];
+let catalogScriptsPromise = null;
+
+function catalogGlobalsReady() {
+  return Array.isArray(window.MOE_EQUIPMENT_CATALOG_GENERATED) ||
+    Array.isArray(window.MOE_EQUIPMENT_CATALOG) ||
+    Array.isArray(window.MOE_EQUIPMENT_CATALOG_MANUAL);
+}
+
+function loadCatalogScriptsOnce() {
+  if (catalogScriptsPromise) return catalogScriptsPromise;
+  catalogScriptsPromise = Promise.all(CATALOG_SCRIPT_URLS.map(src => new Promise(resolve => {
+    if (document.querySelector(`script[data-catalog-src="${src}"]`)) return resolve();
+    const script = document.createElement("script");
+    script.src = src;
+    script.async = false;
+    script.dataset.catalogSrc = src;
+    script.onload = () => resolve();
+    script.onerror = () => resolve();
+    document.head.appendChild(script);
+  }))).then(() => true).catch(() => false);
+  return catalogScriptsPromise;
+}
+
+function catalogArray(...names) {
+  const out = [];
+  names.forEach(name => {
+    const arr = window[name];
+    if (Array.isArray(arr)) out.push(...arr);
+  });
+  return out;
+}
+
+function equipmentCatalogItems() {
+  const raw = catalogArray("MOE_EQUIPMENT_CATALOG_MANUAL", "MOE_EQUIPMENT_CATALOG", "MOE_EQUIPMENT_CATALOG_GENERATED");
+  const seen = new Set();
+  const out = [];
+  raw.forEach(item => {
+    if (!item) return;
+    const key = item.catalogId || item.id || `${item.category || "item"}:${item.officialId || item.name}`;
+    if (seen.has(key)) return;
+    seen.add(key);
+    out.push(item);
+  });
+  return out;
+}
+
+function buffCatalogItems() {
+  const raw = catalogArray("MOE_BUFF_CATALOG_MANUAL", "MOE_BUFF_CATALOG", "MOE_BUFF_CATALOG_GENERATED");
+  const seen = new Set();
+  const out = [];
+  raw.forEach(item => {
+    if (!item) return;
+    const key = item.catalogId || item.id || item.officialTechnicId || item.name;
+    if (seen.has(key)) return;
+    seen.add(key);
+    out.push(item);
+  });
+  return out;
+}
+
+function catalogNorm(s) {
+  return String(s || "").toLowerCase().replace(/\s+/g, "");
+}
+
+function catalogText(item) {
+  return [
+    item.name,
+    item.slot,
+    item.category,
+    item.categoryLabel,
+    item.weaponType,
+    item.weaponHand,
+    item.requiredSkill,
+    item.info,
+    item.note,
+    item.sourceUrl,
+    item.addStatusText,
+    item.equipBuff?.name,
+    item.equipBuff?.info,
+    ...(Array.isArray(item.addStatuses) ? item.addStatuses.map(s => `${s.name}${s.value}`) : []),
+    ...(Array.isArray(item.tags) ? item.tags : [])
+  ].filter(Boolean).join(" ");
+}
+
+function catalogSlotOptions(items) {
+  const slots = Array.from(new Set(items.map(i => i.slot).filter(Boolean))).sort((a, b) => a.localeCompare(b, "ja"));
+  return `<option value="">すべて</option>` + slots.map(s => `<option value="${escapeAttr(s)}">${escapeHtml(s)}</option>`).join("");
+}
+
+function catalogStatOptions(items) {
+  const names = new Set();
+  items.forEach(item => {
+    (item.addStatuses || []).forEach(st => st?.name && names.add(st.name));
+    if (item.extraStats) Object.entries(item.extraStats).forEach(([k, v]) => +v && names.add(k));
+  });
+  const list = Array.from(names).sort((a, b) => String(a).localeCompare(String(b), "ja"));
+  return `<option value="">指定なし</option>` + list.map(s => `<option value="${escapeAttr(s)}">${escapeHtml(catalogDisplayStatName(s))}</option>`).join("");
+}
+
+function catalogDisplayStatName(name) {
+  const map = {
+    attack: "攻撃力",
+    magic: "魔力",
+    speed: "速度",
+    extraAC: "AC",
+    extraHP: "HP",
+    extraMP: "MP",
+    extraST: "ST",
+    extraMaxWeight: "最大重量",
+    extraHit: "命中",
+    extraAvoid: "回避",
+    extraAttackDelay: "攻撃ディレイ",
+    extraMagicDelay: "魔法ディレイ",
+    extraFireRes: "火耐性",
+    extraWaterRes: "水耐性",
+    extraEarthRes: "地耐性",
+    extraWindRes: "風耐性",
+    extraNeutralRes: "無耐性"
+  };
+  return map[name] || name;
+}
+
+function catalogItemMatches(item, filter) {
+  const q = catalogNorm(filter.query);
+  if (q && !catalogNorm(catalogText(item)).includes(q)) return false;
+  if (filter.category && String(item.category || "") !== filter.category) return false;
+  if (filter.slot && String(item.slot || "") !== filter.slot) return false;
+  if (filter.withBuff && !(item.equipBuff?.name || (item.buffRefs || []).length)) return false;
+  if (filter.stat) {
+    const stat = filter.stat;
+    const hit = (item.addStatuses || []).some(s => String(s?.name || "") === stat) || !!+(item.extraStats?.[stat] || 0);
+    if (!hit) return false;
+  }
+  return true;
+}
+
+function catalogFilterState() {
+  return {
+    query: byId("catalogSearch")?.value || "",
+    category: byId("catalogCategory")?.value || "",
+    slot: byId("catalogSlot")?.value || "",
+    stat: byId("catalogStat")?.value || "",
+    withBuff: !!byId("catalogWithBuff")?.checked
+  };
+}
+
+function catalogCategoryLabel(category) {
+  return category === "weapon" ? "武器" : category === "defense" ? "防具/装飾" : category === "shield" ? "盾" : (category || "-");
+}
+
+function catalogStatusSummary(item) {
+  const parts = [];
+  (item.addStatuses || []).forEach(st => {
+    const v = +(st?.value || 0);
+    if (st?.name && v) parts.push(`${st.name} ${v > 0 ? "+" : ""}${fmt(v, 2)}`);
+  });
+  if (!parts.length && item.extraStats) {
+    Object.entries(item.extraStats).forEach(([k, v]) => +v && parts.push(`${catalogDisplayStatName(k)} ${+v > 0 ? "+" : ""}${fmt(+v, 2)}`));
+  }
+  return parts.join(" / ") || "-";
+}
+
+function catalogWeaponSummary(item) {
+  if (item.category !== "weapon") return "-";
+  const parts = [];
+  if (+item.weaponDamage) parts.push(`ダメージ ${fmt(+item.weaponDamage, 2)}`);
+  if (+item.weaponAttackInterval) parts.push(`間隔 ${fmt(+item.weaponAttackInterval, 0)}`);
+  if (+item.weaponRange) parts.push(`射程 ${fmt(+item.weaponRange, 2)}`);
+  if (item.weaponType) parts.push(item.weaponType);
+  return parts.join(" / ") || "-";
+}
+
+function catalogBuffSummary(item) {
+  const buff = item.equipBuff || null;
+  if (!buff?.name && !(item.buffRefs || []).length) return "-";
+  return [buff?.name, buff?.info].filter(Boolean).join("：") || (item.buffRefs || []).join(" / ");
+}
+
+function catalogFindBuffById(id) {
+  const key = String(id || "");
+  if (!key) return null;
+  return buffCatalogItems().find(b => String(b.id || "") === key || String(b.officialTechnicId || "") === key || String(b.catalogId || "") === key) || null;
+}
+
+function catalogEquipmentToRow(item) {
+  const slot = item.slot || idbMapSlot(`${item.equip || ""} ${item.name || ""}`) || "防具: 頭";
+  const row = defaultEquipmentCandidate(slot, false);
+  row.enabled = false;
+  row.name = item.name || "カタログ装備";
+  row.importSource = "catalog";
+  row.importedFromCatalog = true;
+  row.catalogId = item.catalogId || item.id || "";
+  row.officialId = item.officialId || "";
+  row.importUrl = item.sourceUrl || "";
+  row.note = [item.info, item.sourceUrl ? `公式DB: ${item.sourceUrl}` : "", item.verified === false ? "未検証カタログ候補" : ""].filter(Boolean).join("\n");
+
+  if (item.category === "weapon") {
+    row.weaponDamage = +item.weaponDamage || 0;
+    row.weaponAttackInterval = +item.weaponAttackInterval || 0;
+    row.weaponRange = +item.weaponRange || 0;
+    row.weaponDurability = +item.weaponDurability || 0;
+    row.weaponTwoHanded = /2HAND|両手/i.test(item.weaponHand || item.equip || "") ? "○" : "×";
+    if (Array.isArray(item.weaponReq)) row.weaponReq = item.weaponReq;
+    else if (item.requiredSkill || item.needLevel) row.weaponReq = idbWeaponReqsFromText(String(item.requiredSkill || ""), +item.needLevel || 0);
+  }
+
+  if (item.extraStats && typeof item.extraStats === "object") {
+    Object.entries(item.extraStats).forEach(([prop, value]) => {
+      if (prop in row) row[prop] = +(row[prop] || 0) + (+value || 0);
+    });
+  }
+  (item.addStatuses || []).forEach(st => idbApplyStructuredStatus(row, st.name, st.value));
+  if (item.category !== "weapon" && +item.armorClass) row.extraAC = +(row.extraAC || 0) + (+item.armorClass || 0);
+
+  const buff = item.equipBuff?.name ? item.equipBuff : (item.buffRefs || []).map(catalogFindBuffById).find(Boolean);
+  if (buff?.name) {
+    idbSetEquipmentBuff(row, buff.name, buff.info || buff.note || "");
+    row.equipBuffCatalogId = buff.catalogId || buff.id || "";
+    row.equipBuffTechnicId = buff.officialTechnicId || item.technicId || "";
+  }
+
+  return normalizeEquipmentCandidate(row);
+}
+
+function addCatalogEquipmentToRegistered(catalogId) {
+  const item = equipmentCatalogItems().find(x => String(x.catalogId || x.id) === String(catalogId));
+  if (!item) return;
+  state.equipment = normalizeEquipmentRows(state.equipment);
+  state.equipment.push(catalogEquipmentToRow(item));
+  renderEquipmentTable();
+  renderTagLinkSummary();
+  renderShowcaseTab();
+  calc();
+  renderCatalogResults();
+}
+
+function registeredCatalogIds() {
+  return new Set(normalizeEquipmentRows(state.equipment).map(r => String(r.catalogId || "")).filter(Boolean));
+}
+
+function catalogResultRowHtml(item, already) {
+  const id = escapeAttr(item.catalogId || item.id || "");
+  const url = item.sourceUrl ? `<a href="${escapeAttr(item.sourceUrl)}" target="_blank" rel="noopener">公式DB</a>` : "-";
+  const buff = catalogBuffSummary(item);
+  return `<tr>
+    <td>${escapeHtml(item.name || "-")}</td>
+    <td>${escapeHtml(catalogCategoryLabel(item.category))}</td>
+    <td>${escapeHtml(item.slot || "-")}</td>
+    <td>${escapeHtml(catalogWeaponSummary(item))}</td>
+    <td>${escapeHtml(catalogStatusSummary(item))}</td>
+    <td class="catalogBuffCell">${escapeHtml(buff)}</td>
+    <td>${url}</td>
+    <td><button type="button" class="miniBtn" data-catalog-add="${id}" ${already ? "disabled" : ""}>${already ? "追加済" : "装備登録へ追加"}</button></td>
+  </tr>`;
+}
+
+function renderCatalogResults() {
+  const body = byId("catalogResultsBody");
+  const summary = byId("catalogSummary");
+  if (!body || !summary) return;
+  const items = equipmentCatalogItems();
+  const filter = catalogFilterState();
+  const filtered = items.filter(item => catalogItemMatches(item, filter));
+  const shown = filtered.slice(0, 200);
+  const already = registeredCatalogIds();
+  body.innerHTML = shown.length
+    ? shown.map(item => catalogResultRowHtml(item, already.has(String(item.catalogId || item.id || "")))).join("")
+    : `<tr><td colspan="8" class="small mutedText">該当する装備がありません。カタログJSが未生成の場合は tools/build-equipment-catalog-from-google-sheet.mjs を実行してください。</td></tr>`;
+  summary.textContent = `カタログ ${items.length}件 / 表示 ${shown.length}${filtered.length > shown.length ? `（該当 ${filtered.length}件中、先頭200件）` : ""}`;
+  body.querySelectorAll("[data-catalog-add]").forEach(btn => {
+    btn.onclick = () => addCatalogEquipmentToRegistered(btn.dataset.catalogAdd);
+  });
+}
+
+function createCatalogTab(panel) {
+  panel.innerHTML = `
+    <div class="tabSectionHint small">Git上の生成カタログから装備を検索し、使うものだけ装備登録へコピーします。ここにあるだけでは計算対象になりません。</div>
+    <div class="catalogToolbar cardLike">
+      <label>検索 <input id="catalogSearch" type="search" placeholder="装備名・効果・Buff名" autocomplete="off"></label>
+      <label>カテゴリ <select id="catalogCategory"><option value="">すべて</option><option value="weapon">武器</option><option value="defense">防具/装飾</option><option value="shield">盾</option></select></label>
+      <label>部位 <select id="catalogSlot"><option value="">すべて</option></select></label>
+      <label>効果 <select id="catalogStat"><option value="">指定なし</option></select></label>
+      <label class="inlineCheck"><input id="catalogWithBuff" type="checkbox"> 装備Buffあり</label>
+      <button type="button" id="catalogReloadBtn">再読み込み</button>
+    </div>
+    <div id="catalogSummary" class="small mutedText">カタログを確認中...</div>
+    <div class="catalogTableWrap">
+      <table class="catalogTable compactTable">
+        <thead><tr><th>名称</th><th>種別</th><th>部位</th><th>武器性能</th><th>追加効果</th><th>装備Buff</th><th>参照</th><th>操作</th></tr></thead>
+        <tbody id="catalogResultsBody"><tr><td colspan="8" class="small mutedText">読み込み中...</td></tr></tbody>
+      </table>
+    </div>
+    <details class="catalogHelp"><summary>カタログ生成メモ</summary>
+      <div class="small mutedText">Googleスプレッドシートから生成する場合は、リポジトリ直下で <code>node tools/build-equipment-catalog-from-google-sheet.mjs</code> を実行し、生成された <code>src/data/generated/*.generated.js</code> をGitに追加してください。</div>
+    </details>
+  `;
+
+  ["catalogSearch", "catalogCategory", "catalogSlot", "catalogStat", "catalogWithBuff"].forEach(id => {
+    const el = byId(id);
+    if (el) el.oninput = el.onchange = renderCatalogResults;
+  });
+  const reload = byId("catalogReloadBtn");
+  if (reload) reload.onclick = () => {
+    catalogScriptsPromise = null;
+    loadCatalogScriptsOnce().then(() => setupCatalogFilterOptions(true));
+  };
+}
+
+function setupCatalogFilterOptions(force=false) {
+  const items = equipmentCatalogItems();
+  const slotSelect = byId("catalogSlot");
+  const statSelect = byId("catalogStat");
+  if (slotSelect && (force || !slotSelect.dataset.ready)) {
+    const current = slotSelect.value;
+    slotSelect.innerHTML = catalogSlotOptions(items);
+    slotSelect.value = current;
+    slotSelect.dataset.ready = "1";
+  }
+  if (statSelect && (force || !statSelect.dataset.ready)) {
+    const current = statSelect.value;
+    statSelect.innerHTML = catalogStatOptions(items);
+    statSelect.value = current;
+    statSelect.dataset.ready = "1";
+  }
+  renderCatalogResults();
+}
+
+function renderCatalogTab() {
+  const panel = document.querySelector('[data-tab-panel="catalog"]');
+  if (!panel) return;
+  if (!panel.dataset.catalogReady) {
+    panel.dataset.catalogReady = "1";
+    createCatalogTab(panel);
+    loadCatalogScriptsOnce().then(() => setupCatalogFilterOptions(true));
+  } else {
+    setupCatalogFilterOptions(false);
+  }
+}
+
 
 function clearAllEquipmentUsage() {
   state.equipment = normalizeEquipmentRows(state.equipment).map(row => ({...row, enabled:false}));
@@ -9518,6 +9864,7 @@ function renderAll() {
   renderTagLinkSummary();
   renderShowcaseTab();
   renderAttackDpsTab();
+  renderCatalogTab();
 }
 
 /* 種族プルダウンから攻撃力係数hidden値を同期する。 */
