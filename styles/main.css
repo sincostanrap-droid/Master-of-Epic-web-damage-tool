@@ -3658,3 +3658,19 @@
     grid-column: span 1;
   }
 }
+
+
+/* v1.22.4: 追加ステータス直接入力の視認性改善 */
+.extraStatsAllGrid {
+  grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr));
+}
+.extraStatsAllGrid label {
+  min-width: 0;
+}
+.extraStatsAllGrid input[type="number"] {
+  min-width: 5.5rem;
+}
+.extraStatsHelp {
+  margin: 2px 0 6px;
+  opacity: .82;
+}

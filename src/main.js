@@ -210,8 +210,25 @@ const QUICK_EFFECT_DEFS = [
   {key:"hitFlat", category:"追加ステータス", label:"命中+", valueLabel:"値", unit:"", scopes:["base","equipBuff","buff"]},
   {key:"avoidFlat", category:"追加ステータス", label:"回避+", valueLabel:"値", unit:"", scopes:["base","equipBuff","buff"]},
 
+  {key:"fireResFlat", category:"追加ステータス", label:"耐火属性+", valueLabel:"値", unit:"", scopes:["base","equipBuff","buff"]},
+  {key:"waterResFlat", category:"追加ステータス", label:"耐水属性+", valueLabel:"値", unit:"", scopes:["base","equipBuff","buff"]},
+  {key:"earthResFlat", category:"追加ステータス", label:"耐地属性+", valueLabel:"値", unit:"", scopes:["base","equipBuff","buff"]},
+  {key:"windResFlat", category:"追加ステータス", label:"耐風属性+", valueLabel:"値", unit:"", scopes:["base","equipBuff","buff"]},
+  {key:"neutralResFlat", category:"追加ステータス", label:"耐無属性+", valueLabel:"値", unit:"", scopes:["base","equipBuff","buff"]},
+  {key:"attackDelayFlat", category:"追加ステータス", label:"攻撃ディレイ+", valueLabel:"値", unit:"", scopes:["base","equipBuff","buff"]},
+  {key:"magicDelayFlat", category:"追加ステータス", label:"魔法ディレイ+", valueLabel:"値", unit:"", scopes:["base","equipBuff","buff"]},
+
   {key:"maxWeightPct", category:"追加ステータス%", label:"最大重量%", valueLabel:"%", unit:"%", scopes:["equipBuff","buff"]},
   {key:"critRatePct", category:"追加ステータス%", label:"クリ率%", valueLabel:"%", unit:"%", scopes:["equipBuff","buff"]},
+
+  {key:"fireResPct", category:"追加ステータス%", label:"耐火属性%", valueLabel:"%", unit:"%", scopes:["equipBuff","buff"]},
+  {key:"waterResPct", category:"追加ステータス%", label:"耐水属性%", valueLabel:"%", unit:"%", scopes:["equipBuff","buff"]},
+  {key:"earthResPct", category:"追加ステータス%", label:"耐地属性%", valueLabel:"%", unit:"%", scopes:["equipBuff","buff"]},
+  {key:"windResPct", category:"追加ステータス%", label:"耐風属性%", valueLabel:"%", unit:"%", scopes:["equipBuff","buff"]},
+  {key:"neutralResPct", category:"追加ステータス%", label:"耐無属性%", valueLabel:"%", unit:"%", scopes:["equipBuff","buff"]},
+  {key:"attackDelayPct", category:"追加ステータス%", label:"攻撃ディレイ%", valueLabel:"%", unit:"%", scopes:["equipBuff","buff"]},
+  {key:"magicDelayPct", category:"追加ステータス%", label:"魔法ディレイ%", valueLabel:"%", unit:"%", scopes:["equipBuff","buff"]},
+  {key:"damageReducePct", category:"追加ステータス%", label:"被ダメ軽減%", valueLabel:"%", unit:"%", scopes:["equipBuff","buff"]},
 
   {key:"convMagicRate", category:"ダメージ系", label:"魔力→攻撃力%", valueLabel:"%", unit:"%", scopes:["equipBuff","buff"]},
   {key:"convSpeedRate", category:"ダメージ系", label:"速度→攻撃力%", valueLabel:"%", unit:"%", scopes:["equipBuff","buff"]},
@@ -395,6 +412,21 @@ function applyQuickEffectToRow(row, context, key, value, name="", scope="auto") 
     else if (key === "flatMaxWeight") row.extraMaxWeight = +(row.extraMaxWeight || 0) + v;
     else if (key === "hitFlat") row.extraHit = +(row.extraHit || 0) + v;
     else if (key === "avoidFlat") row.extraAvoid = +(row.extraAvoid || 0) + v;
+    else if (key === "fireResFlat") row.extraFireRes = +(row.extraFireRes || 0) + v;
+    else if (key === "waterResFlat") row.extraWaterRes = +(row.extraWaterRes || 0) + v;
+    else if (key === "earthResFlat") row.extraEarthRes = +(row.extraEarthRes || 0) + v;
+    else if (key === "windResFlat") row.extraWindRes = +(row.extraWindRes || 0) + v;
+    else if (key === "neutralResFlat") row.extraNeutralRes = +(row.extraNeutralRes || 0) + v;
+    else if (key === "attackDelayFlat") row.extraAttackDelay = +(row.extraAttackDelay || 0) + v;
+    else if (key === "magicDelayFlat") row.extraMagicDelay = +(row.extraMagicDelay || 0) + v;
+    else if (key === "fireResPct") row.extraFireResPct = +(row.extraFireResPct || 0) + v;
+    else if (key === "waterResPct") row.extraWaterResPct = +(row.extraWaterResPct || 0) + v;
+    else if (key === "earthResPct") row.extraEarthResPct = +(row.extraEarthResPct || 0) + v;
+    else if (key === "windResPct") row.extraWindResPct = +(row.extraWindResPct || 0) + v;
+    else if (key === "neutralResPct") row.extraNeutralResPct = +(row.extraNeutralResPct || 0) + v;
+    else if (key === "attackDelayPct") row.extraAttackDelayPct = +(row.extraAttackDelayPct || 0) + v;
+    else if (key === "magicDelayPct") row.extraMagicDelayPct = +(row.extraMagicDelayPct || 0) + v;
+    else if (key === "damageReducePct") row.extraDamageReducePct = +(row.extraDamageReducePct || 0) + v;
     else if (key === "maxWeightPct") row.extraMaxWeightPct = +(row.extraMaxWeightPct || 0) + v;
     else if (key === "critRatePct") row.extraCritRatePct = +(row.extraCritRatePct || 0) + v;
     return true;
@@ -412,6 +444,13 @@ function applyQuickEffectToRow(row, context, key, value, name="", scope="auto") 
   else if (bodyScope && key === "flatMaxWeight") row.extraMaxWeight = +(row.extraMaxWeight || 0) + v;
   else if (bodyScope && key === "hitFlat") row.extraHit = +(row.extraHit || 0) + v;
   else if (bodyScope && key === "avoidFlat") row.extraAvoid = +(row.extraAvoid || 0) + v;
+  else if (bodyScope && key === "fireResFlat") row.extraFireRes = +(row.extraFireRes || 0) + v;
+  else if (bodyScope && key === "waterResFlat") row.extraWaterRes = +(row.extraWaterRes || 0) + v;
+  else if (bodyScope && key === "earthResFlat") row.extraEarthRes = +(row.extraEarthRes || 0) + v;
+  else if (bodyScope && key === "windResFlat") row.extraWindRes = +(row.extraWindRes || 0) + v;
+  else if (bodyScope && key === "neutralResFlat") row.extraNeutralRes = +(row.extraNeutralRes || 0) + v;
+  else if (bodyScope && key === "attackDelayFlat") row.extraAttackDelay = +(row.extraAttackDelay || 0) + v;
+  else if (bodyScope && key === "magicDelayFlat") row.extraMagicDelay = +(row.extraMagicDelay || 0) + v;
   else {
     row.equipBuffEnabled = true;
     if (!row.equipBuffName) row.equipBuffName = row.name ? `${row.name} のBuff` : "装備Buff";
@@ -430,6 +469,21 @@ function applyQuickEffectToRow(row, context, key, value, name="", scope="auto") 
     else if (key === "flatMaxWeight") row.equipBuffExtraMaxWeight = +(row.equipBuffExtraMaxWeight || 0) + v;
     else if (key === "hitFlat") row.equipBuffExtraHit = +(row.equipBuffExtraHit || 0) + v;
     else if (key === "avoidFlat") row.equipBuffExtraAvoid = +(row.equipBuffExtraAvoid || 0) + v;
+    else if (key === "fireResFlat") row.equipBuffExtraFireRes = +(row.equipBuffExtraFireRes || 0) + v;
+    else if (key === "waterResFlat") row.equipBuffExtraWaterRes = +(row.equipBuffExtraWaterRes || 0) + v;
+    else if (key === "earthResFlat") row.equipBuffExtraEarthRes = +(row.equipBuffExtraEarthRes || 0) + v;
+    else if (key === "windResFlat") row.equipBuffExtraWindRes = +(row.equipBuffExtraWindRes || 0) + v;
+    else if (key === "neutralResFlat") row.equipBuffExtraNeutralRes = +(row.equipBuffExtraNeutralRes || 0) + v;
+    else if (key === "attackDelayFlat") row.equipBuffExtraAttackDelay = +(row.equipBuffExtraAttackDelay || 0) + v;
+    else if (key === "magicDelayFlat") row.equipBuffExtraMagicDelay = +(row.equipBuffExtraMagicDelay || 0) + v;
+    else if (key === "fireResPct") row.equipBuffExtraFireResPct = +(row.equipBuffExtraFireResPct || 0) + v;
+    else if (key === "waterResPct") row.equipBuffExtraWaterResPct = +(row.equipBuffExtraWaterResPct || 0) + v;
+    else if (key === "earthResPct") row.equipBuffExtraEarthResPct = +(row.equipBuffExtraEarthResPct || 0) + v;
+    else if (key === "windResPct") row.equipBuffExtraWindResPct = +(row.equipBuffExtraWindResPct || 0) + v;
+    else if (key === "neutralResPct") row.equipBuffExtraNeutralResPct = +(row.equipBuffExtraNeutralResPct || 0) + v;
+    else if (key === "attackDelayPct") row.equipBuffExtraAttackDelayPct = +(row.equipBuffExtraAttackDelayPct || 0) + v;
+    else if (key === "magicDelayPct") row.equipBuffExtraMagicDelayPct = +(row.equipBuffExtraMagicDelayPct || 0) + v;
+    else if (key === "damageReducePct") row.equipBuffExtraDamageReducePct = +(row.equipBuffExtraDamageReducePct || 0) + v;
     else if (key === "maxWeightPct") row.equipBuffExtraMaxWeightPct = +(row.equipBuffExtraMaxWeightPct || 0) + v;
     else if (key === "critRatePct") row.equipBuffExtraCritRatePct = +(row.equipBuffExtraCritRatePct || 0) + v;
   }
@@ -692,21 +746,16 @@ function makeExtraStatsEditor(row, title, mode="base", onUpdate=null) {
 
   const help = document.createElement("p");
   help.className = "small extraStatsHelp";
-  help.textContent = "値が入っている項目だけ表示します。新しく足す時は上の「効果を追加」を使ってください。";
+  help.textContent = mode === "base"
+    ? "HP/MP/ST/最大重量/命中/回避/AC/各属性耐性/ディレイなどを直接入力できます。"
+    : "Buffで増えるHP/MP/ST/最大重量/命中/回避/AC/各属性耐性/ディレイ/軽減/クリ率などを直接入力できます。";
   wrap.appendChild(help);
 
-  const activeDefs = extraFieldDefsFor(mode).filter(def => extraStatHasValue(row, def, mode));
+  const activeDefs = extraFieldDefsFor(mode);
 
   const activeGrid = document.createElement("div");
-  activeGrid.className = "extraStatsGrid extraStatsActiveGrid";
-  if (activeDefs.length) {
-    activeDefs.forEach(def => activeGrid.appendChild(extraStatNumberInput(row, def, mode, onUpdate)));
-  } else {
-    const empty = document.createElement("div");
-    empty.className = "small extraStatsEmptyMessage";
-    empty.textContent = "値が入っている項目はありません。";
-    activeGrid.appendChild(empty);
-  }
+  activeGrid.className = "extraStatsGrid extraStatsActiveGrid extraStatsAllGrid";
+  activeDefs.forEach(def => activeGrid.appendChild(extraStatNumberInput(row, def, mode, onUpdate)));
   wrap.appendChild(activeGrid);
 
   return wrap;
@@ -7049,18 +7098,17 @@ function showcaseTotalStats(d, m) {
     ["命中", totalStatValue(d.hit, e.extraHit, e.extraHitPct)],
     ["回避", totalStatValue(d.avoid, e.extraAvoid, e.extraAvoidPct)],
     ["防御/AC", totalStatValue(d.def, e.extraAC, e.extraACPct)],
-    ["呪文抵抗", d.resist],
+    ["耐火属性", totalStatValue(d.resist, e.extraFireRes, e.extraFireResPct)],
+    ["耐水属性", totalStatValue(d.resist, e.extraWaterRes, e.extraWaterResPct)],
+    ["耐地属性", totalStatValue(d.resist, e.extraEarthRes, e.extraEarthResPct)],
+    ["耐風属性", totalStatValue(d.resist, e.extraWindRes, e.extraWindResPct)],
+    ["耐無属性", totalStatValue(d.resist, e.extraNeutralRes, e.extraNeutralResPct)],
     ["攻撃力", m?.atk || 0],
     ["魔力", m?.stats?.magic || 0],
     ["速度", m?.stats?.speed || 0],
   ];
 
   const optional = [
-    ["火耐性", totalStatValue(0, e.extraFireRes, e.extraFireResPct), e.extraFireRes || e.extraFireResPct],
-    ["水耐性", totalStatValue(0, e.extraWaterRes, e.extraWaterResPct), e.extraWaterRes || e.extraWaterResPct],
-    ["地耐性", totalStatValue(0, e.extraEarthRes, e.extraEarthResPct), e.extraEarthRes || e.extraEarthResPct],
-    ["風耐性", totalStatValue(0, e.extraWindRes, e.extraWindResPct), e.extraWindRes || e.extraWindResPct],
-    ["無耐性", totalStatValue(0, e.extraNeutralRes, e.extraNeutralResPct), e.extraNeutralRes || e.extraNeutralResPct],
     ["攻撃ディレイ", totalStatValue(0, e.extraAttackDelay, e.extraAttackDelayPct), e.extraAttackDelay || e.extraAttackDelayPct],
     ["魔法ディレイ", totalStatValue(0, e.extraMagicDelay, e.extraMagicDelayPct), e.extraMagicDelay || e.extraMagicDelayPct],
     ["被ダメ軽減", +(e.extraDamageReducePct || 0), e.extraDamageReducePct, "%"],
@@ -7120,7 +7168,7 @@ function showcaseTextFromMetrics(m) {
     "",
     "■スキル由来ステータス",
     `HP ${fmt(d.hp,1)} / MP ${fmt(d.mp,1)} / ST ${fmt(d.st,1)} / 重量 ${fmt(d.weight,1)}`,
-    `命中 ${fmt(d.hit,1)} / 回避 ${fmt(d.avoid,1)} / 防御 ${fmt(d.def,1)} / 呪文抵抗 ${fmt(d.resist,1)}`,
+    `命中 ${fmt(d.hit,1)} / 回避 ${fmt(d.avoid,1)} / 防御 ${fmt(d.def,1)} / 属性耐性基礎 ${fmt(d.resist,1)}`,
     "",
     "■武器",
     weapon
@@ -7218,7 +7266,7 @@ function renderShowcaseTab(m=null) {
             showcasePair("命中", fmt(d.hit,1)),
             showcasePair("回避", fmt(d.avoid,1)),
             showcasePair("防御", fmt(d.def,1)),
-            showcasePair("呪文抵抗", fmt(d.resist,1))
+            showcasePair("属性耐性基礎", fmt(d.resist,1))
           ])}
         </div>
 
@@ -9237,7 +9285,7 @@ function updateTotalStatsSummary(m=null) {
     const metrics = m || computeMetrics(expandSkillSimMasteryBuffState(state), collectInputs());
     const d = skillSimDerived();
     const rows = showcaseTotalStats(d, metrics);
-    const important = ["HP","MP","ST","最大重量","命中","回避","防御/AC","呪文抵抗","攻撃力","魔力","速度"];
+    const important = ["HP","MP","ST","最大重量","命中","回避","防御/AC","耐火属性","耐水属性","耐地属性","耐風属性","耐無属性","攻撃力","魔力","速度"];
     const body = rows
       .filter(r => important.includes(r.label) || !important.includes(r.label))
       .map(r => `<span class="summaryTotalStatPair"><span>${escapeHtml(r.label)}</span><b>${escapeHtml(r.value)}</b></span>`)
