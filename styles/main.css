@@ -3609,3 +3609,15 @@
 .compareTable .plus { color: #16703a; font-weight: 700; }
 .compareTable .minus { color: #b42318; font-weight: 700; }
 .compareDiag { margin-top: 10px; }
+
+
+/* v1.22.1: 構成診断・比較を既存の分析セクションへ統合 */
+.analysisUnifiedPanel {
+  margin-top: 0;
+}
+.analysisUnifiedPanel .analysisActions {
+  align-items: end;
+}
+.analysisUnifiedPanel .analysisBox {
+  max-width: 100%;
+}
