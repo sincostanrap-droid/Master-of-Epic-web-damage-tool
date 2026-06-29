@@ -3946,6 +3946,7 @@ button[onclick*="applySkillSimToCalc"],
 }
 
 
+/* v1.23.5: READMEを現行機能に合わせて整理。アプリ表示バージョンを更新。 */
 /* v1.23.4: Buff登録の操作列を広げ、上下移動/削除ボタンが隠れないようにする */
 #compositeBuffTable.compactTable {
   min-width: 1230px !important;
