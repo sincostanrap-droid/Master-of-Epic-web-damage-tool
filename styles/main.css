@@ -3621,3 +3621,40 @@
 .analysisUnifiedPanel .analysisBox {
   max-width: 100%;
 }
+
+
+/* v1.22.2: 見せびらかし総合ステータス */
+.showcaseTotalStatsCard .small {
+  margin-top: -4px;
+  opacity: .78;
+}
+
+
+/* v1.22.3: 計算サマリー総合ステータス */
+.metricTotalStats {
+  grid-column: span 2;
+}
+.summaryTotalStats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(92px, 1fr));
+  gap: 6px 8px;
+}
+.summaryTotalStatPair {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 6px;
+  border-radius: 6px;
+  background: rgba(127,127,127,.07);
+}
+.summaryTotalStatPair span {
+  opacity: .8;
+}
+.summaryTotalStatPair b {
+  white-space: nowrap;
+}
+@media (max-width: 820px) {
+  .metricTotalStats {
+    grid-column: span 1;
+  }
+}

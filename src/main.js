@@ -6964,9 +6964,27 @@ function showcaseList(items) {
   return `<ul class="showcaseList">${items.length ? items.join("") : `<li class="small">なし</li>`}</ul>`;
 }
 
+function equipmentRowHasShowcaseContent(row) {
+  if (!row || row.enabled === false) return false;
+  if (String(row.name || "").trim()) return true;
+  if (+row.attack || +row.magic || +row.speed || +row.delay) return true;
+  if (isWeaponEquipmentRow(row) && (+row.weaponDamage || +row.weaponWeight || +row.weaponAttackInterval || +row.weaponRange || +row.weaponDurability)) return true;
+  if (extraStatsHasEffect(row, "base") || additionalEffectsSummary(row, "display").length) return true;
+  if (row.equipBuffEnabled && equipmentBuffHasEffect(row)) return true;
+  return false;
+}
+
 function activeEquipmentForShowcase() {
+  const slotOrder = new Map(EQUIPMENT_SLOTS.map((x, i) => [x.slot, i]));
   return normalizeEquipmentRows(state.equipment)
-    .filter(r => r.enabled !== false && equipmentCandidateHasData(r));
+    .map((row, idx) => ({row, idx}))
+    .filter(x => equipmentRowHasShowcaseContent(x.row))
+    .sort((a, b) => {
+      const ao = slotOrder.has(a.row.slot) ? slotOrder.get(a.row.slot) : 9999;
+      const bo = slotOrder.has(b.row.slot) ? slotOrder.get(b.row.slot) : 9999;
+      return ao - bo || a.idx - b.idx;
+    })
+    .map(x => x.row);
 }
 
 function equipmentShowcaseText(row) {
@@ -6987,21 +7005,73 @@ function equipmentShowcaseText(row) {
   return parts.join(" / ") || "補正なし";
 }
 
-function showcaseActiveBuffLines() {
+function showcaseResolvedBuffState() {
+  let st = clone(state || {});
+  if (typeof expandSkillSimMasteryBuffState === "function") st = expandSkillSimMasteryBuffState(st);
+  if (typeof expandEquipmentBuffState === "function") st = expandEquipmentBuffState(st);
+  if (typeof applyBuffGroupRules === "function") st = applyBuffGroupRules(st);
+  return st;
+}
+
+function showcaseActiveBuffLines(resolvedState=null) {
+  const st = resolvedState || showcaseResolvedBuffState();
   const lines = [];
-  normalizeEquipmentRows(state.equipment)
-    .filter(r => r.enabled !== false && r.equipBuffEnabled && equipmentBuffHasEffect(r))
-    .forEach(r => lines.push(`装備Buff: ${equipmentBuffDisplayName(r)}（${equipmentBuffEffectText(r)}）`));
 
-  normalizeCompositeRows(state.composite)
-    .filter(r => r.enabled && compositeHasEffect(r))
-    .forEach(r => lines.push(`${r.name || "装備以外Buff"}（${compositeEffectText(r)}）`));
+  normalizeCompositeRows(st.composite)
+    .filter(r => r.enabled && !r.excluded && compositeHasEffect(r))
+    .forEach(r => {
+      const prefix = /^装備由来[:：]/.test(r.note || "") || /装備Buff$/.test(r.name || "") ? "装備Buff: " : "";
+      lines.push(`${prefix}${r.name || "装備以外Buff"}（${compositeEffectText(r)}）`);
+    });
 
-  (state.other || [])
-    .filter(r => r.enabled)
+  (st.post || [])
+    .filter(r => r.enabled && !r.excluded)
+    .forEach(r => lines.push(`外枠: ${r.name || "外枠補正"}（倍率×${fmt(+r.value || 1,3)}${r.note ? ` / ${r.note}` : ""}）`));
+
+  (st.other || [])
+    .filter(r => r.enabled && !r.excluded)
     .forEach(r => lines.push(`${r.name || "その他バフ"}${r.note ? `（${r.note}）` : ""}`));
 
   return lines;
+}
+
+function totalStatValue(base, flat=0, pct=0) {
+  return ((+base || 0) + (+flat || 0)) * (1 + ((+pct || 0) / 100));
+}
+
+function showcaseTotalStats(d, m) {
+  const e = m?.extraStats || {};
+  const rows = [
+    ["HP", totalStatValue(d.hp, e.extraHP, e.extraHPPct)],
+    ["MP", totalStatValue(d.mp, e.extraMP, e.extraMPPct)],
+    ["ST", totalStatValue(d.st, e.extraST, e.extraSTPct)],
+    ["最大重量", totalStatValue(d.weight, e.extraMaxWeight, e.extraMaxWeightPct)],
+    ["命中", totalStatValue(d.hit, e.extraHit, e.extraHitPct)],
+    ["回避", totalStatValue(d.avoid, e.extraAvoid, e.extraAvoidPct)],
+    ["防御/AC", totalStatValue(d.def, e.extraAC, e.extraACPct)],
+    ["呪文抵抗", d.resist],
+    ["攻撃力", m?.atk || 0],
+    ["魔力", m?.stats?.magic || 0],
+    ["速度", m?.stats?.speed || 0],
+  ];
+
+  const optional = [
+    ["火耐性", totalStatValue(0, e.extraFireRes, e.extraFireResPct), e.extraFireRes || e.extraFireResPct],
+    ["水耐性", totalStatValue(0, e.extraWaterRes, e.extraWaterResPct), e.extraWaterRes || e.extraWaterResPct],
+    ["地耐性", totalStatValue(0, e.extraEarthRes, e.extraEarthResPct), e.extraEarthRes || e.extraEarthResPct],
+    ["風耐性", totalStatValue(0, e.extraWindRes, e.extraWindResPct), e.extraWindRes || e.extraWindResPct],
+    ["無耐性", totalStatValue(0, e.extraNeutralRes, e.extraNeutralResPct), e.extraNeutralRes || e.extraNeutralResPct],
+    ["攻撃ディレイ", totalStatValue(0, e.extraAttackDelay, e.extraAttackDelayPct), e.extraAttackDelay || e.extraAttackDelayPct],
+    ["魔法ディレイ", totalStatValue(0, e.extraMagicDelay, e.extraMagicDelayPct), e.extraMagicDelay || e.extraMagicDelayPct],
+    ["被ダメ軽減", +(e.extraDamageReducePct || 0), e.extraDamageReducePct, "%"],
+    ["クリ率上昇", +(e.extraCritRatePct || 0), e.extraCritRatePct, "%"],
+  ];
+
+  optional.forEach(([label, value, enabled, suffix=""]) => {
+    if (enabled) rows.push([label, value, suffix]);
+  });
+
+  return rows.map(([label, value, suffix=""]) => ({label, value:`${fmt(value, 2)}${suffix}`}));
 }
 
 function showcaseSkillLines() {
@@ -7029,8 +7099,9 @@ function showcaseTextFromMetrics(m) {
     const slot = (r.slot || "").replace(/^武器: /, "").replace(/^防具: /, "").replace(/^装飾: /, "");
     return `- ${slot}: ${r.name || "名称未入力"} / ${equipmentShowcaseText(r)}`;
   });
-  const buffLines = showcaseActiveBuffLines().map(x => `- ${x}`);
+  const buffLines = showcaseActiveBuffLines(showcaseResolvedBuffState()).map(x => `- ${x}`);
   const skillLines = showcaseSkillLines().map(x => `- ${x}`);
+  const totalStats = showcaseTotalStats(d, m).map(x => `- ${x.label}: ${x.value}`);
   const extra = extraStatsSummary(m.extraStats || {}).map(x => `- ${x}`);
 
   return [
@@ -7043,6 +7114,9 @@ function showcaseTextFromMetrics(m) {
     `バフ枠: ${m.slots.total}/24`,
     `攻撃種別: ${byId("attackType")?.selectedOptions?.[0]?.textContent || inputs.attackType || "-"}`,
     `対象AC: ${inputs.targetAC || 0}`,
+    "",
+    "■総合ステータス",
+    ...(totalStats.length ? totalStats : ["- なし"]),
     "",
     "■スキル由来ステータス",
     `HP ${fmt(d.hp,1)} / MP ${fmt(d.mp,1)} / ST ${fmt(d.st,1)} / 重量 ${fmt(d.weight,1)}`,
@@ -7086,10 +7160,12 @@ function renderShowcaseTab(m=null) {
   const race = RACE_LABELS[state.skillSim.race] || state.skillSim.race || "-";
   const weapon = m.selectedWeapon;
   const reqRows = (m.skillModInfo?.evaluated || []).map(r => `${escapeHtml(r.name)} ${fmt(r.current,1)}/${fmt(r.required,1)}`);
+  const resolvedShowcaseState = showcaseResolvedBuffState();
   const equipRows = activeEquipmentForShowcase();
-  const buffLines = showcaseActiveBuffLines();
+  const buffLines = showcaseActiveBuffLines(resolvedShowcaseState);
   const skillLines = showcaseSkillLines();
   const extraLines = extraStatsSummary(m.extraStats || {});
+  const totalStatLines = showcaseTotalStats(d, m);
   const inputs = collectInputs();
 
   if (root) {
@@ -7100,6 +7176,7 @@ function renderShowcaseTab(m=null) {
     const buffItems = buffLines.map(x => `<li>${escapeHtml(x)}</li>`);
     const skillItems = skillLines.map(x => `<li>${escapeHtml(x)}</li>`);
     const extraItems = extraLines.map(x => `<li>${escapeHtml(x)}</li>`);
+    const totalStatItems = totalStatLines.map(x => showcasePair(x.label, x.value));
 
     root.innerHTML = `
       <div class="showcaseHero">
@@ -7123,6 +7200,12 @@ function renderShowcaseTab(m=null) {
             showcasePair("精神力", fmt(skillSimValue("精神力"),1)),
             showcasePair("酩酊度", fmt(d.drunk,1))
           ])}
+        </div>
+
+        <div class="showcaseCard showcaseTotalStatsCard">
+          <h3>総合ステータス</h3>
+          <p class="small">スキル由来 + 装備/有効Buffの追加ステータス込み</p>
+          ${showcaseList(totalStatItems)}
         </div>
 
         <div class="showcaseCard">
@@ -9146,6 +9229,25 @@ function updatePredictedAtkUI(m) {
  * 画面全体の再計算エントリーポイント。
  * 入力イベントのたびに呼ばれ、computeMetrics()→各UI更新→localStorage保存まで行う。
  */
+
+function updateTotalStatsSummary(m=null) {
+  const el = byId("totalStatsSummary");
+  if (!el) return;
+  try {
+    const metrics = m || computeMetrics(expandSkillSimMasteryBuffState(state), collectInputs());
+    const d = skillSimDerived();
+    const rows = showcaseTotalStats(d, metrics);
+    const important = ["HP","MP","ST","最大重量","命中","回避","防御/AC","呪文抵抗","攻撃力","魔力","速度"];
+    const body = rows
+      .filter(r => important.includes(r.label) || !important.includes(r.label))
+      .map(r => `<span class="summaryTotalStatPair"><span>${escapeHtml(r.label)}</span><b>${escapeHtml(r.value)}</b></span>`)
+      .join("");
+    el.innerHTML = body || "-";
+  } catch (e) {
+    el.textContent = "総合ステータスを表示できませんでした。";
+  }
+}
+
 function calc() {
   syncSkillSimToCalcInputs(false, false);
   syncSelectedWeaponToHiddenInputs();
@@ -9166,6 +9268,7 @@ function calc() {
   if (byId("damageAudit")) byId("damageAudit").innerHTML = damageAuditHtml(m, inputs);
   updateSlotUI(m);
   updateEquipmentSummary(m);
+  updateTotalStatsSummary(m);
   updateWeaponReqAutoCurrentDisplays();
   updateSelectedWeaponCalcSummary(m);
   updateWeaponSkillModHint(m);
@@ -9188,6 +9291,8 @@ function calc() {
   if (m.equipmentRaw.attack || m.equipmentRaw.magic || m.equipmentRaw.speed) {
     lines.push(`<p>武器・防具・装飾補正: 攻撃力 ${m.equipmentRaw.attack.toFixed(3)} / 魔力 ${m.equipmentRaw.magic.toFixed(3)} / 速度 ${m.equipmentRaw.speed.toFixed(3)}</p>`);
   }
+  const totalStatLine = showcaseTotalStats(skillSimDerived(), m).map(x => `${x.label} ${x.value}`).join(" / ");
+  if (totalStatLine) lines.push(`<p>総合ステータス: ${escapeHtml(totalStatLine)}</p>`);
   const extraLine = extraStatsSummary(m.extraStats || {}).join(" / ");
   if (extraLine) lines.push(`<p>構成追加ステータス: ${escapeHtml(extraLine)}</p>`);
   if (m.selectedWeapon) {
