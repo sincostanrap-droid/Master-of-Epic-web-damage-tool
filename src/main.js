@@ -5,8 +5,8 @@
   onclick属性から呼ばれる関数があるため、現時点では module ではなく通常scriptとして読み込みます。
 */
 
-const APP_VERSION = "v1.23.2";
-const APP_VERSION_NOTE = "アタックDPSα・ディレイ短縮自動参照";
+const APP_VERSION = "v1.23.3";
+const APP_VERSION_NOTE = "UI調整・自動反映修正";
 
 /* 種族係数。攻撃力係数と魔力係数は別管理。 */
 const RACE_COEFFS = {
@@ -755,10 +755,18 @@ function makeExtraStatsEditor(row, title, mode="base", onUpdate=null) {
     : "Buffで増えるHP/MP/ST/最大重量/命中/回避/AC/各属性耐性/ディレイ/軽減/クリ率などを直接入力できます。";
   wrap.appendChild(help);
 
-  const activeDefs = extraFieldDefsFor(mode);
+  const activeDefs = extraFieldDefsFor(mode).filter(def => extraStatHasValue(row, def, mode));
+
+  if (!activeDefs.length) {
+    const empty = document.createElement("div");
+    empty.className = "small muted extraStatsEmptyMessage";
+    empty.textContent = "入力済みの追加ステータスはありません。必要な効果だけ「効果を追加」から追加してください。";
+    wrap.appendChild(empty);
+    return wrap;
+  }
 
   const activeGrid = document.createElement("div");
-  activeGrid.className = "extraStatsGrid extraStatsActiveGrid extraStatsAllGrid";
+  activeGrid.className = "extraStatsGrid extraStatsActiveGrid";
   activeDefs.forEach(def => activeGrid.appendChild(extraStatNumberInput(row, def, mode, onUpdate)));
   wrap.appendChild(activeGrid);
 
@@ -998,7 +1006,7 @@ function normalizeSkillSim(raw) {
     race: incoming.race || "newtar",
     cap: incoming.cap === undefined || incoming.cap === "" ? 850 : (+incoming.cap || 850),
     weaponSkill: incoming.weaponSkill || "こんぼう",
-    autoApply: incoming.autoApply !== false,
+    autoApply: true,
     skills: {...base.skills, ...(incoming.skills || {})}
   };
   // 旧版・外部データ互換。内部名が異なるものを現行UIのスキル名へ寄せる。
@@ -1053,8 +1061,7 @@ function skillSimDerived() {
 function syncSkillSimToCalcInputs(force=false, updateWeaponReqName=false) {
   if (!state || !state.skillSim) return false;
   state.skillSim = normalizeSkillSim(state.skillSim);
-  if (!force && state.skillSim.autoApply === false) return false;
-
+  // v1.23.3以降、スキルシミュレータは計算タブへ常時自動反映する。
   const d = skillSimDerived();
 
   if (byId("raceSelect")) byId("raceSelect").value = state.skillSim.race || "newtar";
@@ -3461,23 +3468,27 @@ function renderSkillSim() {
   };
 
   const weapon = byId("skillSimWeaponSkill");
-  weapon.innerHTML = SKILL_SIM_WEAPON.map(n => `<option value="${escapeHtml(n)}">${escapeHtml(n)}</option>`).join("");
-  weapon.value = state.skillSim.weaponSkill || "こんぼう";
-  weapon.onchange = e => {
-    state.skillSim.weaponSkill = e.target.value;
-    handleSkillSimChanged();
-  };
+  if (weapon) {
+    weapon.innerHTML = SKILL_SIM_WEAPON.map(n => `<option value="${escapeHtml(n)}">${escapeHtml(n)}</option>`).join("");
+    weapon.value = state.skillSim.weaponSkill || "こんぼう";
+    weapon.onchange = e => {
+      state.skillSim.weaponSkill = e.target.value;
+      handleSkillSimChanged();
+    };
+    const label = weapon.closest("label") || weapon.parentElement;
+    if (label) label.style.display = "none";
+  }
 
   const autoApply = byId("skillSimAutoApply");
   if (autoApply) {
-    autoApply.checked = state.skillSim.autoApply !== false;
-    autoApply.onchange = e => {
-      state.skillSim.autoApply = !!e.target.checked;
-      if (state.skillSim.autoApply) syncSkillSimToCalcInputs(true, false);
-      updateSkillSimSummary();
-      calc();
-    };
+    state.skillSim.autoApply = true;
+    autoApply.checked = true;
+    const label = autoApply.closest("label") || autoApply.parentElement;
+    if (label) label.style.display = "none";
   }
+  document.querySelectorAll('button[onclick*="applySkillSimToCalc"], [data-skill-sim-apply]').forEach(el => {
+    el.style.display = "none";
+  });
 
   const root = byId("skillSimGroups");
   root.innerHTML = "";
@@ -3526,8 +3537,7 @@ function updateSkillSimSummary() {
     `筋力 → ${fmt(skillSimValue("筋力"), 1)}`,
     `精神力 → ${fmt(skillSimValue("精神力"), 1)}`,
     `酩酊度 → ${fmt(d.drunk, 1)}`,
-    `${escapeHtml(state.skillSim.weaponSkill)} → 武器使用条件 ${fmt(d.weapon, 1)}`,
-    `自動反映 → ${state.skillSim.autoApply === false ? "OFF" : "ON"}`
+    `計算タブへ常時自動反映`
   ].map(x => `<div>${x}</div>`).join("");
 
   const masterySummaryEl = byId("skillSimSummary");
@@ -7002,7 +7012,22 @@ function setAttackDpsField(key, value, type="number") {
     const n = parseFloat(value);
     cfg[key] = Number.isFinite(n) ? n : 0;
   }
+  updateAttackDpsManualVisibility();
   calc();
+}
+
+
+function updateAttackDpsManualVisibility() {
+  const cfg = attackDpsState();
+  document.querySelectorAll('[data-attack-dps-manual-for="damage"]').forEach(el => {
+    el.hidden = cfg.damageSource !== "manual";
+  });
+  document.querySelectorAll('[data-attack-dps-manual-for="weaponDelay"]').forEach(el => {
+    el.hidden = cfg.weaponDelaySource !== "manual";
+  });
+  document.querySelectorAll('[data-attack-dps-manual-for="equipBuffDelay"]').forEach(el => {
+    el.hidden = cfg.equipmentBuffDelaySource !== "manual";
+  });
 }
 
 function bindAttackDpsControls() {
@@ -7042,6 +7067,8 @@ function bindAttackDpsControls() {
   bindNumber("attackDpsSimSeconds", "simSeconds");
   bindNumber("attackDpsHitRatePct", "hitRatePct");
 
+  updateAttackDpsManualVisibility();
+
   const copy = byId("attackDpsCopyCurrent");
   if (copy) copy.onclick = copyCurrentToAttackDps;
 }
@@ -7068,11 +7095,11 @@ function createAttackDpsTab(panel) {
             <option value="manual">手入力</option>
           </select>
         </label>
-        <label>手入力ダメージ
-          <input id="attackDpsManualDamage" type="number" step="1">
+        <label data-attack-dps-manual-for="damage">手入力ダメージ
+          <input id="attackDpsManualDamage" class="compactNumberInput" type="number" step="1">
         </label>
         <label>命中率%
-          <input id="attackDpsHitRatePct" type="number" step="0.1" min="0" max="100">
+          <input id="attackDpsHitRatePct" class="compactNumberInput" type="number" step="0.1" min="0" max="100">
         </label>
       </fieldset>
 
@@ -7084,8 +7111,8 @@ function createAttackDpsTab(panel) {
             <option value="manual">手入力</option>
           </select>
         </label>
-        <label>手入力 武器ディレイ
-          <input id="attackDpsManualWeaponDelay" type="number" step="0.1">
+        <label data-attack-dps-manual-for="weaponDelay">手入力 武器ディレイ
+          <input id="attackDpsManualWeaponDelay" class="compactNumberInput" type="number" step="0.1">
         </label>
         <label>装備+攻撃ディレイBuff枠 参照
           <select id="attackDpsEquipBuffDelaySource">
@@ -7093,15 +7120,15 @@ function createAttackDpsTab(panel) {
             <option value="manual">手入力</option>
           </select>
         </label>
-        <label>手入力 装備+攻撃ディレイBuff枠
-          <input id="attackDpsEquipBuffDelay" type="number" step="0.1">
-          <span class="small">自動参照OFF時に使用 / -60で上限</span>
+        <label data-attack-dps-manual-for="equipBuffDelay">手入力 装備+攻撃ディレイBuff枠
+          <input id="attackDpsEquipBuffDelay" class="compactNumberInput" type="number" step="0.1">
+          <span class="small">手入力時に使用 / -60で上限</span>
         </label>
         <label>アタック短縮Buff枠
-          <input id="attackDpsAttackDelayBuff" type="number" step="0.1">
+          <input id="attackDpsAttackDelayBuff" class="compactNumberInput" type="number" step="0.1">
         </label>
         <label>ST補正%
-          <input id="attackDpsStDelayBonus" type="number" step="0.1">
+          <input id="attackDpsStDelayBonus" class="compactNumberInput" type="number" step="0.1">
           <span class="small">ST200以上なら -10 想定</span>
         </label>
         <label class="checkLine">
@@ -7113,13 +7140,13 @@ function createAttackDpsTab(panel) {
       <fieldset>
         <legend>モーション</legend>
         <label>ダメージ発生フレーム
-          <input id="attackDpsDamageFrame" type="number" step="1">
+          <input id="attackDpsDamageFrame" class="compactNumberInput" type="number" step="1">
         </label>
         <label>非キャンセル時の行動不能フレーム
-          <input id="attackDpsNonCancelMotionFrames" type="number" step="1">
+          <input id="attackDpsNonCancelMotionFrames" class="compactNumberInput" type="number" step="1">
         </label>
         <label>FPS
-          <input id="attackDpsFps" type="number" step="1" min="1">
+          <input id="attackDpsFps" class="compactNumberInput" type="number" step="1" min="1">
         </label>
         <label class="checkLine">
           <input id="attackDpsCriticalCancel" type="checkbox">
@@ -7130,7 +7157,7 @@ function createAttackDpsTab(panel) {
       <fieldset>
         <legend>表示</legend>
         <label>初撃込みDPSの計測秒数
-          <input id="attackDpsSimSeconds" type="number" step="1" min="1">
+          <input id="attackDpsSimSeconds" class="compactNumberInput" type="number" step="1" min="1">
         </label>
         <div class="attackDpsNote small">
           α版ではディレイ欄の数値を「60.3 ≒ 1秒」、つまり「ディレイ × 0.01658 秒」として秒換算します。装備本体/装備Buff/装備以外BuffでONになっている「攻撃ディレイ」値は自動参照できます。発生フレームはFPSで秒換算します。遠隔武器の弾着・距離・入力遅延・ラグ・対象デバフ変動は未考慮です。
@@ -7355,21 +7382,52 @@ function renderAttackDpsTab(metrics=null) {
 
 
 function setupAppVersionBadge(nav) {
-  if (!nav || !nav.parentNode) return;
+  const versionText = `${APP_VERSION} / ${APP_VERSION_NOTE}`;
+  document.title = `Master of Epic 物理ダメージ計算webツール ${APP_VERSION}`;
+
+  // 既存HTML側にバージョン専用要素がある場合は、それを必ず更新する。
+  [
+    byId("appVersion"),
+    byId("appVersionText"),
+    byId("versionLabel"),
+    document.querySelector("[data-app-version]")
+  ].filter(Boolean).forEach(el => {
+    el.textContent = versionText;
+  });
+
   let badge = byId("appVersionBadge");
+
+  const title = Array.from(document.querySelectorAll("h1"))
+    .find(el => /Master of Epic 物理ダメージ計算webツール/.test(el.textContent || ""));
+
+  // 旧HTMLに「タイトル直下の静的バージョン表記」が残っている場合は、それを再利用して更新する。
+  if (!badge && title) {
+    const next = title.nextElementSibling;
+    if (next && next.id !== "mainTabNav" && !next.matches("nav, .mainTabs, .mainTabNav") && /(?:v\d+\.\d+|Build|version|バージョン)/i.test(next.textContent || "")) {
+      badge = next;
+      badge.id = "appVersionBadge";
+      badge.classList.add("appVersionBadge");
+    }
+  }
+
   if (!badge) {
     badge = document.createElement("div");
     badge.id = "appVersionBadge";
     badge.className = "appVersionBadge";
+  }
+  badge.textContent = versionText;
+
+  if (title && title.parentNode) {
+    if (title.nextSibling !== badge) title.parentNode.insertBefore(badge, title.nextSibling);
+  } else if (nav && nav.parentNode) {
     nav.parentNode.insertBefore(badge, nav);
   }
-  badge.textContent = `Master of Epic 物理ダメージ計算webツール ${APP_VERSION} / ${APP_VERSION_NOTE}`;
 }
 
 const MAIN_TABS = [
   {id:"calc", label:"計算", hint:"基本設定、サマリー、分析、実測差分、最適化計算をここにまとめています。"},
   {id:"attackDps", label:"アタックDPS α", hint:"通常アタックのクリティカルキャンセル前提DPSを参考値として計算します。単発ダメージ、ディレイ短縮、モーション発生フレームを分けて扱います。"},
-  {id:"skill", label:"スキルシミュレータ", hint:"スキル合計850、残りポイント、種族別の簡易ステータスを確認します。計算側へはボタンを押した時だけ反映します。"},
+  {id:"skill", label:"スキルシミュレータ", hint:"スキル合計850、残りポイント、種族別の簡易ステータスを確認します。計算タブへは常時自動反映します。"},
   {id:"equipment", label:"装備登録", hint:"武器・防具・装飾候補、装備Buff、AC/HP/命中などの追加ステータスを部位ごとのカテゴリで登録します。候補追加はここで行います。"},
   {id:"buffs", label:"Buff登録", hint:"装備以外のBuff、外枠補正、その他バフを登録します。"},
   {id:"groups", label:"競合グループ", hint:"同一グループで重複しないBuffを確認します。"},

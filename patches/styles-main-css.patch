@@ -1,6 +1,8 @@
---- main.orig.css	2026-06-29 03:11:31.721082502 +0000
-+++ moe_attack_dps_alpha/styles/main.css	2026-06-29 03:42:10.300208020 +0000
-@@ -3674,3 +3674,115 @@
+diff --git a/mnt/data/main.orig.css b/styles/main.css
+index 8c9c325..c6b72a6 100644
+--- a/mnt/data/main.orig.css
++++ b/styles/main.css
+@@ -3674,3 +3674,273 @@
    margin: 2px 0 6px;
    opacity: .82;
  }
@@ -116,3 +118,161 @@
 +}
 +
 +/* v1.23.2: アタックDPS α ディレイ短縮自動参照 */
++
++/* v1.23.3: UI調整・自動反映修正 */
++
++
++/* v1.23.3: バージョン表記はタイトル直下に固定 */
++.appVersionBadge {
++  display: inline-flex;
++  align-items: center;
++  width: fit-content;
++  max-width: 100%;
++  margin: 2px 0 12px;
++  padding: 5px 10px;
++  border: 1px solid var(--border, #d8deea);
++  border-radius: 999px;
++  background: var(--panel, #fff);
++  color: var(--muted, #586173);
++  font-size: 12px;
++  line-height: 1.4;
++}
++
++/* v1.23.3: アタックDPS αの手入力欄を小さくし、手入力選択時だけ表示 */
++.attackDpsGrid label[hidden] {
++  display: none !important;
++}
++.attackDpsGrid input[type="number"],
++.attackDpsGrid input.compactNumberInput {
++  width: 7ch;
++  max-width: 7ch;
++  min-width: 0;
++  text-align: right;
++  justify-self: start;
++}
++.attackDpsGrid select {
++  width: min(100%, 18rem);
++  max-width: 100%;
++}
++
++/* v1.23.3: スキルシミュレータはバー長と数値欄を統一 */
++.skillBarRow,
++.skillSimGroupBar[data-skill-group="熟練"] .skillBarRow {
++  grid-template-columns: 7em 150px 6ch !important;
++  justify-content: start;
++}
++.skillBarWrap {
++  width: 150px;
++  min-width: 150px;
++  max-width: 150px;
++}
++.skillBarValue {
++  width: 6ch !important;
++  max-width: 6ch !important;
++  min-width: 0 !important;
++  padding: 3px 4px;
++}
++#skillSimWeaponSkill,
++#skillSimAutoApply,
++label:has(#skillSimWeaponSkill),
++label:has(#skillSimAutoApply),
++button[onclick*="applySkillSimToCalc"],
++[data-skill-sim-apply] {
++  display: none !important;
++}
++
++/* v1.23.3: 追加ステータスは追加済みだけをコンパクト表示 */
++.extraStatsActiveGrid {
++  grid-template-columns: repeat(auto-fit, minmax(7.5rem, max-content));
++  justify-content: start;
++}
++.extraStatsActiveGrid input[type="number"] {
++  width: 7ch;
++  max-width: 7ch;
++  min-width: 0;
++  text-align: right;
++}
++
++/* v1.23.3: Buff登録タブの列幅調整 */
++#compositeBuffTable.compactTable {
++  min-width: 1180px !important;
++}
++#compositeBuffTable th:nth-child(1), #compositeBuffTable td:nth-child(1),
++#compositeBuffTable th:nth-child(2), #compositeBuffTable td:nth-child(2),
++#compositeBuffTable th:nth-child(3), #compositeBuffTable td:nth-child(3),
++#compositeBuffTable th:nth-child(4), #compositeBuffTable td:nth-child(4) {
++  width: 34px !important;
++  min-width: 34px !important;
++  text-align: center;
++}
++#compositeBuffTable th:nth-child(5), #compositeBuffTable td:nth-child(5) {
++  width: 220px !important;
++  min-width: 180px !important;
++}
++#compositeBuffTable th:nth-child(6), #compositeBuffTable td:nth-child(6) {
++  width: 180px !important;
++  min-width: 150px !important;
++}
++#compositeBuffTable th:nth-child(n+7):nth-child(-n+16),
++#compositeBuffTable td:nth-child(n+7):nth-child(-n+16) {
++  width: 58px !important;
++  min-width: 58px !important;
++}
++#compositeBuffTable th:nth-child(17), #compositeBuffTable td:nth-child(17) {
++  width: 84px !important;
++  min-width: 84px !important;
++}
++#compositeBuffTable th:nth-child(18), #compositeBuffTable td:nth-child(18) {
++  width: 170px !important;
++  min-width: 150px !important;
++}
++#compositeBuffTable th:nth-child(19), #compositeBuffTable td:nth-child(19),
++#compositeBuffTable td.actionCell {
++  width: 42px !important;
++  min-width: 42px !important;
++}
++#compositeBuffTable input[type="number"] {
++  width: 6ch !important;
++  max-width: 6ch !important;
++}
++
++/* v1.23.3: 外枠補正・その他バフの固定/除外列を圧縮し、名称/競合グループを広げる */
++#postBuffTable th:nth-child(1), #postBuffTable td:nth-child(1),
++#postBuffTable th:nth-child(2), #postBuffTable td:nth-child(2),
++#postBuffTable th:nth-child(3), #postBuffTable td:nth-child(3),
++#postBuffTable th:nth-child(4), #postBuffTable td:nth-child(4),
++#otherBuffTable th:nth-child(1), #otherBuffTable td:nth-child(1),
++#otherBuffTable th:nth-child(2), #otherBuffTable td:nth-child(2),
++#otherBuffTable th:nth-child(3), #otherBuffTable td:nth-child(3) {
++  width: 34px !important;
++  min-width: 34px !important;
++  text-align: center;
++}
++#postBuffTable th:nth-child(5), #postBuffTable td:nth-child(5),
++#otherBuffTable th:nth-child(4), #otherBuffTable td:nth-child(4) {
++  width: 220px !important;
++  min-width: 180px !important;
++}
++#postBuffTable th:nth-child(6), #postBuffTable td:nth-child(6),
++#otherBuffTable th:nth-child(5), #otherBuffTable td:nth-child(5) {
++  width: 180px !important;
++  min-width: 150px !important;
++}
++#postBuffTable th:nth-child(7), #postBuffTable td:nth-child(7) {
++  width: 60px !important;
++  min-width: 60px !important;
++}
++#postBuffTable th:nth-child(8), #postBuffTable td:nth-child(8),
++#otherBuffTable th:nth-child(6), #otherBuffTable td:nth-child(6) {
++  width: 180px !important;
++  min-width: 150px !important;
++}
++#postBuffTable th:nth-child(9), #postBuffTable td:nth-child(9),
++#otherBuffTable th:nth-child(7), #otherBuffTable td:nth-child(7) {
++  width: 42px !important;
++  min-width: 42px !important;
++}
++#postBuffTable input[type="number"] {
++  width: 6ch !important;
++  max-width: 6ch !important;
++}
