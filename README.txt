@@ -40,3 +40,8 @@ node tools/build-wiki-equip-buff-effects.mjs --rematch-only
 
 HTMLから再解析:
 node tools/build-wiki-equip-buff-effects.mjs --input="data/wiki/equip-buff-effects/*.htm"
+
+v1.23.13 / Buff手入力TSVテンプレート
+- data/manual/buffRules.manual.input.tsv を生成する tools/build-buff-rules-template.mjs を追加
+- TSVから src/data/manual/buffRules.manual.js を生成する tools/build-buff-rules-manual-from-tsv.mjs を追加
+- data/manual/README.md と example TSV を追加
