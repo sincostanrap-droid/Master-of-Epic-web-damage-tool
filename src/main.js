@@ -5,8 +5,8 @@
   onclick属性から呼ばれる関数があるため、現時点では module ではなく通常scriptとして読み込みます。
 */
 
-const APP_VERSION = "v1.23.11";
-const APP_VERSION_NOTE = "長音符正規化修正";
+const APP_VERSION = "v1.23.12";
+const APP_VERSION_NOTE = "Wiki装備Buff効果候補インポート";
 
 /* 種族係数。攻撃力係数と魔力係数は別管理。 */
 const RACE_COEFFS = {
@@ -9900,7 +9900,9 @@ function addIdbEquipmentCandidate() {
 
 const CATALOG_SCRIPT_URLS = [
   "src/data/generated/equipmentCatalog.generated.js",
-  "src/data/generated/buffCatalog.generated.js"
+  "src/data/generated/buffCatalog.generated.js",
+  "src/data/generated/wikiEquipBuffEffects.generated.js",
+  "src/data/manual/buffRules.manual.js"
 ];
 let catalogScriptsPromise = null;
 
