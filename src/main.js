@@ -5,6 +5,9 @@
   onclick属性から呼ばれる関数があるため、現時点では module ではなく通常scriptとして読み込みます。
 */
 
+const APP_VERSION = "v1.23.2";
+const APP_VERSION_NOTE = "アタックDPSα・ディレイ短縮自動参照";
+
 /* 種族係数。攻撃力係数と魔力係数は別管理。 */
 const RACE_COEFFS = {
   newtar: 0.20,
@@ -81,6 +84,7 @@ const BUFF_FLAT_EXTRA_STAT_DEFS = [
   {prop:"extraMaxWeight", equipProp:"equipBuffExtraMaxWeight", label:"最大重量", step:"0.1"},
   {prop:"extraHit", equipProp:"equipBuffExtraHit", label:"命中", step:"0.1"},
   {prop:"extraAvoid", equipProp:"equipBuffExtraAvoid", label:"回避", step:"0.1"},
+  {prop:"extraAttackDelay", equipProp:"equipBuffExtraAttackDelay", label:"攻撃ディレイ", step:"0.1"},
   {prop:"extraMagicDelay", equipProp:"equipBuffExtraMagicDelay", label:"魔法ディレイ", step:"0.1"},
   {prop:"extraFireRes", equipProp:"equipBuffExtraFireRes", label:"火耐性", step:"0.1"},
   {prop:"extraWaterRes", equipProp:"equipBuffExtraWaterRes", label:"水耐性", step:"0.1"},
@@ -3343,7 +3347,7 @@ function renderSkillKnowledge() {
     const dataSource = data.source?.masteries || "不明";
     const usingFallback = dataSource === "内蔵データ";
     const sampleNote = `<span class="skillKnowledgeSampleNote">${usingFallback ? "内蔵マスタリー使用" : "マスタリー実データ"} / テク・魔法はサンプル</span>`;
-    summary.innerHTML = `${shown}/${total}件表示 / 使用可能 ${okCount}件 ${sampleNote}<br><span class="small mutedText">Build v1.20.9 / マスタリー ${data.masteries.length}件 / テク ${data.techniques.length}件 / 魔法 ${data.magic.length}件 / 参照元： ${escapeHtml(dataSource)}</span>`;
+    summary.innerHTML = `${shown}/${total}件表示 / 使用可能 ${okCount}件 ${sampleNote}<br><span class="small mutedText">Build ${APP_VERSION} / マスタリー ${data.masteries.length}件 / テク ${data.techniques.length}件 / 魔法 ${data.magic.length}件 / 参照元： ${escapeHtml(dataSource)}</span>`;
   }
 }
 
@@ -3559,6 +3563,7 @@ function defaultAttackDpsState() {
     manualDamage: 100,
     weaponDelaySource: "currentWeapon",
     manualWeaponDelay: 300,
+    equipmentBuffDelaySource: "auto",
     equipmentBuffDelay: 0,
     attackDelayBuff: 0,
     stDelayBonus: -10,
@@ -3578,6 +3583,7 @@ function normalizeAttackDpsState(raw) {
   const out = {...d, ...src};
   out.damageSource = out.damageSource === "manual" ? "manual" : "current";
   out.weaponDelaySource = out.weaponDelaySource === "manual" ? "manual" : "currentWeapon";
+  out.equipmentBuffDelaySource = out.equipmentBuffDelaySource === "manual" ? "manual" : "auto";
   ["manualDamage", "manualWeaponDelay", "equipmentBuffDelay", "attackDelayBuff", "stDelayBonus", "damageFrame", "nonCancelMotionFrames", "fps", "simSeconds", "hitRatePct"].forEach(k => {
     out[k] = parseFloat(out[k]);
     if (!Number.isFinite(out[k])) out[k] = d[k];
@@ -3900,7 +3906,7 @@ function compositeGroupScore(r) {
   score += (+r.extraAvoid || 0) * 8 + (+r.extraAvoidPct || 0) * 14;
   score += ((+r.extraFireRes || 0) + (+r.extraWaterRes || 0) + (+r.extraEarthRes || 0) + (+r.extraWindRes || 0) + (+r.extraNeutralRes || 0)) * 2;
   score += ((+r.extraFireResPct || 0) + (+r.extraWaterResPct || 0) + (+r.extraEarthResPct || 0) + (+r.extraWindResPct || 0) + (+r.extraNeutralResPct || 0)) * 4;
-  score += (+r.extraAttackDelayPct || 0) * 6;
+  score += Math.max(0, -(+r.extraAttackDelay || 0)) * 6 + Math.max(0, -(+r.extraAttackDelayPct || 0)) * 6;
   score += (+r.extraMagicDelay || 0) * 4 + (+r.extraMagicDelayPct || 0) * 6;
   score += (+r.extraDamageReducePct || 0) * 120;
   score += (+r.extraCritRatePct || 0) * 80;
@@ -7024,6 +7030,7 @@ function bindAttackDpsControls() {
   bindNumber("attackDpsManualDamage", "manualDamage");
   bindSelect("attackDpsWeaponDelaySource", "weaponDelaySource");
   bindNumber("attackDpsManualWeaponDelay", "manualWeaponDelay");
+  bindSelect("attackDpsEquipBuffDelaySource", "equipmentBuffDelaySource");
   bindNumber("attackDpsEquipBuffDelay", "equipmentBuffDelay");
   bindNumber("attackDpsAttackDelayBuff", "attackDelayBuff");
   bindNumber("attackDpsStDelayBonus", "stDelayBonus");
@@ -7080,9 +7087,15 @@ function createAttackDpsTab(panel) {
         <label>手入力 武器ディレイ
           <input id="attackDpsManualWeaponDelay" type="number" step="0.1">
         </label>
-        <label>装備+攻撃ディレイBuff枠
+        <label>装備+攻撃ディレイBuff枠 参照
+          <select id="attackDpsEquipBuffDelaySource">
+            <option value="auto">ONの装備/Buffから自動</option>
+            <option value="manual">手入力</option>
+          </select>
+        </label>
+        <label>手入力 装備+攻撃ディレイBuff枠
           <input id="attackDpsEquipBuffDelay" type="number" step="0.1">
-          <span class="small">-60で上限</span>
+          <span class="small">自動参照OFF時に使用 / -60で上限</span>
         </label>
         <label>アタック短縮Buff枠
           <input id="attackDpsAttackDelayBuff" type="number" step="0.1">
@@ -7120,7 +7133,7 @@ function createAttackDpsTab(panel) {
           <input id="attackDpsSimSeconds" type="number" step="1" min="1">
         </label>
         <div class="attackDpsNote small">
-          α版ではディレイ欄の数値を「60.3 ≒ 1秒」、つまり「ディレイ × 0.01658 秒」として秒換算します。発生フレームはFPSで秒換算します。遠隔武器の弾着・距離・入力遅延・ラグ・対象デバフ変動は未考慮です。
+          α版ではディレイ欄の数値を「60.3 ≒ 1秒」、つまり「ディレイ × 0.01658 秒」として秒換算します。装備本体/装備Buff/装備以外BuffでONになっている「攻撃ディレイ」値は自動参照できます。発生フレームはFPSで秒換算します。遠隔武器の弾着・距離・入力遅延・ラグ・対象デバフ変動は未考慮です。
         </div>
       </fieldset>
     </div>
@@ -7145,15 +7158,71 @@ function copyCurrentToAttackDps() {
     cfg.manualDamage = Math.max(0, Math.floor(metrics.finalDamage || 0));
     const weapon = selectedWeaponForCalc(state);
     if (weapon && +weapon.weaponAttackInterval > 0) cfg.manualWeaponDelay = +weapon.weaponAttackInterval;
-    if (metrics?.extraStats && Number.isFinite(+metrics.extraStats.extraAttackDelay)) {
-      cfg.equipmentBuffDelay = +metrics.extraStats.extraAttackDelay || 0;
-    }
+    const delayAuto = collectAttackDpsDelaySources(state);
+    cfg.equipmentBuffDelay = delayAuto.total || 0;
     bindAttackDpsControls();
     renderAttackDpsTab(metrics);
     calc();
   } catch (e) {
     alert("現在構成の反映に失敗しました: " + (e?.message || e));
   }
+}
+
+
+function attackDpsAddDelaySource(bucket, kind, name, value, note="") {
+  const n = parseFloat(value);
+  if (!Number.isFinite(n) || n === 0) return;
+  const item = {kind, name: name || kind, value: n, note};
+  bucket.sources.push(item);
+  if (kind === "装備") bucket.equipmentTotal += n;
+  else bucket.buffTotal += n;
+  bucket.total += n;
+}
+
+function attackDpsAddDelayPctSource(bucket, kind, name, value, note="") {
+  const n = parseFloat(value);
+  if (!Number.isFinite(n) || n === 0) return;
+  bucket.pctSources.push({kind, name: name || kind, value: n, note});
+}
+
+function collectAttackDpsDelaySources(st=state) {
+  const bucket = {equipmentTotal:0, buffTotal:0, total:0, sources:[], pctSources:[]};
+  const baseState = st || state || {};
+
+  normalizeEquipmentRows(baseState.equipment)
+    .filter(r => r.enabled !== false)
+    .forEach(r => {
+      const label = `${(r.slot || "装備").replace(/^武器: |^防具: |^装飾: /, "")} ${r.name || "名称未入力"}`.trim();
+      attackDpsAddDelaySource(bucket, "装備", label, r.extraAttackDelay, "装備本体");
+      attackDpsAddDelayPctSource(bucket, "装備", label, r.extraAttackDelayPct, "攻撃ディレイ%はDPS枠には未反映");
+    });
+
+  let buffState = clone(baseState);
+  if (typeof expandSkillSimMasteryBuffState === "function") buffState = expandSkillSimMasteryBuffState(buffState);
+  if (typeof expandEquipmentBuffState === "function") buffState = expandEquipmentBuffState(buffState);
+  if (typeof applyBuffGroupRules === "function") buffState = applyBuffGroupRules(buffState);
+
+  normalizeCompositeRows(buffState.composite)
+    .filter(r => r.enabled && !r.excluded && compositeHasEffect(r))
+    .forEach(r => {
+      const isEquipBuff = /^装備由来[:：]/.test(r.note || "") || /装備Buff$/.test(r.name || "");
+      const kind = isEquipBuff ? "装備Buff" : "Buff";
+      attackDpsAddDelaySource(bucket, kind, r.name || kind, r.extraAttackDelay, r.note || "");
+      attackDpsAddDelayPctSource(bucket, kind, r.name || kind, r.extraAttackDelayPct, "攻撃ディレイ%はDPS枠には未反映");
+    });
+
+  bucket.sources.sort((a,b) => a.kind.localeCompare(b.kind, "ja") || a.name.localeCompare(b.name, "ja"));
+  bucket.pctSources.sort((a,b) => a.kind.localeCompare(b.kind, "ja") || a.name.localeCompare(b.name, "ja"));
+  return bucket;
+}
+
+function attackDpsDelaySourceListHtml(auto) {
+  if (!auto?.sources?.length) return "該当なし";
+  const maxShown = 12;
+  const shown = auto.sources.slice(0, maxShown)
+    .map(s => `${s.kind}: ${s.name} ${s.value > 0 ? "+" : ""}${fmt(s.value, 2)}`);
+  if (auto.sources.length > maxShown) shown.push(`ほか ${auto.sources.length - maxShown}件`);
+  return shown.map(escapeHtml).join(" / ");
 }
 
 function attackDpsClampPercentForMultiplier(v, min=-99.9, max=999) {
@@ -7174,9 +7243,13 @@ function computeAttackDpsAlpha(metrics=null) {
   const weaponDelay = cfg.weaponDelaySource === "currentWeapon" ? currentWeaponDelay : Math.max(0, +cfg.manualWeaponDelay || 0);
   if (cfg.weaponDelaySource === "currentWeapon" && !(weaponDelay > 0)) warnings.push("現在の計算武器に攻撃間隔がありません。装備詳細に攻撃間隔を入れるか、手入力に切り替えてください。");
 
-  const equipBuffRaw = +cfg.equipmentBuffDelay || 0;
+  const delayAuto = collectAttackDpsDelaySources(state);
+  const equipBuffRaw = cfg.equipmentBuffDelaySource === "auto"
+    ? delayAuto.total
+    : (+cfg.equipmentBuffDelay || 0);
   const equipBuffCapped = Math.max(-60, equipBuffRaw);
   if (equipBuffRaw < -60) warnings.push("装備+攻撃ディレイBuff枠は -60 に丸めています。");
+  if (cfg.equipmentBuffDelaySource === "auto" && delayAuto.pctSources.length) warnings.push("攻撃ディレイ% は現状DPS自動枠に未反映です。MoEの短縮値は通常『攻撃ディレイ -X』として登録してください。");
 
   const attackDelayBuff = attackDpsClampPercentForMultiplier(cfg.attackDelayBuff);
   const stBonus = attackDpsClampPercentForMultiplier(cfg.stDelayBonus);
@@ -7217,7 +7290,7 @@ function computeAttackDpsAlpha(metrics=null) {
 
   return {
     cfg, weapon, damage, currentDamage, weaponDelay, currentWeaponDelay,
-    equipBuffRaw, equipBuffCapped, attackDelayBuff, stBonus, manualBonus,
+    equipBuffRaw, equipBuffCapped, delayAuto, attackDelayBuff, stBonus, manualBonus,
     delayMultiplier, shortenedDelay, delaySec, fps, damageFrame, damageFrameSec,
     motionLockSec, periodSec, simSeconds, hitRate, hitCount, expectedTotalDamage,
     continuousDps: periodSec > 0 ? damage * hitRate / periodSec : NaN,
@@ -7245,7 +7318,7 @@ function renderAttackDpsResult(metrics=null) {
 
   const cards = [
     attackDpsResultCard("1発ダメージ", fmt(r.damage, 0), r.cfg.damageSource === "current" ? "計算タブ参照" : "手入力"),
-    attackDpsResultCard("短縮後ディレイ", fmt(r.shortenedDelay, 2), `${fmt(r.delaySec, 3)} 秒`),
+    attackDpsResultCard("短縮後ディレイ", fmt(r.shortenedDelay, 2), `${fmt(r.delaySec, 3)} 秒 / ${r.cfg.equipmentBuffDelaySource === "auto" ? "自動参照" : "手入力"}`),
     attackDpsResultCard("ダメージ発生", `${fmt(r.damageFrame, 0)} F`, `${fmt(r.damageFrameSec, 3)} 秒`),
     attackDpsResultCard("実アタック周期", fmt(r.periodSec, 3) + " 秒", r.cfg.criticalCancel ? "クリキャン前提" : "非キャンセル"),
     attackDpsResultCard("継続DPS", fmt(r.continuousDps, 2), `命中率 ${fmt(r.hitRate * 100, 1)}%`),
@@ -7260,6 +7333,8 @@ function renderAttackDpsResult(metrics=null) {
       <summary>計算内訳</summary>
       <div>計算武器: ${escapeHtml(weaponText)} / 武器ディレイ ${fmt(r.weaponDelay, 2)}${r.cfg.weaponDelaySource === "currentWeapon" ? "（現在武器）" : "（手入力）"}</div>
       <div>装備+Buff枠: raw ${fmt(r.equipBuffRaw, 2)} → 適用 ${fmt(r.equipBuffCapped, 2)} / アタック短縮Buff ${fmt(r.attackDelayBuff, 2)} / ST補正 ${fmt(r.stBonus, 2)} / 手動補正 ${fmt(r.manualBonus, 2)}</div>
+      <div>ディレイ短縮自動参照: 装備 ${fmt(r.delayAuto.equipmentTotal, 2)} / Buff ${fmt(r.delayAuto.buffTotal, 2)} / 合計 ${fmt(r.delayAuto.total, 2)}${r.cfg.equipmentBuffDelaySource === "auto" ? "（採用中）" : "（手入力のため未採用）"}</div>
+      <div>参照元: ${attackDpsDelaySourceListHtml(r.delayAuto)}</div>
       <div>短縮後ディレイ = 武器ディレイ × ${fmt(r.delayMultiplier, 4)} = ${fmt(r.shortenedDelay, 3)}（${fmt(r.delaySec, 3)}秒）</div>
       <div>周期 = max(短縮後ディレイ秒 ${fmt(r.delaySec, 3)}, ${r.cfg.criticalCancel ? "ダメージ発生秒" : "行動不能秒"} ${fmt(r.motionLockSec, 3)}) = ${fmt(r.periodSec, 3)}秒</div>
       <div>${fmt(r.simSeconds,0)}秒内ヒット数 = ${r.hitCount} / 期待総ダメージ = ${fmt(r.expectedTotalDamage, 0)}</div>
@@ -7278,6 +7353,18 @@ function renderAttackDpsTab(metrics=null) {
   renderAttackDpsResult(metrics);
 }
 
+
+function setupAppVersionBadge(nav) {
+  if (!nav || !nav.parentNode) return;
+  let badge = byId("appVersionBadge");
+  if (!badge) {
+    badge = document.createElement("div");
+    badge.id = "appVersionBadge";
+    badge.className = "appVersionBadge";
+    nav.parentNode.insertBefore(badge, nav);
+  }
+  badge.textContent = `Master of Epic 物理ダメージ計算webツール ${APP_VERSION} / ${APP_VERSION_NOTE}`;
+}
 
 const MAIN_TABS = [
   {id:"calc", label:"計算", hint:"基本設定、サマリー、分析、実測差分、最適化計算をここにまとめています。"},
@@ -7306,7 +7393,9 @@ function activateMainTab(id) {
 function setupTabLayout() {
   const nav = byId("mainTabNav");
   const panelsWrap = byId("mainTabPanels");
-  if (!nav || !panelsWrap || nav.dataset.ready) return;
+  if (!nav || !panelsWrap) return;
+  setupAppVersionBadge(nav);
+  if (nav.dataset.ready) return;
 
   nav.dataset.ready = "1";
   nav.setAttribute("role", "tablist");

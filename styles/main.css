@@ -3767,3 +3767,22 @@
 .attackDpsFormula div {
   margin: 5px 0;
 }
+
+/* v1.23.1: 画面上のバージョン表記 */
+.appVersionBadge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  max-width: 100%;
+  margin: 0 0 10px;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+/* v1.23.2: アタックDPS α ディレイ短縮自動参照 */
