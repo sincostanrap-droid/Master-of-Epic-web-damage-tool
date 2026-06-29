@@ -545,6 +545,7 @@ function renderPresetSelect() {
     ? names.map(name => `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`).join("")
     : `<option value="">保存済みなし</option>`;
   setPresetStatus(names.length ? `保存済みプリセット: ${names.length}件` : "保存済みプリセットはまだありません。", names.length ? "ok" : "");
+  if (typeof refreshComparePresetSelect === "function") refreshComparePresetSelect();
 }
 
 function saveNamedPreset() {

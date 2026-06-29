@@ -64,7 +64,7 @@ MoE固有の主な仮定:
 </head>
 <body>
 <h1>Master of Epic 物理ダメージ計算webツール</h1>
-<p id="appBuildStamp" class="small appBuildStamp">スキルシミュレータ拡張版 v1.21.9</p>
+<p id="appBuildStamp" class="small appBuildStamp">スキルシミュレータ拡張版 v1.22.0</p>
 <section class="heroCard">
   <div>
     <div class="heroBadge">MoE / Physical Damage Calculator</div>
@@ -179,6 +179,20 @@ MoE固有の主な仮定:
       <div class="metricHoverArea" title="カーソルを合わせるとダメージ計算内訳を表示します">
         <div class="result" id="finalDamage">-</div>
         <div id="damageAudit" class="damageAudit">計算チェック: -</div>
+
+<section class="card analysisPanel" id="buildAnalysisPanel">
+  <h2>構成診断・比較</h2>
+  <div class="analysisActions">
+    <button type="button" onclick="renderBuildDiagnostics()">構成診断を更新</button>
+    <label>比較するプリセット
+      <select id="comparePresetSelect"></select>
+    </label>
+    <button type="button" onclick="compareCurrentWithPreset()">現在構成と比較</button>
+  </div>
+  <div id="buildDiagnostics" class="analysisBox">構成を計算すると、ここに注意点が表示されます。</div>
+  <div id="buildCompareResult" class="analysisBox">保存済みプリセットを選ぶと、現在構成との差分を確認できます。</div>
+</section>
+
         <div class="hoverHint">計算内訳を見る</div>
       </div>
       <div id="breakdown" class="metricTooltip damageBreakdownTooltip">-</div>
@@ -1212,11 +1226,11 @@ MoE固有の主な仮定:
   <textarea id="configBox" placeholder="JSONまたはTSVをここに貼り付けて読み込み可能"></textarea>
 </section>
 
-<script src="./src/storage/shareUrl.js?v=1.21.9" defer></script>
-<script src="./src/storage/importExport.js?v=1.21.9" defer></script>
-<script src="./src/calc/core.js?v=1.21.9" defer></script>
-<script src="./src/data/skillSimKnowledge.js?v=1.21.9" defer></script>
-<script src="./src/main.js?v=1.21.9" defer></script>
-<script src="./src/optimizer/core.js?v=1.21.9" defer></script>
+<script src="./src/storage/shareUrl.js?v=1.22.0" defer></script>
+<script src="./src/storage/importExport.js?v=1.22.0" defer></script>
+<script src="./src/calc/core.js?v=1.22.0" defer></script>
+<script src="./src/data/skillSimKnowledge.js?v=1.22.0" defer></script>
+<script src="./src/main.js?v=1.22.0" defer></script>
+<script src="./src/optimizer/core.js?v=1.22.0" defer></script>
 </body>
 </html>

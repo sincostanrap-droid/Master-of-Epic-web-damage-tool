@@ -3590,3 +3590,22 @@
   outline: 1px dashed rgba(80, 80, 80, .25);
   outline-offset: -2px;
 }
+
+/* v1.22.0: 構成診断・比較 */
+.analysisPanel { margin-top: 16px; }
+.analysisActions { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: end; }
+.analysisActions label { min-width: 220px; }
+.analysisBox { margin-top: 10px; padding: 10px; border: 1px solid var(--border, #ddd); border-radius: 8px; background: rgba(127,127,127,.04); }
+.diagItem { border-left: 4px solid #999; padding: 8px 10px; margin: 8px 0; background: rgba(255,255,255,.5); border-radius: 6px; }
+.diagItem p { margin: 4px 0 0; }
+.diagItem.ok { border-left-color: #2f8f46; }
+.diagItem.warn { border-left-color: #c48500; }
+.diagItem.bad { border-left-color: #c0392b; }
+.diagItem.note { border-left-color: #667085; }
+.compareTitle { font-weight: 700; margin-bottom: 8px; }
+.compareTable { width: 100%; border-collapse: collapse; }
+.compareTable th, .compareTable td { border-bottom: 1px solid var(--border, #ddd); padding: 6px 8px; text-align: right; }
+.compareTable th:first-child, .compareTable td:first-child { text-align: left; }
+.compareTable .plus { color: #16703a; font-weight: 700; }
+.compareTable .minus { color: #b42318; font-weight: 700; }
+.compareDiag { margin-top: 10px; }
