@@ -425,11 +425,99 @@ function mapToSortedObject(map) {
 }
 
 
+function reqNameValue_(v) {
+  if (v == null) return '';
+  if (typeof v === 'object') return str(v.name || v.label || v.id || '');
+  return str(v);
+}
+
+function normalizeRequirementName(name) {
+  return reqNameValue_(name).trim();
+}
+
+function dedupeRequirements(reqs) {
+  const out = [];
+  const seen = new Set();
+
+  for (const req of reqs || []) {
+    const name = normalizeRequirementName(req && req.name);
+    const required = num(req && req.required);
+    if (!name || !required) continue;
+
+    const key = `${name}:${required}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push({ name, required });
+  }
+
+  return out;
+}
+
+function parseRequirementText(skillText, fallbackLevel) {
+  const text = str(skillText).trim();
+  if (!text) return [];
+
+  const reqs = [];
+
+  // 例: 「こんぼう 100 筋力 100」「こんぼう100 / 筋力100」
+  const explicit = [...text.matchAll(/([^\d\s\/、,＋+：:]+)\s*(\d+(?:\.\d+)?)/g)];
+  if (explicit.length) {
+    explicit.forEach(match => reqs.push({ name: match[1], required: Number(match[2]) }));
+    return dedupeRequirements(reqs);
+  }
+
+  return dedupeRequirements(
+    text
+      .split(/[\/、,\s＋+]+/)
+      .filter(Boolean)
+      .map(name => ({ name, required: fallbackLevel }))
+  );
+}
+
+function parseRequirementsJson(value) {
+  const text = str(value).trim();
+  if (!text || text === '[]') return [];
+
+  try {
+    const parsed = JSON.parse(text);
+    const source = Array.isArray(parsed) ? parsed : [parsed];
+    return dedupeRequirements(source.map(entry => {
+      if (!entry || typeof entry !== 'object') return null;
+      return {
+        name: entry.name || entry.skill || entry.skillName || entry.requiredSkill || entry.label,
+        required: entry.required ?? entry.value ?? entry.level ?? entry.need_level ?? entry.needLevel,
+      };
+    }).filter(Boolean));
+  } catch (error) {
+    return [];
+  }
+}
+
+function equipmentRequirements(row, cat) {
+  // 正本: Google Sheet に後追い追記した公式DB個別ページ由来の requirements_json。
+  const fromJson = parseRequirementsJson(row.requirements_json || row.requirementsJson);
+  if (fromJson.length) return fromJson;
+
+  // 補助: requirements_text がある場合。
+  const fromText = parseRequirementText(row.requirements_text || row.requirementsText, num(row.need_level));
+  if (fromText.length) return fromText;
+
+  // 互換: 旧列 requiredSkill + need_level。
+  const fromRequiredSkill = parseRequirementText(row.requiredSkill || row.required_skill, num(row.need_level));
+  if (fromRequiredSkill.length) return fromRequiredSkill;
+
+  // 最後の保険: 武器一覧由来の主条件。複数条件は requirements_json 側で補う。
+  if (cat === 'weapon') {
+    const weaponType = normalizeRequirementName(row.weponType || row.weaponType);
+    const level = num(row.need_level);
+    if (weaponType && level) return [{ name: weaponType, required: level }];
+  }
+
+  return [];
+}
+
 function weaponReq(row) {
-  const skill = str(row.requiredSkill);
-  const level = num(row.need_level);
-  if (!skill) return [];
-  return skill.split(/[\/、,\s]+/).filter(Boolean).map(name => ({ name, required: level }));
+  return equipmentRequirements(row, 'weapon');
 }
 
 function jsonForJs(value) {
@@ -532,7 +620,8 @@ function toCatalog(items, addStatuses, equipBuffs) {
       weaponRange: num(row.range),
       weaponType: str(row.weponType),
       weaponHand: str(row.weponHand),
-      weaponReq: cat === 'weapon' ? weaponReq(row) : [],
+      requirements: equipmentRequirements(row, cat),
+      weaponReq: cat === 'weapon' ? equipmentRequirements(row, cat) : [],
       technicId: num(row.technic_id),
       addStatuses: statuses,
       addStatusText: str(row.add_status_text),
