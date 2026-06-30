@@ -1,4 +1,20 @@
-Master of Epic 物理ダメージ計算webツール v1.23.18 / Scrapbox照合ノイズ抑制
+v1.23.20 / 装備Buff修正タブ・TSV候補自動投入
+- 新タブ「装備Buff修正」を追加。装備登録にあるBuff付き装備を一覧し、既存の装備Buff編集UIで修正できます。
+- 装備カタログからBuff付き装備を追加した時、src/data/generated/equipBuffRuleCandidates.generated.js の候補値を初期値として装備Buffへ投入します。
+- Wiki原文 / Scrapbox根拠行 / 抽出ヒントを装備Buff編集欄に表示・編集できます。
+- 同一technic_idは競合グループ technic-ID を自動設定し、same-technic では後から登録されたものだけ有効にします。
+- 魔力→移動速度% の保持・表示欄を追加。
+- tools/build-equip-buff-candidates-from-tsv.mjs を追加。
+- tools/clear-dev-cache.mjs を追加。
+
+候補JS生成:
+node tools/build-equip-buff-candidates-from-tsv.mjs --input=data/manual/buffRules.manual.refined.tsv
+
+キャッシュ削除:
+node tools/clear-dev-cache.mjs
+または PowerShell: Remove-Item -Recurse -Force data\cache\scrapbox
+
+Master of Epic 物理ダメージ計算webツール v1.23.19 / Buff変換系列・TSV精度補正
 
 差し替え対象:
 - src/main.js

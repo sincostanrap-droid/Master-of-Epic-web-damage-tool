@@ -25,7 +25,7 @@ import path from "node:path";
 import crypto from "node:crypto";
 import { spawnSync } from "node:child_process";
 
-const VERSION = "v1.23.18";
+const VERSION = "v1.23.19";
 const ROOT = process.cwd();
 const PROJECT = "medianmoe";
 const SCRAPBOX_BASE = `https://scrapbox.io`;

@@ -11,7 +11,7 @@
 import fs from "node:fs";
 import path from "node:path";
 
-const VERSION = "v1.23.18";
+const VERSION = "v1.23.19";
 const ROOT = process.cwd();
 const args = Object.fromEntries(process.argv.slice(2).map(a => {
   const m = a.match(/^--([^=]+)=(.*)$/);
@@ -98,6 +98,11 @@ const STAT_TO_EQUIP_PROP = {
 };
 
 const EXTRA_NUMERIC_RULES = {
+  magicToAttackPct: "magicToAttackPct",
+  magicToSpeedPct: "magicToSpeedPct",
+  speedToAttackPct: "speedToAttackPct",
+  jumpMultiplier: "jumpMultiplier",
+  forcedSpeed: "forcedSpeed",
   hpRegenPerMinute: "hpRegenPerMinute",
   stRegenPerMinute: "stRegenPerMinute",
   mpRegenPerMinute: "mpRegenPerMinute",
@@ -189,6 +194,7 @@ function ruleFromRow(row, lineNo) {
     const n = toNumber(row[col]);
     if (n !== null) extra[key] = n;
   }
+  const targetDamageEffects = clean(row.targetDamageEffects);
   return [id, {
     officialTechnicId,
     name: clean(row.name) || clean(row.wikiName) || id,
@@ -199,8 +205,16 @@ function ruleFromRow(row, lineNo) {
     stackRule: clean(row.stackRule) || "same-technic",
     stats,
     extra,
+    conversions: {
+      ...(extra.magicToAttackPct !== undefined ? { magicToAttackPct: extra.magicToAttackPct } : {}),
+      ...(extra.magicToSpeedPct !== undefined ? { magicToSpeedPct: extra.magicToSpeedPct } : {}),
+      ...(extra.speedToAttackPct !== undefined ? { speedToAttackPct: extra.speedToAttackPct } : {})
+    },
     skillEffects: parseSkillEffects(row.skillEffects),
-    customEffects: parseCustomEffects(row.customEffects),
+    customEffects: [
+      ...parseCustomEffects(row.customEffects),
+      ...(targetDamageEffects ? [{ type: "targetDamage", text: targetDamageEffects }] : [])
+    ],
     memo: clean(row.memo),
     sourceWikiName: clean(row.wikiName),
     sourcePage: clean(row.sourcePage),

@@ -1,9 +1,32 @@
+## v1.23.20 / 装備Buff修正タブ・TSV候補自動投入
+
+- 新タブ「装備Buff修正」を追加しました。装備登録にあるBuff付き装備を一覧し、既存の装備Buff編集UIで修正できます。
+- 装備カタログからBuff付き装備を追加した時、`src/data/generated/equipBuffRuleCandidates.generated.js` の候補値を初期値として装備Buffへ投入します。候補値はWiki/Scrapbox/TSV由来の未確定値なので、装備Buff修正タブで確認・修正してください。
+- 装備Buff編集欄に Wiki原文 / Scrapbox根拠行 / 抽出ヒントを表示・編集できる説明欄を追加しました。
+- 同一 `technic_id` の装備Buffは競合グループ `technic-ID` を自動設定し、`same-technic` ルールでは後から登録されたものだけ有効にします。
+- `魔力→移動速度%` の保持・表示欄を追加しました。`魔力→攻撃力%` / `速度→攻撃力%` と合わせてTSV候補から読み込めます。
+- `tools/build-equip-buff-candidates-from-tsv.mjs` を追加しました。`data/manual/buffRules.manual.refined.tsv` などからブラウザ用候補JSを生成します。
+- `tools/clear-dev-cache.mjs` を追加しました。Scrapbox/Wiki開発用キャッシュを削除できます。
+
+候補JS生成:
+
+```powershell
+node tools/build-equip-buff-candidates-from-tsv.mjs --input=data/manual/buffRules.manual.refined.tsv
+```
+
+キャッシュ削除:
+
+```powershell
+node tools/clear-dev-cache.mjs
+# または PowerShell で直接: Remove-Item -Recurse -Force data\cache\scrapbox
+```
+
 # Master of Epic 物理ダメージ計算webツール
 
 **Master of Epic** 向けの、ブラウザだけで動く物理ダメージ計算・構成比較ツールです。  
 武器、スキル、装備、Buff、対象ACなどを入力して、予想ダメージ、攻撃力、Buff枠、構成差分、アタックDPS参考値を確認できます。
 
-現在の表示バージョン: **v1.23.18 / Scrapbox照合ノイズ抑制**
+現在の表示バージョン: **v1.23.19 / Buff変換系列・TSV精度補正**
 
 ---
 
@@ -433,6 +456,22 @@ src/data/manual/buffRules.manual.js
 
 `data/manual/buffRules.manual.example.tsv` に最小例を同梱しています。
 
+
+## v1.23.19 / Buff変換系列・TSV精度補正
+
+- Buff手入力TSVに `魔力→攻撃力%` / `魔力→移動速度%` / `移動速度→攻撃力%` / `ジャンプ力倍率` / `強制移動速度` / `種族/対象特攻メモ` 列を追加。
+- `tools/refine-buff-rules-tsv.mjs` を追加し、Scrapbox/Wiki補完済みTSVから変換系・ジャンプ倍率・一部特攻メモ・競合グループ候補を自動補助抽出できるようにした。
+- 変換系は通常の攻撃力/速度上昇とは別扱いにし、`customEffects` と `extra/conversions` に保持する。現時点では採用行の `enabled` / `verified` は手動確認前提。
+
+```powershell
+node tools/refine-buff-rules-tsv.mjs --input=data/manual/buffRules.manual.scrapbox.tsv
+```
+
+出力:
+
+```text
+data/manual/buffRules.manual.refined.tsv
+```
 
 ## v1.23.18 / Scrapbox照合ノイズ抑制
 

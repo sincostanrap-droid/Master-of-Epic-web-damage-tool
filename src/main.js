@@ -5,8 +5,8 @@
   onclick属性から呼ばれる関数があるため、現時点では module ではなく通常scriptとして読み込みます。
 */
 
-const APP_VERSION = "v1.23.18";
-const APP_VERSION_NOTE = "Scrapbox補完TSV自動生成対応";
+const APP_VERSION = "v1.23.20";
+const APP_VERSION_NOTE = "装備Buff修正タブ・TSV候補自動投入";
 
 /* 種族係数。攻撃力係数と魔力係数は別管理。 */
 const RACE_COEFFS = {
@@ -579,6 +579,7 @@ const QUICK_EFFECT_DEFS = [
   {key:"damageReducePct", category:"追加ステータス%", label:"被ダメ軽減%", valueLabel:"%", unit:"%", scopes:["equipBuff","buff"]},
 
   {key:"convMagicRate", category:"ダメージ系", label:"魔力→攻撃力%", valueLabel:"%", unit:"%", scopes:["equipBuff","buff"]},
+  {key:"convMagicSpeedRate", category:"ダメージ系", label:"魔力→移動速度%", valueLabel:"%", unit:"%", scopes:["equipBuff","buff"]},
   {key:"convSpeedRate", category:"ダメージ系", label:"速度→攻撃力%", valueLabel:"%", unit:"%", scopes:["equipBuff","buff"]},
   {key:"dmgPct", category:"ダメージ系", label:"与ダメ%", valueLabel:"%", unit:"%", scopes:["equipBuff","buff"]},
   {key:"specialMultiplier", category:"ダメージ系", label:"特攻倍率", valueLabel:"倍率", unit:"倍", scopes:["equipBuff","buff"]},
@@ -813,7 +814,7 @@ function applyQuickEffectToRow(row, context, key, value, name="", scope="auto") 
     const map = {
       attackFlat:"flatAttack", magicFlat:"flatMagic", speedFlat:"flatSpeed",
       attackPct:"attackPct", magicPct:"magicPct", speedPct:"speedPct",
-      convMagicRate:"convMagicRate", convSpeedRate:"convSpeedRate",
+      convMagicRate:"convMagicRate", convMagicSpeedRate:"convMagicSpeedRate", convSpeedRate:"convSpeedRate",
       dmgPct:"dmgPct"
     };
     if (map[key]) row[map[key]] = +(row[map[key]] || 0) + v;
@@ -870,7 +871,7 @@ function applyQuickEffectToRow(row, context, key, value, name="", scope="auto") 
     const map = {
       attackFlat:"equipBuffFlatAttack", magicFlat:"equipBuffFlatMagic", speedFlat:"equipBuffFlatSpeed",
       attackPct:"equipBuffAttackPct", magicPct:"equipBuffMagicPct", speedPct:"equipBuffSpeedPct",
-      convMagicRate:"equipBuffConvMagicRate", convSpeedRate:"equipBuffConvSpeedRate",
+      convMagicRate:"equipBuffConvMagicRate", convMagicSpeedRate:"equipBuffConvMagicSpeedRate", convSpeedRate:"equipBuffConvSpeedRate",
       dmgPct:"equipBuffDmgPct"
     };
     if (map[key]) row[map[key]] = +(row[map[key]] || 0) + v;
@@ -1221,6 +1222,15 @@ function defaultEquipmentCandidate(slot, enabled=true) {
     equipBuffEnabled: false,
     equipBuffSlot: true,
     equipBuffName: "",
+    equipBuffCatalogId: "",
+    equipBuffTechnicId: "",
+    equipBuffConflictGroup: "",
+    equipBuffStackRule: "same-technic",
+    equipBuffSourceText: "",
+    equipBuffWikiText: "",
+    equipBuffScrapboxText: "",
+    equipBuffRuleConfidence: "",
+    equipBuffRuleSource: "",
     equipBuffAttackPct: 0,
     equipBuffMagicPct: 0,
     equipBuffSpeedPct: 0,
@@ -1228,6 +1238,7 @@ function defaultEquipmentCandidate(slot, enabled=true) {
     equipBuffFlatMagic: 0,
     equipBuffFlatSpeed: 0,
     equipBuffConvMagicRate: 0,
+    equipBuffConvMagicSpeedRate: 0,
     equipBuffConvSpeedRate: 0,
     equipBuffDmgPct: 0,
     equipBuffSpecial: 1,
@@ -1272,6 +1283,15 @@ function normalizeEquipmentCandidate(row, fallbackSlot) {
     weaponReq: normalizeWeaponReqRowsForEquipment(row?.weaponReq || row?.weaponRequirements || []),
     equipBuffEnabled: !!row?.equipBuffEnabled,
     equipBuffSlot: row?.equipBuffSlot !== false,
+    equipBuffCatalogId: row?.equipBuffCatalogId || "",
+    equipBuffTechnicId: row?.equipBuffTechnicId || "",
+    equipBuffConflictGroup: row?.equipBuffConflictGroup || (row?.equipBuffTechnicId ? `technic-${row.equipBuffTechnicId}` : ""),
+    equipBuffStackRule: row?.equipBuffStackRule || "same-technic",
+    equipBuffSourceText: row?.equipBuffSourceText || "",
+    equipBuffWikiText: row?.equipBuffWikiText || "",
+    equipBuffScrapboxText: row?.equipBuffScrapboxText || "",
+    equipBuffRuleConfidence: row?.equipBuffRuleConfidence || "",
+    equipBuffRuleSource: row?.equipBuffRuleSource || "",
     equipBuffAttackPct: +(row?.equipBuffAttackPct || 0),
     equipBuffMagicPct: +(row?.equipBuffMagicPct || 0),
     equipBuffSpeedPct: +(row?.equipBuffSpeedPct || 0),
@@ -1279,6 +1299,7 @@ function normalizeEquipmentCandidate(row, fallbackSlot) {
     equipBuffFlatMagic: +(row?.equipBuffFlatMagic || 0),
     equipBuffFlatSpeed: +(row?.equipBuffFlatSpeed || 0),
     equipBuffConvMagicRate: +(row?.equipBuffConvMagicRate || 0),
+    equipBuffConvMagicSpeedRate: +(row?.equipBuffConvMagicSpeedRate || 0),
     equipBuffConvSpeedRate: +(row?.equipBuffConvSpeedRate || 0),
     equipBuffDmgPct: +(row?.equipBuffDmgPct || 0),
     equipBuffSpecial: row?.equipBuffSpecial === undefined || row?.equipBuffSpecial === "" ? 1 : +(row?.equipBuffSpecial || 1),
@@ -4110,7 +4131,7 @@ function equipmentBuffHasEffect(r) {
   return !!(
     +r.equipBuffAttackPct || +r.equipBuffMagicPct || +r.equipBuffSpeedPct ||
     +r.equipBuffFlatAttack || +r.equipBuffFlatMagic || +r.equipBuffFlatSpeed ||
-    +r.equipBuffConvMagicRate || +r.equipBuffConvSpeedRate || +r.equipBuffDmgPct ||
+    +r.equipBuffConvMagicRate || +r.equipBuffConvMagicSpeedRate || +r.equipBuffConvSpeedRate || +r.equipBuffDmgPct ||
     (+r.equipBuffSpecial && +r.equipBuffSpecial !== 1) ||
     extraStatsHasEffect(r, "equipBuff") ||
     additionalEffectsSummary(r, "display").length
@@ -4119,6 +4140,13 @@ function equipmentBuffHasEffect(r) {
 
 function equipmentBuffDisplayName(r) {
   return r.equipBuffName || (r.name ? `${r.name} 装備Buff` : "装備Buff");
+}
+
+function equipmentBuffCompositeTags(r) {
+  const tags = splitTags(r.tags || "");
+  const group = r.equipBuffConflictGroup || (r.equipBuffTechnicId ? `technic-${r.equipBuffTechnicId}` : "");
+  if (group) tags.unshift(group);
+  return Array.from(new Set(tags.filter(Boolean))).join(",");
 }
 
 function equipmentBuffEffectText(r) {
@@ -4130,6 +4158,7 @@ function equipmentBuffEffectText(r) {
   if (+r.equipBuffFlatMagic) parts.push(`魔力+${r.equipBuffFlatMagic}`);
   if (+r.equipBuffFlatSpeed) parts.push(`速度+${r.equipBuffFlatSpeed}`);
   if (+r.equipBuffConvMagicRate) parts.push(`魔力→攻撃力 ${r.equipBuffConvMagicRate}%`);
+  if (+r.equipBuffConvMagicSpeedRate) parts.push(`魔力→移動速度 ${r.equipBuffConvMagicSpeedRate}%`);
   if (+r.equipBuffConvSpeedRate) parts.push(`速度→攻撃力 ${r.equipBuffConvSpeedRate}%`);
   if (+r.equipBuffDmgPct) parts.push(`与ダメ+${r.equipBuffDmgPct}%`);
   if (+r.equipBuffSpecial && +r.equipBuffSpecial !== 1) parts.push(`特攻×${r.equipBuffSpecial}`);
@@ -4145,7 +4174,7 @@ function equipmentBuffToCompositeRow(r) {
     enabled: !!r.equipBuffEnabled,
     slot: r.equipBuffSlot !== false,
     name: equipmentBuffDisplayName(r),
-    tags: r.tags || "",
+    tags: equipmentBuffCompositeTags(r),
     attackPct: +r.equipBuffAttackPct || 0,
     magicPct: +r.equipBuffMagicPct || 0,
     speedPct: +r.equipBuffSpeedPct || 0,
@@ -4153,11 +4182,13 @@ function equipmentBuffToCompositeRow(r) {
     flatMagic: +r.equipBuffFlatMagic || 0,
     flatSpeed: +r.equipBuffFlatSpeed || 0,
     convMagicRate: +r.equipBuffConvMagicRate || 0,
+    convMagicSpeedRate: +r.equipBuffConvMagicSpeedRate || 0,
     convSpeedRate: +r.equipBuffConvSpeedRate || 0,
     dmgPct: +r.equipBuffDmgPct || 0,
     special: +r.equipBuffSpecial || 1,
     extraEffects: normalizeAdditionalEffects(r.extraEffects),
-    note: r.equipBuffNote || `装備由来: ${r.name || r.slot || "装備"}`
+    stackRule: r.equipBuffStackRule || "same-technic",
+    note: [r.equipBuffNote || `装備由来: ${r.name || r.slot || "装備"}`, r.equipBuffRuleConfidence ? `候補精度: ${r.equipBuffRuleConfidence}` : ""].filter(Boolean).join(" / ")
   };
   extraFieldDefsFor("equipBuff").forEach(d => {
     row[d.prop] = +(r?.[d.equipProp] || 0);
@@ -4184,6 +4215,7 @@ function normalizeCompositeRows(rows) {
       slot: r.slot !== false,
       name: r.name || "装備以外Buff",
       tags: r.tags || r.tag || "",
+      stackRule: r.stackRule || r.buffStackRule || "",
       attackPct: +r.attackPct || 0,
       magicPct: +r.magicPct || 0,
       speedPct: +r.speedPct || 0,
@@ -4191,6 +4223,7 @@ function normalizeCompositeRows(rows) {
       flatMagic: +r.flatMagic || 0,
       flatSpeed: +r.flatSpeed || 0,
       convMagicRate: +r.convMagicRate || 0,
+      convMagicSpeedRate: +r.convMagicSpeedRate || 0,
       convSpeedRate: +r.convSpeedRate || 0,
       // 装備以外Buffの与ダメは、攻撃力%などと同じく「10%なら10」で保持する。
       // 旧データで dmg:0.1 のような小数が来た場合は 10% として移行する。
@@ -4212,7 +4245,7 @@ function compositeHasEffect(r) {
   return !!(
     +r.attackPct || +r.magicPct || +r.speedPct ||
     +r.flatAttack || +r.flatMagic || +r.flatSpeed ||
-    +r.convMagicRate || +r.convSpeedRate || +r.dmgPct ||
+    +r.convMagicRate || +r.convMagicSpeedRate || +r.convSpeedRate || +r.dmgPct ||
     (+r.special && +r.special !== 1) ||
     extraStatsHasEffect(r, "buff") ||
     additionalEffectsSummary(r, "display").length
@@ -4228,6 +4261,7 @@ function compositeEffectText(r) {
   if (+r.flatMagic) parts.push(`魔力+${r.flatMagic}`);
   if (+r.flatSpeed) parts.push(`速度+${r.flatSpeed}`);
   if (+r.convMagicRate) parts.push(`魔力→攻撃力 ${r.convMagicRate}%`);
+  if (+r.convMagicSpeedRate) parts.push(`魔力→移動速度 ${r.convMagicSpeedRate}%`);
   if (+r.convSpeedRate) parts.push(`速度→攻撃力 ${r.convSpeedRate}%`);
   if (+r.dmgPct) parts.push(`与ダメ+${r.dmgPct}%`);
   if (+r.special && +r.special !== 1) parts.push(`特攻×${r.special}`);
@@ -4316,6 +4350,7 @@ function compositeGroupScore(r) {
   score += (+r.flatMagic || 0) * 12;
   score += (+r.flatSpeed || 0) * 5;
   score += (+r.convMagicRate || 0) * 45;
+  score += (+r.convMagicSpeedRate || 0) * 8;
   score += (+r.convSpeedRate || 0) * 12;
   if (+r.special && +r.special !== 1) score += ((+r.special || 1) - 1) * 100000;
   score += (+r.extraAC || 0) * 8 + (+r.extraACPct || 0) * 12;
@@ -4331,6 +4366,14 @@ function compositeGroupScore(r) {
   score += (+r.extraDamageReducePct || 0) * 120;
   score += (+r.extraCritRatePct || 0) * 80;
   return score;
+}
+
+function buffGroupResolveScore(row, order=0, type="composite") {
+  const rule = String(row?.stackRule || "").toLowerCase();
+  // same-technic/latest 系は、同一テクニックIDの装備Buffを「後から来たものだけ有効」にする。
+  // 競合グループ自体は維持し、競合モニターにも表示する。
+  if (/same-technic|latest|newest|最新/.test(rule)) return 1000000000 + order;
+  return type === "post" ? simpleBuffGroupScore("post", row) : type === "other" ? simpleBuffGroupScore("other", row) : compositeGroupScore(row);
 }
 
 function resolveCompositeRowsForGroups(rows) {
@@ -4350,7 +4393,7 @@ function resolveCompositeRowsForGroups(rows) {
     }
 
     const key = group.toLowerCase();
-    const candidate = {...row, _groupOrder: order, _groupScore: compositeGroupScore(row)};
+    const candidate = {...row, _groupOrder: order, _groupScore: buffGroupResolveScore(row, order, "composite")};
     if (!byGroup.has(key)) {
       byGroup.set(key, {group, winner: candidate, skipped: [], candidates: [candidate]});
       return;
@@ -4400,7 +4443,7 @@ function collectActiveBuffConflictCandidates(st) {
       name: row.name || "装備以外Buff",
       detail: compositeEffectText(row),
       _groupOrder: order++,
-      _groupScore: compositeGroupScore(row)
+      _groupScore: buffGroupResolveScore(row, order, "composite")
     });
   });
 
@@ -4413,7 +4456,7 @@ function collectActiveBuffConflictCandidates(st) {
       name: row.name || "外枠補正",
       detail: simpleBuffEffectText("post", row),
       _groupOrder: order++,
-      _groupScore: simpleBuffGroupScore("post", row)
+      _groupScore: buffGroupResolveScore(row, order, "post")
     });
   });
 
@@ -4426,7 +4469,7 @@ function collectActiveBuffConflictCandidates(st) {
       name: row.name || "その他バフ",
       detail: simpleBuffEffectText("other", row),
       _groupOrder: order++,
-      _groupScore: simpleBuffGroupScore("other", row)
+      _groupScore: buffGroupResolveScore(row, order, "other")
     });
   });
 
@@ -4599,7 +4642,7 @@ function buildConflictMonitorGroups() {
         name: row.name || "外枠補正",
         detail: simpleBuffEffectText("post", row),
         _groupOrder: monitorOrder++,
-        _groupScore: simpleBuffGroupScore("post", row),
+        _groupScore: buffGroupResolveScore(row, order, "post"),
         _monitorActive:false,
         _monitorMark:"未使用外枠",
         _monitorClass:"tagWatch",
@@ -4618,7 +4661,7 @@ function buildConflictMonitorGroups() {
         name: row.name || "その他バフ",
         detail: simpleBuffEffectText("other", row),
         _groupOrder: monitorOrder++,
-        _groupScore: simpleBuffGroupScore("other", row),
+        _groupScore: buffGroupResolveScore(row, order, "other"),
         _monitorActive:false,
         _monitorMark:"未使用その他",
         _monitorClass:"tagWatch",
@@ -5483,6 +5526,41 @@ function equipBuffNumberInput(row, key, label, step="1") {
   return wrap;
 }
 
+function makeEquipmentBuffSourcePanel(row) {
+  const box = document.createElement("details");
+  box.className = "equipBuffSourcePanel equipBuffWide";
+  if (row.equipBuffWikiText || row.equipBuffScrapboxText || row.equipBuffSourceText) box.open = false;
+  const summary = document.createElement("summary");
+  summary.textContent = "Wiki/Scrapbox原文・自動候補メモ";
+  box.appendChild(summary);
+
+  const meta = document.createElement("div");
+  meta.className = "small muted";
+  meta.textContent = [
+    row.equipBuffTechnicId ? `technic_id: ${row.equipBuffTechnicId}` : "technic_idなし",
+    row.equipBuffConflictGroup ? `競合: ${row.equipBuffConflictGroup}` : "競合未設定",
+    row.equipBuffRuleConfidence ? `候補: ${row.equipBuffRuleConfidence}` : "候補精度未設定"
+  ].join(" / ");
+  box.appendChild(meta);
+
+  const makeBlock = (title, text, prop) => {
+    const label = document.createElement("label");
+    label.className = "equipBuffSourceLabel";
+    label.textContent = title;
+    const area = makeCell("textarea", {rows:"4"});
+    area.className = "equipBuffSourceText";
+    area.value = text || "";
+    area.placeholder = `${title} は空です`;
+    area.oninput = () => { row[prop] = area.value; };
+    label.appendChild(area);
+    box.appendChild(label);
+  };
+  makeBlock("Wiki原文", row.equipBuffWikiText, "equipBuffWikiText");
+  makeBlock("Scrapbox根拠行", row.equipBuffScrapboxText, "equipBuffScrapboxText");
+  makeBlock("抽出ヒント/メモ", row.equipBuffSourceText, "equipBuffSourceText");
+  return box;
+}
+
 function makeEquipmentBuffEditor(row, statusButton) {
   const grid = document.createElement("div");
   grid.className = "equipBuffGrid equipBuffGridRow";
@@ -5557,6 +5635,7 @@ function makeEquipmentBuffEditor(row, statusButton) {
   nameMemoRow.appendChild(nameLabel);
   nameMemoRow.appendChild(noteLabel);
   buffSection.appendChild(nameMemoRow);
+  buffSection.appendChild(makeEquipmentBuffSourcePanel(row));
 
   const buffGrid = document.createElement("div");
   buffGrid.className = "equipBuffDirectGrid";
@@ -5567,6 +5646,7 @@ function makeEquipmentBuffEditor(row, statusButton) {
   buffGrid.appendChild(equipBuffNumberInput(row, "equipBuffFlatMagic", "魔力+", "0.1"));
   buffGrid.appendChild(equipBuffNumberInput(row, "equipBuffFlatSpeed", "速度+", "0.1"));
   buffGrid.appendChild(equipBuffNumberInput(row, "equipBuffConvMagicRate", "魔力→攻撃力%", "1"));
+  buffGrid.appendChild(equipBuffNumberInput(row, "equipBuffConvMagicSpeedRate", "魔力→移動速度%", "1"));
   buffGrid.appendChild(equipBuffNumberInput(row, "equipBuffConvSpeedRate", "速度→攻撃力%", "1"));
   buffGrid.appendChild(equipBuffNumberInput(row, "equipBuffDmgPct", "与ダメ%", "1"));
   buffGrid.appendChild(equipBuffNumberInput(row, "equipBuffSpecial", "特攻倍率", "0.01"));
@@ -7856,6 +7936,7 @@ const MAIN_TABS = [
   {id:"skill", label:"スキルシミュレータ", hint:"スキル合計850、残りポイント、種族別の簡易ステータスを確認します。計算タブへは常時自動反映します。"},
   {id:"equipment", label:"装備登録", hint:"武器・防具・装飾候補、装備Buff、AC/HP/命中などの追加ステータスを部位ごとのカテゴリで登録します。候補追加はここで行います。"},
   {id:"catalog", label:"装備カタログ α", hint:"Git上の生成カタログから装備を検索し、必要なものだけ装備登録へ追加します。カタログ上にあるだけでは計算対象になりません。"},
+  {id:"equipBuffFix", label:"装備Buff修正", hint:"装備登録にある装備BuffをWiki/Scrapbox原文と照らし合わせて修正します。編集内容は装備登録の同じ行に反映されます。"},
   {id:"buffs", label:"Buff登録", hint:"装備以外のBuff、外枠補正、その他バフを登録します。"},
   {id:"groups", label:"競合グループ", hint:"同一グループで重複しないBuffを確認します。"},
   {id:"showcase", label:"見せびらかし", hint:"現在構成のダメージ、ステータス、装備、Buffを一覧表示します。"},
@@ -7874,6 +7955,7 @@ function activateMainTab(id) {
   });
   localStorage.setItem("moeDamageSimActiveTab", valid);
   if (valid === "catalog") renderCatalogTab();
+  renderEquipBuffFixTab();
 }
 
 function setupTabLayout() {
@@ -9902,6 +9984,7 @@ const CATALOG_SCRIPT_URLS = [
   "src/data/generated/equipmentCatalog.generated.js",
   "src/data/generated/buffCatalog.generated.js",
   "src/data/generated/wikiEquipBuffEffects.generated.js",
+  "src/data/generated/equipBuffRuleCandidates.generated.js",
   "src/data/manual/buffRules.manual.js"
 ];
 let catalogScriptsPromise = null;
@@ -9963,6 +10046,129 @@ function buffCatalogItems() {
   });
   return out;
 }
+
+function equipBuffRuleCandidateItems() {
+  const raw = catalogArray("MOE_EQUIP_BUFF_RULE_CANDIDATES_MANUAL", "MOE_EQUIP_BUFF_RULE_CANDIDATES", "MOE_EQUIP_BUFF_RULE_CANDIDATES_GENERATED");
+  const manual = window.MOE_BUFF_RULES_MANUAL;
+  if (manual && typeof manual === "object") {
+    Object.entries(manual).forEach(([catalogId, rule]) => {
+      if (!rule || typeof rule !== "object") return;
+      raw.push({catalogId, id:catalogId, ...rule, source:rule.source || "manual"});
+    });
+  }
+  const seen = new Set();
+  const out = [];
+  raw.forEach(item => {
+    if (!item) return;
+    const key = item.catalogId || item.id || item.officialTechnicId || item.name;
+    if (seen.has(key)) return;
+    seen.add(key);
+    out.push(item);
+  });
+  return out;
+}
+
+function equipBuffRuleKeyCandidates(buff, item=null) {
+  const keys = [];
+  const add = v => { const s = String(v || "").trim(); if (s && !keys.includes(s)) keys.push(s); };
+  add(buff?.catalogId); add(buff?.id); add(buff?.officialTechnicId); add(item?.technicId);
+  if (buff?.officialTechnicId) add(`technic-${buff.officialTechnicId}`);
+  if (item?.technicId) add(`technic-${item.technicId}`);
+  add(buff?.name); add(item?.equipBuff?.name);
+  return keys;
+}
+
+function findEquipBuffRuleCandidate(buff, item=null) {
+  const keys = equipBuffRuleKeyCandidates(buff, item).map(k => catalogNorm(k));
+  if (!keys.length) return null;
+  const rules = equipBuffRuleCandidateItems();
+  const exact = rules.find(r => keys.includes(catalogNorm(r.catalogId || r.id || "")) || keys.includes(catalogNorm(r.officialTechnicId || "")) || keys.includes(catalogNorm(r.name || "")) || (r.officialTechnicId && keys.includes(catalogNorm(`technic-${r.officialTechnicId}`))));
+  if (exact) return exact;
+  const bname = catalogNorm(buff?.name || item?.equipBuff?.name || "");
+  if (!bname) return null;
+  return rules.find(r => catalogNorm(r.name || r.wikiName || "") === bname) || null;
+}
+
+function setIfNumeric(row, prop, value, overwrite=false) {
+  const v = +value || 0;
+  if (!v) return false;
+  if (!overwrite && +(row[prop] || 0)) return false;
+  row[prop] = v;
+  return true;
+}
+
+function appendUniqueText(base, add) {
+  const a = String(add || "").trim();
+  if (!a) return base || "";
+  const b = String(base || "").trim();
+  if (!b) return a;
+  if (b.includes(a)) return b;
+  return `${b}
+${a}`;
+}
+
+function applyEquipBuffRuleCandidateToEquipment(row, rule, opts={}) {
+  if (!row || !rule) return false;
+  const overwrite = !!opts.overwrite;
+  let applied = false;
+  row.equipBuffEnabled = true;
+  row.equipBuffSlot = row.equipBuffSlot !== false;
+  row.equipBuffCatalogId = row.equipBuffCatalogId || rule.catalogId || rule.id || "";
+  row.equipBuffTechnicId = row.equipBuffTechnicId || rule.officialTechnicId || "";
+  row.equipBuffConflictGroup = row.equipBuffConflictGroup || rule.conflictGroup || (row.equipBuffTechnicId ? `technic-${row.equipBuffTechnicId}` : "");
+  row.equipBuffStackRule = row.equipBuffStackRule || rule.stackRule || "same-technic";
+  row.equipBuffRuleConfidence = row.equipBuffRuleConfidence || rule.confidence || (rule.verified ? "verified" : "candidate");
+  row.equipBuffRuleSource = row.equipBuffRuleSource || rule.source || "tsv-candidate";
+
+  const stats = rule.stats || {};
+  const statMap = {
+    attack:"equipBuffFlatAttack", attackPct:"equipBuffAttackPct", magic:"equipBuffFlatMagic", magicPct:"equipBuffMagicPct", speed:"equipBuffFlatSpeed", speedPct:"equipBuffSpeedPct",
+    dmgPct:"equipBuffDmgPct",
+    extraAC:"equipBuffExtraAC", extraACPct:"equipBuffExtraACPct", extraHP:"equipBuffExtraHP", extraHPPct:"equipBuffExtraHPPct", extraMP:"equipBuffExtraMP", extraMPPct:"equipBuffExtraMPPct", extraST:"equipBuffExtraST", extraSTPct:"equipBuffExtraSTPct",
+    extraMaxWeight:"equipBuffExtraMaxWeight", extraMaxWeightPct:"equipBuffExtraMaxWeightPct", extraHit:"equipBuffExtraHit", extraHitPct:"equipBuffExtraHitPct", extraAvoid:"equipBuffExtraAvoid", extraAvoidPct:"equipBuffExtraAvoidPct",
+    extraAttackDelay:"equipBuffExtraAttackDelay", extraAttackDelayPct:"equipBuffExtraAttackDelayPct", extraMagicDelay:"equipBuffExtraMagicDelay", extraMagicDelayPct:"equipBuffExtraMagicDelayPct",
+    extraFireRes:"equipBuffExtraFireRes", extraFireResPct:"equipBuffExtraFireResPct", extraWaterRes:"equipBuffExtraWaterRes", extraWaterResPct:"equipBuffExtraWaterResPct", extraEarthRes:"equipBuffExtraEarthRes", extraEarthResPct:"equipBuffExtraEarthResPct", extraWindRes:"equipBuffExtraWindRes", extraWindResPct:"equipBuffExtraWindResPct", extraNeutralRes:"equipBuffExtraNeutralRes", extraNeutralResPct:"equipBuffExtraNeutralResPct",
+    extraDamageReducePct:"equipBuffExtraDamageReducePct", extraCritRatePct:"equipBuffExtraCritRatePct",
+    extraBreath:"equipBuffExtraBreath", extraHearing:"equipBuffExtraHearing", extraSeeing:"equipBuffExtraSeeing", extraSmelling:"equipBuffExtraSmelling", extraFullness:"equipBuffExtraFullness", extraThirst:"equipBuffExtraThirst", extraSteal:"equipBuffExtraSteal", extraLockpickingFail:"equipBuffExtraLockpickingFail", extraFangAttack:"equipBuffExtraFangAttack",
+    extraFishingGaugeLength:"equipBuffExtraFishingGaugeLength", extraFishingHitZone:"equipBuffExtraFishingHitZone",
+    extraSmithingGradeZone:"equipBuffExtraSmithingGradeZone", extraSmithingGaugeSlip:"equipBuffExtraSmithingGaugeSlip", extraSmithingHitZone:"equipBuffExtraSmithingHitZone",
+    extraCarpentryGradeZone:"equipBuffExtraCarpentryGradeZone", extraCarpentryGaugeSlip:"equipBuffExtraCarpentryGaugeSlip", extraCarpentryHitZone:"equipBuffExtraCarpentryHitZone",
+    extraTailoringGradeZone:"equipBuffExtraTailoringGradeZone", extraTailoringGaugeSlip:"equipBuffExtraTailoringGaugeSlip", extraTailoringHitZone:"equipBuffExtraTailoringHitZone",
+    extraDecorationGradeZone:"equipBuffExtraDecorationGradeZone", extraDecorationGaugeSlip:"equipBuffExtraDecorationGaugeSlip", extraDecorationHitZone:"equipBuffExtraDecorationHitZone",
+    extraCookingGradeZone:"equipBuffExtraCookingGradeZone", extraCookingGaugeSlip:"equipBuffExtraCookingGaugeSlip", extraCookingHitZone:"equipBuffExtraCookingHitZone",
+    extraBrewingGradeZone:"equipBuffExtraBrewingGradeZone", extraBrewingGaugeSlip:"equipBuffExtraBrewingGaugeSlip", extraBrewingHitZone:"equipBuffExtraBrewingHitZone",
+    extraAlchemyGradeZone:"equipBuffExtraAlchemyGradeZone", extraAlchemyGaugeSlip:"equipBuffExtraAlchemyGaugeSlip", extraAlchemyHitZone:"equipBuffExtraAlchemyHitZone",
+    extraReplicationGradeZone:"equipBuffExtraReplicationGradeZone", extraReplicationGaugeSlip:"equipBuffExtraReplicationGaugeSlip", extraReplicationHitZone:"equipBuffExtraReplicationHitZone",
+    extraBeautyGaugeSlip:"equipBuffExtraBeautyGaugeSlip", extraBeautyHitZone:"equipBuffExtraBeautyHitZone"
+  };
+  Object.entries(statMap).forEach(([key, prop]) => { if (setIfNumeric(row, prop, stats[key], overwrite)) applied = true; });
+
+  const conv = rule.conversions || {};
+  if (setIfNumeric(row, "equipBuffConvMagicRate", conv.magicToAttackPct, overwrite)) applied = true;
+  if (setIfNumeric(row, "equipBuffConvMagicSpeedRate", conv.magicToSpeedPct, overwrite)) applied = true;
+  if (setIfNumeric(row, "equipBuffConvSpeedRate", conv.speedToAttackPct, overwrite)) applied = true;
+
+  (rule.skillEffects || []).forEach(e => {
+    const name = e.name || e.target || "";
+    const value = +e.value || 0;
+    if (name || value) { pushDisplayEffect(row, "skillPlus", value, name, "", "display", "TSV候補"); applied = true; }
+  });
+  (rule.customEffects || []).forEach(e => {
+    const name = e.name || e.target || "";
+    const value = +e.value || 0;
+    if (name || value) { pushDisplayEffect(row, "custom", value, name, e.unit || "", "display", "TSV候補"); applied = true; }
+  });
+  const misc = rule.misc || {};
+  if (misc.jumpMultiplier) { pushDisplayEffect(row, "custom", misc.jumpMultiplier, "ジャンプ力倍率", "倍", "display", "TSV候補"); applied = true; }
+  if (misc.forcedSpeed) { pushDisplayEffect(row, "custom", misc.forcedSpeed, "強制移動速度", "", "display", "TSV候補"); applied = true; }
+  if (misc.targetDamageEffects) { pushDisplayEffect(row, "custom", 0, misc.targetDamageEffects, "", "display", "TSV候補"); applied = true; }
+
+  row.equipBuffSourceText = appendUniqueText(row.equipBuffSourceText, rule.parsedStatsHint || rule.memo || "");
+  row.equipBuffWikiText = appendUniqueText(row.equipBuffWikiText, rule.rawInfo || "");
+  row.equipBuffScrapboxText = appendUniqueText(row.equipBuffScrapboxText, rule.scrapboxRawLines || "");
+  return applied;
+}
+
 
 function catalogNorm(s) {
   return String(s || "").toLowerCase().replace(/\s+/g, "");
@@ -10107,6 +10313,11 @@ function catalogEquipmentToRow(item) {
     idbSetEquipmentBuff(row, buff.name, buff.info || buff.note || "");
     row.equipBuffCatalogId = buff.catalogId || buff.id || "";
     row.equipBuffTechnicId = buff.officialTechnicId || item.technicId || "";
+    row.equipBuffConflictGroup = row.equipBuffTechnicId ? `technic-${row.equipBuffTechnicId}` : (row.equipBuffCatalogId || "");
+    row.equipBuffStackRule = "same-technic";
+    const candidate = findEquipBuffRuleCandidate(buff, item);
+    if (candidate) applyEquipBuffRuleCandidateToEquipment(row, candidate);
+    if (!row.equipBuffWikiText && (buff.info || buff.note)) row.equipBuffWikiText = buff.info || buff.note || "";
   }
 
   return normalizeEquipmentCandidate(row);
@@ -10118,6 +10329,7 @@ function addCatalogEquipmentToRegistered(catalogId) {
   state.equipment = normalizeEquipmentRows(state.equipment);
   state.equipment.push(catalogEquipmentToRow(item));
   renderEquipmentTable();
+  renderEquipBuffFixTab();
   renderTagLinkSummary();
   renderShowcaseTab();
   calc();
@@ -10227,6 +10439,92 @@ function renderCatalogTab() {
   }
 }
 
+function equipmentBuffFixRows() {
+  state.equipment = normalizeEquipmentRows(state.equipment);
+  return state.equipment
+    .map((row, idx) => ({row, idx}))
+    .filter(x => x.row.equipBuffName || x.row.equipBuffTechnicId || x.row.equipBuffCatalogId || x.row.equipBuffNote || equipmentBuffHasEffect(x.row));
+}
+
+function makeEquipBuffFixCard(row, idx) {
+  const card = document.createElement("div");
+  card.className = "equipBuffFixCard cardLike";
+  const head = document.createElement("div");
+  head.className = "equipBuffFixHead";
+  const slot = (row.slot || "").replace(/^武器: /, "").replace(/^防具: /, "").replace(/^装飾: /, "");
+  const summary = [
+    slot || "部位不明",
+    row.name || "名称未入力",
+    row.equipBuffName ? `Buff: ${row.equipBuffName}` : "Buff名未入力",
+    row.equipBuffTechnicId ? `technic_id ${row.equipBuffTechnicId}` : "technic_idなし"
+  ].join(" / ");
+  const title = document.createElement("div");
+  title.className = "equipBuffFixTitle";
+  title.textContent = summary;
+  head.appendChild(title);
+
+  const status = makeCell("button", {type:"button", class:"equipBuffToggle"});
+  updateEquipBuffStatus(status, row);
+  status.onclick = () => {
+    row.equipBuffEnabled = !row.equipBuffEnabled;
+    updateEquipBuffStatus(status, row);
+    renderEquipmentTable();
+    renderTagLinkSummary();
+    renderShowcaseTab();
+    calc();
+  };
+  head.appendChild(status);
+  card.appendChild(head);
+
+  const group = document.createElement("div");
+  group.className = "small muted";
+  group.textContent = `競合グループ: ${row.equipBuffConflictGroup || (row.equipBuffTechnicId ? `technic-${row.equipBuffTechnicId}` : "未設定")} / ルール: ${row.equipBuffStackRule || "same-technic"}`;
+  card.appendChild(group);
+
+  card.appendChild(makeEquipmentBuffEditor(row, status));
+  return card;
+}
+
+function renderEquipBuffFixList() {
+  const body = byId("equipBuffFixList");
+  const summary = byId("equipBuffFixSummary");
+  if (!body || !summary) return;
+  const rows = equipmentBuffFixRows();
+  body.innerHTML = "";
+  summary.textContent = `${rows.length}件の装備Buff候補`;
+  if (!rows.length) {
+    body.innerHTML = `<div class="emptyState">装備登録にBuff付き装備がありません。装備カタログからBuff付き装備を追加してください。</div>`;
+    return;
+  }
+  rows.forEach(({row, idx}) => body.appendChild(makeEquipBuffFixCard(row, idx)));
+}
+
+function createEquipBuffFixTab(panel) {
+  panel.innerHTML = `
+    <div class="tabSectionHint small">装備登録にあるBuff付き装備を直接編集します。Wiki/Scrapbox由来の効果候補は初期値として入るだけなので、説明文と照らして必要に応じて修正してください。同一technic_idの装備Buffは競合グループ <code>technic-ID</code> として扱い、同時に複数ONの場合は後から登録されたものだけ有効になります。</div>
+    <div class="catalogToolbar cardLike">
+      <button type="button" id="equipBuffFixRefreshBtn">装備登録から再読込</button>
+      <button type="button" id="equipBuffFixOpenAllBtn">原文をすべて開く</button>
+      <button type="button" id="equipBuffFixCloseAllBtn">原文をすべて閉じる</button>
+    </div>
+    <div id="equipBuffFixSummary" class="small mutedText">確認中...</div>
+    <div id="equipBuffFixList" class="equipBuffFixList"></div>
+  `;
+  byId("equipBuffFixRefreshBtn").onclick = renderEquipBuffFixList;
+  byId("equipBuffFixOpenAllBtn").onclick = () => document.querySelectorAll('[data-tab-panel="equipBuffFix"] details').forEach(d => d.open = true);
+  byId("equipBuffFixCloseAllBtn").onclick = () => document.querySelectorAll('[data-tab-panel="equipBuffFix"] details').forEach(d => d.open = false);
+}
+
+function renderEquipBuffFixTab() {
+  const panel = document.querySelector('[data-tab-panel="equipBuffFix"]');
+  if (!panel) return;
+  if (!panel.dataset.equipBuffFixReady) {
+    panel.dataset.equipBuffFixReady = "1";
+    createEquipBuffFixTab(panel);
+  }
+  renderEquipBuffFixList();
+}
+
 
 function clearAllEquipmentUsage() {
   state.equipment = normalizeEquipmentRows(state.equipment).map(row => ({...row, enabled:false}));
@@ -10260,6 +10558,7 @@ function renderAll() {
   renderShowcaseTab();
   renderAttackDpsTab();
   renderCatalogTab();
+  renderEquipBuffFixTab();
 }
 
 /* 種族プルダウンから攻撃力係数hidden値を同期する。 */

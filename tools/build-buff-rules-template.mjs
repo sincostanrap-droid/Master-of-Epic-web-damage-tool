@@ -15,14 +15,16 @@ import fs from "node:fs";
 import path from "node:path";
 import vm from "node:vm";
 
-const VERSION = "v1.23.18";
+const VERSION = "v1.23.19";
 const ROOT = process.cwd();
 const GENERATED_PATH = path.join(ROOT, "src/data/generated/wikiEquipBuffEffects.generated.js");
 const OUT_PATH = path.join(ROOT, "data/manual/buffRules.manual.input.tsv");
 const onlyMatched = process.argv.includes("--only-matched");
 
 const STAT_COLUMNS = [
-  "attack", "attackPct", "magic", "magicPct", "speed", "speedPct", "dmgPct",
+  "attack", "attackPct", "magic", "magicPct", "speed", "speedPct",
+  "magicToAttackPct", "magicToSpeedPct", "speedToAttackPct", "jumpMultiplier", "forcedSpeed", "targetDamageEffects",
+  "dmgPct",
   "extraAC", "extraACPct", "extraHP", "extraHPPct", "extraMP", "extraMPPct", "extraST", "extraSTPct",
   "extraMaxWeight", "extraMaxWeightPct", "extraHit", "extraHitPct", "extraAvoid", "extraAvoidPct",
   "extraAttackDelay", "extraAttackDelayPct", "extraMagicDelay", "extraMagicDelayPct",
@@ -70,6 +72,12 @@ const COLUMN_LABELS = {
   magicPct: "魔力%",
   speed: "移動速度",
   speedPct: "移動速度%",
+  magicToAttackPct: "魔力→攻撃力%",
+  magicToSpeedPct: "魔力→移動速度%",
+  speedToAttackPct: "移動速度→攻撃力%",
+  jumpMultiplier: "ジャンプ力倍率",
+  forcedSpeed: "強制移動速度",
+  targetDamageEffects: "種族/対象特攻メモ",
   dmgPct: "与ダメージ%",
   extraAC: "防御力",
   extraACPct: "防御力%",
@@ -178,7 +186,10 @@ function labelHeader() {
 const PROP_ALIASES = new Map([
   ["attack", "attack"], ["attackPct", "attackPct"],
   ["magic", "magic"], ["magicPct", "magicPct"],
-  ["speed", "speed"], ["speedPct", "speedPct"], ["dmgPct", "dmgPct"],
+  ["speed", "speed"], ["speedPct", "speedPct"],
+  ["magicToAttackPct", "magicToAttackPct"], ["magicToSpeedPct", "magicToSpeedPct"], ["speedToAttackPct", "speedToAttackPct"],
+  ["jumpMultiplier", "jumpMultiplier"], ["forcedSpeed", "forcedSpeed"], ["targetDamageEffects", "targetDamageEffects"],
+  ["dmgPct", "dmgPct"],
   ["extraAC", "extraAC"], ["extraACPct", "extraACPct"],
   ["extraHP", "extraHP"], ["extraHPPct", "extraHPPct"],
   ["extraMP", "extraMP"], ["extraMPPct", "extraMPPct"],

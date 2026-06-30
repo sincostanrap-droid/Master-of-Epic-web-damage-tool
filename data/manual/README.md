@@ -71,6 +71,12 @@ src/data/manual/buffRules.manual.js
 attack / attackPct                攻撃力 / 攻撃力%
 magic / magicPct                  魔力 / 魔力%
 speed / speedPct                  移動速度 / 移動速度%
+magicToAttackPct                  魔力のn%を攻撃力に加算/変換
+magicToSpeedPct                   魔力のn%を移動速度に加算/変換
+speedToAttackPct                  移動速度のn%を攻撃力に変換
+jumpMultiplier                    ジャンプ力倍率。例: 1.21
+forcedSpeed                       強制移動速度。例: 75
+targetDamageEffects               種族/対象特攻などのメモ
 dmgPct                            与ダメ%
 extraHit / extraHitPct            命中 / 命中%
 extraAvoid / extraAvoidPct        回避 / 回避%
@@ -167,3 +173,52 @@ node tools/enrich-buff-rules-template-from-scrapbox.mjs --auto-fetch --refresh-c
 ```powershell
 node tools/enrich-buff-rules-template-from-scrapbox.mjs --auto-fetch --refresh-cache --limit=0
 ```
+
+## 6. Scrapbox補完TSVをさらに精度補正する
+
+Scrapbox補完後のTSVから、魔力→攻撃力変換、魔力→移動速度変換、移動速度→攻撃力変換、ジャンプ力倍率などを補助抽出できます。
+
+```powershell
+node tools/refine-buff-rules-tsv.mjs --input=data/manual/buffRules.manual.scrapbox.tsv
+```
+
+出力:
+
+```text
+data/manual/buffRules.manual.refined.tsv
+```
+
+この処理は既存入力値を上書きせず、空欄だけ補完します。`enabled` と `verified` は自動でONにしないため、採用する行だけ人間が確認してください。
+
+追加/補完される主な列:
+
+```text
+magicToAttackPct      魔力→攻撃力%
+magicToSpeedPct       魔力→移動速度%
+speedToAttackPct      移動速度→攻撃力%
+jumpMultiplier        ジャンプ力倍率
+forcedSpeed           強制移動速度
+targetDamageEffects   種族/対象特攻メモ
+refineStatus          精度補正状態
+refineNotes           精度補正メモ
+```
+
+## v1.23.20 / 装備Buff候補JS生成
+
+`data/manual/buffRules.manual.refined.tsv` など、Wiki/Scrapbox補完済みTSVからブラウザ用の候補JSを生成できます。
+この候補JSは、装備カタログからBuff付き装備を追加した時の初期値として使われます。
+
+```powershell
+node tools/build-equip-buff-candidates-from-tsv.mjs --input=data/manual/buffRules.manual.refined.tsv
+```
+
+出力:
+
+```text
+src/data/generated/equipBuffRuleCandidates.generated.js
+```
+
+注意:
+- 候補値は未確定データです。装備Buff修正タブでWiki原文/Scrapbox根拠行を見ながら修正してください。
+- 同一technic_idは `technic-ID` 競合グループで管理され、`same-technic` では後から登録されたものだけ有効になります。
+- `data/cache/` はScrapbox自動取得用の開発キャッシュなのでGitに入れないでください。
