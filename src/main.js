@@ -5,8 +5,8 @@
   onclick属性から呼ばれる関数があるため、現時点では module ではなく通常scriptとして読み込みます。
 */
 
-const APP_VERSION = "v1.23.20";
-const APP_VERSION_NOTE = "装備Buff修正タブ・TSV候補自動投入";
+const APP_VERSION = "v1.23.21";
+const APP_VERSION_NOTE = "装備Buff修正UI整理・technic_id集約";
 
 /* 種族係数。攻撃力係数と魔力係数は別管理。 */
 const RACE_COEFFS = {
@@ -7936,7 +7936,7 @@ const MAIN_TABS = [
   {id:"skill", label:"スキルシミュレータ", hint:"スキル合計850、残りポイント、種族別の簡易ステータスを確認します。計算タブへは常時自動反映します。"},
   {id:"equipment", label:"装備登録", hint:"武器・防具・装飾候補、装備Buff、AC/HP/命中などの追加ステータスを部位ごとのカテゴリで登録します。候補追加はここで行います。"},
   {id:"catalog", label:"装備カタログ α", hint:"Git上の生成カタログから装備を検索し、必要なものだけ装備登録へ追加します。カタログ上にあるだけでは計算対象になりません。"},
-  {id:"equipBuffFix", label:"装備Buff修正", hint:"装備登録にある装備BuffをWiki/Scrapbox原文と照らし合わせて修正します。編集内容は装備登録の同じ行に反映されます。"},
+  {id:"equipBuffFix", label:"装備Buff修正", hint:"装備登録にある装備Buffをtechnic_id単位で集約し、Wiki/Scrapbox原文と照らし合わせて修正します。競合グループもここで設定できます。"},
   {id:"buffs", label:"Buff登録", hint:"装備以外のBuff、外枠補正、その他バフを登録します。"},
   {id:"groups", label:"競合グループ", hint:"同一グループで重複しないBuffを確認します。"},
   {id:"showcase", label:"見せびらかし", hint:"現在構成のダメージ、ステータス、装備、Buffを一覧表示します。"},
@@ -10439,49 +10439,464 @@ function renderCatalogTab() {
   }
 }
 
-function equipmentBuffFixRows() {
+
+function equipmentBuffFixCandidateRows() {
   state.equipment = normalizeEquipmentRows(state.equipment);
   return state.equipment
     .map((row, idx) => ({row, idx}))
     .filter(x => x.row.equipBuffName || x.row.equipBuffTechnicId || x.row.equipBuffCatalogId || x.row.equipBuffNote || equipmentBuffHasEffect(x.row));
 }
 
-function makeEquipBuffFixCard(row, idx) {
-  const card = document.createElement("div");
-  card.className = "equipBuffFixCard cardLike";
-  const head = document.createElement("div");
-  head.className = "equipBuffFixHead";
-  const slot = (row.slot || "").replace(/^武器: /, "").replace(/^防具: /, "").replace(/^装飾: /, "");
-  const summary = [
-    slot || "部位不明",
-    row.name || "名称未入力",
-    row.equipBuffName ? `Buff: ${row.equipBuffName}` : "Buff名未入力",
-    row.equipBuffTechnicId ? `technic_id ${row.equipBuffTechnicId}` : "technic_idなし"
-  ].join(" / ");
-  const title = document.createElement("div");
-  title.className = "equipBuffFixTitle";
-  title.textContent = summary;
-  head.appendChild(title);
+function equipmentBuffFixGroupKey(row, idx) {
+  const tid = String(row?.equipBuffTechnicId || "").trim();
+  if (tid) return `technic-${tid}`;
+  const catalogId = String(row?.equipBuffCatalogId || "").trim();
+  if (catalogId) return `catalog-${catalogId}`;
+  // technic_id無しは誤統合しない。名称が同じでも、別Buffの可能性があるため行単位で表示する。
+  return `row-${idx}`;
+}
 
-  const status = makeCell("button", {type:"button", class:"equipBuffToggle"});
-  updateEquipBuffStatus(status, row);
-  status.onclick = () => {
-    row.equipBuffEnabled = !row.equipBuffEnabled;
-    updateEquipBuffStatus(status, row);
+function equipmentBuffFixGroups() {
+  const map = new Map();
+  equipmentBuffFixCandidateRows().forEach(({row, idx}) => {
+    const key = equipmentBuffFixGroupKey(row, idx);
+    if (!map.has(key)) {
+      map.set(key, {
+        key,
+        rows: [],
+        rep: row,
+        firstIdx: idx,
+        technicId: row.equipBuffTechnicId || "",
+        catalogId: row.equipBuffCatalogId || ""
+      });
+    }
+    const group = map.get(key);
+    group.rows.push({row, idx});
+    if (!group.rep.equipBuffName && row.equipBuffName) group.rep = row;
+  });
+  return Array.from(map.values()).sort((a,b) => {
+    const an = equipmentBuffDisplayName(a.rep);
+    const bn = equipmentBuffDisplayName(b.rep);
+    return an.localeCompare(bn, "ja") || a.firstIdx - b.firstIdx;
+  });
+}
+
+const EQUIP_BUFF_GROUP_SYNC_FIELDS = Object.freeze([
+  "equipBuffEnabled", "equipBuffSlot", "equipBuffName", "equipBuffConflictGroup", "equipBuffStackRule",
+  "equipBuffSourceText", "equipBuffWikiText", "equipBuffScrapboxText", "equipBuffRuleConfidence", "equipBuffRuleSource",
+  "equipBuffAttackPct", "equipBuffMagicPct", "equipBuffSpeedPct",
+  "equipBuffFlatAttack", "equipBuffFlatMagic", "equipBuffFlatSpeed",
+  "equipBuffConvMagicRate", "equipBuffConvMagicSpeedRate", "equipBuffConvSpeedRate",
+  "equipBuffDmgPct", "equipBuffSpecial", "equipBuffNote"
+]);
+
+function equipBuffGroupAllSyncFields() {
+  return [...EQUIP_BUFF_GROUP_SYNC_FIELDS, ...extraTsvFields("equipBuff"), "extraEffects"];
+}
+
+function cloneEquipBuffGroupValue(value) {
+  if (Array.isArray(value)) return value.map(v => ({...v}));
+  if (value && typeof value === "object") return {...value};
+  return value;
+}
+
+function syncEquipBuffGroupFromRep(group) {
+  const rep = group.rep;
+  equipBuffGroupAllSyncFields().forEach(field => {
+    const value = cloneEquipBuffGroupValue(rep[field]);
+    group.rows.forEach(({row}) => {
+      if (row === rep) return;
+      row[field] = cloneEquipBuffGroupValue(value);
+    });
+  });
+}
+
+function setEquipBuffGroupValue(group, key, value, opts={}) {
+  group.rep[key] = value;
+  group.rows.forEach(({row}) => { row[key] = cloneEquipBuffGroupValue(value); });
+  if (opts.calc !== false) {
     renderEquipmentTable();
     renderTagLinkSummary();
     renderShowcaseTab();
     calc();
+  }
+}
+
+function equipmentBuffGroupEffectText(group) {
+  const text = equipmentBuffEffectText(group.rep);
+  return text || "効果なし";
+}
+
+function equipmentBuffGroupLinkedText(group) {
+  return group.rows.map(({row}) => {
+    const slot = (row.slot || "").replace(/^武器: /, "").replace(/^防具: /, "").replace(/^装飾: /, "");
+    return `${slot || "部位不明"}: ${row.name || "名称未入力"}`;
+  }).join(" / ");
+}
+
+function equipBuffGroupNumberInput(group, key, label, step="1") {
+  const row = group.rep;
+  const wrap = document.createElement("label");
+  wrap.className = "equipBuffFixNumberLabel";
+  wrap.textContent = label;
+  const input = makeCell("input", {type:"number", step, value: row[key] ?? (key === "equipBuffSpecial" ? 1 : 0)});
+  input.oninput = () => {
+    const value = parseFloat(input.value) || (key === "equipBuffSpecial" ? 1 : 0);
+    setEquipBuffGroupValue(group, key, value, {calc:false});
+    calc();
   };
-  head.appendChild(status);
+  wrap.appendChild(input);
+  return wrap;
+}
+
+function makeEquipBuffGroupSourcePanel(group) {
+  const row = group.rep;
+  const box = document.createElement("details");
+  box.className = "equipBuffSourcePanel equipBuffFixSourcePanel";
+  const summary = document.createElement("summary");
+  summary.textContent = "Wiki/Scrapbox原文・自動候補メモ";
+  box.appendChild(summary);
+
+  const meta = document.createElement("div");
+  meta.className = "small muted";
+  meta.textContent = [
+    row.equipBuffTechnicId ? `technic_id: ${row.equipBuffTechnicId}` : "technic_idなし",
+    row.equipBuffRuleConfidence ? `候補: ${row.equipBuffRuleConfidence}` : "候補精度未設定",
+    group.rows.length > 1 ? `同一ID装備: ${group.rows.length}件` : "同一ID装備: 1件"
+  ].join(" / ");
+  box.appendChild(meta);
+
+  const makeBlock = (title, prop) => {
+    const label = document.createElement("label");
+    label.className = "equipBuffSourceLabel";
+    label.textContent = title;
+    const area = makeCell("textarea", {rows:"5"});
+    area.className = "equipBuffSourceText equipBuffFixSourceText";
+    area.value = row[prop] || "";
+    area.placeholder = `${title} は空です`;
+    area.oninput = () => setEquipBuffGroupValue(group, prop, area.value, {calc:false});
+    label.appendChild(area);
+    box.appendChild(label);
+  };
+  makeBlock("Wiki原文", "equipBuffWikiText");
+  makeBlock("Scrapbox根拠行", "equipBuffScrapboxText");
+  makeBlock("抽出ヒント/メモ", "equipBuffSourceText");
+  return box;
+}
+
+function makeEquipBuffGroupAdditionalEffectsList(group) {
+  const row = group.rep;
+  const box = document.createElement("div");
+  box.className = "additionalEffectsList";
+  const effects = normalizeAdditionalEffects(row.extraEffects);
+
+  const head = document.createElement("div");
+  head.className = "additionalEffectsHead";
+  head.textContent = "表示用の追加効果";
+  box.appendChild(head);
+
+  if (!effects.length) {
+    const empty = document.createElement("div");
+    empty.className = "small muted additionalEffectsEmpty";
+    empty.textContent = "スキル+や属性ダメージ%など、表示・連携用の効果はまだありません。";
+    box.appendChild(empty);
+    return box;
+  }
+
+  effects.forEach((effect, idx) => {
+    const item = document.createElement("div");
+    item.className = "additionalEffectItem";
+    item.dataset.effectKey = effect.key || "custom";
+
+    const text = document.createElement("span");
+    text.className = "additionalEffectText";
+    text.textContent = additionalEffectLabel(effect);
+    item.appendChild(text);
+
+    const edit = makeCell("button", {type:"button", class:"miniButton", title:"この表示用効果を編集"}, "編集");
+    edit.onclick = () => {
+      row.extraEffects = normalizeAdditionalEffects(row.extraEffects);
+      const current = row.extraEffects[idx] || effect;
+      const def = quickEffectDef(current.key || "custom");
+
+      let nextName = current.name || "";
+      if (def.targetKind === "skill") {
+        const message = `スキル名を入力してください。\n候補: ${SKILL_SIM_ALL.join(" / ")}`;
+        nextName = prompt(message, current.name || SKILL_SIM_ALL[0] || "");
+        if (nextName === null) return;
+        if (!SKILL_SIM_ALL.includes(nextName)) {
+          alert("スキルシミュレータに存在するスキル名を指定してください。");
+          return;
+        }
+      } else if (def.targetKind === "element") {
+        const message = "属性を入力してください。候補: 火属性 / 水属性 / 地属性 / 風属性 / 無属性";
+        nextName = prompt(message, current.name || "火属性");
+        if (nextName === null) return;
+        if (!ELEMENT_DAMAGE_OPTIONS.includes(nextName)) {
+          alert("属性は 火属性 / 水属性 / 地属性 / 風属性 / 無属性 から指定してください。");
+          return;
+        }
+      } else {
+        nextName = prompt("効果名を入力してください。", current.name || def.placeholder || def.label);
+        if (nextName === null) return;
+      }
+
+      const rawValue = prompt("値を入力してください。", current.value ?? 0);
+      if (rawValue === null) return;
+      const nextValue = parseFloat(rawValue);
+      if (!Number.isFinite(nextValue)) {
+        alert("数値を入力してください。");
+        return;
+      }
+
+      row.extraEffects[idx] = {
+        ...current,
+        name: nextName,
+        value: nextValue,
+        unit: current.unit || def.unit || "",
+        scope: current.scope || "display"
+      };
+      syncEquipBuffGroupFromRep(group);
+      renderEquipmentTable();
+      renderEquipBuffFixList();
+      renderShowcaseTab();
+      calc();
+    };
+    item.appendChild(edit);
+
+    const del = makeCell("button", {type:"button", class:"dangerMini", title:"この表示用効果を削除"}, "×");
+    del.onclick = () => {
+      row.extraEffects = normalizeAdditionalEffects(row.extraEffects);
+      row.extraEffects.splice(idx, 1);
+      syncEquipBuffGroupFromRep(group);
+      renderEquipmentTable();
+      renderEquipBuffFixList();
+      renderShowcaseTab();
+      calc();
+    };
+    item.appendChild(del);
+    box.appendChild(item);
+  });
+  return box;
+}
+
+
+function makeEquipBuffGroupQuickEffectAdder(group) {
+  const row = group.rep;
+  const wrap = document.createElement("div");
+  wrap.className = "quickEffectAdder equipBuffFixQuickAdder";
+
+  const title = document.createElement("div");
+  title.className = "extraStatsTitle";
+  title.textContent = "Buff効果を追加";
+  wrap.appendChild(title);
+
+  const controls = document.createElement("div");
+  controls.className = "quickEffectControls quickEffectControlsBuff";
+
+  const effect = makeCell("select");
+  effect.className = "quickEffectType";
+  effect.innerHTML = quickEffectOptionsHtml("equipment", "equipBuff");
+  controls.appendChild(effect);
+
+  const targetWrap = document.createElement("div");
+  targetWrap.className = "quickEffectTargetWrap";
+  controls.appendChild(targetWrap);
+
+  const value = makeCell("input", {type:"number", step:"0.1", placeholder:"値"});
+  value.className = "quickEffectValue";
+  controls.appendChild(value);
+
+  const add = makeCell("button", {type:"button"}, "追加");
+  controls.appendChild(add);
+
+  let targetInput = null;
+  const updateTargetInput = () => {
+    const def = quickEffectDef(effect.value);
+    targetWrap.innerHTML = "";
+    targetInput = null;
+    value.placeholder = def.valueLabel || "値";
+    if (def.targetKind === "skill") {
+      targetInput = makeCell("select");
+      targetInput.className = "quickEffectTarget";
+      targetInput.innerHTML = SKILL_SIM_ALL.map(name => `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`).join("");
+      targetWrap.appendChild(targetInput);
+    } else if (def.targetKind === "element") {
+      targetInput = makeCell("select");
+      targetInput.className = "quickEffectTarget";
+      targetInput.innerHTML = ELEMENT_DAMAGE_OPTIONS.map(name => `<option value="${escapeHtml(name)}">${escapeHtml(name.replace("属性", ""))}</option>`).join("");
+      targetWrap.appendChild(targetInput);
+    } else if (def.targetKind === "text") {
+      targetInput = makeCell("input", {type:"text", placeholder:def.placeholder || "対象"});
+      targetInput.className = "quickEffectTarget";
+      targetWrap.appendChild(targetInput);
+    } else {
+      const empty = document.createElement("span");
+      empty.className = "small muted";
+      empty.textContent = "対象なし";
+      targetWrap.appendChild(empty);
+    }
+  };
+  effect.onchange = updateTargetInput;
+  updateTargetInput();
+
+  add.onclick = () => {
+    const targetName = targetInput ? targetInput.value : "";
+    const ok = applyQuickEffectToRow(row, "equipment", effect.value, value.value, targetName, "equipBuff");
+    if (!ok) return;
+    row._lastQuickEffectMessage = quickEffectAppliedMessage("equipment", "equipBuff", effect.value, value.value, targetName);
+    syncEquipBuffGroupFromRep(group);
+    renderEquipmentTable();
+    renderEquipBuffFixList();
+    renderTagLinkSummary();
+    renderShowcaseTab();
+    calc();
+  };
+
+  wrap.appendChild(controls);
+  if (row._lastQuickEffectMessage) {
+    const result = document.createElement("div");
+    result.className = "quickEffectResult";
+    result.textContent = row._lastQuickEffectMessage;
+    wrap.appendChild(result);
+  }
+  const help = document.createElement("p");
+  help.className = "small";
+  help.textContent = "このtechnic_idの装備Buffにだけ効果を追加します。装備本体ステータスには入りません。";
+  wrap.appendChild(help);
+  wrap.appendChild(makeEquipBuffGroupAdditionalEffectsList(group));
+  return wrap;
+}
+
+function makeEquipBuffGroupOnlyEditor(group) {
+  const row = group.rep;
+  const wrap = document.createElement("div");
+  wrap.className = "equipBuffFixEditor";
+
+  const controls = document.createElement("div");
+  controls.className = "equipBuffFixControls";
+
+  const enabledLabel = document.createElement("label");
+  enabledLabel.className = "equipBuffInline";
+  const enabled = makeCell("input", {type:"checkbox", checked: group.rows.some(x => !!x.row.equipBuffEnabled)});
+  enabled.onchange = () => setEquipBuffGroupValue(group, "equipBuffEnabled", enabled.checked);
+  enabledLabel.appendChild(enabled);
+  enabledLabel.appendChild(document.createTextNode("Buffを有効"));
+  controls.appendChild(enabledLabel);
+
+  const slotLabel = document.createElement("label");
+  slotLabel.className = "equipBuffInline";
+  const slot = makeCell("input", {type:"checkbox", checked: row.equipBuffSlot !== false});
+  slot.onchange = () => setEquipBuffGroupValue(group, "equipBuffSlot", slot.checked);
+  slotLabel.appendChild(slot);
+  slotLabel.appendChild(document.createTextNode("Buff枠を使う"));
+  controls.appendChild(slotLabel);
+
+  const nameLabel = document.createElement("label");
+  nameLabel.textContent = "Buff名";
+  const name = makeCell("input", {value: row.equipBuffName || "", placeholder:"Buff名"});
+  name.oninput = () => setEquipBuffGroupValue(group, "equipBuffName", name.value, {calc:false});
+  nameLabel.appendChild(name);
+  controls.appendChild(nameLabel);
+
+  const groupLabel = document.createElement("label");
+  groupLabel.textContent = "競合グループ";
+  const conflict = makeCell("input", {value: row.equipBuffConflictGroup || (row.equipBuffTechnicId ? `technic-${row.equipBuffTechnicId}` : ""), placeholder:"例: technic-12345 / magic-damage-buff"});
+  conflict.oninput = () => setEquipBuffGroupValue(group, "equipBuffConflictGroup", conflict.value || (row.equipBuffTechnicId ? `technic-${row.equipBuffTechnicId}` : ""));
+  groupLabel.appendChild(conflict);
+  controls.appendChild(groupLabel);
+
+  const ruleLabel = document.createElement("label");
+  ruleLabel.textContent = "重複ルール";
+  const stackRule = makeCell("select");
+  stackRule.innerHTML = `
+    <option value="same-technic">同一technic_idは最新1つ</option>
+    <option value="latest">同一競合グループは最新1つ</option>
+    <option value="score">同一競合グループは効果スコア優先</option>
+  `;
+  stackRule.value = row.equipBuffStackRule || "same-technic";
+  stackRule.onchange = () => setEquipBuffGroupValue(group, "equipBuffStackRule", stackRule.value);
+  ruleLabel.appendChild(stackRule);
+  controls.appendChild(ruleLabel);
+
+  const memoLabel = document.createElement("label");
+  memoLabel.textContent = "メモ";
+  const memo = makeCell("input", {value: row.equipBuffNote || "", placeholder:"任意メモ"});
+  memo.oninput = () => setEquipBuffGroupValue(group, "equipBuffNote", memo.value, {calc:false});
+  memoLabel.appendChild(memo);
+  controls.appendChild(memoLabel);
+
+  wrap.appendChild(controls);
+
+  const directGrid = document.createElement("div");
+  directGrid.className = "equipBuffDirectGrid equipBuffFixDirectGrid";
+  directGrid.appendChild(equipBuffGroupNumberInput(group, "equipBuffAttackPct", "攻撃力%", "1"));
+  directGrid.appendChild(equipBuffGroupNumberInput(group, "equipBuffMagicPct", "魔力%", "1"));
+  directGrid.appendChild(equipBuffGroupNumberInput(group, "equipBuffSpeedPct", "速度%", "1"));
+  directGrid.appendChild(equipBuffGroupNumberInput(group, "equipBuffFlatAttack", "攻撃力+", "0.1"));
+  directGrid.appendChild(equipBuffGroupNumberInput(group, "equipBuffFlatMagic", "魔力+", "0.1"));
+  directGrid.appendChild(equipBuffGroupNumberInput(group, "equipBuffFlatSpeed", "速度+", "0.1"));
+  directGrid.appendChild(equipBuffGroupNumberInput(group, "equipBuffConvMagicRate", "魔力→攻撃力%", "1"));
+  directGrid.appendChild(equipBuffGroupNumberInput(group, "equipBuffConvMagicSpeedRate", "魔力→移動速度%", "1"));
+  directGrid.appendChild(equipBuffGroupNumberInput(group, "equipBuffConvSpeedRate", "速度→攻撃力%", "1"));
+  directGrid.appendChild(equipBuffGroupNumberInput(group, "equipBuffDmgPct", "与ダメ%", "1"));
+  directGrid.appendChild(equipBuffGroupNumberInput(group, "equipBuffSpecial", "特攻倍率", "0.01"));
+  wrap.appendChild(directGrid);
+
+  wrap.appendChild(makeExtraStatsEditor(row, "Buff追加ステータス", "equipBuff", () => {
+    syncEquipBuffGroupFromRep(group);
+    renderEquipmentTable();
+    renderTagLinkSummary();
+    renderShowcaseTab();
+  }));
+  wrap.appendChild(makeEquipBuffGroupQuickEffectAdder(group));
+  wrap.appendChild(makeEquipBuffGroupSourcePanel(group));
+
+  const help = document.createElement("div");
+  help.className = "small muted";
+  help.textContent = "%欄は10%なら10。同じtechnic_idの装備Buffはこの1枚でまとめて編集し、該当する装備行すべてへ反映します。";
+  wrap.appendChild(help);
+
+  return wrap;
+}
+
+function makeEquipBuffFixCard(group) {
+  const row = group.rep;
+  const card = document.createElement("div");
+  card.className = "equipBuffFixCard cardLike";
+
+  const head = document.createElement("div");
+  head.className = "equipBuffFixHead";
+
+  const titleWrap = document.createElement("div");
+  titleWrap.className = "equipBuffFixTitleWrap";
+  const title = document.createElement("div");
+  title.className = "equipBuffFixTitle";
+  title.textContent = equipmentBuffDisplayName(row);
+  titleWrap.appendChild(title);
+
+  const meta = document.createElement("div");
+  meta.className = "equipBuffFixMeta small muted";
+  meta.textContent = [
+    row.equipBuffTechnicId ? `technic_id ${row.equipBuffTechnicId}` : "technic_idなし",
+    group.rows.length > 1 ? `同一ID ${group.rows.length}装備` : "1装備",
+    row.equipBuffConflictGroup ? `競合: ${row.equipBuffConflictGroup}` : "競合未設定"
+  ].join(" / ");
+  titleWrap.appendChild(meta);
+  head.appendChild(titleWrap);
+
+  const effect = document.createElement("div");
+  effect.className = "equipBuffFixEffectSummary";
+  effect.textContent = equipmentBuffGroupEffectText(group);
+  head.appendChild(effect);
   card.appendChild(head);
 
-  const group = document.createElement("div");
-  group.className = "small muted";
-  group.textContent = `競合グループ: ${row.equipBuffConflictGroup || (row.equipBuffTechnicId ? `technic-${row.equipBuffTechnicId}` : "未設定")} / ルール: ${row.equipBuffStackRule || "same-technic"}`;
-  card.appendChild(group);
+  const linked = document.createElement("div");
+  linked.className = "equipBuffFixLinked small";
+  linked.textContent = `対象装備: ${equipmentBuffGroupLinkedText(group)}`;
+  card.appendChild(linked);
 
-  card.appendChild(makeEquipmentBuffEditor(row, status));
+  card.appendChild(makeEquipBuffGroupOnlyEditor(group));
   return card;
 }
 
@@ -10489,19 +10904,47 @@ function renderEquipBuffFixList() {
   const body = byId("equipBuffFixList");
   const summary = byId("equipBuffFixSummary");
   if (!body || !summary) return;
-  const rows = equipmentBuffFixRows();
+  const groups = equipmentBuffFixGroups();
+  const rawCount = equipmentBuffFixCandidateRows().length;
   body.innerHTML = "";
-  summary.textContent = `${rows.length}件の装備Buff候補`;
-  if (!rows.length) {
+  summary.textContent = `${groups.length}件の装備Buff / 装備行 ${rawCount}件`;
+  if (!groups.length) {
     body.innerHTML = `<div class="emptyState">装備登録にBuff付き装備がありません。装備カタログからBuff付き装備を追加してください。</div>`;
     return;
   }
-  rows.forEach(({row, idx}) => body.appendChild(makeEquipBuffFixCard(row, idx)));
+  groups.forEach(group => body.appendChild(makeEquipBuffFixCard(group)));
+}
+
+function ensureEquipBuffFixStyles() {
+  if (document.getElementById("equipBuffFixStyle")) return;
+  const style = document.createElement("style");
+  style.id = "equipBuffFixStyle";
+  style.textContent = `
+    .equipBuffFixList { display: grid; gap: 14px; }
+    .equipBuffFixCard { padding: 14px; border-radius: 12px; }
+    .equipBuffFixHead { display: grid; grid-template-columns: minmax(260px, 1fr) minmax(220px, 0.9fr); gap: 12px; align-items: start; margin-bottom: 8px; }
+    .equipBuffFixTitle { font-weight: 700; font-size: 1.05rem; }
+    .equipBuffFixMeta { margin-top: 4px; }
+    .equipBuffFixEffectSummary { padding: 8px 10px; border-radius: 8px; background: rgba(127,127,127,.10); font-size: .92rem; line-height: 1.45; }
+    .equipBuffFixLinked { margin: 6px 0 10px; padding: 6px 8px; border-left: 3px solid rgba(127,127,127,.35); }
+    .equipBuffFixEditor { display: grid; gap: 12px; }
+    .equipBuffFixControls { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 8px 10px; align-items: end; }
+    .equipBuffFixControls label, .equipBuffFixNumberLabel { display: grid; gap: 4px; font-size: .9rem; }
+    .equipBuffFixControls input[type="text"], .equipBuffFixControls input:not([type]), .equipBuffFixControls select, .equipBuffFixControls textarea { width: 100%; box-sizing: border-box; }
+    .equipBuffFixDirectGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px 10px; }
+    .equipBuffFixDirectGrid input { width: 100%; box-sizing: border-box; }
+    .equipBuffFixQuickAdder { border: 1px dashed rgba(127,127,127,.35); border-radius: 10px; padding: 10px; }
+    .equipBuffFixSourcePanel { border: 1px solid rgba(127,127,127,.25); border-radius: 10px; padding: 8px 10px; }
+    .equipBuffFixSourceText { min-height: 88px; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: .86rem; }
+    @media (max-width: 820px) { .equipBuffFixHead { grid-template-columns: 1fr; } }
+  `;
+  document.head.appendChild(style);
 }
 
 function createEquipBuffFixTab(panel) {
+  ensureEquipBuffFixStyles();
   panel.innerHTML = `
-    <div class="tabSectionHint small">装備登録にあるBuff付き装備を直接編集します。Wiki/Scrapbox由来の効果候補は初期値として入るだけなので、説明文と照らして必要に応じて修正してください。同一technic_idの装備Buffは競合グループ <code>technic-ID</code> として扱い、同時に複数ONの場合は後から登録されたものだけ有効になります。</div>
+    <div class="tabSectionHint small">装備登録にあるBuff付き装備を <strong>technic_id単位</strong> で集約して編集します。装備本体の追加ステータスはここには表示しません。Wiki/Scrapbox由来の効果候補は初期値なので、原文と照らして必要に応じて修正してください。競合グループもこのタブで設定できます。</div>
     <div class="catalogToolbar cardLike">
       <button type="button" id="equipBuffFixRefreshBtn">装備登録から再読込</button>
       <button type="button" id="equipBuffFixOpenAllBtn">原文をすべて開く</button>

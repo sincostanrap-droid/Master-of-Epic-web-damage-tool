@@ -1,3 +1,10 @@
+v1.23.21 / 装備Buff修正UI整理・technic_id集約
+
+- 装備Buff修正タブをBuff編集専用UIに整理。装備本体の追加ステータスは非表示。
+- 同一technic_idのBuffは1件に集約表示し、編集内容を同じIDの装備行へ反映。
+- 競合グループと重複ルールを装備Buff修正タブで直接編集可能。
+- Wiki/Scrapbox原文を説明欄として表示。
+
 v1.23.20 / 装備Buff修正タブ・TSV候補自動投入
 - 新タブ「装備Buff修正」を追加。装備登録にあるBuff付き装備を一覧し、既存の装備Buff編集UIで修正できます。
 - 装備カタログからBuff付き装備を追加した時、src/data/generated/equipBuffRuleCandidates.generated.js の候補値を初期値として装備Buffへ投入します。
