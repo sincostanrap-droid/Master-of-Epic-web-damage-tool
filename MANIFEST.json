@@ -16,7 +16,7 @@
     "bytes": 955
   },
   {
-    "path": "tools/build-moe-forge-effect-catalog.mjs",
+    "path": "tools/build-reference-effect-catalog.mjs",
     "bytes": 602
   },
   {
@@ -24,7 +24,7 @@
     "bytes": 2468
   },
   {
-    "path": "data/external/moe-forge/README.md",
+    "path": "data/external/effect-reference/README.md",
     "bytes": 346
   },
   {
@@ -36,15 +36,15 @@
     "bytes": 1549
   },
   {
-    "path": "src/data/generated/moeForgeEffectCatalog.generated.js",
+    "path": "src/data/generated/referenceEffectCatalog.generated.js",
     "bytes": 1218768
   },
   {
-    "path": "src/data/generated/moeForgeEquipmentBuffIndex.generated.js",
+    "path": "src/data/generated/referenceEquipmentBuffIndex.generated.js",
     "bytes": 11044450
   },
   {
-    "path": "src/data/generated/moeForgeEffectCatalog.summary.json",
+    "path": "src/data/generated/referenceEffectCatalog.summary.json",
     "bytes": 1124
   },
   {

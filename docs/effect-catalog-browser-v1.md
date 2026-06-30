@@ -1,6 +1,6 @@
-# Effect Catalog Browser v1
+# Effect Reference Browser v1
 
-`effect-catalog-browser.html` is a read-only reference screen for the generated MoE Forge effect data.
+`effect-catalog-browser.html` is a read-only reference screen for the generated external reference effect data.
 
 ## Purpose
 
@@ -27,7 +27,7 @@ http://localhost:8080/effect-catalog-browser.html
 
 This screen imports generated data only for display. It does not write to localStorage and does not connect to the current calculator state.
 
-MoE Forge data is `reference` / `provisional` until verified against official DB, Wiki, or self-tests.
+Reference data is `reference` / `provisional` until verified against official DB, Wiki, or self-tests.
 
 ## Next phase
 

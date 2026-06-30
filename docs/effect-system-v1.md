@@ -5,16 +5,16 @@
 Separate equipment identity from effect calculation.
 
 - Equipment catalog remains official-DB/spreadsheet-derived.
-- Buff/effect catalog is generated from MoE Forge extracted reference data.
+- Buff/effect catalog is generated from external reference effect data.
 - Physical damage calculator reads only the physical subset.
 - Generic equipment simulator can read all stats without losing non-firepower effects.
 
 ## Generated contents
 
-- `src/data/generated/moeForgeEffectCatalog.generated.js`
+- `src/data/generated/referenceEffectCatalog.generated.js`
   - 2276 reference effect entries.
   - Source layers: `module48314`, `module49542`, `module75724.Buffs`.
-- `src/data/generated/moeForgeEquipmentBuffIndex.generated.js`
+- `src/data/generated/referenceEquipmentBuffIndex.generated.js`
   - 12408 equipment-buff reference entries.
   - Holds `Buff`, `BuffInfo`, `BuffStats`, parsed direct effects, and unsupported fields.
 - `src/data/effects/effectStatSchema.js`
@@ -26,7 +26,7 @@ Separate equipment identity from effect calculation.
 
 ## Important handling rules
 
-1. MoE Forge data is `reference`, not `official`.
+1. Reference data is `reference`, not `official`.
 2. Do not delete unrecognized effects. They go to `unsupportedFields`.
 3. Named groups such as `N_Crit_B` and `N_Skill_強化_E` are preserved as named groups and should not be blindly summed.
 4. `1490` is not used as a primary source because it appears to contain simplified/representative values that can conflict with other modules.

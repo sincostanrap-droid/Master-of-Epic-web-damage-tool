@@ -1,5 +1,5 @@
-import { MOE_FORGE_EFFECT_CATALOG } from '../data/generated/moeForgeEffectCatalog.generated.js';
-import { MOE_FORGE_EQUIPMENT_BUFF_INDEX } from '../data/generated/moeForgeEquipmentBuffIndex.generated.js';
+import { REFERENCE_EFFECT_CATALOG } from '../data/generated/referenceEffectCatalog.generated.js';
+import { REFERENCE_EQUIPMENT_BUFF_INDEX } from '../data/generated/referenceEquipmentBuffIndex.generated.js';
 import { EFFECT_STAT_SCHEMA } from '../data/effects/effectStatSchema.js';
 
 const el = (id) => document.getElementById(id);
@@ -95,7 +95,7 @@ function search() {
   const results = [];
 
   if (mode === 'all' || mode === 'buff') {
-    MOE_FORGE_EFFECT_CATALOG.forEach((entry, index) => {
+    REFERENCE_EFFECT_CATALOG.forEach((entry, index) => {
       if (category !== 'all' && !hasCategory(entry, category)) return;
       if (q && !entrySearchHaystack(entry).includes(q)) return;
       results.push(makeBuffResult(entry, index));
@@ -103,7 +103,7 @@ function search() {
   }
 
   if (mode === 'all' || mode === 'equipment') {
-    MOE_FORGE_EQUIPMENT_BUFF_INDEX.forEach((entry, index) => {
+    REFERENCE_EQUIPMENT_BUFF_INDEX.forEach((entry, index) => {
       if (category !== 'all' && !hasCategory(entry, category)) return;
       if (q && !entrySearchHaystack(entry).includes(q)) return;
       results.push(makeEquipmentResult(entry, index));
@@ -116,8 +116,8 @@ function search() {
 }
 
 function renderSummary() {
-  const buffCount = MOE_FORGE_EFFECT_CATALOG.length;
-  const equipmentCount = MOE_FORGE_EQUIPMENT_BUFF_INDEX.length;
+  const buffCount = REFERENCE_EFFECT_CATALOG.length;
+  const equipmentCount = REFERENCE_EQUIPMENT_BUFF_INDEX.length;
   const shown = state.lastResults.length;
   el('summary').innerHTML = [
     `<span class="pill">Buff/効果: <strong>${buffCount.toLocaleString()}</strong></span>`,

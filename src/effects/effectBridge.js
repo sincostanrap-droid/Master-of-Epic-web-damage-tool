@@ -1,16 +1,16 @@
 // Bridge helpers for gradually moving the existing physical damage calculator to the generic effect system.
 // v1 goal: new data structure can exist beside the current addStatuses/equipBuff flow without changing existing behavior.
 
-import { MOE_FORGE_EFFECT_CATALOG } from '../data/generated/moeForgeEffectCatalog.generated.js';
-import { MOE_FORGE_EQUIPMENT_BUFF_INDEX } from '../data/generated/moeForgeEquipmentBuffIndex.generated.js';
+import { REFERENCE_EFFECT_CATALOG } from '../data/generated/referenceEffectCatalog.generated.js';
+import { REFERENCE_EQUIPMENT_BUFF_INDEX } from '../data/generated/referenceEquipmentBuffIndex.generated.js';
 import { findEffectsByName, findEquipmentBuffEntries, resolveEffectEntries } from './effectResolver.js';
 
 export function getReferenceBuffEffectsByName(buffName, context = {}) {
-  return resolveEffectEntries(findEffectsByName(MOE_FORGE_EFFECT_CATALOG, buffName), context);
+  return resolveEffectEntries(findEffectsByName(REFERENCE_EFFECT_CATALOG, buffName), context);
 }
 
 export function getReferenceEquipmentBuffEffects(itemNameOrBuffName, context = {}) {
-  return resolveEffectEntries(findEquipmentBuffEntries(MOE_FORGE_EQUIPMENT_BUFF_INDEX, itemNameOrBuffName), context);
+  return resolveEffectEntries(findEquipmentBuffEntries(REFERENCE_EQUIPMENT_BUFF_INDEX, itemNameOrBuffName), context);
 }
 
 export function toLegacyPhysicalPatch(totals) {

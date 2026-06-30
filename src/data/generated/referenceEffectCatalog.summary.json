@@ -1,0 +1,49 @@
+{
+  "page": "https://moe-web-simulator.pages.dev/",
+  "extractedAt": "2026-06-30T09:07:08.978Z",
+  "generatedAt": "2026-06-30T09:52:05.196295Z",
+  "moduleCounts": {
+    "75724": {
+      "Buffs": 1619,
+      "Head": 1272,
+      "Body": 1310,
+      "Hands": 967,
+      "Pants": 787,
+      "Shoes": 1024,
+      "Shoulder": 583,
+      "Waist_Armor": 505,
+      "Head_Acc": 419,
+      "Face_Acc": 360,
+      "Ear_Acc": 339,
+      "Finger_Acc": 147,
+      "Chest_Acc": 663,
+      "Back_Acc": 413,
+      "Waist_Acc": 503,
+      "Weapon": 1357,
+      "Shield": 328,
+      "Ammo": 62,
+      "Noah": 4,
+      "Arm": 936,
+      "Waist": 484,
+      "HeadAcc": 410,
+      "Face": 356,
+      "Ear": 337,
+      "Finger": 145,
+      "Chest": 649,
+      "Back": 404,
+      "WaistAcc": 498
+    },
+    "1490": {
+      "Equipment": 2917,
+      "Buffs": 2
+    },
+    "48314": 1635,
+    "49542": 1197,
+    "47979": {},
+    "56486": 929
+  },
+  "effectCatalogCount": 2276,
+  "equipmentBuffIndexCount": 12408,
+  "statCount": 29,
+  "note": "Reference/provisional data extracted from an external reference bundle. Do not treat as official without verification."
+}

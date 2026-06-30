@@ -20,7 +20,7 @@ git diff --stat
 Commit the foundation only:
 
 ```bash
-git add src/data/effects src/data/generated/moeForgeEffectCatalog.generated.js src/data/generated/moeForgeEquipmentBuffIndex.generated.js src/data/generated/moeForgeEffectCatalog.summary.json src/effects tools/build-moe-forge-effect-catalog.mjs docs/effect-system-v1.md data/external/moe-forge/README.md
+git add src/data/effects src/data/generated/referenceEffectCatalog.generated.js src/data/generated/referenceEquipmentBuffIndex.generated.js src/data/generated/referenceEffectCatalog.summary.json src/effects tools/build-reference-effect-catalog.mjs docs/effect-system-v1.md data/external/effect-reference/README.md
 git commit -m "Add generic effect catalog foundation"
 git push -u origin feature/effect-catalog-v1
 ```
