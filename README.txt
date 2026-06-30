@@ -1,4 +1,13 @@
-v1.23.21 / 装備Buff修正UI整理・technic_id集約
+v1.23.22 / 装備Buff修正UI改善・カタログソート再投入
+
+- 装備Buff修正タブでは、同一technic_id由来の既定グループを競合グループ欄に表示しないようにしました。内部では同一technic_idは最新1つだけ有効です。
+- 手動入力した競合グループだけを競合グループとして表示・管理します。
+- 装備Buff修正タブに検索、手動競合ありのみ、効果入力済みのみの絞り込みを追加しました。
+- 詳細追加ステータス/効果追加を折りたたみ、主要数値と原文確認を優先するUIにしました。
+- 装備登録側の装備Buff編集欄を折りたたみました。
+- 装備カタログαにソート、昇順/降順、表示件数指定を再投入しました。
+
+v1.23.22 / 装備Buff修正UI改善・カタログソート再投入
 
 - 装備Buff修正タブをBuff編集専用UIに整理。装備本体の追加ステータスは非表示。
 - 同一technic_idのBuffは1件に集約表示し、編集内容を同じIDの装備行へ反映。
@@ -9,7 +18,7 @@ v1.23.20 / 装備Buff修正タブ・TSV候補自動投入
 - 新タブ「装備Buff修正」を追加。装備登録にあるBuff付き装備を一覧し、既存の装備Buff編集UIで修正できます。
 - 装備カタログからBuff付き装備を追加した時、src/data/generated/equipBuffRuleCandidates.generated.js の候補値を初期値として装備Buffへ投入します。
 - Wiki原文 / Scrapbox根拠行 / 抽出ヒントを装備Buff編集欄に表示・編集できます。
-- 同一technic_idは競合グループ technic-ID を自動設定し、same-technic では後から登録されたものだけ有効にします。
+- 同一technic_idは内部処理で最新1つのみ有効にします。technic-ID は手動競合グループとしては表示しません。
 - 魔力→移動速度% の保持・表示欄を追加。
 - tools/build-equip-buff-candidates-from-tsv.mjs を追加。
 - tools/clear-dev-cache.mjs を追加。
