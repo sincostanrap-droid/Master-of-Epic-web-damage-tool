@@ -1,0 +1,13 @@
+{
+  "name": "equipment-effect-matcher-v1",
+  "description": "Adds a neutral, read-only equipment effect matching page for comparing existing equipment data with the reference effect catalog.",
+  "files": [
+    "equipment-effect-matcher.html",
+    "src/effects/equipmentEffectMatcher.js",
+    "docs/equipment-effect-matcher-v1.md",
+    "APPLY_EQUIPMENT_EFFECT_MATCHER_WINDOWS.md",
+    "MANIFEST_EQUIPMENT_EFFECT_MATCHER.json"
+  ],
+  "touchesExistingCalculator": false,
+  "expectedBranch": "feature/effect-catalog-v1"
+}

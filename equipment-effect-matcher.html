@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>装備効果 突合ビュー</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #f7f7f9;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --line: #d1d5db;
+      --accent: #2563eb;
+      --good: #047857;
+      --warn: #92400e;
+      --bad: #b91c1c;
+      --soft: #f3f4f6;
+      --code-bg: #f3f4f6;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #111827;
+        --card: #1f2937;
+        --text: #f9fafb;
+        --muted: #9ca3af;
+        --line: #374151;
+        --accent: #60a5fa;
+        --good: #34d399;
+        --warn: #fbbf24;
+        --bad: #f87171;
+        --soft: #111827;
+        --code-bg: #111827;
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.55;
+    }
+    header {
+      padding: 20px 24px 14px;
+      border-bottom: 1px solid var(--line);
+      background: var(--card);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    h1 { margin: 0 0 6px; font-size: 22px; }
+    h2 { margin: 0 0 10px; font-size: 18px; }
+    h3 { margin: 0 0 6px; font-size: 16px; }
+    header p { margin: 0; color: var(--muted); font-size: 14px; }
+    main { padding: 18px 24px 32px; max-width: 1440px; margin: 0 auto; }
+    .notice {
+      background: color-mix(in srgb, var(--warn) 12%, transparent);
+      color: var(--warn);
+      border: 1px solid color-mix(in srgb, var(--warn) 35%, transparent);
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-bottom: 16px;
+      font-size: 14px;
+    }
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,.04);
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 10px;
+      align-items: end;
+    }
+    label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+    input, select, button, textarea {
+      font: inherit;
+      color: inherit;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 8px 10px;
+      width: 100%;
+    }
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+      font-size: 12px;
+    }
+    button {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+      cursor: pointer;
+      font-weight: 600;
+    }
+    button.secondary {
+      background: var(--card);
+      color: var(--text);
+      border-color: var(--line);
+    }
+    button:disabled { opacity: .55; cursor: not-allowed; }
+    .span-2 { grid-column: span 2; }
+    .span-3 { grid-column: span 3; }
+    .span-4 { grid-column: span 4; }
+    .span-6 { grid-column: span 6; }
+    .span-8 { grid-column: span 8; }
+    .span-12 { grid-column: span 12; }
+    @media (max-width: 900px) {
+      .grid { grid-template-columns: 1fr; }
+      .span-2, .span-3, .span-4, .span-6, .span-8, .span-12 { grid-column: span 1; }
+    }
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(360px, 520px) 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 1100px) { .layout { grid-template-columns: 1fr; } }
+    .muted { color: var(--muted); }
+    .summary {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      border: 1px solid var(--line);
+      background: var(--soft);
+      border-radius: 999px;
+      padding: 2px 8px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .pill.good { color: var(--good); border-color: color-mix(in srgb, var(--good) 40%, var(--line)); }
+    .pill.warn { color: var(--warn); border-color: color-mix(in srgb, var(--warn) 40%, var(--line)); }
+    .pill.bad { color: var(--bad); border-color: color-mix(in srgb, var(--bad) 40%, var(--line)); }
+    .list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 72vh;
+      overflow: auto;
+      padding-right: 2px;
+    }
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--card);
+      padding: 10px;
+    }
+    .item-card { cursor: pointer; }
+    .item-card:hover { border-color: var(--accent); }
+    .item-card.active { outline: 2px solid var(--accent); }
+    .title-row { display: flex; justify-content: space-between; gap: 8px; align-items: start; }
+    .title { font-weight: 700; }
+    .small { font-size: 12px; }
+    .effect-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+    .effect-chip {
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 2px 8px;
+      font-size: 12px;
+      background: var(--soft);
+    }
+    .match-score {
+      font-size: 12px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { border-bottom: 1px solid var(--line); padding: 7px 6px; text-align: left; vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; }
+    pre {
+      white-space: pre-wrap;
+      word-break: break-word;
+      background: var(--code-bg);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px;
+      font-size: 12px;
+      max-height: 320px;
+      overflow: auto;
+    }
+    details { margin-top: 10px; }
+    details > summary { cursor: pointer; color: var(--accent); }
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    @media (max-width: 900px) { .two-col { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>装備効果 突合ビュー</h1>
+    <p>現在ブラウザに保存されている装備データ、または貼り付けた装備JSON/TSVを、参考効果データ・装備効果索引と突き合わせます。計算値はまだ変更しません。</p>
+  </header>
+  <main>
+    <div class="notice">
+      この画面は確認専用です。既存のダメージ計算には反映しません。参考効果データは公式値として扱わず、突合候補と未対応効果の確認に使います。
+    </div>
+
+    <section class="panel">
+      <div class="grid">
+        <div class="span-3">
+          <label for="dataSource">読み込み元</label>
+          <select id="dataSource">
+            <option value="localStorage">ブラウザ保存データを自動探索</option>
+            <option value="pasteJson">貼り付けJSONを解析</option>
+            <option value="pasteTsv">貼り付けTSVを解析</option>
+            <option value="manualNames">装備名/Buff名だけ貼り付け</option>
+          </select>
+        </div>
+        <div class="span-3">
+          <label for="matchMode">突合方法</label>
+          <select id="matchMode">
+            <option value="balanced">バランス</option>
+            <option value="exact">完全一致寄り</option>
+            <option value="loose">ゆるめ</option>
+          </select>
+        </div>
+        <div class="span-2">
+          <label for="minScore">最小スコア</label>
+          <input id="minScore" type="number" min="0" max="100" step="1" value="35" />
+        </div>
+        <div class="span-2">
+          <label for="limit">候補数</label>
+          <input id="limit" type="number" min="1" max="200" step="1" value="80" />
+        </div>
+        <div class="span-2">
+          <label>&nbsp;</label>
+          <button id="runBtn">突合を実行</button>
+        </div>
+        <div class="span-12">
+          <label for="pasteArea">貼り付け欄（JSON/TSV/名称リストを使う場合）</label>
+          <textarea id="pasteArea" placeholder="装備JSON、装備TSV、または装備名/Buff名を1行ずつ貼り付け"></textarea>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div id="summary" class="summary"></div>
+      <div class="muted small">
+        「一致候補あり」は参考データ側の候補が見つかった装備です。「直接効果あり」は装備自身に攻撃力/命中/HPなどの効果らしき値が見つかった装備です。
+      </div>
+    </section>
+
+    <div class="layout">
+      <section class="panel">
+        <h2>装備一覧</h2>
+        <div class="grid" style="margin-bottom: 10px;">
+          <div class="span-8">
+            <label for="filterText">一覧フィルタ</label>
+            <input id="filterText" placeholder="装備名、Buff名、効果テキストで絞り込み" />
+          </div>
+          <div class="span-4">
+            <label for="filterKind">表示</label>
+            <select id="filterKind">
+              <option value="all">すべて</option>
+              <option value="matched">一致候補あり</option>
+              <option value="unmatched">候補なし</option>
+              <option value="direct">直接効果あり</option>
+              <option value="unsupported">未対応/説明のみあり</option>
+            </select>
+          </div>
+        </div>
+        <div id="itemList" class="list"></div>
+      </section>
+
+      <section class="panel">
+        <h2>詳細</h2>
+        <div id="detail" class="muted">左の一覧から装備を選んでください。</div>
+      </section>
+    </div>
+  </main>
+
+  <script type="module" src="./src/effects/equipmentEffectMatcher.js"></script>
+</body>
+</html>
