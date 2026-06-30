@@ -1,0 +1,3298 @@
+{
+  "cachedAt": "2026-06-30T05:32:12.277Z",
+  "data": {
+    "projectName": "medianmoe",
+    "searchQuery": "フェザー リング",
+    "limit": 100,
+    "count": 101,
+    "pages": [
+      {
+        "id": "5dd3e88f749e3f00172f0be4",
+        "title": "フェザー リング",
+        "image": "https://gyazo.com/41bb3ef042366cba0345de66100fed44/raw",
+        "descriptions": [
+          "table:spec",
+          "箇所\t[指装飾]",
+          "スキル\t着こなし1.0",
+          "AC\t0.0",
+          "消耗度"
+        ],
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "pin": 0,
+        "views": 399,
+        "linked": 6,
+        "commitId": "5dd3e9097f0d940017d9b32f",
+        "created": 1574168758,
+        "updated": 1574168841,
+        "accessed": 1782753732,
+        "snapshotCreated": 1762705810,
+        "pageRank": 12.2,
+        "lastAccessed": null,
+        "linesCount": 19,
+        "charsCount": 219,
+        "helpfeels": [],
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "table:spec"
+        ]
+      },
+      {
+        "id": "5d5b2465e83201001796d4ee",
+        "title": "詠唱移動速度バフ",
+        "image": "https://gyazo.com/b0dbf43aed8159c80123cc039bf62169/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 3092,
+        "linked": 24,
+        "created": 1566254194,
+        "updated": 1758926269,
+        "pageRank": 39.2,
+        "linesCount": 80,
+        "charsCount": 1958,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[コンセントレイション リング]\t1.05\t-\t＿＿\t＿＿＿＿＿＿＿\t＿＿＿○＿＿＿\t※1",
+          "[ウィッチ フェザー ストール]\t1.05\tA\t＿＿\t＿＿＿＿＿○＿\t＿＿＿＿＿＿＿"
+        ]
+      },
+      {
+        "id": "677790c5af0882c50872f449",
+        "title": "実装アイテム(2025)",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 7063,
+        "linked": 1,
+        "created": 1735889101,
+        "updated": 1767363198,
+        "pageRank": 22,
+        "linesCount": 355,
+        "charsCount": 6301,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[ツインテール リング エクステ]",
+          "[スネーク リング]\t課金プレゼント",
+          "ノアピース   [ [イクセス ヒーリング] ]",
+          "[スターライト リング]",
+          "[ジェリーフィッシュ イヤリング]\t課金プレゼント",
+          "[マジカル フェザー]",
+          "ノアピース   [ [ヒーリング レイン] ]",
+          "[エスニック イヤリング]\t課金プレゼント",
+          "[ゴースト イヤリング]\t課金プレゼント",
+          "[エレメンタル ジェム リング]"
+        ]
+      },
+      {
+        "id": "6968b2b506c043a29f940e41",
+        "title": "更新情報(20260113)",
+        "image": "https://gyazo.com/02b3c4a29b6ffd682d9ad57eda893e8e/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 846,
+        "linked": 4,
+        "created": 1768469231,
+        "updated": 1769255484,
+        "pageRank": 14.2,
+        "linesCount": 91,
+        "charsCount": 3150,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[エレメンタル ジェム リング]\t1\t0.80%\t2.40%",
+          "[フラッター フェザー リング]\t1\t2.80%\t9.57%"
+        ]
+      },
+      {
+        "id": "6937e7ff0a4548e40f4dbdb3",
+        "title": "更新情報(20251209)",
+        "image": "https://gyazo.com/0d28434ff269506636d0e41a529844f6/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 718,
+        "linked": 3,
+        "created": 1765271553,
+        "updated": 1765981628,
+        "pageRank": 13,
+        "linesCount": 84,
+        "charsCount": 2627,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[エレメンタル ジェム リング]\t1\t0.80%\t2.40%",
+          "[双天使のリング]\t1\t4.50%",
+          "[エレメンタル フェザー ウイング]\t1\t4.50%"
+        ]
+      },
+      {
+        "id": "691c36554305ce4042ce90bc",
+        "title": "更新情報(20251118)",
+        "image": "https://gyazo.com/959c3980d9e07f6126e3a3804e20c5c7/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 713,
+        "linked": 4,
+        "created": 1763456599,
+        "updated": 1764064345,
+        "pageRank": 14.2,
+        "linesCount": 116,
+        "charsCount": 3812,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[フェザー モノクル]\t1\t4.50%",
+          "[フィッシュフック イヤリング]\t1\t2.80%",
+          "[スチームパンク リング]\t1\t2.80%"
+        ]
+      },
+      {
+        "id": "5daa1c43e8900f0017873b6c",
+        "title": "実装アイテム(2019)",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 1032,
+        "linked": 1,
+        "created": 1571429446,
+        "updated": 1760540695,
+        "pageRank": 15.2,
+        "linesCount": 277,
+        "charsCount": 4163,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[フェザー ケープ]",
+          "秘伝の書 [ [ローリング ラリアット] ]",
+          "[バタフライ リング]",
+          "秘伝の書 [ [ジャイアント キリング] ]",
+          "[スパークリング ワイン ボトル]"
+        ]
+      },
+      {
+        "id": "5daa335afe795a001793f154",
+        "title": "更新情報(20151117)",
+        "image": "https://gyazo.com/5beed5a28f49378262964ada80d65a0a/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 341,
+        "linked": 4,
+        "created": 1570416885,
+        "updated": 1722432274,
+        "pageRank": 54,
+        "linesCount": 209,
+        "charsCount": 6182,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[インテリジェンス リング]",
+          "[ウエスト フェザー ウイング]",
+          "[ゴシック リング]",
+          "[ゴシック イヤリング]"
+        ]
+      },
+      {
+        "id": "6888b35a51332cf36c63ca85",
+        "title": "更新情報(20250729)",
+        "image": "https://gyazo.com/cd394d3a10f3d562d94fceadcc167564/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 2229,
+        "linked": 5,
+        "created": 1753789278,
+        "updated": 1754565217,
+        "pageRank": 15.8,
+        "linesCount": 183,
+        "charsCount": 5340,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[マジカル フェザー]\t1\t2.25%\t4.50%",
+          "[フィッシュフック イヤリング]\t3000",
+          "300\t[スプリング シューズ]"
+        ]
+      },
+      {
+        "id": "6811f1dd40f8f774f4dac93f",
+        "title": "更新情報(20250430)",
+        "image": "https://gyazo.com/48aded2880c010fa744145cdeee7ec59/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 2252,
+        "linked": 10,
+        "created": 1746006495,
+        "updated": 1746621077,
+        "pageRank": 21.4,
+        "linesCount": 230,
+        "charsCount": 7808,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[グランフェザードラゴンのペンダント]\t7500",
+          "[ビッグ ダイアモンド リング]\t2000"
+        ]
+      },
+      {
+        "id": "682c9856cdc076c2448d9c73",
+        "title": "更新情報(20250520)",
+        "image": "https://gyazo.com/4469741f54e1fb475ada95605a9a997a/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 1056,
+        "linked": 5,
+        "created": 1747753053,
+        "updated": 1748346248,
+        "pageRank": 15.6,
+        "linesCount": 107,
+        "charsCount": 3634,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[フラッター フェザー リング]\t1\t2.80%\t9.57%"
+        ]
+      },
+      {
+        "id": "5ea800473808fe00242bb143",
+        "title": "錬金の箱1st",
+        "image": "https://gyazo.com/58da136c2cef35cb3c0b1fa9474714cb/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 5996,
+        "linked": 70,
+        "created": 1588068426,
+        "updated": 1686553434,
+        "pageRank": 83.6,
+        "linesCount": 104,
+        "charsCount": 2352,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "7\t[シャイン マジック リング]\t[ダーク マジック リング]",
+          "8\t[シャイン クリスタル イヤリング]\t[ダーク クリスタル イヤリング]",
+          "7\t[ファイアー マジック リング]\t[ウィンド マジック リング]",
+          "8\t[フレイム クリスタル イヤリング]\t[ウィンド クリスタル イヤリング]",
+          "7\t[アイス マジック リング]\t[アース マジック リング]",
+          "8\t[アイス クリスタル イヤリング]\t[アース クリスタル イヤリング]",
+          "7\t[カオス マジック リング]\tアルケミ キューブ",
+          "8\t[カオス クリスタル イヤリング]\tファイン アルケミ キューブ",
+          "3\t[フェザー ヘッドドレス]",
+          "5\t[フェザー モノクル]"
+        ]
+      },
+      {
+        "id": "67d91d80f5f3785352fc6c08",
+        "title": "更新情報(20250318)",
+        "image": "https://gyazo.com/6fbfae1433c6cf3aaca1236d61865ce5/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 1721,
+        "linked": 6,
+        "created": 1742282116,
+        "updated": 1743045050,
+        "pageRank": 17,
+        "linesCount": 169,
+        "charsCount": 5774,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[フラッター フェザー リング]\t1\t1.50%\t4.50%",
+          "[エンジェル フェザー ウイング]\t1\t2.80%\t9.56%",
+          "[エンジェル フェザー ウエストウイング]\t1\t2.80%\t9.57%",
+          "ノアピース   [ [ギャザリング ペット] ]\t1\t2.50%",
+          "秘伝の書   [ [ジャイアント キリング] ]\t1\t2.50%"
+        ]
+      },
+      {
+        "id": "67ebb79e86d2ecf201cc30e5",
+        "title": "更新情報(20250401)",
+        "image": "https://gyazo.com/a9906175cb031bb69f8dca87c012599c/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 802,
+        "linked": 3,
+        "created": 1743501253,
+        "updated": 1744086710,
+        "pageRank": 13.6,
+        "linesCount": 90,
+        "charsCount": 3084,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[フラッター フェザー リング]\t1\t2.80%\t9.57%"
+        ]
+      },
+      {
+        "id": "63b058b9bcf85b001df7747c",
+        "title": "実装アイテム(2023)",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 6076,
+        "linked": 1,
+        "created": 1672501444,
+        "updated": 1733824509,
+        "pageRank": 25,
+        "linesCount": 389,
+        "charsCount": 6979,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[グランフェザー ドラゴン テイル]",
+          "[スプリングガチャチケット]\tACセット",
+          "[メンダコ イヤリング]\tイベント",
+          "[音符のイヤリング]\tイベント",
+          "秘伝の書   [ [ローリング ヒーローキック] ]",
+          "[ガトリング アーム]",
+          "→[ノア ガトリング]",
+          "[アームドフェザー レッグガード]",
+          "[オーロラ イヤリング]"
+        ]
+      },
+      {
+        "id": "67c7090f21be2ad6738bed07",
+        "title": "更新情報(20250304)",
+        "image": "https://gyazo.com/7c7d3b589707707e6324c6b894eed6b0/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 787,
+        "linked": 3,
+        "created": 1741097233,
+        "updated": 1741685506,
+        "pageRank": 13.4,
+        "linesCount": 79,
+        "charsCount": 2704,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "ノアピース   [ [イクセス ヒーリング] ]\t1\t1.20%\t2.40%",
+          "[アーティファクト リング]\t1\t1.50%\t4.50%",
+          "[ウィッチ フェザー ストール]\t1\t2.80%\t9.57%"
+        ]
+      },
+      {
+        "id": "676a96c826cd75982c176a67",
+        "title": "更新情報(20241224)",
+        "image": "https://gyazo.com/253666c3e9594afd03ab4070ab311339/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 2520,
+        "linked": 8,
+        "created": 1735038810,
+        "updated": 1736238851,
+        "pageRank": 19.2,
+        "linesCount": 181,
+        "charsCount": 6131,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[アームドフェザー レッグガード]\t1\t1.45%",
+          "[スチームパンク リング]\t1\t1.45%"
+        ]
+      },
+      {
+        "id": "678f444648023792f170ca79",
+        "title": "更新情報(20250121)",
+        "image": "https://gyazo.com/d4715314e681f9f40f3f01eaf4438f78/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 1193,
+        "linked": 4,
+        "created": 1737442376,
+        "updated": 1738058751,
+        "pageRank": 15.4,
+        "linesCount": 160,
+        "charsCount": 5579,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "「 ツインテール リング エクステ 」登場！ https://moepic.com/top/news_detail.php?",
+          "[ツインテール リング エクステ]\t1\t2.25%\t4.50%\t1.95%\t4.50%\t3.00%",
+          "[エレメンタル フェザー ウイング]\t1\t2.80%\t9.57%\t2.80%\t9.57%\t4.20%"
+        ]
+      },
+      {
+        "id": "674e93f8c3e898c8a5e66507",
+        "title": "更新情報(20241203)",
+        "image": "https://gyazo.com/4dc533ba205facb8070f72f307ffd40d/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 1202,
+        "linked": 5,
+        "created": 1733202937,
+        "updated": 1733818859,
+        "pageRank": 15.8,
+        "linesCount": 151,
+        "charsCount": 5087,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[イカリングヘアー ウィッグ]\t1\t2.80%\t9.56%",
+          "[ウィンドチャーム イヤリング]\t1\t4.50%",
+          "[エレメンタル フェザー ウイング]\t1\t2.00%",
+          "[アームドフェザー レッグガード]\t1\t2.00%"
+        ]
+      },
+      {
+        "id": "673c2fa368165dace3852dcf",
+        "title": "更新情報(20241119)",
+        "image": "https://gyazo.com/71770c51b8f661b191482e6cb869f9a3/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 967,
+        "linked": 6,
+        "created": 1731997604,
+        "updated": 1732608741,
+        "pageRank": 16.8,
+        "linesCount": 91,
+        "charsCount": 3498,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[ゴッドアイ リング]\t1\t1.50%\t4.50%",
+          "[ノア ランタン イヤリング]\t1\t2.25%\t4.50%",
+          "[フェザー ケープ]\t1\t4.50%"
+        ]
+      },
+      {
+        "id": "65409a76d84517001c3ccdde",
+        "title": "更新情報(20231031)",
+        "image": "https://gyazo.com/95bfd2f63e5d763840eb03b7c49968c3/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 1699,
+        "linked": 6,
+        "created": 1698732663,
+        "updated": 1730459582,
+        "pageRank": 17.39,
+        "linesCount": 222,
+        "charsCount": 5970,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[ガトリング アーム]\t1\t0.80%\t2.40%",
+          "[アームドフェザー レッグガード]\t1\t1.20%\t2.40%",
+          "[フェザー ピン]\t3000",
+          "100\t[チャーリング]"
+        ]
+      },
+      {
+        "id": "67330a5a94361cab2f2cf66d",
+        "title": "更新情報(20241112)",
+        "image": "https://gyazo.com/2b11f92f0674563cdbafefb8ab5f15e0/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 1639,
+        "linked": 4,
+        "created": 1731398235,
+        "updated": 1731997935,
+        "pageRank": 14.8,
+        "linesCount": 139,
+        "charsCount": 4692,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[フラッター フェザー リング]\t1\t2.80%\t9.57%",
+          "ノアピース   [ [エンジェリック スプリング] ]\t1\t2.50%",
+          "秘伝の書   [ [ホット スプリング] ]\t1\t2.50%",
+          "秘伝の書   [ [ローリング ヒーローキック] ]\t1\t2.50%"
+        ]
+      },
+      {
+        "id": "63980d87912a71001e8d2c91",
+        "title": "更新情報(20221213)",
+        "image": "https://gyazo.com/326b48a021a3d1468f2c31a2704c0371/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 1719,
+        "linked": 7,
+        "created": 1670909321,
+        "updated": 1728980924,
+        "pageRank": 18.39,
+        "linesCount": 177,
+        "charsCount": 5604,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[エンジェル フェザー ウエストウイング]\t1\t1.00%",
+          "[ゾディアック リング]\t1\t2.00%",
+          "[双天使のリング]\t1\t3.00%"
+        ]
+      },
+      {
+        "id": "62a80bd537078a0023978d88",
+        "title": "更新情報(20220614)",
+        "image": "https://gyazo.com/c7b18fda5304ae8a04b0930b91e0c525/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 805,
+        "linked": 3,
+        "created": 1655180247,
+        "updated": 1732018351,
+        "pageRank": 14.4,
+        "linesCount": 130,
+        "charsCount": 4158,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[フェザー ケープ]\t1\t2.80%\t9.57%",
+          "[バタフライ リング]\t1\t2.80%\t9.57%"
+        ]
+      },
+      {
+        "id": "66f26a9926f3fb002237ceef",
+        "title": "更新情報(20240924)",
+        "image": "https://gyazo.com/1d7640ae129101f2e85f7e93001fcb9f/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 933,
+        "linked": 8,
+        "created": 1727163035,
+        "updated": 1727768286,
+        "pageRank": 18.2,
+        "linesCount": 109,
+        "charsCount": 3390,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[アーティファクト リング]\t1\t1.50%\t4.50%",
+          "[エンジェル フェザー ウイング]\t1\t2.80%\t9.57%",
+          "[エンジェル フェザー ウエストウイング]\t1\t2.80%\t9.57%",
+          "[オーロラ イヤリング]\t1\t1.40%"
+        ]
+      },
+      {
+        "id": "5fedf2867d3e17001cfc996f",
+        "title": "実装アイテム(2021)",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 3983,
+        "linked": 1,
+        "created": 1609429640,
+        "updated": 1719899601,
+        "pageRank": 26,
+        "linesCount": 327,
+        "charsCount": 5887,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[バーサーカーズ リング]\tイベント",
+          "[エンジェル フェザー ガントレット]",
+          "[ウィッチ フェザー ストール]",
+          "[アーティファクト リング]",
+          "[リング オブ パイオニア]\tイベント",
+          "[エンジェル フェザー ウイング]",
+          "[エンジェル フェザー ウエストウイング]",
+          "[どんぐりのイヤリング]\tイベント",
+          "[リボン イヤリング]\t課金プレゼント",
+          "[ハロウィン イヤリング]\tイベント"
+        ]
+      },
+      {
+        "id": "6704bb658b5fab001c0c0a1b",
+        "title": "更新情報(20241008)",
+        "image": "https://gyazo.com/9b271f581fc0bb8043a9aab818dc14ae/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 1038,
+        "linked": 4,
+        "created": 1728363367,
+        "updated": 1728977888,
+        "pageRank": 14.6,
+        "linesCount": 84,
+        "charsCount": 3347,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[フラッター フェザー リング]\t1\t1.50%\t4.50%",
+          "[双天使のリング]\t1\t2.80%\t9.56%",
+          "[エンジェル フェザー ガントレット]\t1\t2.80%\t9.56%"
+        ]
+      },
+      {
+        "id": "6267629d843b56001d266b21",
+        "title": "更新情報(20220426)",
+        "image": "https://gyazo.com/0df4415f254269e20ad0f5acb7a0d43b/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 1664,
+        "linked": 4,
+        "created": 1650942663,
+        "updated": 1722432261,
+        "pageRank": 17.8,
+        "linesCount": 273,
+        "charsCount": 9042,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[チアリング・ファンセット]",
+          "[十四周年記念イヤリング]\t3000",
+          "[ビッグ ダイアモンド リング]\t2000",
+          "[フェザー ヘアバンド] NEW!\t3000"
+        ]
+      },
+      {
+        "id": "669f5cfea99745001c53893a",
+        "title": "更新情報(20240723)",
+        "image": "https://gyazo.com/9336c1f63bfd0e5afec2b16da3183c75/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 1230,
+        "linked": 7,
+        "created": 1721720064,
+        "updated": 1722345132,
+        "pageRank": 17.2,
+        "linesCount": 84,
+        "charsCount": 2730,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[ヴァンパイア イヤリング]\t1\t4.50%",
+          "[ノーブル フェザー ハット]\t1\t4.50%"
+        ]
+      },
+      {
+        "id": "64474a4540e1f3001b355375",
+        "title": "更新情報(20230425)",
+        "image": "https://gyazo.com/4eaec21da5590e11107470c38e282ae3/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 1624,
+        "linked": 5,
+        "created": 1682393671,
+        "updated": 1722432235,
+        "pageRank": 17,
+        "linesCount": 220,
+        "charsCount": 7574,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[ジュエル フェザー ネックレス]\t3000",
+          "[パピヨン リング]\t3000"
+        ]
+      },
+      {
+        "id": "66bb26ce39ffbf001dc12daa",
+        "title": "更新情報(20240813)",
+        "image": "https://gyazo.com/e872a40b6325e1f9ab94e3e9b6e9422f/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 857,
+        "linked": 4,
+        "created": 1723541201,
+        "updated": 1724156125,
+        "pageRank": 14.6,
+        "linesCount": 118,
+        "charsCount": 3946,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[フラッター フェザー リング]\t1\t1.50%\t4.50%",
+          "[トロピカルフィッシュ イヤリング]\t1\t2.80%\t9.57%"
+        ]
+      },
+      {
+        "id": "67334ff7b03614119000b025",
+        "title": "ガチャサムネ(20241112)",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 129,
+        "linked": 1,
+        "created": 1731416057,
+        "updated": 1731665722,
+        "pageRank": 2.8,
+        "linesCount": 82,
+        "charsCount": 1201,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "フラッター フェザー リング",
+          "[+ [フラッター フェザー リング.icon]]"
+        ]
+      },
+      {
+        "id": "6614c5bac4db26002527e5d4",
+        "title": "更新情報(20240409)",
+        "image": "https://gyazo.com/4fcae67a5b12683c00cdc544c52a08f0/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 1071,
+        "linked": 8,
+        "created": 1712637371,
+        "updated": 1713243126,
+        "pageRank": 18.8,
+        "linesCount": 162,
+        "charsCount": 5090,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[エンジェル フェザー ウイング]\t1\t2.80%\t9.57%",
+          "[フラッター フェザー リング]\t1\t2.80%\t9.57%"
+        ]
+      },
+      {
+        "id": "662748c161bd3d0023287857",
+        "title": "更新情報(20240423)",
+        "image": "https://gyazo.com/fc93e601e9894f4f19960ea0a4665195/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 1388,
+        "linked": 5,
+        "created": 1713850562,
+        "updated": 1714459423,
+        "pageRank": 15.6,
+        "linesCount": 98,
+        "charsCount": 3482,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[マジック フェザー ウエスト]\t1\t2.80%\t9.57%",
+          "[エキスパート マジック リング]\t1\t2.80%\t9.57%"
+        ]
+      },
+      {
+        "id": "660b96bd9c38250025916539",
+        "title": "更新情報(20240402)",
+        "image": "https://gyazo.com/6b3b02df6f608728610c043f28fe0024/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 782,
+        "linked": 5,
+        "created": 1712035518,
+        "updated": 1712638074,
+        "pageRank": 15.8,
+        "linesCount": 115,
+        "charsCount": 3723,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[フラッター フェザー リング]\t1\t2.80%\t9.57%"
+        ]
+      },
+      {
+        "id": "63ea0d37f1cbb7001c07496f",
+        "title": "更新情報(20170606)",
+        "image": "https://gyazo.com/0a15388268f5d236d233133697aa93c1/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 133,
+        "linked": 7,
+        "created": 1676283200,
+        "updated": 1709815698,
+        "pageRank": 17.39,
+        "linesCount": 93,
+        "charsCount": 3095,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[フェザー リング]",
+          "[ウィンドチャーム イヤリング]"
+        ]
+      },
+      {
+        "id": "6434cfbc5d377b0021c58d35",
+        "title": "更新情報(20230411)",
+        "image": "https://gyazo.com/1a81d48ed93ee349757e50572b1853ee/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 1141,
+        "linked": 6,
+        "created": 1681182653,
+        "updated": 1681791808,
+        "pageRank": 48,
+        "linesCount": 139,
+        "charsCount": 4699,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[フラッター フェザー リング]\t1\t1.50%\t4.50%",
+          "[グランフェザー ドラゴン テイル]\t1\t1.20%",
+          "[キャット フェイス イヤリング]\t1\t1.20%",
+          "[エンジェル フェザー ガントレット]\t1\t1.20%",
+          "[エンジェル フェザー ウイング]\t1\t1.20%",
+          "[エンジェル フェザー ウエストウイング]\t1\t1.20%",
+          "ノアピース   [ [ギャザリング ペット] ]\t1\t1.20%"
+        ]
+      },
+      {
+        "id": "65812494f1af560024afb12d",
+        "title": "更新情報(20231219)",
+        "image": "https://gyazo.com/e6c50c0619599a165780d890eb391f6c/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 1550,
+        "linked": 8,
+        "created": 1702962327,
+        "updated": 1703581030,
+        "pageRank": 18.8,
+        "linesCount": 141,
+        "charsCount": 4406,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[エンジェル フェザー ガントレット]\t1\t2.80%\t9.56%",
+          "[エンジェル フェザー ガントレット]\t1\t1.20%",
+          "[ゾディアック リング]\t1\t2.00%",
+          "> ◇『 ヒーリング オール 』等の魔法でHPの回復量が「 1000 」を超えた場合、効果が正常に反映されなかった不具合を修正しました。"
+        ]
+      },
+      {
+        "id": "65b8cb08e2621300242462eb",
+        "title": "更新情報(20240130)",
+        "image": "https://gyazo.com/dc84ec76ba34225a4ad0ab0009eb5235/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 1245,
+        "linked": 4,
+        "created": 1706609418,
+        "updated": 1707213550,
+        "pageRank": 14.4,
+        "linesCount": 156,
+        "charsCount": 4961,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[フラッター フェザー リング]\t1\t2.80%\t9.57%",
+          "[インテリジェンス リング]\t1\t4.50%"
+        ]
+      },
+      {
+        "id": "5dc10e008b14200017b69e4a",
+        "title": "実装アイテム(2017)",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 441,
+        "linked": 1,
+        "created": 1572933130,
+        "updated": 1703070690,
+        "pageRank": 15,
+        "linesCount": 334,
+        "charsCount": 4993,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[フェザードラゴンのペンダント]\t課金抽選プレゼント",
+          "[グランフェザードラゴンのペンダント]\tマイレージ",
+          "[ビッグ フェザー イヤリング]",
+          "[ゾディアック リング]",
+          "[ツインリング ウィッグ]"
+        ]
+      },
+      {
+        "id": "5edf4a4038e2820020e216ce",
+        "title": "更新情報(20180130)",
+        "image": "https://gyazo.com/0a0b98bc624e76e0a0791c1a4385b686/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 360,
+        "linked": 3,
+        "created": 1591691841,
+        "updated": 1703081880,
+        "pageRank": 13.8,
+        "linesCount": 142,
+        "charsCount": 4176,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[ジュエル フェザー ネックレス]",
+          "[クレセント ムーン イヤリング]"
+        ]
+      },
+      {
+        "id": "61e66ccf82295b001ef07ffa",
+        "title": "フラッター フェザー リング",
+        "image": "https://gyazo.com/a21a2f6d3c5fbd9d6ef5c3eced43b7c8/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 8036,
+        "linked": 28,
+        "created": 1642491089,
+        "updated": 1681699988,
+        "pageRank": 38.79,
+        "linesCount": 32,
+        "charsCount": 541,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "フラッター フェザー リング"
+        ]
+      },
+      {
+        "id": "6582f5e5ee3fc2002592b7ba",
+        "title": "更新情報(20180123)",
+        "image": "https://gyazo.com/40e29788662e4aa9a2f46ac7b212a627/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 110,
+        "linked": 3,
+        "created": 1703081447,
+        "updated": 1703081803,
+        "pageRank": 13.2,
+        "linesCount": 73,
+        "charsCount": 3069,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[ビッグ フェザー イヤリング]"
+        ]
+      },
+      {
+        "id": "6447817ba52837001cd62908",
+        "title": "アラクラン装備セット",
+        "image": "https://gyazo.com/59c27da9cc64945548f923fd3af1a015/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 9721,
+        "linked": 21,
+        "created": 1682407805,
+        "updated": 1683003928,
+        "pageRank": 31.6,
+        "linesCount": 105,
+        "charsCount": 2807,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "> バーサークイヤリング(10)",
+          "> フラッターフェザーイヤリング(10)"
+        ]
+      },
+      {
+        "id": "649164271df868001bea48cf",
+        "title": "更新情報(20230620)",
+        "image": "https://gyazo.com/67519bf97f49a07f4a272cf93d6a6d58/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 1189,
+        "linked": 5,
+        "created": 1687249961,
+        "updated": 1695100769,
+        "pageRank": 16.2,
+        "linesCount": 178,
+        "charsCount": 5639,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[エンジェル フェザー ウエストウイング]\t1\t2.80%\t9.56%",
+          "ノアピース   [ [ギャザリング ペット] ]\t1\t2.50%"
+        ]
+      },
+      {
+        "id": "64e44ce9a20773001cddeb9b",
+        "title": "更新情報(20230822)",
+        "image": "https://gyazo.com/8f6e1d9d303513e0d876ecf9ab0fbb45/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 1109,
+        "linked": 3,
+        "created": 1692683502,
+        "updated": 1693312165,
+        "pageRank": 13.4,
+        "linesCount": 101,
+        "charsCount": 2987,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[フラッター フェザー リング]\t1\t2.80%\t9.57%",
+          "> ・イカリングヘアー ウィッグ(頭防具)"
+        ]
+      },
+      {
+        "id": "6369ecab169e76001f1a4b51",
+        "title": "ノスタルジックガチャ",
+        "image": "https://gyazo.com/f7325ebfbd14cd9b95fe75e773a26440/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 5363,
+        "linked": 2,
+        "created": 1667886266,
+        "updated": 1692095089,
+        "pageRank": 13.8,
+        "linesCount": 116,
+        "charsCount": 1504,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[スピリット フェザーヘッド]",
+          "[アフェクション リング] 生産品？"
+        ]
+      },
+      {
+        "id": "64a3a72617e6ac001cfca4fa",
+        "title": "更新情報(20230704)",
+        "image": "https://gyazo.com/0f2503dd08e558e6af33b1f6da373a48/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 1176,
+        "linked": 3,
+        "created": 1688446760,
+        "updated": 1689049683,
+        "pageRank": 13.8,
+        "linesCount": 257,
+        "charsCount": 7481,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "秘伝の書   [ [ローリング ヒーローキック] ]\t1\t2.25%\t4.50%",
+          "[リング オブ ブルーローズ]\t1\t2.00%",
+          "[アーティファクト リング]\t1\t2.00%",
+          "[フラッター フェザー リング]\t1\t2.00%"
+        ]
+      },
+      {
+        "id": "646c4e4308f749001b8de2d0",
+        "title": "更新情報(20230523)",
+        "image": "https://gyazo.com/ba97a4c655156ec031590ab919a18bd6/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 1083,
+        "linked": 6,
+        "created": 1684819547,
+        "updated": 1685432021,
+        "pageRank": 17,
+        "linesCount": 148,
+        "charsCount": 4956,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[フラッター フェザー リング]\t1\t1.50%\t4.50%",
+          "[ゾディアック リング]\t1\t4.50%",
+          "ノアピース   [ [ギャザリング ペット] ]\t1\t1.40%\t3.50%"
+        ]
+      },
+      {
+        "id": "5f572d3aff3cec001e748dd2",
+        "title": "エンジェル フェザー イヤリング",
+        "image": "https://gyazo.com/83feeebb7d84dc1ac879ac0d3a293573/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 2357,
+        "linked": 3,
+        "created": 1599548759,
+        "updated": 1686037958,
+        "pageRank": 14,
+        "linesCount": 42,
+        "charsCount": 910,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "エンジェル フェザー イヤリング",
+          "天使の羽根の力によって清められたイヤリング",
+          "> エンジェルフェザーイヤリングの悲劇…。こんなに綺麗で、性能もそう悪くないのに余計なバフがつているがゆえに使うに使えなかったという…。"
+        ]
+      },
+      {
+        "id": "61f8ded5a06ab70022666c26",
+        "title": "更新情報(20220201)",
+        "image": "https://gyazo.com/a4616332970b48c5fa74024f6f8e66b5/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 604,
+        "linked": 16,
+        "created": 1643699979,
+        "updated": 1672446906,
+        "pageRank": 27.4,
+        "linesCount": 120,
+        "charsCount": 4147,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[フラッター フェザー リング]\t1\t1.50%\t4.50%",
+          "> 　▼[メダロット ガトリング]"
+        ]
+      },
+      {
+        "id": "643e12297730f0001c9c388b",
+        "title": "更新情報(20230418)",
+        "image": "https://gyazo.com/5b9711d99ad3660d01f852e95bfd8ba4/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 941,
+        "linked": 4,
+        "created": 1681789483,
+        "updated": 1682408245,
+        "pageRank": 15.8,
+        "linesCount": 132,
+        "charsCount": 4495,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[フラッター フェザー リング]\t1\t1.50%\t4.50%\t1.95%\t4.50%",
+          "[メンダコ イヤリング]"
+        ]
+      },
+      {
+        "id": "6202004c4a0936001d3dfa6d",
+        "title": "更新情報(20220208)",
+        "image": "https://gyazo.com/218df1fed4eeb0368a49f6c93e4de709/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 1130,
+        "linked": 12,
+        "created": 1644298389,
+        "updated": 1675334714,
+        "pageRank": 23.2,
+        "linesCount": 171,
+        "charsCount": 5418,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[フラッター フェザー リング]\t1\t1.50%\t4.50%",
+          "秘伝の書   [ [チョコ ホット スプリング] ]\t1\t2.80%\t9.57%",
+          "秘伝の書   [ [ホット スプリング] ]\t1\t2.50%",
+          "秘伝の書   [ [ローリング ラリアット] ]\t1\t2.50%"
+        ]
+      },
+      {
+        "id": "61cf2908ca1931002122b470",
+        "title": "実装アイテム(2022)",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 5504,
+        "linked": 1,
+        "created": 1640966409,
+        "updated": 1672622423,
+        "pageRank": 25.2,
+        "linesCount": 398,
+        "charsCount": 6950,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[マジック フェザー ヘッド]",
+          "[マジック フェザー ウエスト]",
+          "[フラッター フェザー リング]",
+          "[キャット フェイス イヤリング]",
+          "[チアリング・ファンセット]\tイベント",
+          "→[チアリング・ファン（猫）]",
+          "→[チアリング・ファン（兎）]",
+          "[イカリングヘアー ウィッグ]",
+          "[グリフォンフェザー ケープ]",
+          "[グリフォンフェザー スカート]"
+        ]
+      },
+      {
+        "id": "641a89e182f5b0001c37cc37",
+        "title": "更新情報(20230322)",
+        "image": "https://gyazo.com/a03184f58c0852669a84da51088c24a8/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 1529,
+        "linked": 5,
+        "created": 1679460835,
+        "updated": 1679986369,
+        "pageRank": 16.2,
+        "linesCount": 120,
+        "charsCount": 3678,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[グランフェザー ドラゴン テイル]\t1\t0.80%\t2.40%",
+          "[バタフライ リング]\t1\t2.80%\t9.57%",
+          "[双天使のリング]\t1\t2.80%\t9.56%",
+          "ラッキータイム前の金曜18時までAC1枚もらえるのでスプリングガチャ回すならセット買おうね",
+          "[スプリングガチャチケット]＋[エンシェントコイン]1枚：1,000SP",
+          "[23-03-22 【期間限定】特別ガチャ「 スプリングガチャ 」登場！ https://moepic.com/top/news_detail.php?",
+          "table:スプリングガチャ",
+          "[アーティファクト リング]\t1\t1.40%"
+        ]
+      },
+      {
+        "id": "5f608be9fdb57d001f8ae276",
+        "title": "更新情報(20200915)",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 395,
+        "linked": 5,
+        "created": 1600162796,
+        "updated": 1679464710,
+        "pageRank": 16.6,
+        "linesCount": 163,
+        "charsCount": 4902,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[エキスパート マジック リング]\t1\t2.25%\t4.50%",
+          "[エレメンタル フェザー ウイング]\t1\t1.50%\t4.50%",
+          "[バタフライ リング]\t1\t2.50%"
+        ]
+      },
+      {
+        "id": "62ba8579ca36e9001d578622",
+        "title": "更新情報(20220628)",
+        "image": "https://gyazo.com/70a70e461defe889b55113e3c140dac2/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 956,
+        "linked": 8,
+        "created": 1656391035,
+        "updated": 1674649090,
+        "pageRank": 19.8,
+        "linesCount": 110,
+        "charsCount": 4261,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[フラッター フェザー リング]\t1\t1.50%\t4.50%"
+        ]
+      },
+      {
+        "id": "63eb0f0ca06903001b0cc106",
+        "title": "更新情報(20230214)",
+        "image": "https://gyazo.com/98ef4c55e4fa243c12178d468fef693c/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 1226,
+        "linked": 5,
+        "created": 1676349198,
+        "updated": 1676965732,
+        "pageRank": 15.8,
+        "linesCount": 147,
+        "charsCount": 4910,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[エンジェル フェザー ウイング]\t1\t2.80%\t9.27%\t2.80%\t9.27%",
+          "[小猫のグラップリンググローブ] カラー\t1\t2.80%\t9.27%\t2.80%\t9.27%",
+          "[小猫のグラップリンググローブ]\t1\t2.80%\t9.27%\t2.80%\t9.27%"
+        ]
+      },
+      {
+        "id": "5daa3359fe795a001793f14b",
+        "title": "更新情報(20170704)",
+        "image": "https://gyazo.com/f34caa3bf6174321e65fa78fc354657b/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 161,
+        "linked": 6,
+        "created": 1571286197,
+        "updated": 1676377405,
+        "pageRank": 16.39,
+        "linesCount": 122,
+        "charsCount": 3885,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[ゾディアック リング]",
+          "[ウィンドチャーム イヤリング]",
+          "[スター フェザー]",
+          "[フェザー ヘアバンド]",
+          "[フェザー リング]",
+          "[フェザー ローブ]"
+        ]
+      },
+      {
+        "id": "5e392420cbaf7a0017962db6",
+        "title": "更新情報(20170530)",
+        "image": "https://gyazo.com/7aa25452e7b093064583b0e70a3c5a25/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 122,
+        "linked": 5,
+        "created": 1580803108,
+        "updated": 1676282569,
+        "pageRank": 15.4,
+        "linesCount": 91,
+        "charsCount": 2991,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[ビッグ フェザー イヤリング] [New!.icon]"
+        ]
+      },
+      {
+        "id": "633bbf9c88e48f001d957d1c",
+        "title": "更新情報(20221004)",
+        "image": "https://gyazo.com/f5ce8066371bedccb09c82c3ff1e0deb/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 945,
+        "linked": 5,
+        "created": 1664860061,
+        "updated": 1674649188,
+        "pageRank": 16.39,
+        "linesCount": 137,
+        "charsCount": 4441,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "「グリフォンフェザー ケープ」登場！ https://moepic.com/top/news_detail.php?",
+          "[グリフォンフェザー スカート]\t1\t1.20%\t2.40%",
+          "[グリフォンフェザー ケープ]\t1\t1.20%\t2.40%",
+          "[フラッター フェザー リング]\t1\t1.50%\t4.50%",
+          "[チャーリング]\t1\t4.50%",
+          "> ・マジック フェザー ヘッド(頭装飾)"
+        ]
+      },
+      {
+        "id": "5dc10be88c0f4c0017db29aa",
+        "title": "更新情報(20170314)",
+        "image": "https://gyazo.com/00f6cbfa19aebc9675a3439cba8bb416/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 165,
+        "linked": 4,
+        "created": 1572932585,
+        "updated": 1675478547,
+        "pageRank": 15.4,
+        "linesCount": 199,
+        "charsCount": 5645,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[インテリジェンス リング]",
+          "秘伝の書 [ [マジック スプリング] ]",
+          "[インテリジェンス リング]",
+          "[コンセントレイション リング]",
+          "[グランフェザードラゴンのペンダント]NEW！\t7500"
+        ]
+      },
+      {
+        "id": "63e0d261b66af2001d0cecbc",
+        "title": "更新情報(20170411)",
+        "image": "https://gyazo.com/ecd3fad5d6822cbe21badf7be6358190/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 124,
+        "linked": 4,
+        "created": 1675678315,
+        "updated": 1675678919,
+        "pageRank": 14.4,
+        "linesCount": 126,
+        "charsCount": 3660,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[ウエスト フェザー ウイング]",
+          "[スター フェザー]",
+          "[フェザー ヘアバンド]",
+          "[フェザー リング]",
+          "[フェザー ローブ]"
+        ]
+      },
+      {
+        "id": "63eb6ea5a55a8d001cd1f52b",
+        "title": "更新情報(20170620)",
+        "image": "https://gyazo.com/3f1a4692eb346d68c5b0d84fe6360685/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 143,
+        "linked": 4,
+        "created": 1676373670,
+        "updated": 1676374692,
+        "pageRank": 14.4,
+        "linesCount": 170,
+        "charsCount": 5403,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[ゾディアック リング]NEW！",
+          "[ダイアロス コーリング] M",
+          "[グランフェザードラゴンのペンダント]\t7500"
+        ]
+      },
+      {
+        "id": "6136fc8b1e011e001d3ce314",
+        "title": "更新情報(20210907)",
+        "image": "https://gyazo.com/f4fc34b94ddd859e292269da4c2fbc79/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 701,
+        "linked": 5,
+        "created": 1630993549,
+        "updated": 1674647904,
+        "pageRank": 16.2,
+        "linesCount": 85,
+        "charsCount": 2992,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "「エンジェル フェザー ウイング」登場！ https://moepic.com/top/news_detail.php?",
+          "[エンジェル フェザー ウイング]\t1\t1.20%\t2.40%",
+          "[エンジェル フェザー ウエストウイング]\t1\t1.20%\t2.40%",
+          "[双天使のリング]\t1\t1.50%\t4.50%",
+          "[フォーリンエンジェル リング]\t1\t2.80%\t9.56%",
+          "[エキスパート マジック リング]\t1\t2.80%\t9.57%"
+        ]
+      },
+      {
+        "id": "63d8a21389f2c1001ea6a50f",
+        "title": "更新情報(20230131)",
+        "image": "https://gyazo.com/681c0601fb44ccd9ed12542a880e0a8d/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 1429,
+        "linked": 3,
+        "created": 1675141653,
+        "updated": 1675750452,
+        "pageRank": 14.2,
+        "linesCount": 198,
+        "charsCount": 6124,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[マジック フェザー ヘッド]\t1\t1.50%\t4.50%",
+          "[エキスパート マジック リング]\t1\t2.80%\t9.57%",
+          "ノアピース   [ [ギャザリング ペット] ]\t1\t1.40%\t3.50%",
+          "[スノードーム リング]\t3000",
+          "> 　報酬の「 [リング オブ モラ] 」を入手できなかった不具合を修正しました。"
+        ]
+      },
+      {
+        "id": "61efb65f703f6c001f41b19e",
+        "title": "更新情報(20220125)",
+        "image": "https://gyazo.com/5d8146e2032d8ae6cf9398327e0a3f96/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 1005,
+        "linked": 4,
+        "created": 1643099745,
+        "updated": 1675166398,
+        "pageRank": 15.2,
+        "linesCount": 173,
+        "charsCount": 4802,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[フラッター フェザー リング]\t1\t1.50%\t4.50%",
+          "[双天使のリング]\t1\t1.50%\t4.50%",
+          "[スノードーム リング] NEW!\t3000"
+        ]
+      },
+      {
+        "id": "63577483e00f30001e719703",
+        "title": "更新情報(20221025)",
+        "image": "https://gyazo.com/7defc97b9b7b426771da05129b5a0869/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 1872,
+        "linked": 4,
+        "created": 1666675844,
+        "updated": 1674649228,
+        "pageRank": 15.6,
+        "linesCount": 172,
+        "charsCount": 5215,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[グリフォンフェザー スカート]\t1\t0.80%\t2.40%",
+          "[グリフォンフェザー ケープ]\t1\t0.80%\t2.40%",
+          "[ヴァンパイア イヤリング]\t1\t4.50%",
+          "[ウィッチ フェザー ストール]\t1\t4.50%",
+          "> ・ハロウィン イヤリング(耳装飾)"
+        ]
+      },
+      {
+        "id": "5e1466cc65c4c00017b641c0",
+        "title": "実装アイテム(2016)",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 324,
+        "linked": 1,
+        "created": 1578395349,
+        "updated": 1674573443,
+        "pageRank": 15.6,
+        "linesCount": 293,
+        "charsCount": 4510,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[フェザー リング]",
+          "[ウィンドチャーム イヤリング]"
+        ]
+      },
+      {
+        "id": "5e39250701f539001709307e",
+        "title": "ビッグ フェザー イヤリング",
+        "image": "https://gyazo.com/af27da8c22aacd568804da4b4304749c/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 1080,
+        "linked": 6,
+        "created": 1580803408,
+        "updated": 1676284776,
+        "pageRank": 13.6,
+        "linesCount": 28,
+        "charsCount": 504,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "ビッグ フェザー イヤリング"
+        ]
+      },
+      {
+        "id": "63329828a5fc380020834000",
+        "title": "更新情報(20220927)",
+        "image": "https://gyazo.com/898f7f396940b1a468dc4fff25b6644f/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 1427,
+        "linked": 4,
+        "created": 1664260148,
+        "updated": 1674649219,
+        "pageRank": 15.4,
+        "linesCount": 152,
+        "charsCount": 5015,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "ノアピース   [ [ギャザリング ペット] ]\t1\t1.50%\t4.50%",
+          "[ウエスト フェザー ウイング]\t1\t4.50%"
+        ]
+      },
+      {
+        "id": "60daa6d8436a82001ce217ea",
+        "title": "更新情報(20210629)",
+        "image": "https://gyazo.com/d1f38e86179ce8a26340393d2966261d/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 703,
+        "linked": 4,
+        "created": 1624942298,
+        "updated": 1674647945,
+        "pageRank": 15.4,
+        "linesCount": 133,
+        "charsCount": 4676,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[アーティファクト リング]\t1\t0.80%\t2.40%",
+          "[双天使のリング]\t1\t1.80%",
+          "[フェザー ケープ]\t1\t2.40%"
+        ]
+      },
+      {
+        "id": "62c3f104977378001d17e8c1",
+        "title": "更新情報(20220705)",
+        "image": "https://gyazo.com/3de26260fcfab45b7c53e64987dbd5e8/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 832,
+        "linked": 4,
+        "created": 1657008390,
+        "updated": 1674649098,
+        "pageRank": 15.2,
+        "linesCount": 102,
+        "charsCount": 3655,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[フラッター フェザー リング]\t1\t1.50%\t4.50%"
+        ]
+      },
+      {
+        "id": "63cfe8b16eee08001e0fd75a",
+        "title": "更新情報(20161220)",
+        "image": "https://gyazo.com/f5bc3518c6851ad3132104bec0ffc30e/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 74,
+        "linked": 4,
+        "created": 1674569916,
+        "updated": 1674572790,
+        "pageRank": 14.4,
+        "linesCount": 134,
+        "charsCount": 4750,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "秘伝の書 [ [ヒーリング ショット] ]",
+          "> ◇『 フェザー ドラゴン 』に特殊進化処理を追加しました。",
+          "> 　※レベル80以上の『 フェザー ドラゴン 』に『 変化の秘石 』を渡すと、",
+          "> 　　『 グランフェザー ドラゴン 』に進化します。【16:30追記】"
+        ]
+      },
+      {
+        "id": "63ddbf3dc27780001de4f602",
+        "title": "更新情報(20170307)",
+        "image": "https://gyazo.com/f4c084906ad4037236838abfe8351a63/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 230,
+        "linked": 3,
+        "created": 1675476798,
+        "updated": 1675477605,
+        "pageRank": 13.2,
+        "linesCount": 159,
+        "charsCount": 4724,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[ウエスト フェザー ウイング]",
+          "[ダイアロス コーリング]",
+          "ノアピース [ [エンジェリック スプリング] ]",
+          "> 　▼フェザードラゴンのペンダント"
+        ]
+      },
+      {
+        "id": "63731bb5f4c52500205ac8af",
+        "title": "更新情報(20221115)",
+        "image": "https://gyazo.com/136c02fc8d83b815e8553f1454c69d1b/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 798,
+        "linked": 6,
+        "created": 1668488119,
+        "updated": 1669698572,
+        "pageRank": 17.2,
+        "linesCount": 133,
+        "charsCount": 4646,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[マジック フェザー ウエスト]\t1\t1.50%\t4.50%",
+          "[双天使のリング]\t1\t2.80%\t9.56%",
+          "ノアピース   [ [ギャザリング ペット] ]\t1\t1.40%\t3.50%"
+        ]
+      },
+      {
+        "id": "5e0bbad7ebc5a000172d026c",
+        "title": "実装アイテム(2020)",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 2667,
+        "linked": 1,
+        "created": 1577827041,
+        "updated": 1660535489,
+        "pageRank": 26.4,
+        "linesCount": 391,
+        "charsCount": 6046,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "秘伝の書 [ [チョコ ホット スプリング] ]",
+          "[アニマル レスリング スーツ]",
+          "[双天使のリング]",
+          "[エレメンタル フェザー ウイング]",
+          "[十四周年記念イヤリング]",
+          "[ブライダル リボン リング]\tイベント",
+          "[エンジェル フェザー イヤリング]\tイベント",
+          "[エキスパート マジック リング]",
+          "[ヴァンパイア イヤリング]",
+          "[ノーブル フェザー ハット]"
+        ]
+      },
+      {
+        "id": "63859448109a0e00233dc401",
+        "title": "更新情報(20221129)",
+        "image": "https://gyazo.com/2edba13036eb0950808979845c242fec/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 1236,
+        "linked": 3,
+        "created": 1669698634,
+        "updated": 1670302541,
+        "pageRank": 14.6,
+        "linesCount": 137,
+        "charsCount": 4949,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[フラッター フェザー リング]\t1\t1.50%\t4.50%\t1.95%\t4.50%",
+          "[アーティファクト リング]\t1\t1.90%"
+        ]
+      },
+      {
+        "id": "61e66952f1e8230023026b12",
+        "title": "更新情報(20220118)",
+        "image": "https://gyazo.com/2a8d44bfdc202de8ffe6126f9819c7de/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 730,
+        "linked": 4,
+        "created": 1642490246,
+        "updated": 1668160182,
+        "pageRank": 15,
+        "linesCount": 116,
+        "charsCount": 3699,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[フラッター フェザー リング]\t1\t2.25%\t4.50%",
+          "[マジック フェザー ヘッド]\t1\t1.50%\t4.50%",
+          "[マジック フェザー ウエスト]\t1\t1.50%\t4.50%",
+          "[フォーリンエンジェル リング]\t1\t2.80%\t9.56%",
+          "[フェザー ケープ]\t1\t2.80%\t9.57%",
+          "秘伝の書   [ [チョコ ホット スプリング] ]\t1\t1.61%"
+        ]
+      },
+      {
+        "id": "62b1372326506b001d489e24",
+        "title": "更新情報(20220621)",
+        "image": "https://gyazo.com/cebd1736095909f40e57c2f870d9df11/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 910,
+        "linked": 9,
+        "created": 1655781157,
+        "updated": 1656392890,
+        "pageRank": 20.39,
+        "linesCount": 128,
+        "charsCount": 3876,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[エンジェル フェザー ウイング]\t1\t1.50%\t4.50%",
+          "[フラッター フェザー リング]\t1\t1.50%\t4.50%",
+          "[ゾディアック リング]\t1\t4.50%",
+          "[アーティファクト リング]\t1\t1.20%"
+        ]
+      },
+      {
+        "id": "5dd3e5ac749e3f00172f013d",
+        "title": "更新情報(20160301)",
+        "image": "https://gyazo.com/1287ef8b1fc3cb66f2bfe8763ca8ac9d/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 65,
+        "linked": 3,
+        "created": 1574167982,
+        "updated": 1657733747,
+        "pageRank": 13.8,
+        "linesCount": 84,
+        "charsCount": 3770,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[フェザー リング] [New!.icon]"
+        ]
+      },
+      {
+        "id": "5e14636021aa08001788d39a",
+        "title": "更新情報(20160308)",
+        "image": "https://gyazo.com/0892f5a3cd3cff2231885267383bb746/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 130,
+        "linked": 3,
+        "created": 1578394466,
+        "updated": 1658172700,
+        "pageRank": 13.6,
+        "linesCount": 117,
+        "charsCount": 4251,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[フェザー リング]",
+          "ノアピース `[`[エンジェリック スプリング]`]`",
+          "秘伝の書 `[`[マジック スプリング]`]`"
+        ]
+      },
+      {
+        "id": "628316e9e44270001fa69263",
+        "title": "更新情報(20220517)",
+        "image": "https://gyazo.com/b2473baad25a70f6e75c1446a71bd6e1/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 1006,
+        "linked": 5,
+        "created": 1652758251,
+        "updated": 1654574611,
+        "pageRank": 17,
+        "linesCount": 163,
+        "charsCount": 5499,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[エキスパート マジック リング]\t1\t2.80%\t9.57%",
+          "[フェザー ヘアバンド]\t1\t4.50%"
+        ]
+      },
+      {
+        "id": "624bbd72eaddab002325e490",
+        "title": "更新情報(20220405)",
+        "image": "https://gyazo.com/c8c0ee8c4f637f0bd772089878fd8d29/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 855,
+        "linked": 7,
+        "created": 1649130868,
+        "updated": 1652431857,
+        "pageRank": 18.79,
+        "linesCount": 94,
+        "charsCount": 3427,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[エンジェル フェザー ウイング]\t1\t1.50%\t4.50%",
+          "[エレメンタル  リング アンド ブレスレット]\t1\t2.80%\t9.56%"
+        ]
+      },
+      {
+        "id": "5e39194d7542260017ed712c",
+        "title": "更新情報(20200204)",
+        "image": "https://gyazo.com/7ca393edf2cfae0f682668c379fa5797/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 600,
+        "linked": 3,
+        "created": 1580800335,
+        "updated": 1655911539,
+        "pageRank": 14,
+        "linesCount": 91,
+        "charsCount": 3234,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "秘伝の書 `[`[チョコ ホット スプリング]`]` [New!.icon]\t1\t1.20%\t2.40%",
+          "[ビッグ フェザー イヤリング]\t1\t2.80%\t9.57%"
+        ]
+      },
+      {
+        "id": "62caa4c268b778001d2200ac",
+        "title": "更新情報(20151006)",
+        "image": "https://gyazo.com/1512682ef96e8cc7e06e639cf6cd9518/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 59,
+        "linked": 2,
+        "created": 1657447644,
+        "updated": 1657448140,
+        "pageRank": 12.2,
+        "linesCount": 122,
+        "charsCount": 4201,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[クレセント ムーン イヤリング]",
+          "[フェザー ヘアバンド]",
+          "[ゴシック リング]",
+          "[ゴシック イヤリング]"
+        ]
+      },
+      {
+        "id": "6254f901f0a40d001dd8de38",
+        "title": "更新情報(20220412)",
+        "image": "https://gyazo.com/7bff124e3e1edae09187a5f60959d498/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 976,
+        "linked": 4,
+        "created": 1649735939,
+        "updated": 1651071600,
+        "pageRank": 16.2,
+        "linesCount": 223,
+        "charsCount": 7608,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[エンジェル フェザー ウエストウイング]\t1\t1.50%\t4.50%",
+          "ノアピース   [ [エンジェリック スプリング] ]\t1\t2.50%"
+        ]
+      },
+      {
+        "id": "620b6c90a96045001fcb6efe",
+        "title": "更新情報(20220215)",
+        "image": "https://gyazo.com/9ab316176e214c3e9144d7ff6f906136/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 835,
+        "linked": 10,
+        "created": 1644915858,
+        "updated": 1645524511,
+        "pageRank": 20.8,
+        "linesCount": 106,
+        "charsCount": 3266,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[フラッター フェザー リング]\t1\t1.50%\t4.50%"
+        ]
+      },
+      {
+        "id": "621db0ff08c36b001d57e073",
+        "title": "更新情報(20220301)",
+        "image": "https://gyazo.com/2fa9e1f646045fda500099b2c797df67/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 665,
+        "linked": 5,
+        "created": 1646113024,
+        "updated": 1649141158,
+        "pageRank": 16.2,
+        "linesCount": 94,
+        "charsCount": 3228,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[フラッター フェザー リング]\t1\t1.50%\t4.50%"
+        ]
+      },
+      {
+        "id": "62396e6427996f001d6fe870",
+        "title": "更新情報(20220322)",
+        "image": "https://gyazo.com/8fcf133ca2c3e3780a59cd4c09e75209/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 880,
+        "linked": 6,
+        "created": 1647930982,
+        "updated": 1648525694,
+        "pageRank": 17,
+        "linesCount": 127,
+        "charsCount": 4045,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[フラッター フェザー リング]\t1\t1.50%\t4.50%",
+          "[ヴァンパイア イヤリング]\t1\t2.80%\t9.56%",
+          "[アーティファクト リング]\t1\t2.10%"
+        ]
+      },
+      {
+        "id": "62270536820f020020db4108",
+        "title": "更新情報(20220308)",
+        "image": "https://gyazo.com/e796ea5e68b137a436a20821fd6a0e13/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 888,
+        "linked": 4,
+        "created": 1646724407,
+        "updated": 1647327329,
+        "pageRank": 15.2,
+        "linesCount": 106,
+        "charsCount": 3499,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[ウィッチ フェザー ストール]\t1\t2.80%\t9.57%",
+          "[双天使のリング]\t1\t2.80%\t9.56%",
+          "50\t[エンジェル フェザー イヤリング]",
+          "> 　▼[メガ ヒーリング ポーション]"
+        ]
+      },
+      {
+        "id": "61dd5684d3de10001f28bdda",
+        "title": "更新情報(20220111)",
+        "image": "https://gyazo.com/e2abc0fd53bd92681e7bf9c72475fb37/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 529,
+        "linked": 5,
+        "created": 1641895558,
+        "updated": 1642491241,
+        "pageRank": 16.6,
+        "linesCount": 103,
+        "charsCount": 3995,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "「 マジック フェザー ヘッド 」登場！ https://moepic.com/top/news_detail.php?",
+          "[アーティファクト リング]\t1\t0.80%\t2.40%\t1.04%\t2.40%\t1.60%",
+          "[マジック フェザー ヘッド]\t1\t2.25%\t4.50%\t1.95%\t4.50%\t3.00%",
+          "[マジック フェザー ウエスト]\t1\t2.25%\t4.50%\t1.95%\t4.50%\t3.00%"
+        ]
+      },
+      {
+        "id": "6193492e17f8c3001fa01d92",
+        "title": "更新情報(20211116)",
+        "image": "https://gyazo.com/93cf76067d30eec03ffa777192c32cf6/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 721,
+        "linked": 5,
+        "created": 1637042494,
+        "updated": 1637566388,
+        "pageRank": 15.4,
+        "linesCount": 128,
+        "charsCount": 4252,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "→[メダロット ガトリング]",
+          "[エンジェル フェザー ウイング]\t1\t0.80%\t2.40%"
+        ]
+      },
+      {
+        "id": "61777d6f6a4b09001d404a1b",
+        "title": "更新情報(20211026)",
+        "image": "https://gyazo.com/fab52db58c4040ab3d53843795bf761e/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 1858,
+        "linked": 4,
+        "created": 1635220849,
+        "updated": 1635838861,
+        "pageRank": 15.4,
+        "linesCount": 187,
+        "charsCount": 5796,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[ゴシック リング]\t1\t4.50%",
+          "[ゴシック イヤリング]\t1\t4.50%",
+          "[グランフェザードラゴンのペンダント]\t7500"
+        ]
+      },
+      {
+        "id": "614012bf537aa10020f734bc",
+        "title": "更新情報(20210914)",
+        "image": "https://gyazo.com/3db1585be4961ad4049a5da2fec46dfa/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 944,
+        "linked": 5,
+        "created": 1631589062,
+        "updated": 1632224967,
+        "pageRank": 16.6,
+        "linesCount": 139,
+        "charsCount": 4093,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[エンジェル フェザー ウイング]\t1\t0.80%\t2.40%",
+          "[エンジェル フェザー ウエストウイング]\t1\t0.80%\t2.40%",
+          "[インテリジェンス リング]\t1\t4.50%",
+          "[アニマル レスリング スーツ]\t1\t1.80%"
+        ]
+      },
+      {
+        "id": "5e5dfb17ffc3560017cbda8b",
+        "title": "更新情報(20200303)",
+        "image": "https://gyazo.com/27fcc64c9b20f65fb20bbcf213502030/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 504,
+        "linked": 3,
+        "created": 1583217433,
+        "updated": 1632202727,
+        "pageRank": 14.8,
+        "linesCount": 129,
+        "charsCount": 4143,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[アニマル レスリング スーツ]\t1\t0.80%\t2.40%\t1.60%",
+          "[双天使のリング]\t1\t1.20%\t2.40%\t1.60%",
+          "[エレメンタル フェザー ウイング]\t1\t1.20%\t2.40%\t1.60%"
+        ]
+      },
+      {
+        "id": "60bee5da1a1750003616039e",
+        "title": "更新情報(20210608)",
+        "image": "https://gyazo.com/e9c31e4bcb927a8d1bd0625f32ec8245/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 587,
+        "linked": 6,
+        "created": 1623123420,
+        "updated": 1623733503,
+        "pageRank": 17,
+        "linesCount": 77,
+        "charsCount": 2755,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[アーティファクト リング]\t1\t1.20%\t2.40%",
+          "> ◇『 [ウィッチ フェザー ストール] 』を「 精錬の泉 」で精錬すると『 ウィッチ フェザー ストール（肘無） 』と交換できるようにしました。"
+        ]
+      },
+      {
+        "id": "60ac74b77690280023816808",
+        "title": "更新情報(20210525)",
+        "image": "https://gyazo.com/ffbba16f39f3b9b95a9b7d9e87f3c47d/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 605,
+        "linked": 3,
+        "created": 1621914809,
+        "updated": 1625041246,
+        "pageRank": 14,
+        "linesCount": 143,
+        "charsCount": 4885,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[エンジェル フェザー ガントレット]\t1\t0.80%\t2.40%",
+          "[バタフライ リング]\t1\t2.80%\t9.57%"
+        ]
+      },
+      {
+        "id": "6087970c6d70a1001feb4afe",
+        "title": "更新情報(20210427)",
+        "image": "https://gyazo.com/1a3a11b927f713185ccce70ed05638a1/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 895,
+        "linked": 3,
+        "created": 1619498766,
+        "updated": 1620727743,
+        "pageRank": 14,
+        "linesCount": 220,
+        "charsCount": 7746,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[サターン リング]\t1\t4.50%",
+          "[グランフェザードラゴンのペンダント]\t7500",
+          "[ビッグ ダイアモンド リング]\t2000",
+          "[十四周年記念イヤリング] NEW!\t3000",
+          "[21-04-27 スタードロップ イヤリングプレゼントキャンペーン実施中！ https://moepic.com/top/news_detail.php?",
+          "[スタードロップ イヤリング]",
+          "秘伝の書   [ [ジャイアント キリング] ]\t1\t2.50%"
+        ]
+      },
+      {
+        "id": "60755b86160fad001c3def82",
+        "title": "更新情報(20210413)",
+        "image": "https://gyazo.com/75faa4f4885dc82342339d7fca0fd42b/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 753,
+        "linked": 4,
+        "created": 1618303881,
+        "updated": 1618900630,
+        "pageRank": 14.6,
+        "linesCount": 83,
+        "charsCount": 2874,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[エンジェル フェザー ガントレット]\t1\t0.80%\t2.40%",
+          "[ウィッチ フェザー ストール]\t1\t2.25%\t4.50%",
+          "[フォーリンエンジェル リング]\t1\t1.50%\t4.50%"
+        ]
+      },
+      {
+        "id": "5daa3359fe795a001793f149",
+        "title": "更新情報(20150120)",
+        "image": "https://gyazo.com/bf8aa10d7b206de972dcd9544d645bd3/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 259,
+        "linked": 3,
+        "created": 1556725891,
+        "updated": 1618220953,
+        "pageRank": 13.8,
+        "linesCount": 142,
+        "charsCount": 4296,
+        "words": [
+          "フェザー",
+          "リング"
+        ],
+        "lines": [
+          "[ゴシック リング]",
+          "[ゴシック イヤリング]",
+          "[スター フェザー]",
+          "秘伝の書 `[`[ヒーリング ショット]`]`",
+          "ノアピース `[`[エンジェリック スプリング]`]`"
+        ]
+      }
+    ],
+    "existsExactTitleMatch": true,
+    "field": "lines",
+    "query": {
+      "words": [
+        "フェザー",
+        "リング"
+      ],
+      "excludes": []
+    },
+    "backend": "elasticsearch"
+  }
+}

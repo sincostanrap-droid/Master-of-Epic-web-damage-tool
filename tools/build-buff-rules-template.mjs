@@ -15,7 +15,7 @@ import fs from "node:fs";
 import path from "node:path";
 import vm from "node:vm";
 
-const VERSION = "v1.23.13";
+const VERSION = "v1.23.18";
 const ROOT = process.cwd();
 const GENERATED_PATH = path.join(ROOT, "src/data/generated/wikiEquipBuffEffects.generated.js");
 const OUT_PATH = path.join(ROOT, "data/manual/buffRules.manual.input.tsv");
@@ -49,9 +49,131 @@ const STAT_COLUMNS = [
 const HEADER = [
   "enabled", "verified", "applyDefault", "officialTechnicId", "catalogId", "name", "conflictGroup", "stackRule",
   ...STAT_COLUMNS,
-  "skillEffects", "customEffects", "memo", "source", "wikiName", "matchStatus", "matchedBuffIds", "matchedOfficialTechnicIds",
+  "skillEffects", "customEffects", "memo", "source",
+  "scrapboxMatchStatus", "scrapboxMatchedQueries", "scrapboxPages", "scrapboxStackRuleHint", "scrapboxConflictGroupHint", "scrapboxEffectHint", "scrapboxNotes", "scrapboxRawLines",
+  "wikiName", "matchStatus", "matchedBuffIds", "matchedOfficialTechnicIds",
   "parsedStatsHint", "unparsedNotes", "equipmentNames", "rawInfo", "sourcePage", "wikiId"
 ];
+
+const COLUMN_LABELS = {
+  enabled: "有効化",
+  verified: "確認済み",
+  applyDefault: "装備追加時に既定適用",
+  officialTechnicId: "公式DBテクニックID",
+  catalogId: "内部Buff ID",
+  name: "Buff名",
+  conflictGroup: "競合グループ",
+  stackRule: "重複/併用ルール",
+  attack: "攻撃力",
+  attackPct: "攻撃力%",
+  magic: "魔力",
+  magicPct: "魔力%",
+  speed: "移動速度",
+  speedPct: "移動速度%",
+  dmgPct: "与ダメージ%",
+  extraAC: "防御力",
+  extraACPct: "防御力%",
+  extraHP: "最大HP",
+  extraHPPct: "最大HP%",
+  extraMP: "最大MP",
+  extraMPPct: "最大MP%",
+  extraST: "最大ST",
+  extraSTPct: "最大ST%",
+  extraMaxWeight: "最大重量",
+  extraMaxWeightPct: "最大重量%",
+  extraHit: "命中",
+  extraHitPct: "命中%",
+  extraAvoid: "回避",
+  extraAvoidPct: "回避%",
+  extraAttackDelay: "攻撃ディレイ",
+  extraAttackDelayPct: "攻撃ディレイ%",
+  extraMagicDelay: "魔法ディレイ",
+  extraMagicDelayPct: "魔法ディレイ%",
+  extraFireRes: "耐火属性",
+  extraFireResPct: "耐火属性%",
+  extraWaterRes: "耐水属性",
+  extraWaterResPct: "耐水属性%",
+  extraEarthRes: "耐地属性",
+  extraEarthResPct: "耐地属性%",
+  extraWindRes: "耐風属性",
+  extraWindResPct: "耐風属性%",
+  extraNeutralRes: "耐無属性",
+  extraNeutralResPct: "耐無属性%",
+  extraDamageReducePct: "被ダメージ軽減%",
+  extraCritRatePct: "クリティカル率%",
+  extraBreath: "BREATH",
+  extraHearing: "HEARING",
+  extraSeeing: "SEEING",
+  extraSmelling: "SMELLING",
+  extraFullness: "満腹度",
+  extraThirst: "潤喉度",
+  extraSteal: "盗み補正",
+  extraLockpickingFail: "ピッキング失敗回数補正",
+  extraFangAttack: "牙攻撃補正",
+  extraFishingGaugeLength: "釣りゲージ長",
+  extraFishingHitZone: "釣りヒットゾーン",
+  extraSmithingGradeZone: "鍛冶グレードゾーン",
+  extraSmithingGaugeSlip: "鍛冶ゲージ滑り",
+  extraSmithingHitZone: "鍛冶ヒットゾーン",
+  extraCarpentryGradeZone: "大工グレードゾーン",
+  extraCarpentryGaugeSlip: "大工ゲージ滑り",
+  extraCarpentryHitZone: "大工ヒットゾーン",
+  extraTailoringGradeZone: "裁縫グレードゾーン",
+  extraTailoringGaugeSlip: "裁縫ゲージ滑り",
+  extraTailoringHitZone: "裁縫ヒットゾーン",
+  extraDecorationGradeZone: "装飾細工グレードゾーン",
+  extraDecorationGaugeSlip: "装飾細工ゲージ滑り",
+  extraDecorationHitZone: "装飾細工ヒットゾーン",
+  extraCookingGradeZone: "料理グレードゾーン",
+  extraCookingGaugeSlip: "料理ゲージ滑り",
+  extraCookingHitZone: "料理ヒットゾーン",
+  extraBrewingGradeZone: "醸造グレードゾーン",
+  extraBrewingGaugeSlip: "醸造ゲージ滑り",
+  extraBrewingHitZone: "醸造ヒットゾーン",
+  extraAlchemyGradeZone: "薬調合グレードゾーン",
+  extraAlchemyGaugeSlip: "薬調合ゲージ滑り",
+  extraAlchemyHitZone: "薬調合ヒットゾーン",
+  extraReplicationGradeZone: "複製グレードゾーン",
+  extraReplicationGaugeSlip: "複製ゲージ滑り",
+  extraReplicationHitZone: "複製ヒットゾーン",
+  extraBeautyGaugeSlip: "美容ゲージ滑り",
+  extraBeautyHitZone: "美容ヒットゾーン",
+  hpRegenPerMinute: "HP自然回復/分",
+  stRegenPerMinute: "ST自然回復/分",
+  mpRegenPerMinute: "MP自然回復/分",
+  stCostReducePct: "ST消費軽減%",
+  mpCostReducePct: "MP消費軽減%",
+  itemUseDelayPct: "アイテム使用ディレイ%",
+  physicalDamageReducePct: "物理ダメージ軽減%",
+  physicalReflectPct: "物理反射%",
+  magicReflectPct: "魔法反射%",
+  skillEffects: "スキル効果補正",
+  customEffects: "その他メモ効果",
+  memo: "手入力メモ",
+  source: "入力元",
+  scrapboxMatchStatus: "Scrapbox照合状態",
+  scrapboxMatchedQueries: "Scrapbox照合クエリ",
+  scrapboxPages: "Scrapbox候補ページ",
+  scrapboxStackRuleHint: "Scrapbox重複/併用ヒント",
+  scrapboxConflictGroupHint: "Scrapbox競合グループ候補",
+  scrapboxEffectHint: "Scrapbox効果ヒント",
+  scrapboxNotes: "Scrapbox注意メモ",
+  scrapboxRawLines: "Scrapbox根拠行",
+  wikiName: "Wiki名称",
+  matchStatus: "照合状態",
+  matchedBuffIds: "照合Buff ID",
+  matchedOfficialTechnicIds: "照合テクニックID",
+  parsedStatsHint: "自動抽出ヒント",
+  unparsedNotes: "未解析メモ",
+  equipmentNames: "対象装備",
+  rawInfo: "Wiki原文",
+  sourcePage: "Wikiページ",
+  wikiId: "Wiki行ID"
+};
+
+function labelHeader() {
+  return HEADER.map(h => tsvCell(COLUMN_LABELS[h] || h)).join("\t");
+}
 
 const PROP_ALIASES = new Map([
   ["attack", "attack"], ["attackPct", "attackPct"],
@@ -134,6 +256,14 @@ function buildRow(row) {
     customEffects: "",
     memo: "",
     source: "wiki-manual",
+    scrapboxMatchStatus: "",
+    scrapboxMatchedQueries: "",
+    scrapboxPages: "",
+    scrapboxStackRuleHint: "",
+    scrapboxConflictGroupHint: "",
+    scrapboxEffectHint: "",
+    scrapboxNotes: "",
+    scrapboxRawLines: "",
     wikiName: row.name || "",
     matchStatus: row.matchStatus || "",
     matchedBuffIds: joinList(buffIds),
@@ -151,7 +281,7 @@ function buildRow(row) {
 const rows = loadGeneratedRows();
 const filtered = onlyMatched ? rows.filter(r => (r.matchedOfficialTechnicIds || []).length) : rows;
 fs.mkdirSync(path.dirname(OUT_PATH), { recursive: true });
-const text = [HEADER.join("\t"), ...filtered.map(buildRow)].join("\n") + "\n";
+const text = [labelHeader(), HEADER.join("\t"), ...filtered.map(buildRow)].join("\n") + "\n";
 fs.writeFileSync(OUT_PATH, text, "utf8");
 console.log(`[buff-rules-template] ${VERSION}`);
 console.log(`[read] ${GENERATED_PATH} (${rows.length} rows)`);

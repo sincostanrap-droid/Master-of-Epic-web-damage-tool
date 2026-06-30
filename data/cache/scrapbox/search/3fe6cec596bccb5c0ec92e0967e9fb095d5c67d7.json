@@ -1,0 +1,332 @@
+{
+  "cachedAt": "2026-06-30T05:32:14.382Z",
+  "data": {
+    "projectName": "medianmoe",
+    "searchQuery": "メカニカル ヘッドフォン",
+    "limit": 100,
+    "count": 10,
+    "pages": [
+      {
+        "id": "5d6cad8cad1f940017593c59",
+        "title": "メカニカル ヘッドフォン",
+        "image": "https://gyazo.com/31f9b1d0e4008d858323cd0de3949491/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 933,
+        "linked": 4,
+        "created": 1567403487,
+        "updated": 1700550803,
+        "pageRank": 10.8,
+        "linesCount": 23,
+        "charsCount": 295,
+        "words": [
+          "メカニカル",
+          "ヘッドフォン"
+        ],
+        "lines": [
+          "メカニカル ヘッドフォン"
+        ]
+      },
+      {
+        "id": "5dc10e008b14200017b69e4a",
+        "title": "実装アイテム(2017)",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 441,
+        "linked": 1,
+        "created": 1572933130,
+        "updated": 1703070690,
+        "pageRank": 15,
+        "linesCount": 334,
+        "charsCount": 4993,
+        "words": [
+          "メカニカル",
+          "ヘッドフォン"
+        ],
+        "lines": [
+          "[メカニカル ヘッドフォン]",
+          "[メカニカル アイシールド]"
+        ]
+      },
+      {
+        "id": "63ce5c9d8f3863001db58a20",
+        "title": "更新情報(20160816)",
+        "image": "https://gyazo.com/dea5b315ce057cf4fe7f0cdd03b8bf01/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 76,
+        "linked": 6,
+        "created": 1674468511,
+        "updated": 1674469558,
+        "pageRank": 16.39,
+        "linesCount": 114,
+        "charsCount": 4052,
+        "words": [
+          "メカニカル",
+          "ヘッドフォン"
+        ],
+        "lines": [
+          "[メカニカル フェイス] NEW!!",
+          "[猫耳ヘッドフォン]"
+        ]
+      },
+      {
+        "id": "5dc10be88c0f4c0017db29aa",
+        "title": "更新情報(20170314)",
+        "image": "https://gyazo.com/00f6cbfa19aebc9675a3439cba8bb416/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 165,
+        "linked": 4,
+        "created": 1572932585,
+        "updated": 1675478547,
+        "pageRank": 15.4,
+        "linesCount": 199,
+        "charsCount": 5645,
+        "words": [
+          "メカニカル",
+          "ヘッドフォン"
+        ],
+        "lines": [
+          "[メカニカル ヘッドフォン]"
+        ]
+      },
+      {
+        "id": "63ddbf3dc27780001de4f602",
+        "title": "更新情報(20170307)",
+        "image": "https://gyazo.com/f4c084906ad4037236838abfe8351a63/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 230,
+        "linked": 3,
+        "created": 1675476798,
+        "updated": 1675477605,
+        "pageRank": 13.2,
+        "linesCount": 159,
+        "charsCount": 4724,
+        "words": [
+          "メカニカル",
+          "ヘッドフォン"
+        ],
+        "lines": [
+          "[メカニカル ヘッドフォン]NEW！"
+        ]
+      },
+      {
+        "id": "633185dfc6661100228dc497",
+        "title": "更新情報(20160405)",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 40,
+        "linked": 3,
+        "created": 1664189921,
+        "updated": 1664190837,
+        "pageRank": 13.4,
+        "linesCount": 87,
+        "charsCount": 3241,
+        "words": [
+          "メカニカル",
+          "ヘッドフォン"
+        ],
+        "lines": [
+          "[メカニカル ヒーロー ヘルム]",
+          "[猫耳ヘッドフォン]"
+        ]
+      },
+      {
+        "id": "60067437519721001cbbb135",
+        "title": "更新情報(20160329)",
+        "image": "https://gyazo.com/134b282d5eb4f6a60463797a609e0f3a/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 101,
+        "linked": 3,
+        "created": 1611035705,
+        "updated": 1660913990,
+        "pageRank": 13.6,
+        "linesCount": 86,
+        "charsCount": 4079,
+        "words": [
+          "メカニカル",
+          "ヘッドフォン"
+        ],
+        "lines": [
+          "[メカニカル バタフライ]",
+          "[メカニカル ヒーロー ヘルム]",
+          "[猫耳ヘッドフォン]",
+          "[メカニカル ブーツ]",
+          "[メカニカル ビッグアーム]"
+        ]
+      },
+      {
+        "id": "5fcefd5af08862001d23752b",
+        "title": "更新情報(20201208)",
+        "image": "https://gyazo.com/79145432fc113679b4701d56ad3ac1a3/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 458,
+        "linked": 4,
+        "created": 1607400796,
+        "updated": 1620112911,
+        "pageRank": 14.8,
+        "linesCount": 120,
+        "charsCount": 4482,
+        "words": [
+          "メカニカル",
+          "ヘッドフォン"
+        ],
+        "lines": [
+          "[ウサ耳ヘッドフォン]\t1\t4.50%",
+          "[メカニカル モノアイ ヘルメット]\t[エアリエル ロッド]\t[アクア ロッド]",
+          "[メカニカル アシスト レッグ]\t[ノア ブレイカー]\t[双天使のリング]",
+          "[メカニカル オクト ウイング]\t[ラビット イヤーマフ]\t[スチームパンク ガントレット]",
+          "[大樹の杖]\t[メカニカル ウイング アーム]\t[死神の大鎌]",
+          "[クロスバックルセット]\t[メカニカル ブーツ]\t[箱入り染色液(黒)]"
+        ]
+      },
+      {
+        "id": "5ec3a67a9c955300233c00da",
+        "title": "更新情報(20200519)",
+        "image": "https://gyazo.com/d4f17964e2e4065ca00bd18dcdd732ad/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 489,
+        "linked": 4,
+        "created": 1589880445,
+        "updated": 1592496452,
+        "pageRank": 14.8,
+        "linesCount": 97,
+        "charsCount": 3062,
+        "words": [
+          "メカニカル",
+          "ヘッドフォン"
+        ],
+        "lines": [
+          "[メカニカル ウイング アーム]\t1\t1.50%\t4.50%",
+          "[猫耳ヘッドフォン]\t1\t4.50%"
+        ]
+      },
+      {
+        "id": "5daa335dfe795a001793f169",
+        "title": "更新情報(20190716)",
+        "image": "https://gyazo.com/b58ea7038ed3cbdb8f04df092fed1f06/raw",
+        "user": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "lastUpdateUser": {
+          "id": "5c49afc4ed0e2f0017cf811b"
+        },
+        "users": [
+          {
+            "id": "5c49afc4ed0e2f0017cf811b"
+          }
+        ],
+        "views": 93,
+        "linked": 4,
+        "created": 1563260733,
+        "updated": 1575772868,
+        "pageRank": 14.4,
+        "linesCount": 118,
+        "charsCount": 4065,
+        "words": [
+          "メカニカル",
+          "ヘッドフォン"
+        ],
+        "lines": [
+          "[メカニカル ヘッドフォン] \t1\t4.50%"
+        ]
+      }
+    ],
+    "existsExactTitleMatch": true,
+    "field": "lines",
+    "query": {
+      "words": [
+        "メカニカル",
+        "ヘッドフォン"
+      ],
+      "excludes": []
+    },
+    "backend": "elasticsearch"
+  }
+}

@@ -11,7 +11,7 @@
 import fs from "node:fs";
 import path from "node:path";
 
-const VERSION = "v1.23.13";
+const VERSION = "v1.23.18";
 const ROOT = process.cwd();
 const args = Object.fromEntries(process.argv.slice(2).map(a => {
   const m = a.match(/^--([^=]+)=(.*)$/);
@@ -112,8 +112,24 @@ const EXTRA_NUMERIC_RULES = {
 function parseTsv(text) {
   const lines = text.replace(/^\uFEFF/, "").split(/\r?\n/).filter(line => line.length);
   if (!lines.length) return [];
-  const header = lines[0].split("\t");
-  return lines.slice(1).map(line => {
+  let header = lines[0].split("\t");
+  let dataStart = 1;
+
+  // v1.23.14以降のTSVは、1行目が日本語表示名、2行目が内部キー。
+  // 旧形式TSVは1行目が内部キーなので、そのまま読む。
+  if (!header.includes("enabled") && lines[1]) {
+    const maybeKeys = lines[1].split("\t");
+    if (maybeKeys.includes("enabled") && maybeKeys.includes("officialTechnicId")) {
+      header = maybeKeys;
+      dataStart = 2;
+    }
+  }
+
+  if (!header.includes("enabled") || !header.includes("officialTechnicId")) {
+    throw new Error("TSVヘッダーを認識できません。1行目が内部キー、または1行目が日本語名・2行目が内部キーの形式にしてください。");
+  }
+
+  return lines.slice(dataStart).map(line => {
     const cells = line.split("\t");
     const row = {};
     header.forEach((h, i) => row[h] = cells[i] ?? "");
@@ -189,7 +205,17 @@ function ruleFromRow(row, lineNo) {
     sourceWikiName: clean(row.wikiName),
     sourcePage: clean(row.sourcePage),
     equipmentNames: splitList(row.equipmentNames),
-    rawInfo: clean(row.rawInfo)
+    rawInfo: clean(row.rawInfo),
+    scrapbox: {
+      matchStatus: clean(row.scrapboxMatchStatus),
+      matchedQueries: splitList(row.scrapboxMatchedQueries),
+      pages: splitList(row.scrapboxPages),
+      stackRuleHint: clean(row.scrapboxStackRuleHint),
+      conflictGroupHint: clean(row.scrapboxConflictGroupHint),
+      effectHint: clean(row.scrapboxEffectHint),
+      notes: clean(row.scrapboxNotes),
+      rawLines: clean(row.scrapboxRawLines)
+    }
   }];
 }
 
