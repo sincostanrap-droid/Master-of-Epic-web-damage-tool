@@ -1,0 +1,12 @@
+{
+  "name": "moe_native_effect_rule_promote_critical_patch_v4",
+  "purpose": "Promote critical rate UP A/B Lv1-Lv3 from reviewed candidates into native manual rules while excluding mixed auto-extracted stats.",
+  "files": [
+    "tools/promote-native-critical-rules.mjs",
+    "docs/native-effect-rule-promotion-critical-v1.md",
+    "APPLY_NATIVE_EFFECT_RULE_PROMOTE_CRITICAL_WINDOWS.md",
+    "MANIFEST_NATIVE_EFFECT_RULE_PROMOTE_CRITICAL.json"
+  ],
+  "calculationIntegration": false,
+  "rulesAddedByScript": 6
+}
