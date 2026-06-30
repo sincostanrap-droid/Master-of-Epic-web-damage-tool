@@ -206,11 +206,11 @@
 <body>
   <header>
     <h1>装備効果 突合ビュー</h1>
-    <p>現在ブラウザに保存されている装備データ、または貼り付けた装備JSON/TSVを、参考効果データ・装備効果索引と突き合わせます。計算値はまだ変更しません。</p>
+    <p>現在ブラウザに保存されている装備データ、または貼り付けた装備JSON/TSVを、参考効果データ・装備効果索引と突き合わせます。元データ由来の効果と参考候補を分けて表示し、計算値は変更しません。</p>
   </header>
   <main>
     <div class="notice">
-      この画面は確認専用です。既存のダメージ計算には反映しません。参考効果データは公式値として扱わず、突合候補と未対応効果の確認に使います。
+      この画面は確認専用です。既存のダメージ計算には反映しません。参考効果データは公式値として扱わず、突合候補と説明/未対応効果の確認に使います。
     </div>
 
     <section class="panel">
@@ -254,7 +254,7 @@
     <section class="panel">
       <div id="summary" class="summary"></div>
       <div class="muted small">
-        「一致候補あり」は参考データ側の候補が見つかった装備です。「直接効果あり」は装備自身に攻撃力/命中/HPなどの効果らしき値が見つかった装備です。
+        「一致候補あり」は参考データ側の候補が見つかった装備です。「元データ効果あり」は、選択した装備raw自身から攻撃力/命中/HPなどの効果候補が読めた装備です。参考データ側の候補値とは分けて表示します。
       </div>
     </section>
 
@@ -272,8 +272,8 @@
               <option value="all">すべて</option>
               <option value="matched">一致候補あり</option>
               <option value="unmatched">候補なし</option>
-              <option value="direct">直接効果あり</option>
-              <option value="unsupported">未対応/説明のみあり</option>
+              <option value="direct">元データ効果あり</option>
+              <option value="unsupported">説明/未対応あり</option>
             </select>
           </div>
         </div>

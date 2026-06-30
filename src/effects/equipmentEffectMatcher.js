@@ -91,6 +91,28 @@ const DIRECT_FIELD_MAP = new Map([
   ['無耐性', { stat: 'resistMagic', mode: 'flat' }]
 ]);
 
+const BASE_FIELD_NAMES = new Set([
+  'AC', 'AC(基礎)', '防御力', 'HP', 'HP(基礎)', '最大HP', 'MP', 'MP(基礎)', '最大MP',
+  'ST', 'ST(基礎)', '最大ST', '重量', '最大重量'
+]);
+
+const STAT_CONTAINER_KEYS = [
+  'add_status', 'addStatus', 'additionalStats', 'additionalStatus', 'buffStats', 'buffStatus',
+  'stats', 'status', 'effects', 'effectStats', 'effect_status', 'statBonuses', 'bonuses'
+];
+
+const FIELD_ALIASES = new Map([
+  ['attack', '攻撃力'], ['atk', '攻撃力'], ['attack_bonus', '攻撃力(バフ)'], ['atk_bonus', '攻撃力(バフ)'],
+  ['hit', '命中'], ['accuracy', '命中'], ['avoid', '回避'], ['evasion', '回避'],
+  ['magic', '魔力'], ['mag', '魔力'], ['attackDelay', '攻撃ディレイ'], ['delay', '攻撃ディレイ'],
+  ['crit', 'クリティカル率'], ['critRate', 'クリティカル率'], ['critical', 'クリティカル率'],
+  ['hp', '最大HP'], ['mp', '最大MP'], ['st', '最大ST'], ['ac', 'AC'],
+  ['res_fire', '火抵抗'], ['fireResist', '火抵抗'], ['res_water', '水抵抗'], ['waterResist', '水抵抗'],
+  ['res_wind', '風抵抗'], ['windResist', '風抵抗'], ['res_earth', '地抵抗'], ['earthResist', '地抵抗'],
+  ['res_magic', '無抵抗'], ['magicResist', '無抵抗'], ['speed', '移動速度'], ['moveSpeed', '移動速度'],
+  ['weight', '最大重量']
+]);
+
 const STAT_TEXT_PATTERNS = [
   [/攻撃力\s*([+-]?\d+(?:\.\d+)?)/g, 'attack', 'flat'],
   [/命中\s*([+-]?\d+(?:\.\d+)?)/g, 'hit', 'flat'],
@@ -155,10 +177,10 @@ function normalizeItem(raw, meta = {}) {
   const slot = item.slot || item.type || item.part || item['部位'] || item.category || '';
   const buffName = item.buffName || item.Buff || item.buff || item['Buff'] || item['付加効果'] || item.addEffectName || '';
   const buffInfo = item.buffInfo || item.BuffInfo || item['BuffInfo'] || item['追加効果'] || item.description || item.note || item.memo || '';
-  const buffStatsText = item.buffStatsText || item.BuffStats || item['BuffStats'] || item.add_status || item.addStatus || item['追加効果ステータス'] || '';
+  const buffStatsText = item.buffStatsText || item.BuffStats || item['BuffStats'] || item['追加効果ステータス'] || '';
   const id = item.id || item.itemId || item.uid || `${meta.source || 'src'}:${meta.index ?? Math.random().toString(36).slice(2)}`;
   const directEffects = extractDirectEffects(item, buffStatsText);
-  const unsupportedTexts = [buffInfo].filter(Boolean);
+  const unsupportedTexts = collectUnsupportedTexts(item, buffInfo, buffStatsText, directEffects);
 
   return {
     id: String(id),
@@ -175,28 +197,118 @@ function normalizeItem(raw, meta = {}) {
   };
 }
 
-function extractDirectEffects(item, buffStatsText = '') {
-  const effects = [];
-  for (const [field, mapping] of DIRECT_FIELD_MAP.entries()) {
-    if (!Object.prototype.hasOwnProperty.call(item, field)) continue;
-    const value = asNumber(item[field]);
-    if (value === null || value === 0) continue;
-    effects.push({ ...mapping, value, sourceField: field });
+function makeEffect(mapping, value, sourceField, sourceContainer = 'item-field') {
+  return {
+    ...mapping,
+    value,
+    sourceField,
+    sourceContainer,
+    origin: 'item-raw',
+    category: BASE_FIELD_NAMES.has(sourceField) ? 'base' : 'effect'
+  };
+}
+
+function pushMappedEffect(effects, field, rawValue, sourceContainer = 'item-field') {
+  const key = String(field || '').trim();
+  const mappedKey = DIRECT_FIELD_MAP.has(key) ? key : FIELD_ALIASES.get(key);
+  if (!mappedKey || !DIRECT_FIELD_MAP.has(mappedKey)) return false;
+  const value = asNumber(rawValue);
+  if (value === null || value === 0) return false;
+  effects.push(makeEffect(DIRECT_FIELD_MAP.get(mappedKey), value, key, sourceContainer));
+  return true;
+}
+
+function extractEffectsFromContainer(value, sourceContainer, effects, depth = 0) {
+  if (depth > 4 || value == null) return;
+
+  if (typeof value === 'string') {
+    extractEffectsFromText(value, sourceContainer, effects);
+    return;
   }
 
-  const text = String(buffStatsText || '');
+  if (Array.isArray(value)) {
+    value.forEach((entry, index) => extractEffectsFromContainer(entry, `${sourceContainer}[${index}]`, effects, depth + 1));
+    return;
+  }
+
+  if (typeof value !== 'object') return;
+
+  const statName = value.stat || value.key || value.name || value.label || value['項目'] || value['名称'];
+  const statValue = value.value ?? value.amount ?? value.num ?? value['値'] ?? value['数値'];
+  if (statName && pushMappedEffect(effects, statName, statValue, sourceContainer)) return;
+
+  for (const [field, rawValue] of Object.entries(value)) {
+    if (STAT_CONTAINER_KEYS.includes(field)) {
+      extractEffectsFromContainer(rawValue, `${sourceContainer}.${field}`, effects, depth + 1);
+      continue;
+    }
+    if (pushMappedEffect(effects, field, rawValue, sourceContainer)) continue;
+    if (typeof rawValue === 'object' && rawValue !== null && depth < 2) {
+      extractEffectsFromContainer(rawValue, `${sourceContainer}.${field}`, effects, depth + 1);
+    }
+  }
+}
+
+function extractEffectsFromText(text, sourceField, effects) {
+  const src = String(text || '');
+  if (!src) return;
   for (const [regex, stat, mode] of STAT_TEXT_PATTERNS) {
     regex.lastIndex = 0;
     let match;
-    while ((match = regex.exec(text)) !== null) {
+    while ((match = regex.exec(src)) !== null) {
       const value = asNumber(match[1]);
       if (value !== null && value !== 0) {
-        effects.push({ stat, mode, value, sourceField: 'BuffStats' });
+        effects.push({ stat, mode, value, sourceField, sourceContainer: 'item-text', origin: 'item-raw', category: 'effect' });
       }
     }
   }
+}
 
-  return effects;
+function dedupeEffects(effects) {
+  const seen = new Set();
+  const out = [];
+  for (const effect of effects) {
+    const key = [effect.stat, effect.mode, effect.value, effect.sourceField, effect.sourceContainer].join('|');
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(effect);
+  }
+  return out;
+}
+
+function extractDirectEffects(item, buffStatsText = '') {
+  const effects = [];
+
+  // ここは参考データ側の候補を使わず、選択した装備rawだけを見る。
+  for (const [field, rawValue] of Object.entries(item || {})) {
+    if (STAT_CONTAINER_KEYS.includes(field)) {
+      extractEffectsFromContainer(rawValue, field, effects);
+      continue;
+    }
+    pushMappedEffect(effects, field, rawValue, 'item-field');
+  }
+
+  extractEffectsFromText(buffStatsText, 'BuffStats', effects);
+  return dedupeEffects(effects);
+}
+
+function collectUnsupportedTexts(item, buffInfo, buffStatsText, directEffects) {
+  const texts = [];
+  if (buffInfo) texts.push({ label: 'BuffInfo / 説明文', text: String(buffInfo), reason: '説明文です。現時点では自動計算へ接続していません。' });
+
+  const hasParsedBuffStats = directEffects.some((effect) => effect.sourceField === 'BuffStats');
+  if (buffStatsText && !hasParsedBuffStats) {
+    texts.push({ label: 'BuffStats', text: String(buffStatsText), reason: '数値効果として読み取れない、または未対応の表記です。' });
+  }
+
+  for (const key of ['特殊効果', '追加効果', 'remarks', 'note', 'memo', 'description']) {
+    const value = item?.[key];
+    if (typeof value === 'string' && value.trim() && value !== buffInfo) {
+      texts.push({ label: key, text: value, reason: '説明/注記として保持しています。' });
+    }
+  }
+
+  return texts;
 }
 
 function looksEquipmentLike(obj) {
@@ -446,7 +558,7 @@ function filteredItems() {
     if (kind === 'matched' && !item.matches.length) return false;
     if (kind === 'unmatched' && item.matches.length) return false;
     if (kind === 'direct' && !item.directEffects.length) return false;
-    if (kind === 'unsupported' && !(item.buffInfo || item.unsupportedTexts.length)) return false;
+    if (kind === 'unsupported' && !item.unsupportedTexts.length) return false;
     if (!q) return true;
     const haystack = compact([
       item.name, item.slot, item.buffName, item.buffInfo, item.buffStatsText,
@@ -460,12 +572,12 @@ function renderSummary() {
   const items = state.items;
   const matched = items.filter((item) => item.matches.length).length;
   const direct = items.filter((item) => item.directEffects.length).length;
-  const unsupported = items.filter((item) => item.buffInfo || item.unsupportedTexts.length).length;
+  const unsupported = items.filter((item) => item.unsupportedTexts.length).length;
   const totalMatches = items.reduce((sum, item) => sum + item.matches.length, 0);
   el('summary').innerHTML = [
     `<span class="pill">装備候補 ${items.length}</span>`,
     `<span class="pill good">一致候補あり ${matched}</span>`,
-    `<span class="pill">直接効果あり ${direct}</span>`,
+    `<span class="pill">元データ効果あり ${direct}</span>`,
     `<span class="pill warn">説明/未対応あり ${unsupported}</span>`,
     `<span class="pill">候補合計 ${totalMatches}</span>`,
     state.lastRun ? `<span class="pill">最小スコア ${state.lastRun.minScore}</span>` : ''
@@ -506,12 +618,13 @@ function renderItemList() {
 function renderEffectTable(effects = []) {
   if (!effects.length) return '<p class="muted">正規化済み効果はありません。</p>';
   return `<table>
-    <thead><tr><th>stat</th><th>表示</th><th>mode</th><th>元フィールド</th></tr></thead>
+    <thead><tr><th>stat</th><th>表示</th><th>mode</th><th>由来</th><th>元フィールド</th></tr></thead>
     <tbody>${effects.map((effect) => `<tr>
       <td>${esc(effect.stat || '')}</td>
       <td>${esc(effectLabel(effect))}</td>
       <td>${esc(effect.mode || '')}</td>
-      <td>${esc(effect.sourceField || effect.sourceFields?.join('+') || effect.group || '')}</td>
+      <td>${esc(effect.origin || effect.category || '')}</td>
+      <td>${esc([effect.sourceContainer, effect.sourceField || effect.sourceFields?.join('+') || effect.group || ''].filter(Boolean).join(' / '))}</td>
     </tr>`).join('')}</tbody>
   </table>`;
 }
@@ -538,6 +651,15 @@ function renderMatch(match) {
   </div>`;
 }
 
+function renderUnsupportedTexts(texts = []) {
+  if (!texts.length) return '<p class="muted">説明/未対応として保持した情報はありません。</p>';
+  return texts.map((entry) => `<div class="card">
+    <div class="title">${esc(entry.label || '説明')}</div>
+    <p>${esc(entry.text || '')}</p>
+    ${entry.reason ? `<p class="small muted">${esc(entry.reason)}</p>` : ''}
+  </div>`).join('');
+}
+
 function renderDetail() {
   const item = state.items.find((it) => it.id === state.selectedId);
   if (!item) {
@@ -554,14 +676,17 @@ function renderDetail() {
     <div class="summary">
       <span class="pill">部位 ${esc(item.slot || '不明')}</span>
       <span class="pill">Buff ${esc(item.buffName || 'なし')}</span>
-      <span class="pill">直接効果 ${item.directEffects.length}</span>
+      <span class="pill">元データ効果候補 ${item.directEffects.length}</span>
       <span class="pill">一致候補 ${item.matches.length}</span>
       <span class="pill">${esc(item.source)}</span>
     </div>
     ${item.buffInfo ? `<p>${esc(item.buffInfo)}</p>` : ''}
     ${item.buffStatsText ? `<p class="small muted">BuffStats: ${esc(item.buffStatsText)}</p>` : ''}
-    <h3>装備側から読めた直接効果</h3>
+    <h3>装備元データから読めた効果候補</h3>
+    <p class="small muted">ここは参考データ側の候補ではなく、この装備の元データに入っているフィールドだけから抽出しています。</p>
     ${renderEffectTable(item.directEffects)}
+    <h3>説明/未対応として保持した情報</h3>
+    ${renderUnsupportedTexts(item.unsupportedTexts)}
     <details><summary>元データ</summary><pre>${esc(JSON.stringify(item.raw, null, 2))}</pre></details>
   </div>
   <h3>参考データ側の突合候補</h3>
