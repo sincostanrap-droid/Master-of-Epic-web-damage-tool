@@ -1,0 +1,13 @@
+{
+  "name": "moe_native_effect_rule_candidates_patch_v3",
+  "purpose": "Add candidate extraction and coverage tools for native/manual effect rules without using external extracted catalogs.",
+  "files": [
+    "tools/extract-native-effect-rule-candidates.mjs",
+    "tools/report-native-effect-rule-coverage.mjs",
+    "docs/native-effect-rule-candidate-workflow.md",
+    "APPLY_NATIVE_EFFECT_RULE_CANDIDATES_WINDOWS.md",
+    "MANIFEST_NATIVE_EFFECT_RULE_CANDIDATES.json"
+  ],
+  "does_not_modify_runtime_calculation": true,
+  "output_dir": "dist/native-effect-rules"
+}
