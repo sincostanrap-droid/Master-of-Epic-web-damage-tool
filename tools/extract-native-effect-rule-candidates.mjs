@@ -58,6 +58,10 @@ function stripBom(text) {
   return String(text || '').replace(/^\uFEFF/, '');
 }
 
+function withUtf8Bom(text) {
+  return '\uFEFF' + String(text ?? '').replace(/^\uFEFF/, '');
+}
+
 function splitTsvLine(line) {
   return String(line).split('\t');
 }
@@ -372,7 +376,7 @@ async function main() {
   }
 
   await fs.mkdir(path.dirname(args.output), { recursive: true });
-  await fs.writeFile(args.output, lines.join('\n') + '\n', 'utf8');
+  await fs.writeFile(args.output, withUtf8Bom(lines.join('\n') + '\n'), 'utf8');
   await fs.writeFile(args.summary, JSON.stringify({
     generatedAt: new Date().toISOString(),
     output: path.relative(repoRoot, args.output).replace(/\\/g, '/'),

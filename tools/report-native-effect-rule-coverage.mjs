@@ -27,6 +27,10 @@ function usage() {
   console.log(`Usage: node tools/report-native-effect-rule-coverage.mjs\n\nReports which equipment Buffs are already covered by nativeEffectRules and which remain unregistered.`);
 }
 
+function withUtf8Bom(text) {
+  return '\uFEFF' + String(text ?? '').replace(/^\uFEFF/, '');
+}
+
 function normalizeName(value) {
   return String(value ?? '').normalize('NFKC').replace(/\s+/g, ' ').trim();
 }
@@ -213,10 +217,10 @@ async function main() {
   const uncoveredLines = [uncoveredHeader.join('\t'), ...uncoveredBuffs.map(r => [r.buffName, r.technicId, r.count, r.examples.join('|')].map(tsv).join('\t'))].join('\n') + '\n';
 
   await fs.mkdir(args.outDir, { recursive: true });
-  await fs.writeFile(path.join(args.outDir, 'nativeEffectRuleCoverage.all.tsv'), toLines(rows), 'utf8');
-  await fs.writeFile(path.join(args.outDir, 'nativeEffectRuleCoverage.matched.tsv'), toLines(matched), 'utf8');
-  await fs.writeFile(path.join(args.outDir, 'nativeEffectRuleCoverage.unmatchedBuffs.tsv'), toLines(unmatched), 'utf8');
-  await fs.writeFile(path.join(args.outDir, 'nativeEffectRuleCoverage.uncoveredBuffNames.tsv'), uncoveredLines, 'utf8');
+  await fs.writeFile(path.join(args.outDir, 'nativeEffectRuleCoverage.all.tsv'), withUtf8Bom(toLines(rows)), 'utf8');
+  await fs.writeFile(path.join(args.outDir, 'nativeEffectRuleCoverage.matched.tsv'), withUtf8Bom(toLines(matched)), 'utf8');
+  await fs.writeFile(path.join(args.outDir, 'nativeEffectRuleCoverage.unmatchedBuffs.tsv'), withUtf8Bom(toLines(unmatched)), 'utf8');
+  await fs.writeFile(path.join(args.outDir, 'nativeEffectRuleCoverage.uncoveredBuffNames.tsv'), withUtf8Bom(uncoveredLines), 'utf8');
   await fs.writeFile(path.join(args.outDir, 'nativeEffectRuleCoverage.summary.json'), JSON.stringify({
     generatedAt: new Date().toISOString(),
     equipmentSource,
