@@ -1,0 +1,15 @@
+{
+  "name": "moe_native_effect_rules_patch_v1",
+  "purpose": "Add native/manual effect rule foundation without using external extracted effect catalogs as source of truth.",
+  "files": [
+    "data/manual/nativeEffectRules.manual.tsv",
+    "tools/build-native-effect-rules.mjs",
+    "src/data/generated/nativeEffectRules.generated.js",
+    "src/effects/nativeEffectResolver.js",
+    "docs/native-effect-rules-v1.md",
+    "APPLY_NATIVE_EFFECT_RULES_WINDOWS.md",
+    "MANIFEST_NATIVE_EFFECT_RULES.json"
+  ],
+  "calculationIntegration": false,
+  "sourcePolicy": "official-db-plus-native-manual-rules"
+}
