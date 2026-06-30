@@ -1,0 +1,12 @@
+{
+  "name": "moe_effect_browser_patch_v2",
+  "description": "Read-only Effect Catalog Browser for feature/effect-catalog-v1",
+  "files": [
+    "effect-catalog-browser.html",
+    "src/effects/effectCatalogBrowser.js",
+    "docs/effect-catalog-browser-v1.md",
+    "APPLY_EFFECT_BROWSER_WINDOWS.md",
+    "MANIFEST_EFFECT_BROWSER.json"
+  ],
+  "safety": "Display-only. Does not change existing calculator behavior."
+}
