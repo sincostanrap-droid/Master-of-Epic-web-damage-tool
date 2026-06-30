@@ -5,8 +5,8 @@
   onclick属性から呼ばれる関数があるため、現時点では module ではなく通常scriptとして読み込みます。
 */
 
-const APP_VERSION = "v1.23.22";
-const APP_VERSION_NOTE = "装備Buff修正UI改善・カタログソート再投入";
+const APP_VERSION = "v1.23.23";
+const APP_VERSION_NOTE = "装備カタログ条件表示・ページ送り・追加効果二重加算修正";
 
 /* 種族係数。攻撃力係数と魔力係数は別管理。 */
 const RACE_COEFFS = {
@@ -10206,12 +10206,17 @@ function catalogText(item) {
     item.weaponType,
     item.weaponHand,
     item.requiredSkill,
+    item.needLevel,
+    item.armorClass,
     item.info,
     item.note,
     item.sourceUrl,
     item.addStatusText,
     item.equipBuff?.name,
     item.equipBuff?.info,
+    ...(Array.isArray(item.weaponReq) ? item.weaponReq.map(r => `${r.name || r.skill || ""}${r.value || r.required || r.min || ""}`) : []),
+    ...(Array.isArray(item.needSkills) ? item.needSkills.map(r => `${r.name || r.skill || ""}${r.value || r.required || r.min || ""}`) : []),
+    ...(Array.isArray(item.requirements) ? item.requirements.map(r => `${r.name || r.skill || ""}${r.value || r.required || r.min || ""}`) : []),
     ...(Array.isArray(item.addStatuses) ? item.addStatuses.map(s => `${s.name}${s.value}`) : []),
     ...(Array.isArray(item.tags) ? item.tags : [])
   ].filter(Boolean).join(" ");
@@ -10239,12 +10244,24 @@ function catalogDisplayStatName(name) {
   return TOOL_STAT_DISPLAY_NAMES[name] || name;
 }
 
+let catalogPageIndex = 0;
+
+function catalogHasBuff(item) {
+  return !!(item?.equipBuff?.name || (Array.isArray(item?.buffRefs) && item.buffRefs.length));
+}
+
+function catalogResetPage() {
+  catalogPageIndex = 0;
+}
+
 function catalogItemMatches(item, filter) {
   const q = catalogNorm(filter.query);
   if (q && !catalogNorm(catalogText(item)).includes(q)) return false;
   if (filter.category && String(item.category || "") !== filter.category) return false;
   if (filter.slot && String(item.slot || "") !== filter.slot) return false;
-  if (filter.withBuff && !(item.equipBuff?.name || (item.buffRefs || []).length)) return false;
+  const hasBuff = catalogHasBuff(item);
+  if (filter.buffMode === "with" && !hasBuff) return false;
+  if (filter.buffMode === "without" && hasBuff) return false;
   if (filter.stat) {
     const stat = filter.stat;
     const hit = (item.addStatuses || []).some(s => String(s?.name || "") === stat || String(s?.statKey || "") === stat) || !!+(item.extraStats?.[stat] || 0);
@@ -10253,17 +10270,96 @@ function catalogItemMatches(item, filter) {
   return true;
 }
 
+function catalogNeedSkillPairs(item) {
+  const out = [];
+  const add = (name, value) => {
+    const n = String(name || "").trim();
+    const v = parseFloat(value);
+    if (!n && !Number.isFinite(v)) return;
+    const key = `${n}:${Number.isFinite(v) ? v : ""}`;
+    if (!out.some(x => x.key === key)) out.push({key, name:n || "必要スキル", value:Number.isFinite(v) ? v : 0});
+  };
+  const parseObj = req => {
+    if (!req) return;
+    if (typeof req === "string") {
+      const m = req.match(/(.+?)[：:\s]+([0-9]+(?:\.[0-9]+)?)/);
+      if (m) add(m[1], m[2]);
+      else if (req.trim()) add(req.trim(), 0);
+      return;
+    }
+    add(req.name || req.skill || req.type || req.label, req.value ?? req.required ?? req.min ?? req.level ?? req.needLevel);
+  };
+  [item.weaponReq, item.needSkills, item.need_skills, item.requirements, item.requiredSkills].forEach(arr => {
+    if (Array.isArray(arr)) arr.forEach(parseObj);
+  });
+  if (item.requiredSkill || item.needLevel) {
+    const text = String(item.requiredSkill || "");
+    const m = text.match(/(.+?)[：:\s]+([0-9]+(?:\.[0-9]+)?)/);
+    if (m) add(m[1], m[2]);
+    else add(text || idbWeaponSkillName(item) || "必要スキル", item.needLevel || 0);
+  }
+  return out.map(({key, ...x}) => x);
+}
+
+function catalogNeedSummary(item) {
+  const reqs = catalogNeedSkillPairs(item);
+  const parts = reqs.map(req => {
+    const cur = req.name ? skillSimValue(req.name) : NaN;
+    const base = req.value ? `${req.name} ${fmt(req.value, 1)}` : req.name;
+    if (Number.isFinite(cur) && req.value) {
+      const shortage = req.value - cur;
+      return shortage > 0 ? `${base}（現在${fmt(cur, 1)} / 不足${fmt(shortage, 1)}）` : `${base}（現在${fmt(cur, 1)}）`;
+    }
+    return base;
+  });
+  return parts.join(" / ") || "-";
+}
+
+function catalogPerformanceSummary(item) {
+  const parts = [];
+  const tierArrays = [item.tiers, item.performanceTiers, item.skillTiers, item.conditionTiers].filter(Array.isArray);
+  tierArrays.forEach(tiers => {
+    tiers.slice(0, 4).forEach(t => {
+      if (!t || typeof t !== "object") return;
+      const min = t.min ?? t.required ?? t.level ?? t.needLevel;
+      const label = t.label || t.name || t.rank || (min !== undefined ? `条件${min}` : "段階");
+      const text = t.effect || t.summary || t.note || t.performance || t.value || "";
+      parts.push([label, text].filter(Boolean).join(":"));
+    });
+  });
+  const reqs = catalogNeedSkillPairs(item);
+  const missing = reqs.filter(r => r.value && Number.isFinite(skillSimValue(r.name)) && skillSimValue(r.name) < r.value);
+  if (missing.length) parts.unshift("必要スキル未満時は性能低下の可能性あり");
+  return parts.join(" / ") || "-";
+}
+
+function catalogRequirementAndPerformanceSummary(item) {
+  const req = catalogNeedSummary(item);
+  const perf = catalogPerformanceSummary(item);
+  if (req === "-" && perf === "-") return "-";
+  if (perf === "-") return `必要: ${req}`;
+  if (req === "-") return `変動: ${perf}`;
+  return `必要: ${req} / 変動: ${perf}`;
+}
+
+function catalogArmorSummary(item) {
+  const ac = +(item.armorClass ?? item.ac ?? item.defense ?? 0);
+  return ac ? fmt(ac, 2) : "-";
+}
+
 function catalogItemSortValue(item, key) {
   if (key === "name") return item.name || "";
   if (key === "category") return `${catalogCategoryLabel(item.category)} ${item.slot || ""} ${item.name || ""}`;
   if (key === "slot") return `${item.slot || ""} ${item.name || ""}`;
+  if (key === "req") return catalogNeedSummary(item);
   if (key === "buff") return catalogBuffSummary(item) || "";
+  if (key === "hasBuff") return catalogHasBuff(item) ? 1 : 0;
   if (key === "weaponDamage") return +(item.weaponDamage || 0);
   if (key === "weaponDelay") return +(item.weaponAttackInterval || 0);
   if (key === "attack") return +(item.extraStats?.attack || 0);
   if (key === "magic") return +(item.extraStats?.magic || 0);
   if (key === "speed") return +(item.extraStats?.speed || 0);
-  if (key === "ac") return +(item.extraStats?.extraAC || item.armorClass || 0);
+  if (key === "ac") return +(item.armorClass ?? item.ac ?? item.defense ?? item.extraStats?.extraAC ?? 0);
   if (key === "hp") return +(item.extraStats?.extraHP || 0);
   if (key === "mp") return +(item.extraStats?.extraMP || 0);
   if (key === "st") return +(item.extraStats?.extraST || 0);
@@ -10276,7 +10372,7 @@ function catalogItemSortValue(item, key) {
 function sortCatalogItems(items, filter) {
   const key = filter.sort || "name";
   const dir = filter.sortDir === "desc" ? -1 : 1;
-  const numericKeys = new Set(["weaponDamage", "weaponDelay", "attack", "magic", "speed", "ac", "hp", "mp", "st", "hit", "avoid", "attackDelay"]);
+  const numericKeys = new Set(["weaponDamage", "weaponDelay", "attack", "magic", "speed", "ac", "hp", "mp", "st", "hit", "avoid", "attackDelay", "hasBuff"]);
   return items.slice().sort((a, b) => {
     const av = catalogItemSortValue(a, key);
     const bv = catalogItemSortValue(b, key);
@@ -10295,7 +10391,7 @@ function catalogFilterState() {
     category: byId("catalogCategory")?.value || "",
     slot: byId("catalogSlot")?.value || "",
     stat: byId("catalogStat")?.value || "",
-    withBuff: !!byId("catalogWithBuff")?.checked,
+    buffMode: byId("catalogBuffMode")?.value || "",
     sort: byId("catalogSort")?.value || "name",
     sortDir: byId("catalogSortDir")?.value || "asc",
     limit: +(byId("catalogLimit")?.value || 200) || 200
@@ -10362,12 +10458,16 @@ function catalogEquipmentToRow(item) {
     else if (item.requiredSkill || item.needLevel) row.weaponReq = idbWeaponReqsFromText(String(item.requiredSkill || ""), +item.needLevel || 0);
   }
 
-  if (item.extraStats && typeof item.extraStats === "object") {
+  const structuredStatuses = Array.isArray(item.addStatuses) ? item.addStatuses : [];
+  if (structuredStatuses.length) {
+    structuredStatuses.forEach(st => idbApplyStructuredStatus(row, st.name, st.value, st.statKey));
+  } else if (item.extraStats && typeof item.extraStats === "object") {
+    // generated catalog normally contains both addStatuses and normalized extraStats for the same official add_status rows.
+    // Applying both doubles imported equipment effects, so extraStats is only a fallback when structured addStatuses are absent.
     Object.entries(item.extraStats).forEach(([prop, value]) => {
       if (prop in row) row[prop] = +(row[prop] || 0) + (+value || 0);
     });
   }
-  (item.addStatuses || []).forEach(st => idbApplyStructuredStatus(row, st.name, st.value, st.statKey));
   if (item.category !== "weapon" && +item.armorClass) row.extraAC = +(row.extraAC || 0) + (+item.armorClass || 0);
 
   const buff = item.equipBuff?.name ? item.equipBuff : (item.buffRefs || []).map(catalogFindBuffById).find(Boolean);
@@ -10410,12 +10510,30 @@ function catalogResultRowHtml(item, already) {
     <td>${escapeHtml(item.name || "-")}</td>
     <td>${escapeHtml(catalogCategoryLabel(item.category))}</td>
     <td>${escapeHtml(item.slot || "-")}</td>
+    <td class="catalogNeedCell">${escapeHtml(catalogRequirementAndPerformanceSummary(item))}</td>
+    <td>${escapeHtml(catalogArmorSummary(item))}</td>
     <td>${escapeHtml(catalogWeaponSummary(item))}</td>
     <td>${escapeHtml(catalogStatusSummary(item))}</td>
     <td class="catalogBuffCell">${escapeHtml(buff)}</td>
     <td>${url}</td>
     <td><button type="button" class="miniBtn" data-catalog-add="${id}" ${already ? "disabled" : ""}>${already ? "追加済" : "装備登録へ追加"}</button></td>
   </tr>`;
+}
+
+function renderCatalogPageControls(filteredLength, page, pageCount, limit) {
+  const box = byId("catalogPageControls");
+  if (!box) return;
+  const start = filteredLength ? page * limit + 1 : 0;
+  const end = filteredLength ? Math.min(filteredLength, (page + 1) * limit) : 0;
+  box.innerHTML = `
+    <button type="button" id="catalogPrevPage" ${page <= 0 ? "disabled" : ""}>前へ</button>
+    <span class="small">${pageCount ? page + 1 : 0} / ${pageCount || 0} ページ（${start}-${end} / ${filteredLength}件）</span>
+    <button type="button" id="catalogNextPage" ${page >= pageCount - 1 ? "disabled" : ""}>次へ</button>
+  `;
+  const prev = byId("catalogPrevPage");
+  const next = byId("catalogNextPage");
+  if (prev) prev.onclick = () => { catalogPageIndex = Math.max(0, catalogPageIndex - 1); renderCatalogResults(); };
+  if (next) next.onclick = () => { catalogPageIndex = Math.min(Math.max(0, pageCount - 1), catalogPageIndex + 1); renderCatalogResults(); };
 }
 
 function renderCatalogResults() {
@@ -10425,13 +10543,17 @@ function renderCatalogResults() {
   const items = equipmentCatalogItems();
   const filter = catalogFilterState();
   const filtered = sortCatalogItems(items.filter(item => catalogItemMatches(item, filter)), filter);
-  const limit = Math.max(50, Math.min(1000, +(filter.limit || 200)));
-  const shown = filtered.slice(0, limit);
+  const limit = Math.max(25, Math.min(1000, +(filter.limit || 200)));
+  const pageCount = filtered.length ? Math.ceil(filtered.length / limit) : 0;
+  catalogPageIndex = Math.max(0, Math.min(catalogPageIndex, Math.max(0, pageCount - 1)));
+  const start = catalogPageIndex * limit;
+  const shown = filtered.slice(start, start + limit);
   const already = registeredCatalogIds();
   body.innerHTML = shown.length
     ? shown.map(item => catalogResultRowHtml(item, already.has(String(item.catalogId || item.id || "")))).join("")
-    : `<tr><td colspan="8" class="small mutedText">該当する装備がありません。カタログJSが未生成の場合は tools/build-equipment-catalog-from-google-sheet.mjs を実行してください。</td></tr>`;
-  summary.textContent = `カタログ ${items.length}件 / 表示 ${shown.length}${filtered.length > shown.length ? `（該当 ${filtered.length}件中、先頭${limit}件）` : ""}`;
+    : `<tr><td colspan="10" class="small mutedText">該当する装備がありません。カタログJSが未生成の場合は tools/build-equipment-catalog-from-google-sheet.mjs を実行してください。</td></tr>`;
+  summary.textContent = `カタログ ${items.length}件 / 該当 ${filtered.length}件 / 表示 ${shown.length}件`;
+  renderCatalogPageControls(filtered.length, catalogPageIndex, pageCount, limit);
   body.querySelectorAll("[data-catalog-add]").forEach(btn => {
     btn.onclick = () => addCatalogEquipmentToRegistered(btn.dataset.catalogAdd);
   });
@@ -10439,42 +10561,47 @@ function renderCatalogResults() {
 
 function createCatalogTab(panel) {
   panel.innerHTML = `
-    <div class="tabSectionHint small">Git上の生成カタログから装備を検索し、使うものだけ装備登録へコピーします。ここにあるだけでは計算対象になりません。</div>
+    <div class="tabSectionHint small">Git上の生成カタログから装備を検索し、使うものだけ装備登録へコピーします。ここにあるだけでは計算対象になりません。必要スキル/AC/性能変動の手掛かりもカタログ上で確認できます。</div>
     <div class="catalogToolbar cardLike">
-      <label>検索 <input id="catalogSearch" type="search" placeholder="装備名・効果・Buff名" autocomplete="off"></label>
+      <label>検索 <input id="catalogSearch" type="search" placeholder="装備名・効果・Buff名・必要スキル" autocomplete="off"></label>
       <label>カテゴリ <select id="catalogCategory"><option value="">すべて</option><option value="weapon">武器</option><option value="defense">防具/装飾</option><option value="shield">盾</option></select></label>
       <label>部位 <select id="catalogSlot"><option value="">すべて</option></select></label>
       <label>効果 <select id="catalogStat"><option value="">指定なし</option></select></label>
+      <label>装備Buff <select id="catalogBuffMode"><option value="">すべて</option><option value="with">あり</option><option value="without">なし</option></select></label>
       <label>ソート <select id="catalogSort">
-        <option value="name">名称</option><option value="category">種別/部位</option><option value="slot">部位</option><option value="buff">装備Buff名</option>
+        <option value="name">名称</option><option value="category">種別/部位</option><option value="slot">部位</option><option value="req">装備条件</option><option value="buff">装備Buff名</option><option value="hasBuff">Buff有無</option>
         <option value="weaponDamage">武器ダメージ</option><option value="weaponDelay">攻撃間隔</option>
         <option value="attack">攻撃力</option><option value="magic">魔力</option><option value="speed">速度</option><option value="ac">AC</option>
         <option value="hp">HP</option><option value="mp">MP</option><option value="st">ST</option><option value="hit">命中</option><option value="avoid">回避</option><option value="attackDelay">攻撃ディレイ</option>
       </select></label>
       <label>順序 <select id="catalogSortDir"><option value="asc">昇順</option><option value="desc">降順</option></select></label>
-      <label>表示 <select id="catalogLimit"><option value="100">100件</option><option value="200" selected>200件</option><option value="500">500件</option><option value="1000">1000件</option></select></label>
-      <label class="inlineCheck"><input id="catalogWithBuff" type="checkbox"> 装備Buffあり</label>
+      <label>1ページ <select id="catalogLimit"><option value="50">50件</option><option value="100">100件</option><option value="200" selected>200件</option><option value="500">500件</option><option value="1000">1000件</option></select></label>
       <button type="button" id="catalogReloadBtn">再読み込み</button>
     </div>
-    <div id="catalogSummary" class="small mutedText">カタログを確認中...</div>
+    <div class="catalogSummaryLine"><div id="catalogSummary" class="small mutedText">カタログを確認中...</div><div id="catalogPageControls" class="catalogPageControls"></div></div>
     <div class="catalogTableWrap">
       <table class="catalogTable compactTable">
-        <thead><tr><th>名称</th><th>種別</th><th>部位</th><th>武器性能</th><th>追加効果</th><th>装備Buff</th><th>参照</th><th>操作</th></tr></thead>
-        <tbody id="catalogResultsBody"><tr><td colspan="8" class="small mutedText">読み込み中...</td></tr></tbody>
+        <thead><tr><th>名称</th><th>種別</th><th>部位</th><th>条件/変動</th><th>AC</th><th>武器性能</th><th>追加効果</th><th>装備Buff</th><th>参照</th><th>操作</th></tr></thead>
+        <tbody id="catalogResultsBody"><tr><td colspan="10" class="small mutedText">読み込み中...</td></tr></tbody>
       </table>
     </div>
     <details class="catalogHelp"><summary>カタログ生成メモ</summary>
-      <div class="small mutedText">Googleスプレッドシートから生成する場合は、リポジトリ直下で <code>node tools/build-equipment-catalog-from-google-sheet.mjs</code> を実行し、生成された <code>src/data/generated/*.generated.js</code> をGitに追加してください。</div>
+      <div class="small mutedText">Googleスプレッドシートから生成する場合は、リポジトリ直下で <code>node tools/build-equipment-catalog-from-google-sheet.mjs</code> を実行し、生成された <code>src/data/generated/*.generated.js</code> をGitに追加してください。取り込み時は <code>addStatuses</code> と <code>extraStats</code> の二重適用を避け、追加効果が2倍にならないようにしています。</div>
     </details>
   `;
 
-  ["catalogSearch", "catalogCategory", "catalogSlot", "catalogStat", "catalogSort", "catalogSortDir", "catalogLimit", "catalogWithBuff"].forEach(id => {
+  ["catalogSearch", "catalogCategory", "catalogSlot", "catalogStat", "catalogBuffMode", "catalogSort", "catalogSortDir", "catalogLimit"].forEach(id => {
     const el = byId(id);
-    if (el) el.oninput = el.onchange = renderCatalogResults;
+    if (el) {
+      const handler = () => { catalogResetPage(); renderCatalogResults(); };
+      el.oninput = handler;
+      el.onchange = handler;
+    }
   });
   const reload = byId("catalogReloadBtn");
   if (reload) reload.onclick = () => {
     catalogScriptsPromise = null;
+    catalogResetPage();
     loadCatalogScriptsOnce().then(() => setupCatalogFilterOptions(true));
   };
 }
