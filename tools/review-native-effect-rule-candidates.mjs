@@ -66,53 +66,25 @@ function readText(file) {
 }
 
 function parseDelimited(text, delimiter = '\t') {
-  const rows = [];
-  let row = [];
-  let field = '';
-  let inQuotes = false;
-
-  for (let i = 0; i < text.length; i += 1) {
-    const ch = text[i];
-    const next = text[i + 1];
-
-    if (ch === '"') {
-      if (inQuotes && next === '"') {
-        field += '"';
-        i += 1;
-      } else {
-        inQuotes = !inQuotes;
-      }
-      continue;
-    }
-
-    if (!inQuotes && ch === delimiter) {
-      row.push(field);
-      field = '';
-      continue;
-    }
-
-    if (!inQuotes && (ch === '\n' || ch === '\r')) {
-      if (ch === '\r' && next === '\n') i += 1;
-      row.push(field);
-      rows.push(row);
-      row = [];
-      field = '';
-      continue;
-    }
-
-    field += ch;
-  }
-
-  if (field.length > 0 || row.length > 0) {
-    row.push(field);
-    rows.push(row);
-  }
-
-  if (rows.length === 0) return [];
-  const header = rows.shift();
-  return rows
-    .filter((r) => r.some((v) => v !== ''))
-    .map((r) => Object.fromEntries(header.map((h, idx) => [h, r[idx] ?? ''])));
+  // Candidate TSV cells contain raw JSON like {"attackPct":30}.
+  // They are not CSV-quoted, so a quote-aware parser would strip JSON quotes
+  // and make every effects_json parse fail. For these generated TSV files,
+  // tabs/newlines are already sanitized by the candidate extractor, so a
+  // plain TSV split is the correct parser.
+  const lines = String(text || '')
+    .replace(/^\uFEFF/, '')
+    .split(/\r?\n/)
+    .filter((line) => line.trim() !== '');
+  if (lines.length === 0) return [];
+  const header = lines.shift().split(delimiter).map((h) => h.replace(/^\uFEFF/, '').trim());
+  return lines.map((line) => {
+    const cells = line.split(delimiter);
+    const row = {};
+    header.forEach((h, idx) => {
+      row[h] = cells[idx] ?? '';
+    });
+    return row;
+  });
 }
 
 function stringifyDelimited(rows, header, delimiter = '\t') {
