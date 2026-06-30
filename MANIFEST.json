@@ -1,0 +1,54 @@
+[
+  {
+    "path": "BRANCH_WORKFLOW.md",
+    "bytes": 1134
+  },
+  {
+    "path": "README.md",
+    "bytes": 540
+  },
+  {
+    "path": "MANIFEST.json",
+    "bytes": 859
+  },
+  {
+    "path": "APPLY_WINDOWS.md",
+    "bytes": 955
+  },
+  {
+    "path": "tools/build-moe-forge-effect-catalog.mjs",
+    "bytes": 602
+  },
+  {
+    "path": "docs/effect-system-v1.md",
+    "bytes": 2468
+  },
+  {
+    "path": "data/external/moe-forge/README.md",
+    "bytes": 346
+  },
+  {
+    "path": "src/effects/effectResolver.js",
+    "bytes": 3925
+  },
+  {
+    "path": "src/effects/effectBridge.js",
+    "bytes": 1549
+  },
+  {
+    "path": "src/data/generated/moeForgeEffectCatalog.generated.js",
+    "bytes": 1218768
+  },
+  {
+    "path": "src/data/generated/moeForgeEquipmentBuffIndex.generated.js",
+    "bytes": 11044450
+  },
+  {
+    "path": "src/data/generated/moeForgeEffectCatalog.summary.json",
+    "bytes": 1124
+  },
+  {
+    "path": "src/data/effects/effectStatSchema.js",
+    "bytes": 2326
+  }
+]
