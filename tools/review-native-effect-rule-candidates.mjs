@@ -5,8 +5,16 @@
  * This script does NOT promote any rule and does NOT modify
  * data/manual/nativeEffectRules.manual.tsv.
  *
- * It reads dist/native-effect-rules/nativeEffectRules.candidates.tsv
- * and emits review-only TSV reports with UTF-8 BOM for Windows/Excel.
+ * v7 notes:
+ * - physicalDamagePct from old candidate extraction is intentionally treated as
+ *   ambiguous. It may mean outgoing physical damage, damage reduction, or
+ *   reflection depending on the source text.
+ * - This review emits physical-damage classification reports with suggested
+ *   stat keys:
+ *     physicalOutgoingDamagePct
+ *     physicalDamageReductionPct
+ *     physicalReflectPct
+ *     physicalDamageUnknownPct
  */
 
 import fs from 'node:fs';
@@ -20,6 +28,10 @@ const OUT_ALL = path.join(OUT_DIR, 'nativeEffectRules.strictReview.all.tsv');
 const OUT_COMBAT = path.join(OUT_DIR, 'nativeEffectRules.strictReview.combat.tsv');
 const OUT_ATTACK_DELAY = path.join(OUT_DIR, 'nativeEffectRules.strictReview.attackDelay.needsManual.tsv');
 const OUT_LIKELY_MIXED = path.join(OUT_DIR, 'nativeEffectRules.strictReview.likelyMixedOrNonCombat.tsv');
+const OUT_PHYSICAL_ALL = path.join(OUT_DIR, 'nativeEffectRules.strictReview.physicalDamage.all.tsv');
+const OUT_PHYSICAL_OUTGOING = path.join(OUT_DIR, 'nativeEffectRules.strictReview.physicalDamage.outgoing.tsv');
+const OUT_PHYSICAL_DEFENSIVE = path.join(OUT_DIR, 'nativeEffectRules.strictReview.physicalDamage.reductionOrReflect.tsv');
+const OUT_PHYSICAL_UNKNOWN = path.join(OUT_DIR, 'nativeEffectRules.strictReview.physicalDamage.unknownOrMixed.tsv');
 const OUT_SUMMARY = path.join(OUT_DIR, 'nativeEffectRules.strictReview.summary.json');
 
 const COMBAT_KEYS = new Set([
@@ -30,6 +42,10 @@ const COMBAT_KEYS = new Set([
   'attackDelay',
   'criticalRate',
   'physicalDamagePct',
+  'physicalOutgoingDamagePct',
+  'physicalDamageReductionPct',
+  'physicalReflectPct',
+  'physicalDamageUnknownPct',
   'skillEffectBonuses',
 ]);
 
@@ -58,6 +74,44 @@ const EQUIPMENT_STATUS_MARKERS = [
   'HP自然回復増加バフ',
 ];
 
+const PHYSICAL_OUTGOING_PATTERNS = [
+  /物理与ダメージ増加バフ/,
+  /物理与ダメージ/,
+  /物理(?:攻撃)?与ダメージ/,
+  /与物理ダメージ/,
+  /与ダメージ(?:増加|上昇|アップ|UP)/i,
+  /物理ダメージ(?:増加|上昇|アップ|UP)/i,
+];
+
+const PHYSICAL_REDUCTION_PATTERNS = [
+  /ダメージ軽減/,
+  /物理(?:ダメージ)?軽減/,
+  /被ダメージ/,
+  /被物理ダメージ/,
+  /物理防御/,
+  /防御/,
+  /軽減/,
+  /バリア/,
+  /ガード/,
+  /シールド/,
+  /盾/,
+  /守り/,
+  /守護/,
+  /結界/,
+  /アイギス/,
+  /攻防一体/,
+  /守りの鎖/,
+  /守りの翼/,
+];
+
+const PHYSICAL_REFLECT_PATTERNS = [
+  /物理反射/,
+  /反射/,
+  /リフレクト/,
+  /カウンター/,
+  /ソーン/,
+];
+
 function readText(file) {
   if (!fs.existsSync(file)) {
     throw new Error(`Missing input: ${file}\nRun: node tools/extract-native-effect-rule-candidates.mjs`);
@@ -68,9 +122,8 @@ function readText(file) {
 function parseDelimited(text, delimiter = '\t') {
   // Candidate TSV cells contain raw JSON like {"attackPct":30}.
   // They are not CSV-quoted, so a quote-aware parser would strip JSON quotes
-  // and make every effects_json parse fail. For these generated TSV files,
-  // tabs/newlines are already sanitized by the candidate extractor, so a
-  // plain TSV split is the correct parser.
+  // and make effects_json parse fail. For these generated TSV files,
+  // tabs/newlines are sanitized by the candidate extractor, so plain split is correct.
   const lines = String(text || '')
     .replace(/^\uFEFF/, '')
     .split(/\r?\n/)
@@ -100,7 +153,7 @@ function stringifyDelimited(rows, header, delimiter = '\t') {
 
 function writeBom(file, text) {
   fs.mkdirSync(path.dirname(file), { recursive: true });
-  fs.writeFileSync(file, '\uFEFF' + text, 'utf8');
+  fs.writeFileSync(file, '\uFEFF' + String(text || '').replace(/^\uFEFF/, ''), 'utf8');
 }
 
 function safeJsonParse(text, fallback) {
@@ -122,8 +175,12 @@ function getUnsupportedText(row) {
   return text.join(' / ');
 }
 
+function getEffects(row) {
+  return safeJsonParse(row.effects_json, {});
+}
+
 function getEffectKeys(row) {
-  const effects = safeJsonParse(row.effects_json, {});
+  const effects = getEffects(row);
   return Object.keys(effects).filter((key) => COMBAT_KEYS.has(key));
 }
 
@@ -141,6 +198,82 @@ function containsAny(text, words) {
   return words.some((w) => text.includes(w));
 }
 
+function countMatches(text, patterns) {
+  return patterns.filter((pattern) => pattern.test(text)).length;
+}
+
+function matchingPatternLabels(text, patterns) {
+  return patterns
+    .filter((pattern) => pattern.test(text))
+    .map((pattern) => String(pattern).replace(/^\//, '').replace(/\/[a-z]*$/, ''));
+}
+
+function classifyPhysicalDamage(row) {
+  const effects = getEffects(row);
+  const value = effects.physicalDamagePct;
+  if (value == null) {
+    return {
+      physical_damage_class: '',
+      suggested_stat_key: '',
+      physical_damage_value: '',
+      physical_damage_reason: '',
+    };
+  }
+
+  // Do not use notes/effects_json here. Existing candidates often have
+  // notes like "auto hits: 物理与ダメージ%:10", which is exactly the
+  // ambiguous machine-detected label we are trying to review.
+  const combinedText = [
+    row.target_name,
+    row.equipment_names,
+    row.unsupported_json,
+  ].join('\n');
+
+  const outgoingHits = countMatches(combinedText, PHYSICAL_OUTGOING_PATTERNS);
+  const reductionHits = countMatches(combinedText, PHYSICAL_REDUCTION_PATTERNS);
+  const reflectHits = countMatches(combinedText, PHYSICAL_REFLECT_PATTERNS);
+
+  const labels = [];
+  if (outgoingHits) labels.push(`outgoing:${matchingPatternLabels(combinedText, PHYSICAL_OUTGOING_PATTERNS).slice(0, 3).join('|')}`);
+  if (reductionHits) labels.push(`reduction:${matchingPatternLabels(combinedText, PHYSICAL_REDUCTION_PATTERNS).slice(0, 3).join('|')}`);
+  if (reflectHits) labels.push(`reflect:${matchingPatternLabels(combinedText, PHYSICAL_REFLECT_PATTERNS).slice(0, 3).join('|')}`);
+
+  // Reflection wins over generic defensive words because it is a distinct mechanic.
+  if (reflectHits && !outgoingHits) {
+    return {
+      physical_damage_class: 'reflect',
+      suggested_stat_key: 'physicalReflectPct',
+      physical_damage_value: value,
+      physical_damage_reason: labels.join('; ') || 'reflect keyword detected',
+    };
+  }
+
+  if (reductionHits && !outgoingHits) {
+    return {
+      physical_damage_class: 'reduction',
+      suggested_stat_key: 'physicalDamageReductionPct',
+      physical_damage_value: value,
+      physical_damage_reason: labels.join('; ') || 'defensive/reduction keyword detected',
+    };
+  }
+
+  if (outgoingHits && !reductionHits && !reflectHits) {
+    return {
+      physical_damage_class: 'outgoing',
+      suggested_stat_key: 'physicalOutgoingDamagePct',
+      physical_damage_value: value,
+      physical_damage_reason: labels.join('; ') || 'outgoing damage keyword detected',
+    };
+  }
+
+  return {
+    physical_damage_class: 'unknown_or_mixed',
+    suggested_stat_key: 'physicalDamageUnknownPct',
+    physical_damage_value: value,
+    physical_damage_reason: labels.join('; ') || 'physicalDamagePct found but direction could not be inferred',
+  };
+}
+
 function classify(row) {
   const effectKeys = getEffectKeys(row);
   const combinedText = [
@@ -152,6 +285,7 @@ function classify(row) {
   ].join('\n');
   const unsupportedText = getUnsupportedText(row);
   const attackDelayValuesInNotes = findAttackDelayValues(row.notes || '');
+  const physical = classifyPhysicalDamage(row);
   const reasons = [];
 
   if (effectKeys.length === 0) {
@@ -161,6 +295,7 @@ function classify(row) {
       effect_keys: '',
       unsupported_text: unsupportedText,
       attack_delay_values_in_notes: attackDelayValuesInNotes.join('|'),
+      ...physical,
     };
   }
 
@@ -184,6 +319,10 @@ function classify(row) {
     reasons.push(`verification-is-${row.verification || 'empty'}`);
   }
 
+  if (physical.physical_damage_class) {
+    reasons.push(`physical-damage-class:${physical.physical_damage_class}`);
+  }
+
   if (effectKeys.includes('attackDelay')) {
     if (attackDelayValuesInNotes.length > 1) {
       reasons.push(`multiple-attack-delay-values-in-notes:${attackDelayValuesInNotes.join('|')}`);
@@ -201,6 +340,18 @@ function classify(row) {
       effect_keys: effectKeys.join('|'),
       unsupported_text: unsupportedText,
       attack_delay_values_in_notes: attackDelayValuesInNotes.join('|'),
+      ...physical,
+    };
+  }
+
+  if (physical.physical_damage_class && physical.physical_damage_class !== 'outgoing') {
+    return {
+      review_status: 'physical_damage_direction_needs_manual_review',
+      review_reason: unique(reasons).join('; '),
+      effect_keys: effectKeys.join('|'),
+      unsupported_text: unsupportedText,
+      attack_delay_values_in_notes: attackDelayValuesInNotes.join('|'),
+      ...physical,
     };
   }
 
@@ -211,6 +362,7 @@ function classify(row) {
       effect_keys: effectKeys.join('|'),
       unsupported_text: unsupportedText,
       attack_delay_values_in_notes: attackDelayValuesInNotes.join('|'),
+      ...physical,
     };
   }
 
@@ -220,6 +372,7 @@ function classify(row) {
     effect_keys: effectKeys.join('|'),
     unsupported_text: unsupportedText,
     attack_delay_values_in_notes: attackDelayValuesInNotes.join('|'),
+    ...physical,
   };
 }
 
@@ -242,6 +395,10 @@ function main() {
     'effects_json',
     'unsupported_text',
     'attack_delay_values_in_notes',
+    'physical_damage_class',
+    'suggested_stat_key',
+    'physical_damage_value',
+    'physical_damage_reason',
     'stack_group',
     'stack_mode',
     'verification',
@@ -252,14 +409,26 @@ function main() {
   const combat = reviewed.filter((r) => r.effect_keys);
   const attackDelayNeedsManual = combat.filter((r) => r.effect_keys.split('|').includes('attackDelay'));
   const likelyMixed = reviewed.filter((r) => r.review_status === 'likely_mixed_or_non_attack_delay');
+  const physicalAll = combat.filter((r) => r.physical_damage_class);
+  const physicalOutgoing = physicalAll.filter((r) => r.physical_damage_class === 'outgoing');
+  const physicalDefensive = physicalAll.filter((r) => r.physical_damage_class === 'reduction' || r.physical_damage_class === 'reflect');
+  const physicalUnknown = physicalAll.filter((r) => r.physical_damage_class === 'unknown_or_mixed');
 
   writeBom(OUT_ALL, stringifyDelimited(reviewed, header));
   writeBom(OUT_COMBAT, stringifyDelimited(combat, header));
   writeBom(OUT_ATTACK_DELAY, stringifyDelimited(attackDelayNeedsManual, header));
   writeBom(OUT_LIKELY_MIXED, stringifyDelimited(likelyMixed, header));
+  writeBom(OUT_PHYSICAL_ALL, stringifyDelimited(physicalAll, header));
+  writeBom(OUT_PHYSICAL_OUTGOING, stringifyDelimited(physicalOutgoing, header));
+  writeBom(OUT_PHYSICAL_DEFENSIVE, stringifyDelimited(physicalDefensive, header));
+  writeBom(OUT_PHYSICAL_UNKNOWN, stringifyDelimited(physicalUnknown, header));
 
   const byStatus = reviewed.reduce((acc, r) => {
     acc[r.review_status] = (acc[r.review_status] || 0) + 1;
+    return acc;
+  }, {});
+  const byPhysicalDamageClass = physicalAll.reduce((acc, r) => {
+    acc[r.physical_damage_class] = (acc[r.physical_damage_class] || 0) + 1;
     return acc;
   }, {});
 
@@ -271,15 +440,24 @@ function main() {
       combat: path.relative(ROOT, OUT_COMBAT).replaceAll('\\', '/'),
       attackDelayNeedsManual: path.relative(ROOT, OUT_ATTACK_DELAY).replaceAll('\\', '/'),
       likelyMixedOrNonCombat: path.relative(ROOT, OUT_LIKELY_MIXED).replaceAll('\\', '/'),
+      physicalDamageAll: path.relative(ROOT, OUT_PHYSICAL_ALL).replaceAll('\\', '/'),
+      physicalDamageOutgoing: path.relative(ROOT, OUT_PHYSICAL_OUTGOING).replaceAll('\\', '/'),
+      physicalDamageReductionOrReflect: path.relative(ROOT, OUT_PHYSICAL_DEFENSIVE).replaceAll('\\', '/'),
+      physicalDamageUnknownOrMixed: path.relative(ROOT, OUT_PHYSICAL_UNKNOWN).replaceAll('\\', '/'),
     },
     counts: {
       total: reviewed.length,
       combat: combat.length,
       attackDelayNeedsManual: attackDelayNeedsManual.length,
       likelyMixedOrNonCombat: likelyMixed.length,
+      physicalDamageAll: physicalAll.length,
+      physicalDamageOutgoing: physicalOutgoing.length,
+      physicalDamageReductionOrReflect: physicalDefensive.length,
+      physicalDamageUnknownOrMixed: physicalUnknown.length,
       byStatus,
+      byPhysicalDamageClass,
     },
-    note: 'Review-only report. Do not promote candidate-auto-review rows automatically.',
+    note: 'Review-only report. physicalDamagePct is ambiguous and must not be promoted directly. Use suggested_stat_key only after source verification.',
   };
 
   writeBom(OUT_SUMMARY, JSON.stringify(summary, null, 2) + '\n');
@@ -289,6 +467,10 @@ function main() {
   console.log(`  ${path.relative(ROOT, OUT_COMBAT)}`);
   console.log(`  ${path.relative(ROOT, OUT_ATTACK_DELAY)}`);
   console.log(`  ${path.relative(ROOT, OUT_LIKELY_MIXED)}`);
+  console.log(`  ${path.relative(ROOT, OUT_PHYSICAL_ALL)}`);
+  console.log(`  ${path.relative(ROOT, OUT_PHYSICAL_OUTGOING)}`);
+  console.log(`  ${path.relative(ROOT, OUT_PHYSICAL_DEFENSIVE)}`);
+  console.log(`  ${path.relative(ROOT, OUT_PHYSICAL_UNKNOWN)}`);
   console.log(`  ${path.relative(ROOT, OUT_SUMMARY)}`);
 }
 
