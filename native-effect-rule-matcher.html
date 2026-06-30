@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MoE 自作効果ルール突合</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #f6f7fb;
+      --panel: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --border: #d1d5db;
+      --accent: #2563eb;
+      --ok: #047857;
+      --warn: #b45309;
+      --bad: #b91c1c;
+      --code: #f3f4f6;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #111827;
+        --panel: #1f2937;
+        --text: #f9fafb;
+        --muted: #9ca3af;
+        --border: #374151;
+        --accent: #60a5fa;
+        --ok: #34d399;
+        --warn: #fbbf24;
+        --bad: #f87171;
+        --code: #111827;
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 24px;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    h1 { margin: 0 0 6px; font-size: 24px; }
+    h2 { margin: 0 0 12px; font-size: 18px; }
+    p { line-height: 1.7; }
+    .layout { max-width: 1280px; margin: 0 auto; }
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      margin: 14px 0;
+      box-shadow: 0 1px 2px rgba(0,0,0,.04);
+    }
+    .muted { color: var(--muted); }
+    .toolbar {
+      display: grid;
+      grid-template-columns: minmax(240px, 1fr) repeat(2, minmax(160px, max-content));
+      gap: 10px;
+      align-items: end;
+    }
+    @media (max-width: 760px) {
+      .toolbar { grid-template-columns: 1fr; }
+    }
+    label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+    input, select, button, textarea {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 9px 10px;
+      background: var(--panel);
+      color: var(--text);
+      font: inherit;
+    }
+    button {
+      cursor: pointer;
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+      font-weight: 600;
+    }
+    button.secondary {
+      background: transparent;
+      color: var(--text);
+      border-color: var(--border);
+    }
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+    }
+    .metric {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      background: color-mix(in srgb, var(--panel) 86%, var(--bg));
+    }
+    .metric .value { font-size: 24px; font-weight: 700; }
+    .metric .label { font-size: 12px; color: var(--muted); }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    th, td {
+      border-bottom: 1px solid var(--border);
+      padding: 8px;
+      vertical-align: top;
+      text-align: left;
+    }
+    th { color: var(--muted); font-weight: 600; position: sticky; top: 0; background: var(--panel); z-index: 1; }
+    .table-wrap { max-height: 68vh; overflow: auto; border: 1px solid var(--border); border-radius: 10px; }
+    .badge {
+      display: inline-flex;
+      gap: 4px;
+      align-items: center;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 2px 8px;
+      margin: 2px 4px 2px 0;
+      white-space: nowrap;
+      background: color-mix(in srgb, var(--panel) 80%, var(--bg));
+    }
+    .ok { color: var(--ok); }
+    .warn { color: var(--warn); }
+    .bad { color: var(--bad); }
+    code, pre {
+      background: var(--code);
+      border-radius: 8px;
+      padding: 2px 5px;
+    }
+    pre { padding: 10px; overflow: auto; }
+    details { margin-top: 6px; }
+    summary { cursor: pointer; color: var(--accent); }
+    .small { font-size: 12px; }
+    .nowrap { white-space: nowrap; }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <h1>MoE 自作効果ルール突合</h1>
+    <p class="muted">
+      装備カタログ上の装備名・Buff名・テクニックIDと、<code>nativeEffectRules.manual.tsv</code> から生成した自作ルールを突き合わせる開発用ページです。
+      本体の物理ダメージ計算には接続しません。
+    </p>
+
+    <section class="panel">
+      <h2>検索・絞り込み</h2>
+      <div class="toolbar">
+        <div>
+          <label for="queryInput">装備名 / Buff名 / ルールID</label>
+          <input id="queryInput" type="search" placeholder="例: 怪鳥の力 / ミリタリー / コブラ / バトハン" />
+        </div>
+        <div>
+          <label for="filterSelect">表示対象</label>
+          <select id="filterSelect">
+            <option value="all">すべて</option>
+            <option value="matched">自作ルール一致あり</option>
+            <option value="unmatchedBuff">Buffあり・自作ルール未登録</option>
+            <option value="directOnly">装備側直接効果あり</option>
+            <option value="unsupported">説明/未対応メモあり</option>
+          </select>
+        </div>
+        <div>
+          <label>&nbsp;</label>
+          <button id="reloadButton" type="button">再読み込み</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>概要</h2>
+      <div id="summary" class="summary"></div>
+      <div id="loadWarning" class="small muted" style="margin-top:10px"></div>
+    </section>
+
+    <section class="panel">
+      <h2>突合結果</h2>
+      <div class="small muted" id="resultCount"></div>
+      <div class="table-wrap" style="margin-top:8px">
+        <table>
+          <thead>
+            <tr>
+              <th>装備</th>
+              <th>Buff / 技</th>
+              <th>自作ルール</th>
+              <th>装備元データから読めた直接効果</th>
+              <th>説明/未対応</th>
+            </tr>
+          </thead>
+          <tbody id="resultBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <script src="src/data/generated/equipmentCatalog.generated.js"></script>
+  <script src="src/data/generated/nativeEffectRules.generated.js"></script>
+  <script src="src/effects/nativeEffectResolver.js"></script>
+  <script src="src/effects/nativeEffectRuleMatcher.js"></script>
+</body>
+</html>
