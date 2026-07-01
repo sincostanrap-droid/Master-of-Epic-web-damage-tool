@@ -1,0 +1,922 @@
+﻿
+  src\main.js:188:  return out;
+  src\main.js:189:}
+  src\main.js:190:
+> src\main.js:191:function emptyExtraStats() {
+  src\main.js:192:  const out = {};
+  src\main.js:193:  extraFieldDefsFor("summary").forEach(d => out[d.prop] = 0);
+  src\main.js:194:  return out;
+  src\main.js:195:}
+  src\main.js:196:
+  src\main.js:197:/*
+> src\main.js:198: * 公式DB add_status 名 → ツール内部ステータスキー対応表。
+  src\main.js:199: * 公式DBから生成したカタログと、公式DB HTML貼り付け取り込みの両方で使う。
+> src\main.js:200: * 値は装備行のプロパティ名に合わせる。新しいadd_status名が増えた場合は、
+  src\main.js:201: * tools/build-equipment-catalog-from-google-sheet.mjs の対応表も同時に更新する。
+  src\main.js:202: */
+> src\main.js:203:const OFFICIAL_ADD_STATUS_TO_TOOL_STAT = Object.freeze({
+  src\main.js:204:  "攻撃力": "attack",
+  src\main.js:205:  "魔力": "magic",
+  src\main.js:206:  "移動速度": "speed",
+  src\main.js:207:  "速度": "speed",
+  src\main.js:208:
+  src\main.js:209:  "最大HP": "extraHP",
+  src\main.js:210:  "HP": "extraHP",
+  src\main.js:211:  "最大ＭＰ": "extraMP",
+  src\main.js:282:});
+  src\main.js:283:
+  src\main.js:284:/*
+> src\main.js:285: * 公式DBには物理ダメージ計算に使わない生産/生活/感覚系 add_status も含まれる。
+  src\main.js:286: * これらは未対応エラーではなく「既知の非対象」として扱い、装備登録時の数値反映から除外する。
+  src\main.js:287: */
+> src\main.js:288:const OFFICIAL_ADD_STATUS_KNOWN_IGNORED = Object.freeze(new Set([]));
+  src\main.js:289:
+  src\main.js:290:const TOOL_STAT_DISPLAY_NAMES = Object.freeze({
+  src\main.js:291:  attack: "攻撃力",
+  src\main.js:292:  magic: "魔力",
+  src\main.js:293:  speed: "移動速度",
+  src\main.js:294:  extraAC: "AC",
+  src\main.js:295:  extraHP: "HP",
+  src\main.js:296:  extraMP: "MP",
+  src\main.js:360:
+  src\main.js:361:function isKnownIgnoredOfficialAddStatus(name) {
+  src\main.js:362:  const normalized = normalizeOfficialAddStatusName(name);
+> src\main.js:363:  return !normalized || normalized === "なし" || OFFICIAL_ADD_STATUS_KNOWN_IGNORED.has(normalized);
+  src\main.js:364:}
+  src\main.js:365:
+  src\main.js:366:
+  src\main.js:367:function deriveUtilityAddStatusKey(normalizedName) {
+  src\main.js:368:  const n = normalizedName || "";
+  src\main.js:369:  const craftMap = {
+  src\main.js:370:    "鍛冶": "Smithing",
+  src\main.js:371:    "大工": "Carpentry",
+  src\main.js:393:  if (!normalized || normalized === "なし" || isKnownIgnoredOfficialAddStatus(normalized)) return "";
+  src\main.js:394:  const utilityStatusKey = deriveUtilityAddStatusKey(normalized);
+  src\main.js:395:  if (utilityStatusKey) return utilityStatusKey;
+> src\main.js:396:  if (OFFICIAL_ADD_STATUS_TO_TOOL_STAT[normalized]) return OFFICIAL_ADD_STATUS_TO_TOOL_STAT[normalized];
+  src\main.js:397:  if (/攻撃力/.test(normalized)) return "attack";
+  src\main.js:398:  if (/魔力/.test(normalized)) return "magic";
+  src\main.js:399:  if (/移動速度|速度/.test(normalized)) return "speed";
+  src\main.js:400:  if (/最大?HP/.test(normalized)) return "extraHP";
+  src\main.js:401:  if (/最大?MP/.test(normalized)) return "extraMP";
+  src\main.js:402:  if (/最大?ST/.test(normalized)) return "extraST";
+  src\main.js:403:  if (/防御力|アーマークラス|AC/.test(normalized)) return "extraAC";
+  src\main.js:404:  if (/最大重量|重量/.test(normalized)) return "extraMaxWeight";
+  src\main.js:460:  return true;
+  src\main.js:461:}
+  src\main.js:462:
+> src\main.js:463:function extraStatsHasEffect(row, mode="base") {
+  src\main.js:464:  mode = normalizeExtraMode(mode);
+  src\main.js:465:  return extraFieldDefsFor(mode).some(d => +(row?.[extraPropFor(d, mode)] || 0));
+  src\main.js:466:}
+  src\main.js:467:
+> src\main.js:468:function extraStatsEffectText(row, mode="base") {
+  src\main.js:469:  mode = normalizeExtraMode(mode);
+  src\main.js:470:  const parts = [];
+  src\main.js:471:  extraFieldDefsFor(mode).forEach(d => {
+  src\main.js:472:    const v = +(row?.[extraPropFor(d, mode)] || 0);
+  src\main.js:473:    if (v) parts.push(`${d.label}${v > 0 ? "+" : ""}${v}`);
+  src\main.js:474:  });
+  src\main.js:475:  return parts.join(" / ");
+  src\main.js:476:}
+  src\main.js:477:
+> src\main.js:478:function addExtraStatsInto(acc, row, mode="base") {
+  src\main.js:479:  mode = normalizeExtraMode(mode);
+  src\main.js:480:  extraFieldDefsFor(mode).forEach(d => {
+  src\main.js:481:    acc[d.prop] = (acc[d.prop] || 0) + (+(row?.[extraPropFor(d, mode)] || 0));
+  src\main.js:482:  });
+  src\main.js:483:  return acc;
+  src\main.js:484:}
+  src\main.js:485:
+> src\main.js:486:function normalizeExtraStatsOnRow(out, source) {
+  src\main.js:487:  ["base", "buff", "equipBuff"].forEach(mode => {
+  src\main.js:488:    extraFieldDefsFor(mode).forEach(d => {
+  src\main.js:489:      const prop = extraPropFor(d, mode);
+  src\main.js:490:      out[prop] = +(source?.[prop] || 0);
+  src\main.js:491:    });
+  src\main.js:492:  });
+  src\main.js:493:  return out;
+  src\main.js:494:}
+  src\main.js:495:
+> src\main.js:496:function extraStatsSummary(extra) {
+  src\main.js:497:  const parts = [];
+  src\main.js:498:  extraFieldDefsFor("summary").forEach(d => {
+  src\main.js:499:    const v = +(extra?.[d.prop] || 0);
+  src\main.js:500:    if (v) parts.push(`${d.label} ${v > 0 ? "+" : ""}${fmt(v, 2)}`);
+  src\main.js:501:  });
+  src\main.js:502:  return parts;
+  src\main.js:503:}
+  src\main.js:504:
+  src\main.js:720:  }).filter(e => e.name || e.value);
+  src\main.js:721:}
+  src\main.js:722:
+> src\main.js:723:function pushDisplayEffect(row, key, value, name="", unit="", scope="display", note="") {
+  src\main.js:724:  row.extraEffects = normalizeAdditionalEffects(row.extraEffects);
+  src\main.js:725:  row.extraEffects.push({key, name, value:+value || 0, unit: unit || quickEffectDef(key).unit || "", scope, note});
+  src\main.js:726:}
+  src\main.js:727:
+  src\main.js:728:function quickEffectTargetName(def, targetValue) {
+  src\main.js:729:  if (def.targetKind === "element") return targetValue || "火属性";
+  src\main.js:730:  if (def.targetKind === "skill") return targetValue || (SKILL_SIM_ALL && SKILL_SIM_ALL[0]) || "筋力";
+  src\main.js:731:  if (def.targetKind === "text") return targetValue || def.placeholder || def.label;
+  src\main.js:789:  const def = quickEffectDef(key);
+  src\main.js:790:  const displayOnly = ["skillPlus", "elementDamagePct", "custom"].includes(key);
+  src\main.js:791:  if (displayOnly) {
+> src\main.js:792:    pushDisplayEffect(row, key, v, quickEffectTargetName(def, name), def.unit || "", "display");
+  src\main.js:793:    return true;
+  src\main.js:794:  }
+  src\main.js:795:
+  src\main.js:796:  const extraDef = quickEffectExtraStatDef(key);
+  src\main.js:797:  if (extraDef) {
+  src\main.js:798:    if (context === "composite") {
+  src\main.js:799:      row[extraDef.prop] = +(row[extraDef.prop] || 0) + v;
+  src\main.js:800:      return true;
+  src\main.js:909:  wrap.className = "quickEffectAdder equipBuffWide";
+  src\main.js:910:
+  src\main.js:911:  const title = document.createElement("div");
+> src\main.js:912:  title.className = "extraStatsTitle";
+  src\main.js:913:  title.textContent = "効果を追加";
+  src\main.js:914:  wrap.appendChild(title);
+  src\main.js:915:
+  src\main.js:916:  const controls = document.createElement("div");
+  src\main.js:917:  controls.className = context === "equipment" ? "quickEffectControls quickEffectControlsEquipment" : "quickEffectControls quickEffe
+ctControlsBuff";
+  src\main.js:918:
+  src\main.js:919:  let scope = null;
+  src\main.js:920:  if (context === "equipment") {
+  src\main.js:1149:  return +(row?.[prop] || 0) !== 0;
+  src\main.js:1150:}
+  src\main.js:1151:
+> src\main.js:1152:function makeExtraStatsEditor(row, title, mode="base", onUpdate=null) {
+  src\main.js:1153:  mode = normalizeExtraMode(mode);
+  src\main.js:1154:  const wrap = document.createElement("div");
+> src\main.js:1155:  wrap.className = "extraStatsEditor equipBuffWide";
+  src\main.js:1156:  const h = document.createElement("div");
+> src\main.js:1157:  h.className = "extraStatsTitle";
+  src\main.js:1158:  h.textContent = title;
+  src\main.js:1159:  wrap.appendChild(h);
+  src\main.js:1160:
+  src\main.js:1161:  const help = document.createElement("p");
+> src\main.js:1162:  help.className = "small extraStatsHelp";
+  src\main.js:1163:  help.textContent = mode === "base"
+  src\main.js:1164:    ? "HP/MP/ST/最大重量/命中/回避/AC/耐性/ディレイ/生産・生活系などを直接入力できます。"
+  src\main.js:1165:    : "Buffで増えるHP/MP/ST/最大重量/命中/回避/AC/耐性/ディレイ/軽減/クリ率/生産・生活系などを直接入力できます。";
+  src\main.js:1166:  wrap.appendChild(help);
+  src\main.js:1167:
+  src\main.js:1168:  const activeDefs = extraFieldDefsFor(mode).filter(def => extraStatHasValue(row, def, mode));
+  src\main.js:1169:
+  src\main.js:1170:  if (!activeDefs.length) {
+  src\main.js:1171:    const empty = document.createElement("div");
+> src\main.js:1172:    empty.className = "small muted extraStatsEmptyMessage";
+  src\main.js:1173:    empty.textContent = "入力済みの追加ステータスはありません。必要な効果だけ「効果を追加」から追加してください。";
+  src\main.js:1174:    wrap.appendChild(empty);
+  src\main.js:1175:    return wrap;
+  src\main.js:1176:  }
+  src\main.js:1177:
+  src\main.js:1178:  const activeGrid = document.createElement("div");
+> src\main.js:1179:  activeGrid.className = "extraStatsGrid extraStatsActiveGrid";
+  src\main.js:1180:  activeDefs.forEach(def => activeGrid.appendChild(extraStatNumberInput(row, def, mode, onUpdate)));
+  src\main.js:1181:  wrap.appendChild(activeGrid);
+  src\main.js:1182:
+  src\main.js:1183:  return wrap;
+  src\main.js:1184:}
+  src\main.js:1185:
+  src\main.js:1186:function extraTsvFields(mode="base") {
+  src\main.js:1187:  mode = normalizeExtraMode(mode);
+  src\main.js:1305:    equipBuffSpecial: row?.equipBuffSpecial === undefined || row?.equipBuffSpecial === "" ? 1 : +(row?.equipBuffSpecial || 1),
+  src\main.js:1306:    extraEffects: normalizeAdditionalEffects(row?.extraEffects || row?.additionalEffects || [])
+  src\main.js:1307:  };
+> src\main.js:1308:  normalizeExtraStatsOnRow(out, row || {});
+  src\main.js:1309:  if (+out.delay && !(+out.extraAttackDelay)) out.extraAttackDelay = +out.delay;
+  src\main.js:1310:  out.delay = 0;
+  src\main.js:1311:  return out;
+  src\main.js:1312:}
+  src\main.js:1313:
+  src\main.js:1314:function normalizeEquipmentRows(rows) {
+  src\main.js:1315:  const incoming = Array.isArray(rows) ? rows : [];
+  src\main.js:1316:  if (!incoming.length) return defaultEquipmentRows();
+  src\main.js:4133:    +r.equipBuffFlatAttack || +r.equipBuffFlatMagic || +r.equipBuffFlatSpeed ||
+  src\main.js:4134:    +r.equipBuffConvMagicRate || +r.equipBuffConvMagicSpeedRate || +r.equipBuffConvSpeedRate || +r.equipBuffDmgPct ||
+  src\main.js:4135:    (+r.equipBuffSpecial && +r.equipBuffSpecial !== 1) ||
+> src\main.js:4136:    extraStatsHasEffect(r, "equipBuff") ||
+  src\main.js:4137:    additionalEffectsSummary(r, "display").length
+  src\main.js:4138:  );
+  src\main.js:4139:}
+  src\main.js:4140:
+  src\main.js:4141:function equipmentBuffDisplayName(r) {
+  src\main.js:4142:  return r.equipBuffName || (r.name ? `${r.name} 装備Buff` : "装備Buff");
+  src\main.js:4143:}
+  src\main.js:4144:
+  src\main.js:4173:  if (+r.equipBuffConvSpeedRate) parts.push(`速度→攻撃力 ${r.equipBuffConvSpeedRate}%`);
+  src\main.js:4174:  if (+r.equipBuffDmgPct) parts.push(`与ダメ+${r.equipBuffDmgPct}%`);
+  src\main.js:4175:  if (+r.equipBuffSpecial && +r.equipBuffSpecial !== 1) parts.push(`特攻×${r.equipBuffSpecial}`);
+> src\main.js:4176:  const extra = extraStatsEffectText(r, "equipBuff");
+  src\main.js:4177:  if (extra) parts.push(extra);
+  src\main.js:4178:  const displayOnly = additionalEffectsSummary(r, "display");
+  src\main.js:4179:  if (displayOnly.length) parts.push(...displayOnly);
+  src\main.js:4180:  return parts.join(" / ") || "効果なし";
+  src\main.js:4181:}
+  src\main.js:4182:
+  src\main.js:4183:function equipmentBuffToCompositeRow(r) {
+  src\main.js:4184:  const row = {
+  src\main.js:4260:    +r.flatAttack || +r.flatMagic || +r.flatSpeed ||
+  src\main.js:4261:    +r.convMagicRate || +r.convMagicSpeedRate || +r.convSpeedRate || +r.dmgPct ||
+  src\main.js:4262:    (+r.special && +r.special !== 1) ||
+> src\main.js:4263:    extraStatsHasEffect(r, "buff") ||
+  src\main.js:4264:    additionalEffectsSummary(r, "display").length
+  src\main.js:4265:  );
+  src\main.js:4266:}
+  src\main.js:4267:/* バフ枠ツールチップ用に、装備以外Buffの効果を人間向けの文字列へまとめる。 */
+  src\main.js:4268:function compositeEffectText(r) {
+  src\main.js:4269:  const parts = [];
+  src\main.js:4270:  if (+r.attackPct) parts.push(`攻撃力+${r.attackPct}%`);
+  src\main.js:4271:  if (+r.magicPct) parts.push(`魔力+${r.magicPct}%`);
+  src\main.js:4278:  if (+r.convSpeedRate) parts.push(`速度→攻撃力 ${r.convSpeedRate}%`);
+  src\main.js:4279:  if (+r.dmgPct) parts.push(`与ダメ+${r.dmgPct}%`);
+  src\main.js:4280:  if (+r.special && +r.special !== 1) parts.push(`特攻×${r.special}`);
+> src\main.js:4281:  const extra = extraStatsEffectText(r, false);
+  src\main.js:4282:  if (extra) parts.push(extra);
+  src\main.js:4283:  const displayOnly = additionalEffectsSummary(r, "display");
+  src\main.js:4284:  if (displayOnly.length) parts.push(...displayOnly);
+  src\main.js:4285:  return parts.join(" / ") || "効果なし";
+  src\main.js:4286:}
+  src\main.js:4287:/**
+  src\main.js:4288: * 装備以外Buffを計算用の既存カテゴリへ展開する。
+  src\main.js:4289: *
+  src\main.js:5133:/* 装備以外Buff表をstate.compositeから描画する。 */
+  src\main.js:5134:
+  src\main.js:5135:function updateCompositeExtraStatus(button, row) {
+> src\main.js:5136:  const has = extraStatsHasEffect(row, "buff") || additionalEffectsSummary(row, "display").length;
+  src\main.js:5137:  button.textContent = has ? "追加あり" : "追加なし";
+  src\main.js:5138:  button.classList.toggle("on", !!has);
+  src\main.js:5139:}
+  src\main.js:5140:
+  src\main.js:5141:function makeCompositeExtraDetailRow(row) {
+  src\main.js:5142:  const detailTr = document.createElement("tr");
+  src\main.js:5143:  detailTr.className = "compositeExtraDetailRow";
+  src\main.js:5144:  detailTr.style.display = row._compositeExtraOpen ? "" : "none";
+  src\main.js:5148:  td.className = "compositeExtraDetailCell";
+  src\main.js:5149:
+  src\main.js:5150:  const title = document.createElement("div");
+> src\main.js:5151:  title.className = "extraStatsTitle";
+  src\main.js:5152:  title.textContent = `${row.name || "装備以外Buff"} の追加ステータス`;
+  src\main.js:5153:  td.appendChild(title);
+  src\main.js:5154:
+  src\main.js:5155:  const holder = document.createElement("div");
+  src\main.js:5156:  holder.className = "compositeExtraEditor";
+  src\main.js:5157:  td.appendChild(holder);
+  src\main.js:5158:
+  src\main.js:5159:  detailTr.appendChild(td);
+  src\main.js:5174:
+  src\main.js:5175:  const holder = detailTr.querySelector(".compositeExtraEditor");
+  src\main.js:5176:  holder.appendChild(makeQuickEffectAdder(row, "composite", button));
+> src\main.js:5177:  holder.appendChild(makeExtraStatsEditor(row, "入力済みの追加ステータス", "buff", () => updateCompositeExtraStatus(button, row)));
+  src\main.js:5178:
+  src\main.js:5179:  return td;
+  src\main.js:5180:}
+  src\main.js:5181:
+  src\main.js:5182:
+  src\main.js:5183:function renderCompositeTable() {
+  src\main.js:5184:  const tbody = document.querySelector("#compositeBuffTable tbody");
+  src\main.js:5185:  if (!tbody) return;
+  src\main.js:5313:  wrap.className = "weaponReqEditor";
+  src\main.js:5314:
+  src\main.js:5315:  const title = document.createElement("div");
+> src\main.js:5316:  title.className = "extraStatsTitle";
+  src\main.js:5317:  title.textContent = "使用条件";
+  src\main.js:5318:  wrap.appendChild(title);
+  src\main.js:5319:
+  src\main.js:5320:  const help = document.createElement("p");
+  src\main.js:5321:  help.className = "small";
+  src\main.js:5322:  help.textContent = "スキルはスキルシミュレータの項目から選択します。現在値はスキルシミュレータ側の値を自動取得し、必要値だけ手入力します。";
+  src\main.js:5323:  wrap.appendChild(help);
+  src\main.js:5324:
+  src\main.js:5427:  box.className = "weaponCalcEditor equipBuffWide";
+  src\main.js:5428:
+  src\main.js:5429:  const title = document.createElement("div");
+> src\main.js:5430:  title.className = "extraStatsTitle";
+  src\main.js:5431:  title.textContent = "武器性能・使用条件（ダメージ計算に使用）";
+  src\main.js:5432:  box.appendChild(title);
+  src\main.js:5433:
+  src\main.js:5434:  const note = document.createElement("p");
+  src\main.js:5435:  note.className = "small weaponCalcNote";
+  src\main.js:5436:  note.textContent = "使用条件の現在値はスキルシミュレータから自動取得します。必要値だけ入力してください。";
+  src\main.js:5437:  box.appendChild(note);
+  src\main.js:5438:
+  src\main.js:5520:}
+  src\main.js:5521:
+  src\main.js:5522:function updateEquipBuffStatus(button, row) {
+> src\main.js:5523:  const baseExtra = extraStatsHasEffect(row, "base") || additionalEffectsSummary(row, "display").length;
+  src\main.js:5524:  const weaponText = weaponCalcStatusText(row);
+  src\main.js:5525:  const buffText = row.equipBuffEnabled ? `Buff ON: ${equipmentBuffDisplayName(row)}` : "Buffなし";
+  src\main.js:5526:  const suffix = [weaponText, baseExtra ? "追加あり" : ""].filter(Boolean).join(" / ");
+  src\main.js:5527:  button.textContent = suffix ? `詳細: ${buffText} / ${suffix}` : `詳細: ${buffText}`;
+  src\main.js:5528:  button.classList.toggle("on", !!row.equipBuffEnabled || baseExtra || !!weaponText);
+  src\main.js:5529:}
+  src\main.js:5530:
+  src\main.js:5531:function equipBuffNumberInput(row, key, label, step="1") {
+  src\main.js:5587:    grid.appendChild(makeWeaponCalcEditor(row, statusButton));
+  src\main.js:5588:  }
+  src\main.js:5589:
+> src\main.js:5590:  grid.appendChild(makeExtraStatsEditor(row, "装備本体の追加ステータス", "base", statusUpdater));
+  src\main.js:5591:
+  src\main.js:5592:  const buffSection = document.createElement("div");
+  src\main.js:5593:  buffSection.className = "equipBuffSection equipBuffWide";
+  src\main.js:5594:
+  src\main.js:5595:  const buffTitle = document.createElement("div");
+> src\main.js:5596:  buffTitle.className = "extraStatsTitle";
+  src\main.js:5597:  buffTitle.textContent = "装備Buff";
+  src\main.js:5598:  buffSection.appendChild(buffTitle);
+  src\main.js:5599:
+  src\main.js:5600:  const buffTop = document.createElement("div");
+  src\main.js:5601:  buffTop.className = "equipBuffTopControls";
+  src\main.js:5602:
+  src\main.js:5603:  const enabledLabel = document.createElement("label");
+  src\main.js:5604:  enabledLabel.className = "equipBuffInline";
+  src\main.js:5672:  buffGrid.appendChild(equipBuffNumberInput(row, "equipBuffSpecial", "特攻倍率", "0.01"));
+  src\main.js:5673:  buffDetails.appendChild(buffGrid);
+  src\main.js:5674:
+> src\main.js:5675:  buffDetails.appendChild(makeExtraStatsEditor(row, "装備Buffの追加ステータス", "equipBuff", statusUpdater));
+  src\main.js:5676:
+  src\main.js:5677:  const help = document.createElement("div");
+  src\main.js:5678:  help.className = "small";
+  src\main.js:5679:  help.textContent = "%欄は10%なら10。装備本体は装備ON時、装備BuffはBuff ONかつ効果ありの場合だけ反映します。";
+  src\main.js:5680:  buffDetails.appendChild(help);
+  src\main.js:5681:  buffSection.appendChild(buffDetails);
+  src\main.js:5682:
+  src\main.js:5683:  grid.appendChild(buffSection);
+  src\main.js:5995:    row.importUrl, row.importSource,
+  src\main.js:5996:    effects, reqs,
+  src\main.js:5997:    additionalEffectsSummary(row).join(" "),
+> src\main.js:5998:    extraStatsEffectText(row, "base"),
+> src\main.js:5999:    extraStatsEffectText(row, "equipBuff")
+  src\main.js:6000:  ].filter(Boolean).join(" ").toLowerCase();
+  src\main.js:6001:}
+  src\main.js:6002:
+  src\main.js:6003:function equipmentCandidateMatchesFilter(row, filter=equipmentFilterState()) {
+  src\main.js:6004:  if (filter.slot !== "all" && row.slot !== filter.slot) return false;
+  src\main.js:6005:
+  src\main.js:6006:  if (filter.text) {
+  src\main.js:6007:    const terms = filter.text.split(/\s+/).filter(Boolean);
+  src\main.js:6361:  if (objective === "magic") return m.stats.magic;
+  src\main.js:6362:  if (objective === "speed") return m.stats.speed;
+  src\main.js:6363:  if (objective === "slotsMin") return m.slots?.total || 0;
+> src\main.js:6364:  if (String(objective || "").startsWith("extra")) return +(m.extraStats?.[objective] || 0);
+  src\main.js:6365:  return m.finalDamage;
+  src\main.js:6366:}
+  src\main.js:6367:
+  src\main.js:6368:function optimizerObjectiveIsMinimize(objective) {
+  src\main.js:6369:  return OPTIMIZER_MINIMIZE_OBJECTIVES.has(String(objective || ""));
+  src\main.js:6370:}
+  src\main.js:6371:
+  src\main.js:6372:function optimizerMetricValue(m, objective) {
+  src\main.js:6435:}
+  src\main.js:6436:
+  src\main.js:6437:function optimizerStatCapRows(m, settings=null) {
+> src\main.js:6438:  const extra = m.extraStats || {};
+  src\main.js:6439:  const d = skillSimDerived();
+  src\main.js:6440:
+  src\main.js:6441:  return [
+  src\main.js:6442:    {label:"クリ率上昇量", value: +extra.extraCritRatePct || 0, cap: optimizerCritRateCap(settings), note:"素のクリ率は上限判定から除外"},
+  src\main.js:6443:    {label:"命中上昇量", value: optimizerEffectiveIncrease(d.hit, +extra.extraHit || 0, +extra.extraHitPct || 0), cap:500},
+  src\main.js:6444:    {label:"AC", value: optimizerEffectiveTotal(0, +extra.extraAC || 0, +extra.extraACPct || 0), cap:500},
+  src\main.js:6445:    {label:"魔力", value: +m.stats.magic || 0, cap:500},
+  src\main.js:6446:    {label:"回避", value: optimizerEffectiveTotal(d.avoid, +extra.extraAvoid || 0, +extra.extraAvoidPct || 0), cap:500},
+  src\main.js:6556:    +row.weaponDamage || +row.weaponWeight || +row.weaponAttackInterval || +row.weaponRange || +row.weaponDurability || row.weaponT
+woHanded === "○" ||
+  src\main.js:6557:    normalizeWeaponReqRowsForEquipment(row.weaponReq).some(r => +r.required) ||
+  src\main.js:6558:    row.equipBuffEnabled || equipmentBuffHasEffect(row) ||
+> src\main.js:6559:    extraStatsHasEffect(row, "base")
+  src\main.js:6560:  );
+  src\main.js:6561:}
+  src\main.js:6562:
+  src\main.js:6563:
+  src\main.js:6564:function optimizerPrepareRunCaches(settings) {
+  src\main.js:6565:  settings._equipmentRows = normalizeEquipmentRows(state.equipment);
+  src\main.js:6566:  settings._compositeRows = normalizeCompositeRows(state.composite);
+  src\main.js:6567:  settings._otherRows = Array.isArray(state.other) ? state.other : [];
+  src\main.js:7102:    +row.weaponDamage || +row.weaponWeight || +row.weaponAttackInterval || +row.weaponRange || +row.weaponDurability || row.weaponT
+woHanded === "○" ||
+  src\main.js:7103:    normalizeWeaponReqRowsForEquipment(row.weaponReq).some(r => +r.required) ||
+  src\main.js:7104:    row.equipBuffEnabled || equipmentBuffHasEffect(row) ||
+> src\main.js:7105:    extraStatsHasEffect(row, "base")
+  src\main.js:7106:  );
+  src\main.js:7107:}
+  src\main.js:7108:
+  src\main.js:7109:function optimizerEquipmentLabel(row) {
+  src\main.js:7110:  const slot = (row.slot || "").replace(/^武器: /, "").replace(/^防具: /, "").replace(/^装飾: /, "");
+  src\main.js:7111:  const group = splitTags(row.tags)[0];
+  src\main.js:7112:  const name = row.name || (isWeaponEquipmentRow(row) && (+row.weaponDamage || +row.weaponWeight) ? "名称未入力の武器" : "空");
+  src\main.js:7113:  const weaponParts = [];
+  src\main.js:7484:      <td class="num">${fmt(m.atk)}</td>
+  src\main.js:7485:      <td class="num">${fmt(m.stats.magic)}</td>
+  src\main.js:7486:      <td class="num">${m.slots.total}/24</td>
+> src\main.js:7487:      <td class="optimizerList">${escapeHtml(extraStatsSummary(m.extraStats || {}).join(" / ") || "-")}</td>
+  src\main.js:7488:      <td class="optimizerList">${escapeHtml(optimizerEquipmentSummaryByIdx(r.equipmentIdxs, m))}</td>
+  src\main.js:7489:      <td class="optimizerList">${escapeHtml(optimizerBuffSummaryByIdx(r.compositeIdxs))}</td>
+  src\main.js:7490:      <td><button class="optimizerApplyButton" onclick="applyIntegratedOptimizerResult(${i})">適用</button></td>
+  src\main.js:7491:    </tr>`;
+  src\main.js:7492:  }).join("");
+  src\main.js:7493:
+  src\main.js:7494:  el.innerHTML = `${diagnostics}<table>
+  src\main.js:7495:    <thead><tr><th>順位</th><th>種別</th><th>ダメージ</th><th>攻撃力</th><th>魔力</th><th>枠</th><th>追加ステータス</th><th>装備</th><th>装備以外Buff</th><th>
+適用</th></tr></thead>
+  src\main.js:8030:  if (String(row.name || "").trim()) return true;
+  src\main.js:8031:  if (+row.attack || +row.magic || +row.speed || +row.delay) return true;
+  src\main.js:8032:  if (isWeaponEquipmentRow(row) && (+row.weaponDamage || +row.weaponWeight || +row.weaponAttackInterval || +row.weaponRange || +row
+.weaponDurability)) return true;
+> src\main.js:8033:  if (extraStatsHasEffect(row, "base") || additionalEffectsSummary(row, "display").length) return true;
+  src\main.js:8034:  if (row.equipBuffEnabled && equipmentBuffHasEffect(row)) return true;
+  src\main.js:8035:  return false;
+  src\main.js:8036:}
+  src\main.js:8037:
+  src\main.js:8038:function activeEquipmentForShowcase() {
+  src\main.js:8039:  const slotOrder = new Map(EQUIPMENT_SLOTS.map((x, i) => [x.slot, i]));
+  src\main.js:8040:  return normalizeEquipmentRows(state.equipment)
+  src\main.js:8041:    .map((row, idx) => ({row, idx}))
+  src\main.js:8061:    if (+row.weaponDurability) parts.push(`耐久 ${fmt(+row.weaponDurability,0)}`);
+  src\main.js:8062:    if (row.weaponTwoHanded === "○") parts.push("両手");
+  src\main.js:8063:  }
+> src\main.js:8064:  const extra = extraStatsSummary(row, "base");
+  src\main.js:8065:  if (extra.length) parts.push(extra.join(" / "));
+  src\main.js:8066:  return parts.join(" / ") || "補正なし";
+  src\main.js:8067:}
+  src\main.js:8068:
+  src\main.js:8069:function showcaseResolvedBuffState() {
+  src\main.js:8070:  let st = clone(state || {});
+  src\main.js:8071:  if (typeof expandSkillSimMasteryBuffState === "function") st = expandSkillSimMasteryBuffState(st);
+  src\main.js:8072:  if (typeof expandEquipmentBuffState === "function") st = expandEquipmentBuffState(st);
+  src\main.js:8101:}
+  src\main.js:8102:
+  src\main.js:8103:function showcaseTotalStats(d, m) {
+> src\main.js:8104:  const e = m?.extraStats || {};
+  src\main.js:8105:  const rows = [
+  src\main.js:8106:    ["HP", totalStatValue(d.hp, e.extraHP, e.extraHPPct)],
+  src\main.js:8107:    ["MP", totalStatValue(d.mp, e.extraMP, e.extraMPPct)],
+  src\main.js:8108:    ["ST", totalStatValue(d.st, e.extraST, e.extraSTPct)],
+  src\main.js:8109:    ["最大重量", totalStatValue(d.weight, e.extraMaxWeight, e.extraMaxWeightPct)],
+  src\main.js:8110:    ["命中", totalStatValue(d.hit, e.extraHit, e.extraHitPct)],
+  src\main.js:8111:    ["回避", totalStatValue(d.avoid, e.extraAvoid, e.extraAvoidPct)],
+  src\main.js:8112:    ["防御/AC", totalStatValue(d.def, e.extraAC, e.extraACPct)],
+  src\main.js:8162:  const buffLines = showcaseActiveBuffLines(showcaseResolvedBuffState()).map(x => `- ${x}`);
+  src\main.js:8163:  const skillLines = showcaseSkillLines().map(x => `- ${x}`);
+  src\main.js:8164:  const totalStats = showcaseTotalStats(d, m).map(x => `- ${x.label}: ${x.value}`);
+> src\main.js:8165:  const extra = extraStatsSummary(m.extraStats || {}).map(x => `- ${x}`);
+  src\main.js:8166:
+  src\main.js:8167:  return [
+  src\main.js:8168:    `【${title}】`,
+  src\main.js:8169:    `種族: ${race}`,
+  src\main.js:8170:    `予想ダメージ: ${fmt(Math.floor(m.finalDamage),0)} ダメージ前後`,
+  src\main.js:8171:    `攻撃力: ${fmt(m.atk,3)}`,
+  src\main.js:8172:    `魔力: ${fmt(m.stats.magic,3)}`,
+  src\main.js:8173:    `速度: ${fmt(m.stats.speed,3)}`,
+  src\main.js:8224:  const equipRows = activeEquipmentForShowcase();
+  src\main.js:8225:  const buffLines = showcaseActiveBuffLines(resolvedShowcaseState);
+  src\main.js:8226:  const skillLines = showcaseSkillLines();
+> src\main.js:8227:  const extraLines = extraStatsSummary(m.extraStats || {});
+  src\main.js:8228:  const totalStatLines = showcaseTotalStats(d, m);
+  src\main.js:8229:  const inputs = collectInputs();
+  src\main.js:8230:
+  src\main.js:8231:  if (root) {
+  src\main.js:8232:    const equipItems = equipRows.map(r => {
+  src\main.js:8233:      const slot = (r.slot || "").replace(/^武器: /, "").replace(/^防具: /, "").replace(/^装飾: /, "");
+  src\main.js:8234:      return `<li><b>${escapeHtml(slot)}: ${escapeHtml(r.name || "名称未入力")}</b><br><span class="small">${escapeHtml(equipmentShowcas
+eText(r))}</span></li>`;
+  src\main.js:8235:    });
+  src\main.js:8907:}
+  src\main.js:8908:
+  src\main.js:8909:
+> src\main.js:8910:function idbApplyAdditionalEffectLine(row, line) {
+  src\main.js:8911:  const subLines = idbSplitEffectLine(line);
+  src\main.js:8912:  if (subLines.length > 1) {
+> src\main.js:8913:    subLines.forEach(part => idbApplyAdditionalEffectLine(row, part));
+  src\main.js:8914:    return;
+  src\main.js:8915:  }
+  src\main.js:8916:
+  src\main.js:8917:  const s = idbCanonicalEffectLine(line);
+  src\main.js:8918:  if (!s) return;
+  src\main.js:8919:
+  src\main.js:8920:  const add = (prop, v) => row[prop] = +(row[prop] || 0) + (+v || 0);
+> src\main.js:8921:  const display = (key, name, value, unit="") => pushDisplayEffect(row, key, value, name, unit, "display");
+  src\main.js:8922:
+  src\main.js:8923:  let num;
+  src\main.js:8924:
+  src\main.js:8925:  if (/(?:攻撃力|ATK)/i.test(s) && Number.isFinite(num = idbEffectNumberFor(s, ["攻撃力", "ATK"]))) return add("attack", num);
+  src\main.js:8926:  if (/(?:魔力|MGC)/i.test(s) && Number.isFinite(num = idbEffectNumberFor(s, ["魔力", "MGC"]))) return add("magic", num);
+  src\main.js:8927:  if (/(?:移動速度|速度)/.test(s) && Number.isFinite(num = idbEffectNumberFor(s, ["移動速度", "速度"]))) return add("speed", num);
+  src\main.js:8928:  if (/(?:最大HP|ＨＰ|HP)/i.test(s) && Number.isFinite(num = idbEffectNumberFor(s, ["最大HP", "ＨＰ", "HP"]))) return add("extraHP", num);
+  src\main.js:8929:  if (/(?:最大MP|ＭＰ|MP)/i.test(s) && Number.isFinite(num = idbEffectNumberFor(s, ["最大MP", "ＭＰ", "MP"]))) return add("extraMP", num);
+  src\main.js:9042:  return parseFloat(v) || 0;
+  src\main.js:9043:}
+  src\main.js:9044:
+> src\main.js:9045:function idbApplyStructuredStatus(row, name, value, statKey="") {
+  src\main.js:9046:  const n = String(name || "").trim();
+  src\main.js:9047:  const v = parseFloat(value) || 0;
+  src\main.js:9048:  if (!n || !v || isKnownIgnoredOfficialAddStatus(n)) return;
+  src\main.js:9049:
+  src\main.js:9050:  const key = statKey || toolStatKeyForOfficialAddStatus(n);
+  src\main.js:9051:  if (addToolStatValue(row, key, v)) return;
+  src\main.js:9052:
+> src\main.js:9053:  pushDisplayEffect(row, "custom", v, n, "", "display");
+  src\main.js:9054:}
+  src\main.js:9055:
+  src\main.js:9056:function idbWeaponSkillName(item) {
+  src\main.js:9057:  const reqs = idbStructuredWeaponRequirements(item);
+  src\main.js:9058:  return reqs[0]?.name || "";
+  src\main.js:9059:}
+  src\main.js:9060:
+  src\main.js:9061:function idbNormalizeSkillNameForTool(name) {
+  src\main.js:9415:  // 深掘り対象を広げる。ただしステータス配列は追加効果なので必要スキルには使わない。
+  src\main.js:9416:  for (const [key, val] of entries) {
+  src\main.js:9417:    const k = key.toLowerCase();
+> src\main.js:9418:    if (/add_status|status|stat|property|properties|range|interval|delay|technic|buff|image|description|info|flavor|damage|durabili
+ty/.test(k)) continue;
+  src\main.js:9419:    if (typeof val === "object" && val) {
+  src\main.js:9420:      idbDeepCollectSkillRequirements(val, out, seen, depth + 1);
+  src\main.js:9421:    }
+  src\main.js:9422:  }
+  src\main.js:9423:}
+  src\main.js:9424:
+  src\main.js:9425:function idbStructuredWeaponRange(item) {
+  src\main.js:9426:  const direct = item?.range ?? item?.effective_range ?? item?.effectiveRange ?? item?.valid_range ?? item?.validRange ?? item?.sho
+ot_range ?? item?.attack_range;
+  src\main.js:9675:    idbSetEquipmentBuff(row, technic.name, technic.info || "");
+  src\main.js:9676:  }
+  src\main.js:9677:
+> src\main.js:9678:  const addStatuses = item.add_statuses || item.addStatuses || item.add_status || [];
+> src\main.js:9679:  if (Array.isArray(addStatuses)) {
+> src\main.js:9680:    addStatuses.forEach(st => idbApplyStructuredStatus(row, st.name, idbStatusValue(st), st.statKey));
+  src\main.js:9681:  }
+  src\main.js:9682:
+  src\main.js:9683:  idbSupplementStructuredWeapon(row, item, raw, page);
+  src\main.js:9684:
+  src\main.js:9685:  return {
+  src\main.js:9686:    row: normalizeEquipmentCandidate(row),
+  src\main.js:9687:    text: "",
+  src\main.js:9688:    lines: [],
+  src\main.js:9689:    equipPart: equipText,
+> src\main.js:9690:    effectLines: Array.isArray(addStatuses)
+> src\main.js:9691:      ? addStatuses.filter(st => st?.name && st.name !== "なし" && idbStatusValue(st)).map(st => `${st.name} ${idbStatusValue(st) >= 
+0 ? "+" : ""}${idbStatusValue(st)}`)
+  src\main.js:9692:      : [],
+  src\main.js:9693:    source: "data-page"
+  src\main.js:9694:  };
+  src\main.js:9695:}
+  src\main.js:9696:
+  src\main.js:9697:function parseIdbStructuredPage(raw) {
+  src\main.js:9698:  const page = idbExtractInertiaDataPage(raw);
+  src\main.js:9699:  const item = idbStructuredItemFromPage(page);
+  src\main.js:9738:  if (buff) idbSetEquipmentBuff(row, buff.name, buff.note);
+  src\main.js:9739:
+  src\main.js:9740:  const effectLines = idbCollectEffectLines(lines, text);
+> src\main.js:9741:  effectLines.forEach(line => idbApplyAdditionalEffectLine(row, line));
+  src\main.js:9742:
+  src\main.js:9743:  return {
+  src\main.js:9744:    row: normalizeEquipmentCandidate(row),
+  src\main.js:9745:    text,
+  src\main.js:9746:    lines,
+  src\main.js:9747:    equipPart,
+  src\main.js:9748:    effectLines
+  src\main.js:9749:  };
+  src\main.js:9842:    ? `<div class="idbPreviewWarnings">${warnings.map(w => `<div>⚠ ${escapeHtml(w)}</div>`).join("")}</div>`
+  src\main.js:9843:    : `<div class="idbPreviewOk">重要項目の未取得警告はありません。候補追加前に数値だけ確認してください。</div>`;
+  src\main.js:9844:
+> src\main.js:9845:  const baseText = extraStatsEffectText(r, "base");
+  src\main.js:9846:  const baseSection = baseText
+  src\main.js:9847:    ? idbPreviewSection("装備本体の追加ステータス", `<div>${escapeHtml(baseText)}</div>`)
+  src\main.js:9848:    : "";
+  src\main.js:9849:
+  src\main.js:9850:  const buffSection = (r.equipBuffEnabled || r.equipBuffName || r.equipBuffNote)
+  src\main.js:9851:    ? idbPreviewSection(
+  src\main.js:9852:        "装備Buff",
+  src\main.js:9853:        `<div><b>${escapeHtml(r.equipBuffName || "Buff名未取得")}</b>${r.equipBuffNote ? `<div class="mutedText">${escapeHtml(r.equipBu
+ffNote)}</div>` : ""}</div>
+  src\main.js:9884:
+  src\main.js:9885:
+  src\main.js:9886:function idbParserSelfTest() {
+> src\main.js:9887:  const inertiaPage = `<div id="app" data-page="{&quot;component&quot;:&quot;Public/Items/Defences/Show&quot;,&quot;props&quot;:{&q
+uot;defense&quot;:{&quot;id&quot;:22761,&quot;name&quot;:&quot;ジャイアント ドラゴンフライ&quot;,&quot;info&quot;:&quot;人より巨大なトンボの一種&quot;,&quot;equip&quot;:&quot;
+腰（装）&quot;,&quot;armor_class&quot;:0,&quot;requiredSkill&quot;:&quot;着こなし&quot;,&quot;need_level&quot;:1,&quot;technic&quot;:{&quot;name&quot;:&quot;ト
+ンボの餌&quot;,&quot;info&quot;:&quot;高速で移動する巨大なトンボに捕獲された獲物\\n※WarAgeでは効果がない&quot;},&quot;add_statuses&quot;:[{&quot;name&quot;:&quot;回避&quot;,&quot;pivot
+&quot;:{&quot;value&quot;:10}},{&quot;name&quot;:&quot;最大重量&quot;,&quot;pivot&quot;:{&quot;value&quot;:30}},{&quot;name&quot;:&quot;移動速度&quot;,&quot;p
+ivot&quot;:{&quot;value&quot;:5}},{&quot;name&quot;:&quot;なし&quot;,&quot;pivot&quot;:{&quot;value&quot;:0}}]}}}"></div>`;
+  src\main.js:9888:
+  src\main.js:9889:  const weaponPageDirect = `<div id="app" data-page="{&quot;component&quot;:&quot;Public/Items/Weapons/Show&quot;,&quot;props&quot;
+:{&quot;weapon&quot;:{&quot;id&quot;:17163,&quot;name&quot;:&quot;バール&quot;,&quot;equip&quot;:&quot;右手 1HAND&quot;,&quot;damage&quot;:65,&quot;attack_
+interval&quot;:310,&quot;range&quot;:4.2,&quot;durability&quot;:22,&quot;requiredSkill&quot;:&quot;こんぼう&quot;,&quot;need_level&quot;:81}}}"></div>`;
+  src\main.js:9890:
+  src\main.js:9891:  const weaponPageNested = `<div id="app" data-page="{&quot;component&quot;:&quot;Public/Items/Weapons/Show&quot;,&quot;props&quot;
+:{&quot;weapon&quot;:{&quot;id&quot;:99999,&quot;name&quot;:&quot;テスト刀剣&quot;,&quot;equip&quot;:&quot;右手 2HAND&quot;,&quot;damage&quot;:100,&quot;atta
+ckInterval&quot;:450,&quot;effectiveRange&quot;:5.5,&quot;required_skill&quot;:{&quot;name&quot;:&quot;刀剣&quot;,&quot;pivot&quot;:{&quot;value&quot;:9
+1}}}}}"></div>`;
+  src\main.js:9892:
+  src\main.js:9893:  const weaponPageMulti2 = `<div id="app" data-page="{&quot;component&quot;:&quot;Public/Items/Weapons/Show&quot;,&quot;props&quot;
+:{&quot;weapon&quot;:{&quot;id&quot;:7135,&quot;name&quot;:&quot;炎の珠&quot;,&quot;equip&quot;:&quot;右手 1HAND&quot;,&quot;damage&quot;:30,&quot;required
+Skill&quot;:&quot;こんぼう 素手&quot;,&quot;need_level&quot;:50,&quot;description&quot;:&quot;必要スキル こんぼう 50.0 素手 50.0 ダメージ: 30.0 攻撃間隔: 120 有効レンジ: 3.4&quot;}
+}}"></div>`;
+  src\main.js:9894:
+  src\main.js:9895:  const weaponPageMulti3 = `<div id="app" data-page="{&quot;component&quot;:&quot;Public/Items/Weapons/Show&quot;,&quot;props&quot;
+:{&quot;weapon&quot;:{&quot;id&quot;:4856,&quot;name&quot;:&quot;SGK ウェポン&quot;,&quot;equip&quot;:&quot;右手 2HAND&quot;,&quot;damage&quot;:89,&quot;att
+ack_interval&quot;:690,&quot;effective_range&quot;:7.1,&quot;requiredSkill1&quot;:&quot;刀剣&quot;,&quot;need_level1&quot;:100,&quot;requiredSkill2&quot
+;:&quot;素手&quot;,&quot;need_level2&quot;:100,&quot;requiredSkill3&quot;:&quot;槍&quot;,&quot;need_level3&quot;:100,&quot;description&quot;:&quot;武器カテゴリ
+説明にこんぼうという語が混じっても必要スキルへ混ぜない&quot;}}}"></div>`;
+  src\main.js:9896:
+> src\main.js:9897:  const copperKnifePage = `<div id="app" data-page="{&quot;component&quot;:&quot;Public/Items/Weapons/Show&quot;,&quot;props&quot;:
+{&quot;weapon&quot;:{&quot;id&quot;:282,&quot;name&quot;:&quot;カッパー ナイフ&quot;,&quot;equip&quot;:&quot;右手 左手&quot;,&quot;damage&quot;:2.2,&quot;effecti
+ve_range&quot;:3.6,&quot;requiredSkill&quot;:&quot;刀剣&quot;,&quot;need_level&quot;:1,&quot;type&quot;:&quot;Weapon&quot;,&quot;info&quot;:&quot;説明文にこん
+ぼうという語が混じっても必要スキルにはしない&quot;,&quot;add_statuses&quot;:[{&quot;name&quot;:&quot;命中&quot;,&quot;pivot&quot;:{&quot;value&quot;:5}}]}}}"></div>`;
+  src\main.js:9898:
+  src\main.js:9899:  const samples = [
+  src\main.js:9900:`ジャイアント ドラゴンフライ
+  src\main.js:9901:装備部位
+  src\main.js:9902:    腰（装）
+  src\main.js:9903:必要スキル
+  src\main.js:9904:    着こなし 1.0
+  src\main.js:9905:アーマークラス
+  src\main.js:10000:
+  src\main.js:10001:
+  src\main.js:10002:const CATALOG_SCRIPT_URLS = [
+> src\main.js:10003:  "src/data/generated/equipmentCatalog.generated.js",
+  src\main.js:10004:  "src/data/generated/buffCatalog.generated.js",
+  src\main.js:10005:  "src/data/generated/wikiEquipBuffEffects.generated.js",
+  src\main.js:10006:  "src/data/generated/equipBuffRuleCandidates.generated.js",
+  src\main.js:10007:  "src/data/manual/buffRules.manual.js"
+  src\main.js:10008:];
+  src\main.js:10009:let catalogScriptsPromise = null;
+  src\main.js:10010:
+  src\main.js:10011:function catalogGlobalsReady() {
+  src\main.js:10038:  return out;
+  src\main.js:10039:}
+  src\main.js:10040:
+> src\main.js:10041:function equipmentCatalogItems() {
+  src\main.js:10042:  const raw = catalogArray("MOE_EQUIPMENT_CATALOG_MANUAL", "MOE_EQUIPMENT_CATALOG", "MOE_EQUIPMENT_CATALOG_GENERATED");
+  src\main.js:10043:  const seen = new Set();
+  src\main.js:10044:  const out = [];
+  src\main.js:10045:  raw.forEach(item => {
+  src\main.js:10046:    if (!item) return;
+  src\main.js:10047:    const key = item.catalogId || item.id || `${item.category || "item"}:${item.officialId || item.name}`;
+  src\main.js:10048:    if (seen.has(key)) return;
+  src\main.js:10049:    seen.add(key);
+  src\main.js:10052:  return out;
+  src\main.js:10053:}
+  src\main.js:10054:
+> src\main.js:10055:function buffCatalogItems() {
+  src\main.js:10056:  const raw = catalogArray("MOE_BUFF_CATALOG_MANUAL", "MOE_BUFF_CATALOG", "MOE_BUFF_CATALOG_GENERATED");
+  src\main.js:10057:  const seen = new Set();
+  src\main.js:10058:  const out = [];
+  src\main.js:10059:  raw.forEach(item => {
+  src\main.js:10060:    if (!item) return;
+  src\main.js:10061:    const key = item.catalogId || item.id || item.officialTechnicId || item.name;
+  src\main.js:10062:    if (seen.has(key)) return;
+  src\main.js:10063:    seen.add(key);
+  src\main.js:10172:  (rule.skillEffects || []).forEach(e => {
+  src\main.js:10173:    const name = e.name || e.target || "";
+  src\main.js:10174:    const value = +e.value || 0;
+> src\main.js:10175:    if (name || value) { pushDisplayEffect(row, "skillPlus", value, name, "", "display", "TSV候補"); applied = true; }
+  src\main.js:10176:  });
+  src\main.js:10177:  (rule.customEffects || []).forEach(e => {
+  src\main.js:10178:    const name = e.name || e.target || "";
+  src\main.js:10179:    const value = +e.value || 0;
+> src\main.js:10180:    if (name || value) { pushDisplayEffect(row, "custom", value, name, e.unit || "", "display", "TSV候補"); applied = true; }
+  src\main.js:10181:  });
+  src\main.js:10182:  const misc = rule.misc || {};
+> src\main.js:10183:  if (misc.jumpMultiplier) { pushDisplayEffect(row, "custom", misc.jumpMultiplier, "ジャンプ力倍率", "倍", "display", "TSV候補"); applied = 
+true; }
+> src\main.js:10184:  if (misc.forcedSpeed) { pushDisplayEffect(row, "custom", misc.forcedSpeed, "強制移動速度", "", "display", "TSV候補"); applied = true; }
+> src\main.js:10185:  if (misc.targetDamageEffects) { pushDisplayEffect(row, "custom", 0, misc.targetDamageEffects, "", "display", "TSV候補"); applied =
+ true; }
+  src\main.js:10186:
+  src\main.js:10187:  row.equipBuffSourceText = appendUniqueText(row.equipBuffSourceText, rule.parsedStatsHint || rule.memo || "");
+  src\main.js:10188:  row.equipBuffWikiText = appendUniqueText(row.equipBuffWikiText, rule.rawInfo || "");
+  src\main.js:10189:  row.equipBuffScrapboxText = appendUniqueText(row.equipBuffScrapboxText, rule.scrapboxRawLines || "");
+  src\main.js:10190:  return applied;
+  src\main.js:10191:}
+  src\main.js:10192:
+  src\main.js:10193:
+  src\main.js:10215:    ...(Array.isArray(item.weaponReq) ? item.weaponReq.map(r => `${r.name || r.skill || ""}${r.value || r.required || r.min || ""}
+`) : []),
+  src\main.js:10216:    ...(Array.isArray(item.needSkills) ? item.needSkills.map(r => `${r.name || r.skill || ""}${r.value || r.required || r.min || "
+"}`) : []),
+  src\main.js:10217:    ...(Array.isArray(item.requirements) ? item.requirements.map(r => `${r.name || r.skill || ""}${r.value || r.required || r.min 
+|| ""}`) : []),
+> src\main.js:10218:    ...(Array.isArray(item.addStatuses) ? item.addStatuses.map(s => `${s.name}${s.value}`) : []),
+  src\main.js:10219:    ...(Array.isArray(item.tags) ? item.tags : [])
+  src\main.js:10220:  ].filter(Boolean).join(" ");
+  src\main.js:10221:}
+  src\main.js:10222:
+  src\main.js:10223:function catalogSlotOptions(items) {
+  src\main.js:10224:  const slots = Array.from(new Set(items.map(i => i.slot).filter(Boolean))).sort((a, b) => a.localeCompare(b, "ja"));
+  src\main.js:10225:  return `<option value="">すべて</option>` + slots.map(s => `<option value="${escapeAttr(s)}">${escapeHtml(s)}</option>`).join("");
+  src\main.js:10226:}
+  src\main.js:10228:function catalogStatOptions(items) {
+  src\main.js:10229:  const names = new Set();
+  src\main.js:10230:  items.forEach(item => {
+> src\main.js:10231:    (item.addStatuses || []).forEach(st => {
+  src\main.js:10232:      if (st?.statKey) names.add(st.statKey);
+  src\main.js:10233:      else if (st?.name) names.add(st.name);
+  src\main.js:10234:    });
+> src\main.js:10235:    if (item.extraStats) Object.entries(item.extraStats).forEach(([k, v]) => +v && names.add(k));
+  src\main.js:10236:  });
+  src\main.js:10237:  const list = Array.from(names).sort((a, b) => String(a).localeCompare(String(b), "ja"));
+  src\main.js:10238:  return `<option value="">指定なし</option>` + list.map(s => `<option value="${escapeAttr(s)}">${escapeHtml(catalogDisplayStatName(s)
+)}</option>`).join("");
+  src\main.js:10239:}
+  src\main.js:10240:
+  src\main.js:10241:function catalogDisplayStatName(name) {
+  src\main.js:10242:  return TOOL_STAT_DISPLAY_NAMES[name] || name;
+  src\main.js:10243:}
+  src\main.js:10252:  catalogPageIndex = 0;
+  src\main.js:10253:}
+  src\main.js:10254:
+> src\main.js:10255:function catalogItemMatches(item, filter) {
+  src\main.js:10256:  const q = catalogNorm(filter.query);
+  src\main.js:10257:  if (q && !catalogNorm(catalogText(item)).includes(q)) return false;
+  src\main.js:10258:  if (filter.category && String(item.category || "") !== filter.category) return false;
+  src\main.js:10259:  if (filter.slot && String(item.slot || "") !== filter.slot) return false;
+  src\main.js:10260:  const hasBuff = catalogHasBuff(item);
+  src\main.js:10261:  if (filter.buffMode === "with" && !hasBuff) return false;
+  src\main.js:10262:  if (filter.buffMode === "without" && hasBuff) return false;
+  src\main.js:10263:  if (filter.stat) {
+  src\main.js:10264:    const stat = filter.stat;
+> src\main.js:10265:    const hit = (item.addStatuses || []).some(s => String(s?.name || "") === stat || String(s?.statKey || "") === stat) || !!+(ite
+m.extraStats?.[stat] || 0);
+  src\main.js:10266:    if (!hit) return false;
+  src\main.js:10267:  }
+  src\main.js:10268:  return true;
+  src\main.js:10269:}
+  src\main.js:10270:
+  src\main.js:10271:function catalogNeedSkillPairs(item) {
+  src\main.js:10272:  const out = [];
+  src\main.js:10273:  const add = (name, value) => {
+  src\main.js:10345:  return ac ? fmt(ac, 2) : "-";
+  src\main.js:10346:}
+  src\main.js:10347:
+> src\main.js:10348:function catalogItemSortValue(item, key) {
+  src\main.js:10349:  if (key === "name") return item.name || "";
+  src\main.js:10350:  if (key === "category") return `${catalogCategoryLabel(item.category)} ${item.slot || ""} ${item.name || ""}`;
+  src\main.js:10351:  if (key === "slot") return `${item.slot || ""} ${item.name || ""}`;
+  src\main.js:10352:  if (key === "req") return catalogNeedSummary(item);
+  src\main.js:10353:  if (key === "buff") return catalogBuffSummary(item) || "";
+  src\main.js:10354:  if (key === "hasBuff") return catalogHasBuff(item) ? 1 : 0;
+  src\main.js:10355:  if (key === "weaponDamage") return +(item.weaponDamage || 0);
+  src\main.js:10356:  if (key === "weaponDelay") return +(item.weaponAttackInterval || 0);
+> src\main.js:10357:  if (key === "attack") return +(item.extraStats?.attack || 0);
+> src\main.js:10358:  if (key === "magic") return +(item.extraStats?.magic || 0);
+> src\main.js:10359:  if (key === "speed") return +(item.extraStats?.speed || 0);
+> src\main.js:10360:  if (key === "ac") return +(item.armorClass ?? item.ac ?? item.defense ?? item.extraStats?.extraAC ?? 0);
+> src\main.js:10361:  if (key === "hp") return +(item.extraStats?.extraHP || 0);
+> src\main.js:10362:  if (key === "mp") return +(item.extraStats?.extraMP || 0);
+> src\main.js:10363:  if (key === "st") return +(item.extraStats?.extraST || 0);
+> src\main.js:10364:  if (key === "hit") return +(item.extraStats?.extraHit || 0);
+> src\main.js:10365:  if (key === "avoid") return +(item.extraStats?.extraAvoid || 0);
+> src\main.js:10366:  if (key === "attackDelay") return +(item.extraStats?.extraAttackDelay || 0);
+  src\main.js:10367:  return item.name || "";
+  src\main.js:10368:}
+  src\main.js:10369:
+> src\main.js:10370:function sortCatalogItems(items, filter) {
+  src\main.js:10371:  const key = filter.sort || "name";
+  src\main.js:10372:  const dir = filter.sortDir === "desc" ? -1 : 1;
+  src\main.js:10373:  const numericKeys = new Set(["weaponDamage", "weaponDelay", "attack", "magic", "speed", "ac", "hp", "mp", "st", "hit", "avoid", 
+"attackDelay", "hasBuff"]);
+  src\main.js:10374:  return items.slice().sort((a, b) => {
+> src\main.js:10375:    const av = catalogItemSortValue(a, key);
+> src\main.js:10376:    const bv = catalogItemSortValue(b, key);
+  src\main.js:10377:    if (numericKeys.has(key)) {
+  src\main.js:10378:      const diff = (+av || 0) - (+bv || 0);
+  src\main.js:10379:      if (diff) return diff * dir;
+  src\main.js:10380:      return String(a.name || "").localeCompare(String(b.name || ""), "ja");
+  src\main.js:10381:    }
+  src\main.js:10382:    return String(av || "").localeCompare(String(bv || ""), "ja") * dir;
+  src\main.js:10383:  });
+  src\main.js:10384:}
+  src\main.js:10402:
+  src\main.js:10403:function catalogStatusSummary(item) {
+  src\main.js:10404:  const parts = [];
+> src\main.js:10405:  (item.addStatuses || []).forEach(st => {
+  src\main.js:10406:    const v = +(st?.value || 0);
+  src\main.js:10407:    if (st?.name && v) parts.push(`${st.name} ${v > 0 ? "+" : ""}${fmt(v, 2)}`);
+  src\main.js:10408:  });
+> src\main.js:10409:  if (!parts.length && item.extraStats) {
+> src\main.js:10410:    Object.entries(item.extraStats).forEach(([k, v]) => +v && parts.push(`${catalogDisplayStatName(k)} ${+v > 0 ? "+" : ""}${fmt(+
+v, 2)}`));
+  src\main.js:10411:  }
+  src\main.js:10412:  return parts.join(" / ") || "-";
+  src\main.js:10413:}
+  src\main.js:10414:
+  src\main.js:10415:function catalogWeaponSummary(item) {
+  src\main.js:10416:  if (item.category !== "weapon") return "-";
+  src\main.js:10417:  const parts = [];
+  src\main.js:10418:  if (+item.weaponDamage) parts.push(`ダメージ ${fmt(+item.weaponDamage, 2)}`);
+  src\main.js:10431:function catalogFindBuffById(id) {
+  src\main.js:10432:  const key = String(id || "");
+  src\main.js:10433:  if (!key) return null;
+> src\main.js:10434:  return buffCatalogItems().find(b => String(b.id || "") === key || String(b.officialTechnicId || "") === key || String(b.catalogI
+d || "") === key) || null;
+  src\main.js:10435:}
+  src\main.js:10436:
+  src\main.js:10437:function catalogEquipmentToRow(item) {
+  src\main.js:10438:  const slot = item.slot || idbMapSlot(`${item.equip || ""} ${item.name || ""}`) || "防具: 頭";
+  src\main.js:10439:  const row = defaultEquipmentCandidate(slot, false);
+  src\main.js:10440:  row.enabled = false;
+  src\main.js:10441:  row.name = item.name || "カタログ装備";
+  src\main.js:10442:  row.importSource = "catalog";
+  src\main.js:10456:    else if (item.requiredSkill || item.needLevel) row.weaponReq = idbWeaponReqsFromText(String(item.requiredSkill || ""), +item.n
+eedLevel || 0);
+  src\main.js:10457:  }
+  src\main.js:10458:
+> src\main.js:10459:  const structuredStatuses = Array.isArray(item.addStatuses) ? item.addStatuses : [];
+  src\main.js:10460:  if (structuredStatuses.length) {
+> src\main.js:10461:    structuredStatuses.forEach(st => idbApplyStructuredStatus(row, st.name, st.value, st.statKey));
+> src\main.js:10462:  } else if (item.extraStats && typeof item.extraStats === "object") {
+> src\main.js:10463:    // generated catalog normally contains both addStatuses and normalized extraStats for the same official add_status rows.
+> src\main.js:10464:    // Applying both doubles imported equipment effects, so extraStats is only a fallback when structured addStatuses are absent.
+> src\main.js:10465:    Object.entries(item.extraStats).forEach(([prop, value]) => {
+  src\main.js:10466:      if (prop in row) row[prop] = +(row[prop] || 0) + (+value || 0);
+  src\main.js:10467:    });
+  src\main.js:10468:  }
+  src\main.js:10469:  if (item.category !== "weapon" && +item.armorClass) row.extraAC = +(row.extraAC || 0) + (+item.armorClass || 0);
+  src\main.js:10470:
+  src\main.js:10471:  const buff = item.equipBuff?.name ? item.equipBuff : (item.buffRefs || []).map(catalogFindBuffById).find(Boolean);
+  src\main.js:10472:  if (buff?.name) {
+  src\main.js:10473:    idbSetEquipmentBuff(row, buff.name, buff.info || buff.note || "");
+  src\main.js:10484:}
+  src\main.js:10485:
+  src\main.js:10486:function addCatalogEquipmentToRegistered(catalogId) {
+> src\main.js:10487:  const item = equipmentCatalogItems().find(x => String(x.catalogId || x.id) === String(catalogId));
+  src\main.js:10488:  if (!item) return;
+  src\main.js:10489:  state.equipment = normalizeEquipmentRows(state.equipment);
+  src\main.js:10490:  state.equipment.push(catalogEquipmentToRow(item));
+  src\main.js:10491:  renderEquipmentTable();
+  src\main.js:10492:  renderTagLinkSummary();
+  src\main.js:10493:  renderShowcaseTab();
+  src\main.js:10494:  calc();
+  src\main.js:10495:  renderCatalogResults();
+  src\main.js:10537:  const body = byId("catalogResultsBody");
+  src\main.js:10538:  const summary = byId("catalogSummary");
+  src\main.js:10539:  if (!body || !summary) return;
+> src\main.js:10540:  const items = equipmentCatalogItems();
+  src\main.js:10541:  const filter = catalogFilterState();
+> src\main.js:10542:  const filtered = sortCatalogItems(items.filter(item => catalogItemMatches(item, filter)), filter);
+  src\main.js:10543:  const limit = Math.max(25, Math.min(1000, +(filter.limit || 200)));
+  src\main.js:10544:  const pageCount = filtered.length ? Math.ceil(filtered.length / limit) : 0;
+  src\main.js:10545:  catalogPageIndex = Math.max(0, Math.min(catalogPageIndex, Math.max(0, pageCount - 1)));
+  src\main.js:10546:  const start = catalogPageIndex * limit;
+  src\main.js:10547:  const shown = filtered.slice(start, start + limit);
+  src\main.js:10548:  const already = registeredCatalogIds();
+  src\main.js:10549:  body.innerHTML = shown.length
+  src\main.js:10550:    ? shown.map(item => catalogResultRowHtml(item, already.has(String(item.catalogId || item.id || "")))).join("")
+  src\main.js:10583:      </table>
+  src\main.js:10584:    </div>
+  src\main.js:10585:    <details class="catalogHelp"><summary>カタログ生成メモ</summary>
+> src\main.js:10586:      <div class="small mutedText">Googleスプレッドシートから生成する場合は、リポジトリ直下で <code>node tools/build-equipment-catalog-from-google-sheet.mjs
+</code> を実行し、生成された <code>src/data/generated/*.generated.js</code> をGitに追加してください。取り込み時は <code>addStatuses</code> と <code>extraStats</code> の二重適用を避け、追加効
+果が2倍にならないようにしています。</div>
+  src\main.js:10587:    </details>
+  src\main.js:10588:  `;
+  src\main.js:10589:
+  src\main.js:10590:  ["catalogSearch", "catalogCategory", "catalogSlot", "catalogStat", "catalogBuffMode", "catalogSort", "catalogSortDir", "catalogL
+imit"].forEach(id => {
+  src\main.js:10591:    const el = byId(id);
+  src\main.js:10592:    if (el) {
+  src\main.js:10593:      const handler = () => { catalogResetPage(); renderCatalogResults(); };
+  src\main.js:10594:      el.oninput = handler;
+  src\main.js:10604:}
+  src\main.js:10605:
+  src\main.js:10606:function setupCatalogFilterOptions(force=false) {
+> src\main.js:10607:  const items = equipmentCatalogItems();
+  src\main.js:10608:  const slotSelect = byId("catalogSlot");
+  src\main.js:10609:  const statSelect = byId("catalogStat");
+  src\main.js:10610:  if (slotSelect && (force || !slotSelect.dataset.ready)) {
+  src\main.js:10611:    const current = slotSelect.value;
+  src\main.js:10612:    slotSelect.innerHTML = catalogSlotOptions(items);
+  src\main.js:10613:    slotSelect.value = current;
+  src\main.js:10614:    slotSelect.dataset.ready = "1";
+  src\main.js:10615:  }
+  src\main.js:10832:    `魔力: ${m.equipmentRaw.magic.toFixed(3)}`,
+  src\main.js:10833:    `速度: ${m.equipmentRaw.speed.toFixed(3)}`
+  src\main.js:10834:  ];
+> src\main.js:10835:  const extra = extraStatsSummary(m.extraStats || {});
+  src\main.js:10836:  if (extra.length) {
+  src\main.js:10837:    lines.push(`<b>追加ステータス</b>`);
+  src\main.js:10838:    extra.forEach(x => lines.push(x));
+  src\main.js:10839:  }
+  src\main.js:10840:  byId("equipmentSummary").innerHTML = lines.map(x => `<div>${x}</div>`).join("");
+  src\main.js:10841:}
+  src\main.js:10842:
+  src\main.js:10843:/* 使用条件補正の説明表示を更新する。 */
+  src\main.js:10977:  }
+  src\main.js:10978:  const totalStatLine = showcaseTotalStats(skillSimDerived(), m).map(x => `${x.label} ${x.value}`).join(" / ");
+  src\main.js:10979:  if (totalStatLine) lines.push(`<p>総合ステータス: ${escapeHtml(totalStatLine)}</p>`);
+> src\main.js:10980:  const extraLine = extraStatsSummary(m.extraStats || {}).join(" / ");
+  src\main.js:10981:  if (extraLine) lines.push(`<p>構成追加ステータス: ${escapeHtml(extraLine)}</p>`);
+  src\main.js:10982:  if (m.selectedWeapon) {
+  src\main.js:10983:    const slotName = (m.selectedWeapon.slot || "武器").replace(/^武器: /, "");
+  src\main.js:10984:    lines.push(`<p>計算武器: ${escapeHtml(slotName)} ${escapeHtml(m.selectedWeapon.name || "名称未入力")} / 武器ダメージ ${m.weaponDamage.toFixed
+(3)} / 武器重量 ${m.weaponWeight.toFixed(3)}</p>`);
+  src\main.js:10985:  }
+  src\main.js:10986:  if (m.skillModInfo && m.skillModInfo.evaluated && m.skillModInfo.evaluated.length) {
+  src\main.js:10987:    const reqText = m.skillModInfo.evaluated.map(r => `${escapeHtml(r.name)} ${r.current.toFixed(1)}/${r.required.toFixed(1)}${r.d
+enom !== r.required ? `（判定分母 ${r.denom.toFixed(1)}）` : ""}=${(r.ratio * 100).toFixed(1)}%${r.meetsGate ? "" : " / 8割未満"}`).join(" / ");
+  src\main.js:10988:    const totalReqText = m.skillModInfo.totalRequired
+
+
