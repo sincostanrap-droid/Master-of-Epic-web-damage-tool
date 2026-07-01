@@ -3572,7 +3572,7 @@ window.MOE_EQUIP_BUFF_RULE_CANDIDATES_GENERATED = [
     "verified": false,
     "applyDefault": false,
     "confidence": "conversion-refined",
-    "conflictGroup": "attack-conversion",
+    "conflictGroup": "",
     "stackRule": "manual-check",
     "stats": {},
     "conversions": {
@@ -12111,7 +12111,7 @@ window.MOE_EQUIP_BUFF_RULE_CANDIDATES_GENERATED = [
     "verified": false,
     "applyDefault": false,
     "confidence": "conversion-refined",
-    "conflictGroup": "attack-conversion",
+    "conflictGroup": "",
     "stackRule": "manual-check",
     "stats": {},
     "conversions": {
@@ -13524,7 +13524,7 @@ window.MOE_EQUIP_BUFF_RULE_CANDIDATES_GENERATED = [
     "verified": false,
     "applyDefault": false,
     "confidence": "conversion-refined",
-    "conflictGroup": "attack-conversion",
+    "conflictGroup": "",
     "stackRule": "manual-check",
     "stats": {},
     "conversions": {
@@ -18187,7 +18187,7 @@ window.MOE_EQUIP_BUFF_RULE_CANDIDATES_GENERATED = [
     "verified": false,
     "applyDefault": false,
     "confidence": "conversion-refined",
-    "conflictGroup": "attack-conversion",
+    "conflictGroup": "",
     "stackRule": "same-technic",
     "stats": {},
     "conversions": {
@@ -23615,7 +23615,7 @@ window.MOE_EQUIP_BUFF_RULE_CANDIDATES_GENERATED = [
     "verified": false,
     "applyDefault": false,
     "confidence": "conversion-refined",
-    "conflictGroup": "attack-conversion",
+    "conflictGroup": "",
     "stackRule": "same-technic",
     "stats": {},
     "conversions": {
@@ -25215,7 +25215,7 @@ window.MOE_EQUIP_BUFF_RULE_CANDIDATES_GENERATED = [
     "verified": false,
     "applyDefault": false,
     "confidence": "conversion-refined",
-    "conflictGroup": "attack-conversion",
+    "conflictGroup": "",
     "stackRule": "manual-check",
     "stats": {},
     "conversions": {
@@ -30266,7 +30266,7 @@ window.MOE_EQUIP_BUFF_RULE_CANDIDATES_GENERATED = [
     "verified": false,
     "applyDefault": false,
     "confidence": "conversion-refined",
-    "conflictGroup": "attack-conversion",
+    "conflictGroup": "",
     "stackRule": "manual-check",
     "stats": {},
     "conversions": {
@@ -30950,7 +30950,7 @@ window.MOE_EQUIP_BUFF_RULE_CANDIDATES_GENERATED = [
     "verified": false,
     "applyDefault": false,
     "confidence": "conversion-refined",
-    "conflictGroup": "attack-conversion",
+    "conflictGroup": "",
     "stackRule": "same-technic",
     "stats": {},
     "conversions": {
@@ -30991,7 +30991,7 @@ window.MOE_EQUIP_BUFF_RULE_CANDIDATES_GENERATED = [
     "verified": false,
     "applyDefault": false,
     "confidence": "conversion-refined",
-    "conflictGroup": "attack-conversion",
+    "conflictGroup": "",
     "stackRule": "same-technic",
     "stats": {},
     "conversions": {
@@ -31032,7 +31032,7 @@ window.MOE_EQUIP_BUFF_RULE_CANDIDATES_GENERATED = [
     "verified": false,
     "applyDefault": false,
     "confidence": "conversion-refined",
-    "conflictGroup": "attack-conversion",
+    "conflictGroup": "",
     "stackRule": "same-technic",
     "stats": {},
     "conversions": {
@@ -31186,7 +31186,7 @@ window.MOE_EQUIP_BUFF_RULE_CANDIDATES_GENERATED = [
     "verified": false,
     "applyDefault": false,
     "confidence": "conversion-refined",
-    "conflictGroup": "attack-conversion",
+    "conflictGroup": "",
     "stackRule": "same-technic",
     "stats": {},
     "conversions": {
@@ -31416,7 +31416,7 @@ window.MOE_EQUIP_BUFF_RULE_CANDIDATES_GENERATED = [
     "verified": false,
     "applyDefault": false,
     "confidence": "conversion-refined",
-    "conflictGroup": "attack-conversion",
+    "conflictGroup": "",
     "stackRule": "manual-check",
     "stats": {},
     "conversions": {
@@ -37823,7 +37823,7 @@ window.MOE_EQUIP_BUFF_RULE_CANDIDATES_GENERATED = [
     "verified": false,
     "applyDefault": false,
     "confidence": "conversion-refined",
-    "conflictGroup": "attack-conversion",
+    "conflictGroup": "",
     "stackRule": "same-technic",
     "stats": {},
     "conversions": {
@@ -38739,7 +38739,7 @@ window.MOE_EQUIP_BUFF_RULE_CANDIDATES_GENERATED = [
     "verified": false,
     "applyDefault": false,
     "confidence": "conversion-refined",
-    "conflictGroup": "attack-conversion",
+    "conflictGroup": "",
     "stackRule": "manual-check",
     "stats": {},
     "conversions": {
@@ -39835,7 +39835,7 @@ window.MOE_EQUIP_BUFF_RULE_CANDIDATES_GENERATED = [
     "verified": false,
     "applyDefault": false,
     "confidence": "conversion-refined",
-    "conflictGroup": "attack-conversion",
+    "conflictGroup": "",
     "stackRule": "same-technic",
     "stats": {},
     "conversions": {
@@ -43035,7 +43035,7 @@ window.MOE_EQUIP_BUFF_RULE_CANDIDATES_GENERATED = [
     "verified": false,
     "applyDefault": false,
     "confidence": "conversion-refined",
-    "conflictGroup": "attack-conversion",
+    "conflictGroup": "",
     "stackRule": "same-technic",
     "stats": {},
     "conversions": {
@@ -43117,7 +43117,7 @@ window.MOE_EQUIP_BUFF_RULE_CANDIDATES_GENERATED = [
     "verified": false,
     "applyDefault": false,
     "confidence": "conversion-refined",
-    "conflictGroup": "attack-conversion",
+    "conflictGroup": "",
     "stackRule": "manual-check",
     "stats": {},
     "conversions": {
