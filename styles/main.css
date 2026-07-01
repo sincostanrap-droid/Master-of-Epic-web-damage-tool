@@ -4031,3 +4031,199 @@ button[onclick*="applySkillSimToCalc"],
 .catalogHelp {
   margin-top: 10px;
 }
+
+/* v13: equipment detail UI polish */
+.equipBuffGridRow {
+  gap: 12px;
+}
+
+.quickEffectAdder,
+.extraStatsEditor,
+.equipBuffSection,
+.weaponCalcEditor {
+  border: 1px solid color-mix(in srgb, var(--primary, #d9a334) 22%, var(--border, #3c3a33));
+  background: linear-gradient(180deg, color-mix(in srgb, var(--bg-card, #232321) 94%, var(--primary, #d9a334)), var(--bg-card, #232321));
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.04) inset;
+}
+
+.extraStatsTitle,
+.additionalEffectsHead {
+  display: flex;
+  align-items: center;
+  gap: .45em;
+  font-weight: 700;
+  letter-spacing: .02em;
+  margin-bottom: .35rem;
+}
+
+.extraStatsTitle::before,
+.additionalEffectsHead::before {
+  content: "";
+  width: .55em;
+  height: .55em;
+  border-radius: 999px;
+  background: var(--primary, #d9a334);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary, #d9a334) 16%, transparent);
+  flex: 0 0 auto;
+}
+
+.extraStatsHelp,
+.quickEffectAdder .small,
+.additionalEffectsEmpty,
+.equipmentInlineBuffDetails > .small,
+.equipBuffSection .small {
+  line-height: 1.55;
+}
+
+.additionalEffectsList {
+  margin-top: .7rem;
+  border: 1px dashed color-mix(in srgb, var(--primary, #d9a334) 34%, var(--border, #3c3a33));
+  background: color-mix(in srgb, var(--primary, #d9a334) 6%, transparent);
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.additionalEffectItem {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  flex-wrap: wrap;
+  padding: .35rem .45rem;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, .12);
+  margin-top: .35rem;
+}
+
+.additionalEffectText {
+  flex: 1 1 12rem;
+  min-width: 0;
+}
+
+.equipmentInlineBuffDetails {
+  margin-top: .7rem;
+}
+
+.equipmentInlineBuffDetails > summary {
+  cursor: pointer;
+  user-select: none;
+  font-weight: 700;
+  padding: .5rem .65rem;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--primary, #d9a334) 25%, var(--border, #3c3a33));
+  background: color-mix(in srgb, var(--primary, #d9a334) 8%, transparent);
+}
+
+.equipmentInlineBuffDetails[open] > summary {
+  margin-bottom: .75rem;
+}
+
+.equipBuffTopControls,
+.equipBuffNameMemoRow,
+.equipBuffDirectGrid,
+.extraStatsGrid,
+.quickEffectControls {
+  gap: .55rem;
+}
+
+.equipBuffInline {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  padding: .35rem .55rem;
+  border: 1px solid var(--border, #3c3a33);
+  border-radius: 999px;
+  background: rgba(0,0,0,.10);
+}
+
+.equipBuffDirectGrid label,
+.extraStatsGrid label,
+.quickEffectControls label,
+.equipBuffNameMemoRow label {
+  min-width: 0;
+}
+
+.equipBuffDirectGrid input,
+.extraStatsGrid input,
+.equipBuffNameMemoRow input {
+  width: 100%;
+}
+
+@media (max-width: 720px) {
+  .quickEffectAdder,
+  .extraStatsEditor,
+  .equipBuffSection,
+  .weaponCalcEditor {
+    padding: 10px;
+  }
+
+  .additionalEffectItem {
+    align-items: stretch;
+  }
+}
+
+/* v13.1: equipment detail UI color correction */
+/*
+ * v13のカード色が強く、テーマ背景から浮いて文字が読みにくかったため、
+ * 装備詳細まわりだけを既存テーマ寄りの控えめな見た目へ戻す。
+ * 計算処理・入力項目・保存形式には触れない。
+ */
+.quickEffectAdder,
+.extraStatsEditor,
+.equipBuffSection,
+.weaponCalcEditor {
+  color: inherit;
+  border-color: var(--border, rgba(127, 127, 127, .28));
+  background: transparent;
+  background: color-mix(in srgb, currentColor 3%, transparent);
+  box-shadow: none;
+}
+
+.extraStatsTitle,
+.additionalEffectsHead {
+  color: inherit;
+}
+
+.extraStatsTitle::before,
+.additionalEffectsHead::before {
+  background: currentColor;
+  opacity: .42;
+  box-shadow: none;
+}
+
+.extraStatsHelp,
+.quickEffectAdder .small,
+.additionalEffectsEmpty,
+.equipmentInlineBuffDetails > .small,
+.equipBuffSection .small {
+  color: inherit;
+  opacity: .82;
+}
+
+.additionalEffectsList {
+  color: inherit;
+  border-color: var(--border, rgba(127, 127, 127, .25));
+  background: transparent;
+  background: color-mix(in srgb, currentColor 2%, transparent);
+}
+
+.additionalEffectItem {
+  color: inherit;
+  background: transparent;
+  border: 1px solid var(--border, rgba(127, 127, 127, .20));
+}
+
+.equipmentInlineBuffDetails > summary {
+  color: inherit;
+  border-color: var(--border, rgba(127, 127, 127, .25));
+  background: transparent;
+  background: color-mix(in srgb, currentColor 2%, transparent);
+}
+
+.equipBuffInline {
+  color: inherit;
+  border-color: var(--border, rgba(127, 127, 127, .25));
+  background: transparent;
+  background: color-mix(in srgb, currentColor 2%, transparent);
+}

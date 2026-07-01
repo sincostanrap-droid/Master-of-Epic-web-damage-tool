@@ -629,7 +629,7 @@ function quickEffectAppliedMessage(context, scope, key, value, targetName="") {
   const v = fmt(+value || 0, 2);
   const target = targetName ? `${targetName} ` : "";
   if (["skillPlus", "elementDamagePct", "custom"].includes(key)) {
-    return `表示用の追加効果へ保存: ${target}${def.label} ${v}${def.unit || ""}`;
+    return `計算未対応・表示用効果へ保存: ${target}${def.label} ${v}${def.unit || ""}`;
   }
   const where = context === "equipment"
     ? (scope === "base" ? "装備本体の追加ステータス" : "装備Buff")
@@ -1031,13 +1031,13 @@ function makeAdditionalEffectsList(row, context) {
 
   const head = document.createElement("div");
   head.className = "additionalEffectsHead";
-  head.textContent = "表示用の追加効果";
+  head.textContent = "計算未対応・表示用効果";
   box.appendChild(head);
 
   if (!effects.length) {
     const empty = document.createElement("div");
     empty.className = "small muted additionalEffectsEmpty";
-    empty.textContent = "スキル+や属性ダメージ%など、表示・連携用の効果はまだありません。";
+    empty.textContent = "スキル+や属性ダメージ%など、計算に直接反映しない表示・連携用の効果はまだありません。";
     box.appendChild(empty);
     return box;
   }
@@ -1161,8 +1161,8 @@ function makeExtraStatsEditor(row, title, mode="base", onUpdate=null) {
   const help = document.createElement("p");
   help.className = "small extraStatsHelp";
   help.textContent = mode === "base"
-    ? "HP/MP/ST/最大重量/命中/回避/AC/耐性/ディレイ/生産・生活系などを直接入力できます。"
-    : "Buffで増えるHP/MP/ST/最大重量/命中/回避/AC/耐性/ディレイ/軽減/クリ率/生産・生活系などを直接入力できます。";
+    ? "装備本体ON時に計算へ反映される追加ステータスです。HP/MP/ST/最大重量/命中/回避/AC/耐性/ディレイ/生産・生活系などを直接入力できます。"
+    : "Buff ON時に計算へ反映される追加ステータスです。HP/MP/ST/最大重量/命中/回避/AC/耐性/ディレイ/軽減/クリ率/生産・生活系などを直接入力できます。";
   wrap.appendChild(help);
 
   const activeDefs = extraFieldDefsFor(mode).filter(def => extraStatHasValue(row, def, mode));
@@ -5587,7 +5587,7 @@ function makeEquipmentBuffEditor(row, statusButton) {
     grid.appendChild(makeWeaponCalcEditor(row, statusButton));
   }
 
-  grid.appendChild(makeExtraStatsEditor(row, "装備本体の追加ステータス", "base", statusUpdater));
+  grid.appendChild(makeExtraStatsEditor(row, "装備本体の追加ステータス（計算に反映）", "base", statusUpdater));
 
   const buffSection = document.createElement("div");
   buffSection.className = "equipBuffSection equipBuffWide";
@@ -5672,11 +5672,11 @@ function makeEquipmentBuffEditor(row, statusButton) {
   buffGrid.appendChild(equipBuffNumberInput(row, "equipBuffSpecial", "特攻倍率", "0.01"));
   buffDetails.appendChild(buffGrid);
 
-  buffDetails.appendChild(makeExtraStatsEditor(row, "装備Buffの追加ステータス", "equipBuff", statusUpdater));
+  buffDetails.appendChild(makeExtraStatsEditor(row, "装備Buffの追加ステータス（計算に反映）", "equipBuff", statusUpdater));
 
   const help = document.createElement("div");
   help.className = "small";
-  help.textContent = "%欄は10%なら10。装備本体は装備ON時、装備BuffはBuff ONかつ効果ありの場合だけ反映します。";
+  help.textContent = "%欄は10%なら10。装備本体は装備ON時、装備BuffはBuff ONかつ効果ありの場合だけ計算へ反映します。";
   buffDetails.appendChild(help);
   buffSection.appendChild(buffDetails);
 
