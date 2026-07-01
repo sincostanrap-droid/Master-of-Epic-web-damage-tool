@@ -4227,3 +4227,169 @@ button[onclick*="applySkillSimToCalc"],
   background: transparent;
   background: color-mix(in srgb, currentColor 2%, transparent);
 }
+
+/* v16: catalog mobile layout start */
+/*
+ * 装備カタログの狭幅画面対策。
+ * 計算処理・カタログデータ・JSには触れず、検索UIと結果テーブルが画面外へ押し出されないようにする。
+ */
+[data-tab-panel="catalog"] {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.catalogToolbar {
+  box-sizing: border-box;
+  max-width: 100%;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10.5rem, 1fr));
+  gap: .65rem .75rem;
+  align-items: end;
+}
+
+.catalogToolbar label {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: .25rem;
+}
+
+.catalogToolbar input,
+.catalogToolbar select,
+.catalogToolbar button,
+#catalogReloadBtn {
+  max-width: 100%;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.catalogSummaryLine {
+  max-width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem .75rem;
+  align-items: center;
+}
+
+.catalogSummaryLine > * {
+  min-width: 0;
+}
+
+.catalogPageControls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .35rem;
+  align-items: center;
+}
+
+.catalogPageControls button {
+  min-width: 4.5rem;
+}
+
+.catalogTableWrap {
+  box-sizing: border-box;
+  max-width: 100%;
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: visible;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-inline: contain;
+}
+
+.catalogTable {
+  width: max-content;
+  min-width: min(62rem, 100%);
+}
+
+.catalogTable th,
+.catalogTable td {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  vertical-align: top;
+}
+
+.catalogNeedCell,
+.catalogBuffCell {
+  min-width: 9rem;
+  max-width: 16rem;
+}
+
+@media (max-width: 760px) {
+  .catalogToolbar {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: .55rem;
+    padding: .75rem;
+  }
+
+  .catalogToolbar label:first-child,
+  .catalogToolbar label:has(#catalogSort),
+  .catalogToolbar button,
+  #catalogReloadBtn {
+    grid-column: 1 / -1;
+  }
+
+  .catalogSummaryLine {
+    margin: .5rem 0;
+    align-items: stretch;
+  }
+
+  #catalogSummary {
+    flex: 1 1 100%;
+  }
+
+  .catalogPageControls {
+    flex: 1 1 100%;
+    justify-content: space-between;
+  }
+
+  .catalogPageControls button {
+    flex: 1 1 0;
+  }
+
+  .catalogTableWrap {
+    margin-inline: calc(var(--content-padding, 0px) * -1);
+    padding-inline: .5rem;
+    border-radius: 0;
+  }
+
+  .catalogTable {
+    min-width: 58rem;
+    font-size: .82rem;
+  }
+
+  .catalogTable th,
+  .catalogTable td {
+    padding: .42rem .5rem;
+  }
+
+  .catalogTable .miniBtn,
+  .catalogTable button {
+    white-space: normal;
+    min-width: 5.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .catalogToolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .catalogToolbar label,
+  .catalogToolbar label:first-child,
+  .catalogToolbar label:has(#catalogSort),
+  .catalogToolbar button,
+  #catalogReloadBtn {
+    grid-column: 1 / -1;
+  }
+
+  .catalogTable {
+    min-width: 54rem;
+  }
+
+  .catalogNeedCell,
+  .catalogBuffCell {
+    min-width: 8rem;
+    max-width: 13rem;
+  }
+}
+/* v16: catalog mobile layout end */
