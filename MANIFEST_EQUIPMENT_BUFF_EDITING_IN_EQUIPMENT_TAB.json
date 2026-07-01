@@ -1,0 +1,15 @@
+{
+  "name": "equipment-buff-editing-in-equipment-tab",
+  "summary": "Remove the separate equipment buff fix tab and keep editing inside the equipment registration UI.",
+  "overwrites": [
+    "src/main.js"
+  ],
+  "adds": [
+    "docs/equipment-buff-editing-in-equipment-tab.md",
+    "APPLY_EQUIPMENT_BUFF_EDITING_IN_EQUIPMENT_TAB_WINDOWS.md"
+  ],
+  "notes": [
+    "src/calc/core.js is intentionally unchanged.",
+    "Existing equipment buff calculation path remains expandEquipmentBuffState -> equipmentBuffToCompositeRow."
+  ]
+}
