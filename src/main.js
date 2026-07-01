@@ -10515,6 +10515,72 @@ function catalogResetPage() {
   catalogPageIndex = 0;
 }
 
+
+function catalogStatNumericValue(item, stat) {
+  const key = String(stat || "").trim();
+  if (!key) return NaN;
+
+  let total = 0;
+  let found = false;
+
+  const add = value => {
+    const v = parseFloat(value);
+    if (!Number.isFinite(v) || v === 0) return;
+    total += v;
+    found = true;
+  };
+
+  (item?.addStatuses || []).forEach(st => {
+    if (!st) return;
+    const name = String(st.name || st.normalizedName || "").trim();
+    const statKey = String(st.statKey || "").trim();
+    if (statKey === key || name === key) add(st.value);
+  });
+
+  if (found) return total;
+
+  const extra = item?.extraStats || {};
+  if (Object.prototype.hasOwnProperty.call(extra, key)) {
+    const v = parseFloat(extra[key]);
+    return Number.isFinite(v) && v !== 0 ? v : NaN;
+  }
+
+  // 念のため、表示名で選ばれた場合も内部キーへ寄せて探す。
+  const mappedKey = typeof toolStatKeyForOfficialAddStatus === "function" ? toolStatKeyForOfficialAddStatus(key) : "";
+  if (mappedKey && Object.prototype.hasOwnProperty.call(extra, mappedKey)) {
+    const v = parseFloat(extra[mappedKey]);
+    return Number.isFinite(v) && v !== 0 ? v : NaN;
+  }
+
+  return NaN;
+}
+
+function catalogStatNumericFilterMatches(value, op, expected) {
+  if (!Number.isFinite(value)) return false;
+  const mode = String(op || "any");
+  if (mode === "any" || mode === "exists") return value !== 0;
+
+  const target = parseFloat(expected);
+  if (!Number.isFinite(target)) return value !== 0;
+
+  if (mode === "gte") return value >= target;
+  if (mode === "lte") return value <= target;
+  if (mode === "gt") return value > target;
+  if (mode === "lt") return value < target;
+  if (mode === "eq") return Math.abs(value - target) < 1e-9;
+  return value !== 0;
+}
+
+function catalogStatFilterDescription(filter) {
+  if (!filter?.stat) return "";
+  const label = catalogDisplayStatName(filter.stat);
+  const op = String(filter.statOp || "any");
+  const raw = filter.statValueRaw ?? "";
+  if (!raw || op === "any" || op === "exists") return `${label}あり`;
+  const opLabel = {gte:"以上", lte:"以下", gt:"超", lt:"未満", eq:"="}[op] || "";
+  return `${label} ${raw}${opLabel}`;
+}
+
 function catalogItemMatches(item, filter) {
   const q = catalogNorm(filter.query);
   if (q && !catalogNorm(catalogText(item)).includes(q)) return false;
@@ -10524,9 +10590,8 @@ function catalogItemMatches(item, filter) {
   if (filter.buffMode === "with" && !hasBuff) return false;
   if (filter.buffMode === "without" && hasBuff) return false;
   if (filter.stat) {
-    const stat = filter.stat;
-    const hit = (item.addStatuses || []).some(s => String(s?.name || "") === stat || String(s?.statKey || "") === stat) || !!+(item.extraStats?.[stat] || 0);
-    if (!hit) return false;
+    const statValue = catalogStatNumericValue(item, filter.stat);
+    if (!catalogStatNumericFilterMatches(statValue, filter.statOp, filter.statValueRaw)) return false;
   }
   return true;
 }
@@ -10647,11 +10712,15 @@ function sortCatalogItems(items, filter) {
 }
 
 function catalogFilterState() {
+  const statValueRaw = byId("catalogStatValue")?.value || "";
   return {
     query: byId("catalogSearch")?.value || "",
     category: byId("catalogCategory")?.value || "",
     slot: byId("catalogSlot")?.value || "",
     stat: byId("catalogStat")?.value || "",
+    statOp: byId("catalogStatOp")?.value || "any",
+    statValueRaw,
+    statValue: statValueRaw === "" ? NaN : parseFloat(statValueRaw),
     buffMode: byId("catalogBuffMode")?.value || "",
     sort: byId("catalogSort")?.value || "name",
     sortDir: byId("catalogSortDir")?.value || "asc",
@@ -10815,7 +10884,8 @@ function renderCatalogResults() {
   body.innerHTML = shown.length
     ? shown.map(item => catalogResultRowHtml(item, already.has(String(item.catalogId || item.id || "")))).join("")
     : `<tr><td colspan="10" class="small mutedText">該当する装備がありません。カタログJSが未生成の場合は tools/build-equipment-catalog-from-google-sheet.mjs を実行してください。</td></tr>`;
-  summary.textContent = `カタログ ${items.length}件 / 該当 ${filtered.length}件 / 表示 ${shown.length}件`;
+  const statFilterText = catalogStatFilterDescription(filter);
+  summary.textContent = `カタログ ${items.length}件 / 該当 ${filtered.length}件 / 表示 ${shown.length}件${statFilterText ? ` / ${statFilterText}` : ""}`;
   renderCatalogPageControls(filtered.length, catalogPageIndex, pageCount, limit);
   body.querySelectorAll("[data-catalog-add]").forEach(btn => {
     btn.onclick = () => addCatalogEquipmentToRegistered(btn.dataset.catalogAdd);
@@ -10830,6 +10900,8 @@ function createCatalogTab(panel) {
       <label>カテゴリ <select id="catalogCategory"><option value="">すべて</option><option value="weapon">武器</option><option value="defense">防具/装飾</option><option value="shield">盾</option></select></label>
       <label>部位 <select id="catalogSlot"><option value="">すべて</option></select></label>
       <label>効果 <select id="catalogStat"><option value="">指定なし</option></select></label>
+      <label>数値条件 <select id="catalogStatOp"><option value="any">有無のみ</option><option value="gte">以上</option><option value="lte">以下</option><option value="gt">超</option><option value="lt">未満</option><option value="eq">等しい</option></select></label>
+      <label>効果値 <input id="catalogStatValue" type="number" step="0.1" placeholder="例: -2 / 4"></label>
       <label>装備Buff <select id="catalogBuffMode"><option value="">すべて</option><option value="with">あり</option><option value="without">なし</option></select></label>
       <label>ソート <select id="catalogSort">
         <option value="name">名称</option><option value="category">種別/部位</option><option value="slot">部位</option><option value="req">装備条件</option><option value="buff">装備Buff名</option><option value="hasBuff">Buff有無</option>
@@ -10853,7 +10925,7 @@ function createCatalogTab(panel) {
     </details>
   `;
 
-  ["catalogSearch", "catalogCategory", "catalogSlot", "catalogStat", "catalogBuffMode", "catalogSort", "catalogSortDir", "catalogLimit"].forEach(id => {
+  ["catalogSearch", "catalogCategory", "catalogSlot", "catalogStat", "catalogStatOp", "catalogStatValue", "catalogBuffMode", "catalogSort", "catalogSortDir", "catalogLimit"].forEach(id => {
     const el = byId(id);
     if (el) {
       const handler = () => { catalogResetPage(); renderCatalogResults(); };
