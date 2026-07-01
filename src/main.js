@@ -4366,6 +4366,9 @@ function compositeGroupScore(r) {
   score += (+r.convMagicSpeedRate || 0) * 8;
   score += (+r.convSpeedRate || 0) * 12;
   if (+r.special && +r.special !== 1) score += ((+r.special || 1) - 1) * 100000;
+  normalizeAdditionalEffects(r.extraEffects || []).forEach(e => {
+    if (e && e.key === "skillPlus") score += Math.max(0, +e.value || 0) * 25;
+  });
   score += (+r.extraAC || 0) * 8 + (+r.extraACPct || 0) * 12;
   score += (+r.extraHP || 0) * 2 + (+r.extraHPPct || 0) * 20;
   score += (+r.extraMP || 0) * 1.5 + (+r.extraMPPct || 0) * 12;
@@ -10004,6 +10007,7 @@ const CATALOG_SCRIPT_URLS = [
   "src/data/generated/buffCatalog.generated.js",
   "src/data/generated/wikiEquipBuffEffects.generated.js",
   "src/data/generated/equipBuffRuleCandidates.generated.js",
+  "src/data/generated/skillBuffCompatibility.generated.js",
   "src/data/manual/buffRules.manual.js"
 ];
 let catalogScriptsPromise = null;
@@ -10106,6 +10110,95 @@ function findEquipBuffRuleCandidate(buff, item=null) {
   const bname = catalogNorm(buff?.name || item?.equipBuff?.name || "");
   if (!bname) return null;
   return rules.find(r => catalogNorm(r.name || r.wikiName || "") === bname) || null;
+}
+
+
+function skillBuffCompatibilityItems() {
+  const raw = catalogArray("MOE_SKILL_BUFF_COMPATIBILITY_MANUAL", "MOE_SKILL_BUFF_COMPATIBILITY", "MOE_SKILL_BUFF_COMPATIBILITY_GENERATED");
+  const seen = new Set();
+  const out = [];
+  raw.forEach(item => {
+    if (!item) return;
+    const key = item.id || `${item.skillName || ""}:${item.groupRaw || ""}:${item.buffName || ""}:${item.valueRaw || ""}`;
+    if (seen.has(key)) return;
+    seen.add(key);
+    out.push(item);
+  });
+  return out;
+}
+
+function skillBuffCompatibilityRulesForBuff(buff, item=null) {
+  const names = [];
+  const add = v => { const s = String(v || "").trim(); if (s && !names.includes(s)) names.push(s); };
+  add(buff?.name);
+  add(item?.equipBuff?.name);
+  const normalized = names.map(catalogNorm).filter(Boolean);
+  if (!normalized.length) return [];
+  return skillBuffCompatibilityItems().filter(rule => normalized.includes(catalogNorm(rule.buffName || rule.name || "")));
+}
+
+function hasSkillPlusDisplayEffect(row, skillName, value) {
+  const name = String(skillName || "").trim();
+  const v = +value || 0;
+  return normalizeAdditionalEffects(row?.extraEffects || []).some(e =>
+    e && e.key === "skillPlus" && String(e.name || "").trim() === name && (+e.value || 0) === v
+  );
+}
+
+function appendSkillBuffCompatibilitySource(row, rules, applied, conflictGroups) {
+  const skillLines = rules
+    .filter(r => +r.value && !r.valueUncertain)
+    .map(r => `${r.skillName}+${fmt(+r.value, 1)}（${r.buffName} / ${r.groupRaw || "?"}）`);
+  if (skillLines.length) {
+    row.equipBuffSourceText = appendUniqueText(row.equipBuffSourceText, `Wiki併用表: ${skillLines.join(" / ")}`);
+  }
+
+  const uncertain = rules.filter(r => r.valueUncertain || r.groupUncertain || r.noteNeedsReview || (Array.isArray(r.reviewFlags) && r.reviewFlags.length));
+  if (uncertain.length) {
+    const notes = uncertain.map(r => `${r.skillName}:${r.valueRaw || "?"}/${r.groupRaw || "?"}`).join(" / ");
+    row.equipBuffSourceText = appendUniqueText(row.equipBuffSourceText, `Wiki併用表レビュー注意: ${notes}`);
+  }
+
+  if (conflictGroups.length > 1) {
+    row.equipBuffSourceText = appendUniqueText(row.equipBuffSourceText, `複数スキル+競合候補: ${conflictGroups.join(" / ")}（現行UIは単一競合グループのみ自動反映）`);
+  }
+
+  if (applied) {
+    row.equipBuffWikiText = appendUniqueText(row.equipBuffWikiText, "スキル値+効果は MoE Wiki アイテム/追加効果/併用 の表から自動投入。効果量不明(+？)は投入しません。");
+  }
+}
+
+function applySkillBuffCompatibilityToEquipment(row, buff, item=null) {
+  const rules = skillBuffCompatibilityRulesForBuff(buff, item);
+  if (!rules.length) return false;
+
+  let applied = false;
+  row.equipBuffEnabled = true;
+  row.equipBuffSlot = row.equipBuffSlot !== false;
+
+  rules.forEach(rule => {
+    const skillName = String(rule.skillName || "").trim();
+    const value = +rule.value || 0;
+    if (!skillName || !value || rule.valueUncertain) return;
+    if (!hasSkillPlusDisplayEffect(row, skillName, value)) {
+      const note = [`Wiki併用表`, rule.groupRaw ? `グループ${rule.groupRaw}` : ""].filter(Boolean).join(" / ");
+      pushDisplayEffect(row, "skillPlus", value, skillName, "", "display", note);
+      applied = true;
+    }
+  });
+
+  const safeGroups = Array.from(new Set(rules
+    .filter(r => r.safeForConflictAutoApply && r.conflictGroup)
+    .map(r => String(r.conflictGroup || "").trim())
+    .filter(Boolean)));
+
+  if (!row.equipBuffConflictGroup && safeGroups.length === 1) {
+    row.equipBuffConflictGroup = safeGroups[0];
+    row.equipBuffStackRule = "score";
+  }
+
+  appendSkillBuffCompatibilitySource(row, rules, applied, safeGroups);
+  return applied;
 }
 
 function setIfNumeric(row, prop, value, overwrite=false) {
@@ -10477,6 +10570,7 @@ function catalogEquipmentToRow(item) {
     row.equipBuffStackRule = "same-technic";
     const candidate = findEquipBuffRuleCandidate(buff, item);
     if (candidate) applyEquipBuffRuleCandidateToEquipment(row, candidate);
+    applySkillBuffCompatibilityToEquipment(row, buff, item);
     if (!row.equipBuffWikiText && (buff.info || buff.note)) row.equipBuffWikiText = buff.info || buff.note || "";
   }
 
