@@ -1,0 +1,252 @@
+﻿id	skillName	groupRaw	group	groupUncertain	valueRaw	value	valueUncertain	buffName	conflictGroup	safeForSkillPlusAutoApply	safeForConflictAutoApply	matchedEquipmentCount	matchedTechnicIds	matchedEquipmentNames	note	sectionNote	reviewFlags
+skillPlusWiki-001	筋力	A	A	False	+？	0	True	ガトリング アーム	skillPlus:筋力:A	False	False	1	12307	ガトリング アーム		筋力に関しては併用の可否の検証がされておりません 効果量確認はライオニックオーラの効果時間がスキル+20で約5秒増える	value_uncertain
+skillPlusWiki-002	筋力	B？	B	True	+20	20.0	False	マッスル パワー	skillPlus:筋力:B	True	False	1	12139	マッスルアーム シャツ		筋力に関しては併用の可否の検証がされておりません 効果量確認はライオニックオーラの効果時間がスキル+20で約5秒増える	group_uncertain
+skillPlusWiki-003	筋力	C？	C	True	+20	20.0	False	ノア リアクター	skillPlus:筋力:C	True	False	1	13125	ノア リアクター		筋力に関しては併用の可否の検証がされておりません 効果量確認はライオニックオーラの効果時間がスキル+20で約5秒増える	group_uncertain
+skillPlusWiki-004	牙	A	A	False	+20	20.0	False	吸血鬼の加護	skillPlus:牙:A	True	True	1	10196	ヴァンパイア イヤリング			
+skillPlusWiki-005	牙	B	B	False	+15	15.0	False	サメの力	skillPlus:牙:B	True	True	1	13487	シャーク ヘッド			
+skillPlusWiki-006	牙	C？	C	True	+20	20.0	False	真祖の吸血鬼	skillPlus:牙:C	True	False	1	14069	トゥルー ヴァンパイア コート			group_uncertain
+skillPlusWiki-007	戦闘技術	A	A	False	+15	15.0	False	学習装置	skillPlus:戦闘技術:A	True	True	1	10215	ラーニング デバイス		基本全て併用可能(部位被り以外で併用不可の報告がない)	
+skillPlusWiki-008	戦闘技術	A？	A	True	+15	15.0	False	鬼人の力	skillPlus:戦闘技術:A	True	False	1	10508	鬼人の角 +3		基本全て併用可能(部位被り以外で併用不可の報告がない)	group_uncertain
+skillPlusWiki-009	戦闘技術	B	B	False	+10	10.0	False	獅子奮迅	skillPlus:戦闘技術:B	True	True	4	11156	オリエンタル ロング ウィッグ|スパルタ アーマー|ファー付きオフィサーコート|武将の陣羽織		基本全て併用可能(部位被り以外で併用不可の報告がない)	
+skillPlusWiki-010	戦闘技術	C	C	False	+10	10.0	False	盗剣士	skillPlus:戦闘技術:C	True	True	10	10683	にゃん太 なりきりウェア|にゃん太 なりきりウェア カラー|にゃん太 なりきりグローブ|にゃん太 なりきりグローブ カラー|にゃん太 なりきりパンツ|にゃん太 なりきりパンツ カラー|にゃん太 なりきりブーツ|にゃん太 なりきりブーツ カラー|にゃん太 なりきりマスク|にゃん太 なりきりマスク カラー		基本全て併用可能(部位被り以外で併用不可の報告がない)	
+skillPlusWiki-011	戦闘技術	D	D	False	+10	10.0	False	熊猫流の極意	skillPlus:戦闘技術:D	True	True	3	11533	ラン ウィッグ|ランのパーカー A|ランのパーカー B		基本全て併用可能(部位被り以外で併用不可の報告がない)	
+skillPlusWiki-012	戦闘技術	E	E	False	+10	10.0	False	ベルセルク	skillPlus:戦闘技術:E	True	True	2	12193	サイバーパンク マスク|スカー ヘルム		基本全て併用可能(部位被り以外で併用不可の報告がない)	
+skillPlusWiki-013	戦闘技術	F	F	False	+10	10.0	False	竜王の力	skillPlus:戦闘技術:F	True	True	4	12248	ドラゴニック チェスト アーマー|ドラゴンロード マスク|竜王の斧槍|竜眼のマスク		基本全て併用可能(部位被り以外で併用不可の報告がない)	
+skillPlusWiki-014	戦闘技術	G	G	False	+20	20.0	False	ミリタリーアーツ	skillPlus:戦闘技術:G	True	True	3	13385	バイカラー ミリタリー ウェア（白）|バイカラー ミリタリー ウェア（黒）|ミリタリー フェイスガード		基本全て併用可能(部位被り以外で併用不可の報告がない)	
+skillPlusWiki-015	戦闘技術	H	H	False	+10	10.0	False	天職：剣士	skillPlus:戦闘技術:H	True	True	10	13615	八重樫雫 なりきりウィッグ|八重樫雫 なりきりウィッグ カラー|八重樫雫 なりきりウェア|八重樫雫 なりきりウェア カラー|八重樫雫 なりきりグローブ|八重樫雫 なりきりグローブ カラー|八重樫雫 なりきりシューズ|八重樫雫 なりきりシューズ カラー|八重樫雫 なりきりパンツ|八重樫雫 なりきりパンツ カラー		基本全て併用可能(部位被り以外で併用不可の報告がない)	
+skillPlusWiki-016	戦闘技術	I？	I	True	+20	20.0	False	武芸百般	skillPlus:戦闘技術:I	True	False	1	13679	無頼漢の道衣		基本全て併用可能(部位被り以外で併用不可の報告がない)	group_uncertain
+skillPlusWiki-017	戦闘技術	J？	J	True	+20	20.0	False	タクティカルギア	skillPlus:戦闘技術:J	True	False	3	14343	タクティカル ウェア|タクティカル パンツ|タクティカル ブーツ		基本全て併用可能(部位被り以外で併用不可の報告がない)	group_uncertain
+skillPlusWiki-018	戦闘技術	K？	K	True	+20	20.0	False	戦翼の力	skillPlus:戦闘技術:K	True	False	1	14348	メタリック バトル ウイング		基本全て併用可能(部位被り以外で併用不可の報告がない)	group_uncertain
+skillPlusWiki-019	戦闘技術	L？	L	True	+20	20.0	False	騎士の極意	skillPlus:戦闘技術:L	True	False	1	14357	ソード ピアス		基本全て併用可能(部位被り以外で併用不可の報告がない)	group_uncertain
+skillPlusWiki-020	物まね	A	A	False	+10	10.0	False	隠密の極意	skillPlus:物まね:A	True	True	1	10050	宝珠の首輪（レプリカ）		物まねに関しては併用の可否の検証がされておりません	
+skillPlusWiki-021	物まね	B？	B	True	+20	20.0	False	影ノ者	skillPlus:物まね:B	True	False	7	11150	影炎ノ上衣|影炎ノ下衣|影炎ノ手甲|影炎ノ肩当|影炎ノ腰当|影炎ノ足袋|影炎ノ頭巾		物まねに関しては併用の可否の検証がされておりません	group_uncertain
+skillPlusWiki-022	物まね	C？	C	True	+10	10.0	False	暗殺者	skillPlus:物まね:C	True	False	12	10682	アカツキ なりきりウィッグ|アカツキ なりきりウィッグ カラー|アカツキ なりきりウェア|アカツキ なりきりウェア カラー|アカツキ なりきりグローブ|アカツキ なりきりグローブ カラー|アカツキ なりきりパンツ|アカツキ なりきりパンツ カラー|アカツキ なりきりブーツ|アカツキ なりきりブーツ カラー|アサシン ホルスター ベルト|暗殺者の半仮面		物まねに関しては併用の可否の検証がされておりません	group_uncertain
+skillPlusWiki-023	物まね	D？	D	True	+15	15.0	False	暗器の鉤爪	skillPlus:物まね:D	True	False	1	12871	忍びの手甲鉤		物まねに関しては併用の可否の検証がされておりません	group_uncertain
+skillPlusWiki-024	物まね	E？	E	True	+？	0	True	愚者のアルカナ	skillPlus:物まね:E	False	False	1	13488	愚者の仮面		物まねに関しては併用の可否の検証がされておりません	value_uncertain|group_uncertain
+skillPlusWiki-025	物まね	F？	F	True	+20	20.0	False	怪盗の極意	skillPlus:物まね:F	True	False	2	13963	ファントム シーフ キャップ|ファントム シーフ ローブ		物まねに関しては併用の可否の検証がされておりません	group_uncertain
+skillPlusWiki-026	物まね	G？	G	True	+？	0	True	サイボーグ	skillPlus:物まね:G	False	False	10	14157	パシーラ なりきりウィッグ|パシーラ なりきりウィッグ カラー|パシーラ なりきりグローブ|パシーラ なりきりグローブ カラー|パシーラ なりきりスーツ|パシーラ なりきりスーツ カラー|パシーラ なりきりブーツ|パシーラ なりきりブーツ カラー|パシーラ なりきりマフラー|パシーラ なりきりマフラー カラー		物まねに関しては併用の可否の検証がされておりません	value_uncertain|group_uncertain
+skillPlusWiki-027	調教	A	A	False	+10	10.0	False	アニマル フレンズ	skillPlus:調教:A	True	True	4	12207	アニマル イヤー ケープ|ウサギのぬいぐるみヘッド|ウサギのフード付きマフラー|ハロウィン アニマル フード		効果量確認はドミニオンで調教+10なら40秒、調教+20なら80秒増える ラブウィップで調教+10なら2秒、調教+20なら4秒増える (効果時間はペットウィンドウのバフをクリックで表示される)	
+skillPlusWiki-028	調教	B	B	False	+10	10.0	False	アニマル ラヴァー	skillPlus:調教:B	True	True	3	10678	アニマル イヤー ヘッドバンド|アニマル カンカン帽|キャット ショルダーバッグ		効果量確認はドミニオンで調教+10なら40秒、調教+20なら80秒増える ラブウィップで調教+10なら2秒、調教+20なら4秒増える (効果時間はペットウィンドウのバフをクリックで表示される)	
+skillPlusWiki-029	調教	B	B	False	+20	20.0	False	アニマル トレーニング	skillPlus:調教:B	True	True	1	13692	トレーニング ロング グローブ		効果量確認はドミニオンで調教+10なら40秒、調教+20なら80秒増える ラブウィップで調教+10なら2秒、調教+20なら4秒増える (効果時間はペットウィンドウのバフをクリックで表示される)	
+skillPlusWiki-030	調教	C	C	False	+10	10.0	False	犬笛	skillPlus:調教:C	True	True	2	10048	アニマル ホイッスル|パンダ ホイッスル		効果量確認はドミニオンで調教+10なら40秒、調教+20なら80秒増える ラブウィップで調教+10なら2秒、調教+20なら4秒増える (効果時間はペットウィンドウのバフをクリックで表示される)	
+skillPlusWiki-031	調教	D	D	False	+20	20.0	False	グルーミング	skillPlus:調教:D	True	True	1	9964	グルーミング グローブ		効果量確認はドミニオンで調教+10なら40秒、調教+20なら80秒増える ラブウィップで調教+10なら2秒、調教+20なら4秒増える (効果時間はペットウィンドウのバフをクリックで表示される)	
+skillPlusWiki-032	調教	E	E	False	+10	10.0	False	☆USK☆	skillPlus:調教:E	True	True	1	11322	チアリング・ファン（猫）		効果量確認はドミニオンで調教+10なら40秒、調教+20なら80秒増える ラブウィップで調教+10なら2秒、調教+20なら4秒増える (効果時間はペットウィンドウのバフをクリックで表示される)	
+skillPlusWiki-033	調教	F	F	False	+20	20.0	False	調教師の心得	skillPlus:調教:F	True	True	2	10977	アニマル ファー ベルト|ベルト ファー ブーツ		効果量確認はドミニオンで調教+10なら40秒、調教+20なら80秒増える ラブウィップで調教+10なら2秒、調教+20なら4秒増える (効果時間はペットウィンドウのバフをクリックで表示される)	
+skillPlusWiki-034	調教	G	G	False	+20	20.0	False	使役の力	skillPlus:調教:G	True	True	1	12337	テイマーズ ロッド		効果量確認はドミニオンで調教+10なら40秒、調教+20なら80秒増える ラブウィップで調教+10なら2秒、調教+20なら4秒増える (効果時間はペットウィンドウのバフをクリックで表示される)	
+skillPlusWiki-035	調教	H	H	False	+20	20.0	False	獣人の加護	skillPlus:調教:H	True	True	1	13009	獣人のストール		効果量確認はドミニオンで調教+10なら40秒、調教+20なら80秒増える ラブウィップで調教+10なら2秒、調教+20なら4秒増える (効果時間はペットウィンドウのバフをクリックで表示される)	
+skillPlusWiki-036	調教	I	I	False	+20	20.0	False	アニマル セラピスト	skillPlus:調教:I	True	True	1	13485	ネコミミ フリル キャップ		効果量確認はドミニオンで調教+10なら40秒、調教+20なら80秒増える ラブウィップで調教+10なら2秒、調教+20なら4秒増える (効果時間はペットウィンドウのバフをクリックで表示される)	
+skillPlusWiki-037	調教	J	J	False	+20	20.0	False	変成魔法	skillPlus:調教:J	True	True	2	13616	フリード・バグアー なりきりローブ|フリード・バグアー なりきりローブ カラー		効果量確認はドミニオンで調教+10なら40秒、調教+20なら80秒増える ラブウィップで調教+10なら2秒、調教+20なら4秒増える (効果時間はペットウィンドウのバフをクリックで表示される)	
+skillPlusWiki-038	調教	K	K	False	+10	10.0	False	ご褒美おやつ	skillPlus:調教:K	True	True	1	13691	ペットフード ポーチ		効果量確認はドミニオンで調教+10なら40秒、調教+20なら80秒増える ラブウィップで調教+10なら2秒、調教+20なら4秒増える (効果時間はペットウィンドウのバフをクリックで表示される)	
+skillPlusWiki-039	調教	K？	K	True	+20	20.0	False	散歩拒否	skillPlus:調教:K	True	False	1	13720	お散歩リード		効果量確認はドミニオンで調教+10なら40秒、調教+20なら80秒増える ラブウィップで調教+10なら2秒、調教+20なら4秒増える (効果時間はペットウィンドウのバフをクリックで表示される)	group_uncertain
+skillPlusWiki-040	調教	L？	L	True	+20	20.0	False	メダロッター	skillPlus:調教:L	True	False	32	12388	アラセ なりきりウィッグ|アラセ なりきりウィッグ カラー|アラセ なりきりウェア|アラセ なりきりウェア カラー|アラセ なりきりシューズ|アラセ なりきりシューズ カラー|アラセ なりきりパンツ|アラセ なりきりパンツ カラー|アラセ なりきりメダロッチ|アラセ なりきりメダロッチ カラー|イッキ なりきりウィッグ|イッキ なりきりウィッグ カラー|イッキ なりきりウェア|イッキ なりきりウェア カラー|イッキ なりきりシューズ|イッキ なりきりシューズ カラー|イッキ なりきりパンツ|イッキ なりきりパンツ カラー|イッキ なりきりメダロッチ|イッキ なりきりメダロッチ カラー|ヒカル なりきりウィッグ|ヒカル なりきりウィッグ カラー|ヒサキ なりきりイヤリング|ヒサキ なりきりイヤリング カラー|ヒサキ なりきりウィッグ|ヒサキ なりきりウィッグ カラー|ヒサキ なりきりシューズ|ヒサキ なりきりシューズ カラー|ヒサキ なりきりメダロッチ|ヒサキ なりきりメダロッチ カラー|ヒサキ なりきりワンピース|ヒサキ なりきりワンピース カラー		効果量確認はドミニオンで調教+10なら40秒、調教+20なら80秒増える ラブウィップで調教+10なら2秒、調教+20なら4秒増える (効果時間はペットウィンドウのバフをクリックで表示される)	group_uncertain
+skillPlusWiki-041	破壊魔法	A	A	False	+10	10.0	False	魔術師の極意	skillPlus:破壊魔法:A	True	True	5	9201	チャーリーのニット帽|魔導書付きチェーンベルト|魔術師のショートパンツ|魔術師のパンツ|魔術師のローブ		効果量確認は プロメテウスの炎 で破壊魔法+10ならダメージが8程度増える ( 魔法攻撃ダメージアップ をつけて検証しないよう注意)	
+skillPlusWiki-042	破壊魔法	B	B	False	+10	10.0	False	火神の力	skillPlus:破壊魔法:B	True	True	2	9324	イグニス ロッド|背負いイグニス ロッド		効果量確認は プロメテウスの炎 で破壊魔法+10ならダメージが8程度増える ( 魔法攻撃ダメージアップ をつけて検証しないよう注意)	
+skillPlusWiki-043	破壊魔法	B	B	False	+15	15.0	False	雪の女王	skillPlus:破壊魔法:B	True	False	1	10258	氷雪のサークレット	火神の力を上書き	効果量確認は プロメテウスの炎 で破壊魔法+10ならダメージが8程度増える ( 魔法攻撃ダメージアップ をつけて検証しないよう注意)	note_needs_review
+skillPlusWiki-044	破壊魔法	C	C	False	+5	5.0	False	太陽の力	skillPlus:破壊魔法:C	True	True	2	11083	太陽のポンチョ|太陽の耳飾り		効果量確認は プロメテウスの炎 で破壊魔法+10ならダメージが8程度増える ( 魔法攻撃ダメージアップ をつけて検証しないよう注意)	
+skillPlusWiki-045	破壊魔法	D	D	False	+10	10.0	False	魔導の真髄	skillPlus:破壊魔法:D	True	True	2	11280	魔導の手袋|魔法のとんがり帽子		効果量確認は プロメテウスの炎 で破壊魔法+10ならダメージが8程度増える ( 魔法攻撃ダメージアップ をつけて検証しないよう注意)	
+skillPlusWiki-046	破壊魔法	E	E	False	+10	10.0	False	鬼道の力	skillPlus:破壊魔法:E	True	True	1	10509	鬼人の双角 +3		効果量確認は プロメテウスの炎 で破壊魔法+10ならダメージが8程度増える ( 魔法攻撃ダメージアップ をつけて検証しないよう注意)	
+skillPlusWiki-047	破壊魔法	E？	E	True	+5	5.0	False	神獣青龍の加護	skillPlus:破壊魔法:E	True	False	1	13397	異界の神獣青龍		効果量確認は プロメテウスの炎 で破壊魔法+10ならダメージが8程度増える ( 魔法攻撃ダメージアップ をつけて検証しないよう注意)	group_uncertain
+skillPlusWiki-048	破壊魔法	F	F	False	+10	10.0	False	レイヴン ファミリア	skillPlus:破壊魔法:F	True	True	1	8986	カラスの使い魔	同部位他装備と併用可能か不明	効果量確認は プロメテウスの炎 で破壊魔法+10ならダメージが8程度増える ( 魔法攻撃ダメージアップ をつけて検証しないよう注意)	
+skillPlusWiki-049	破壊魔法	F？	F	True	+10	10.0	False	マギア フォース	skillPlus:破壊魔法:F	True	False	1	11968	マギア ウイング	同部位他装備と併用可能か不明	効果量確認は プロメテウスの炎 で破壊魔法+10ならダメージが8程度増える ( 魔法攻撃ダメージアップ をつけて検証しないよう注意)	group_uncertain
+skillPlusWiki-050	破壊魔法	F？	F	True	+5	5.0	False	マジック チャーム	skillPlus:破壊魔法:F	True	False	1	12773	ウィッチ ハット チャーム	同部位他装備と併用可能か不明	効果量確認は プロメテウスの炎 で破壊魔法+10ならダメージが8程度増える ( 魔法攻撃ダメージアップ をつけて検証しないよう注意)	group_uncertain
+skillPlusWiki-051	破壊魔法	F？	F	True	+5	5.0	False	神獣白虎の加護	skillPlus:破壊魔法:F	True	False	1	13398	異界の神獣白虎	同部位他装備と併用可能か不明	効果量確認は プロメテウスの炎 で破壊魔法+10ならダメージが8程度増える ( 魔法攻撃ダメージアップ をつけて検証しないよう注意)	group_uncertain
+skillPlusWiki-052	破壊魔法	G	G	False	+10	10.0	False	ラル・ファク神の加護	skillPlus:破壊魔法:G	True	True	2	9518	アポステル ローブ|パスター マント		効果量確認は プロメテウスの炎 で破壊魔法+10ならダメージが8程度増える ( 魔法攻撃ダメージアップ をつけて検証しないよう注意)	
+skillPlusWiki-053	破壊魔法	H	H	False	+15	15.0	False	雷光の巫女	skillPlus:破壊魔法:H	True	True	2	11834	朱乃 なりきりウィッグ|朱乃 なりきりウィッグ カラー	上級魔術師と併用可能か不明	効果量確認は プロメテウスの炎 で破壊魔法+10ならダメージが8程度増える ( 魔法攻撃ダメージアップ をつけて検証しないよう注意)	
+skillPlusWiki-054	破壊魔法	H？	H	True	+15	15.0	False	上級魔術師	skillPlus:破壊魔法:H	True	False	1	12763	ツインブレイド ロング ウィッグ	雷光の巫女と併用可能か不明	効果量確認は プロメテウスの炎 で破壊魔法+10ならダメージが8程度増える ( 魔法攻撃ダメージアップ をつけて検証しないよう注意)	group_uncertain
+skillPlusWiki-055	破壊魔法	H？	H	True	+10	10.0	False	錬金術の極意	skillPlus:破壊魔法:H	True	False	1	13864	シングル ブレイド ウィッグ		効果量確認は プロメテウスの炎 で破壊魔法+10ならダメージが8程度増える ( 魔法攻撃ダメージアップ をつけて検証しないよう注意)	group_uncertain
+skillPlusWiki-056	破壊魔法	I	I	False	+10	10.0	False	鉱人道士	skillPlus:破壊魔法:I	True	True	1	11462	鉱人道士の髭		効果量確認は プロメテウスの炎 で破壊魔法+10ならダメージが8程度増える ( 魔法攻撃ダメージアップ をつけて検証しないよう注意)	
+skillPlusWiki-057	破壊魔法	I？	I	True	+10	10.0	False	氷結の魔女	skillPlus:破壊魔法:I	True	False	1	13387	ミステリアス ハーフマスク		効果量確認は プロメテウスの炎 で破壊魔法+10ならダメージが8程度増える ( 魔法攻撃ダメージアップ をつけて検証しないよう注意)	group_uncertain
+skillPlusWiki-058	破壊魔法	J	J	False	+5	5.0	False	大魔導士	skillPlus:破壊魔法:J	True	True	1	12444	スペルマスター ロングコート		効果量確認は プロメテウスの炎 で破壊魔法+10ならダメージが8程度増える ( 魔法攻撃ダメージアップ をつけて検証しないよう注意)	
+skillPlusWiki-059	破壊魔法	K	K	False	+15	15.0	False	殲滅の魔術師	skillPlus:破壊魔法:K	True	True	8	13089	アグレッシブキャスター ウイングウィッグ カラー|アグレッシブキャスター ガーターベルト カラー|アグレッシブキャスター グローブ カラー|アグレッシブキャスター サスペンダー カラー|アグレッシブキャスター タトゥー カラー|アグレッシブキャスター ハイヒールブーツ カラー|アグレッシブキャスター ホットパンツ カラー|アグレッシブキャスター モンスターハット カラー		効果量確認は プロメテウスの炎 で破壊魔法+10ならダメージが8程度増える ( 魔法攻撃ダメージアップ をつけて検証しないよう注意)	
+skillPlusWiki-060	破壊魔法	L	L	False	+15	15.0	False	破壊の紋章	skillPlus:破壊魔法:L	True	True	1	13140	グラフィカル マジック ウイング		効果量確認は プロメテウスの炎 で破壊魔法+10ならダメージが8程度増える ( 魔法攻撃ダメージアップ をつけて検証しないよう注意)	
+skillPlusWiki-061	破壊魔法	L？	L	True	+10	10.0	False	英雄の翼	skillPlus:破壊魔法:L	True	False	1	13678	ヒロイック ウイング		効果量確認は プロメテウスの炎 で破壊魔法+10ならダメージが8程度増える ( 魔法攻撃ダメージアップ をつけて検証しないよう注意)	group_uncertain
+skillPlusWiki-062	破壊魔法	M	M	False	+10	10.0	False	魔法陣ブースト	skillPlus:破壊魔法:M	True	True	1	13240	マジック レザーグローブ		効果量確認は プロメテウスの炎 で破壊魔法+10ならダメージが8程度増える ( 魔法攻撃ダメージアップ をつけて検証しないよう注意)	
+skillPlusWiki-063	破壊魔法	M？	M	True	+？	0	True	シルフの加護	skillPlus:破壊魔法:M	False	False	1	14311	ストーム ブレスレット		効果量確認は プロメテウスの炎 で破壊魔法+10ならダメージが8程度増える ( 魔法攻撃ダメージアップ をつけて検証しないよう注意)	value_uncertain|group_uncertain
+skillPlusWiki-064	破壊魔法	N	N	False	+10	10.0	False	ウラエウスの力	skillPlus:破壊魔法:N	True	True	1	13354	コブラヘッド ロッド		効果量確認は プロメテウスの炎 で破壊魔法+10ならダメージが8程度増える ( 魔法攻撃ダメージアップ をつけて検証しないよう注意)	
+skillPlusWiki-065	破壊魔法	N?	N	True	+10	10.0	False	女王の威厳	skillPlus:破壊魔法:N	True	False	1	13831	ワンド オブ クイーン		効果量確認は プロメテウスの炎 で破壊魔法+10ならダメージが8程度増える ( 魔法攻撃ダメージアップ をつけて検証しないよう注意)	group_uncertain
+skillPlusWiki-066	破壊魔法	O	O	False	+5	5.0	False	神獣玄武の加護	skillPlus:破壊魔法:O	True	True	1	13399	異界の神獣玄武		効果量確認は プロメテウスの炎 で破壊魔法+10ならダメージが8程度増える ( 魔法攻撃ダメージアップ をつけて検証しないよう注意)	
+skillPlusWiki-067	破壊魔法	P	P	False	+5	5.0	False	神獣朱雀の加護	skillPlus:破壊魔法:P	True	True	1	13396	異界の神獣朱雀		効果量確認は プロメテウスの炎 で破壊魔法+10ならダメージが8程度増える ( 魔法攻撃ダメージアップ をつけて検証しないよう注意)	
+skillPlusWiki-068	破壊魔法	Q	Q	False	+10	10.0	False	大賢者の知識	skillPlus:破壊魔法:Q	True	True	1	13693	大賢者のケープ		効果量確認は プロメテウスの炎 で破壊魔法+10ならダメージが8程度増える ( 魔法攻撃ダメージアップ をつけて検証しないよう注意)	
+skillPlusWiki-069	破壊魔法	Q？	Q	True	+15	15.0	False	破壊の魔石	skillPlus:破壊魔法:Q	True	False	1	13721	マジック ジェム チョーカー		効果量確認は プロメテウスの炎 で破壊魔法+10ならダメージが8程度増える ( 魔法攻撃ダメージアップ をつけて検証しないよう注意)	group_uncertain
+skillPlusWiki-070	破壊魔法	R	R	False	+10	10.0	False	レゾナンス ムーン	skillPlus:破壊魔法:R	True	True	2	13082	クレセント ムーン|ムーン フォース ティアラ		効果量確認は プロメテウスの炎 で破壊魔法+10ならダメージが8程度増える ( 魔法攻撃ダメージアップ をつけて検証しないよう注意)	
+skillPlusWiki-071	破壊魔法	S？	S	True	+10	10.0	False	魔術師の怨念	skillPlus:破壊魔法:S	True	False	1	14070	スカル スピリット オーラ		効果量確認は プロメテウスの炎 で破壊魔法+10ならダメージが8程度増える ( 魔法攻撃ダメージアップ をつけて検証しないよう注意)	group_uncertain
+skillPlusWiki-072	破壊魔法	T？	T	True	+10	10.0	False	バフォメットの力	skillPlus:破壊魔法:T	True	False	1	14129	悪魔侯爵の杖		効果量確認は プロメテウスの炎 で破壊魔法+10ならダメージが8程度増える ( 魔法攻撃ダメージアップ をつけて検証しないよう注意)	group_uncertain
+skillPlusWiki-073	破壊魔法	U？	U	True	+20%	20.0	False	氷の魔術師	skillPlus:破壊魔法:U	True	False	1	14140	グレイシャル ローブ	氷結の魔女と併用可	効果量確認は プロメテウスの炎 で破壊魔法+10ならダメージが8程度増える ( 魔法攻撃ダメージアップ をつけて検証しないよう注意)	group_uncertain
+skillPlusWiki-074	破壊魔法	V？	V	True	+10	10.0	False	叡智の力	skillPlus:破壊魔法:V	True	False	1	14146	叡智の魔導書		効果量確認は プロメテウスの炎 で破壊魔法+10ならダメージが8程度増える ( 魔法攻撃ダメージアップ をつけて検証しないよう注意)	group_uncertain
+skillPlusWiki-075	回復魔法	A	A	False	+20	20.0	False	双天使の加護	skillPlus:回復魔法:A	True	True	1	9667	双天使のリング			
+skillPlusWiki-076	回復魔法	A	A	False	+20	20.0	False	ホーリー エンハンス	skillPlus:回復魔法:A	True	True	2	8137	月と星のストラ|聖なる十字架			
+skillPlusWiki-077	回復魔法	A	A	False	+20	20.0	False	天空の滅竜魔導士	skillPlus:回復魔法:A	True	True	2	9001	ウェンディ なりきりウィッグ|ウェンディ なりきりウィッグ カラー			
+skillPlusWiki-078	回復魔法	A	A	False	+20	20.0	False	錬金サポート	skillPlus:回復魔法:A	True	True	2	9391	ボダッハ なりきりウィッグ|ボダッハ なりきりウィッグ カラー			
+skillPlusWiki-079	回復魔法	B	B	False	+20	20.0	False	光の精霊	skillPlus:回復魔法:B	True	True	1	10650	ホワイト ウィスプ			
+skillPlusWiki-080	回復魔法	B	B	False	+10	10.0	False	プリンセス ハート	skillPlus:回復魔法:B	True	False	7	10431	ハートライト ウィッグ|プリンセス グラデ ウィッグ|プリンセス ショート ウィッグ|プリンセス スカート|プリンセス ドレス|リボン オペラ グローブ|姫カット ハーフツイン ウィッグ	光の精霊が優先		note_needs_review
+skillPlusWiki-081	回復魔法	C	C	False	+10	10.0	False	ホーリー メイデン	skillPlus:回復魔法:C	True	True	1	11304	メイデン クローク			
+skillPlusWiki-082	回復魔法	C	C	False	+10	10.0	False	新人魔法少女	skillPlus:回復魔法:C	True	True	5	11594	スノーホワイト なりきりウィッグ カラー|スノーホワイト なりきりウェア カラー|スノーホワイト なりきりグローブ カラー|スノーホワイト なりきりブーツ カラー|スノーホワイト なりきりヘアバンド カラー			
+skillPlusWiki-083	回復魔法	C	C	False	+10	10.0	False	施療神官	skillPlus:回復魔法:C	True	True	2	10686	てとら なりきりウィッグ|てとら なりきりウィッグ カラー			
+skillPlusWiki-084	回復魔法	D	D	False	+10	10.0	False	風精霊の加護	skillPlus:回復魔法:D	True	True	2	9600	エアリエル ロッド|背負いエアリエル ロッド			
+skillPlusWiki-085	回復魔法	D	D	False	+10	10.0	False	慈愛の力	skillPlus:回復魔法:D	True	False	1	10063	ホワイト エンジェル ロッド	風精霊の加護が優先		note_needs_review
+skillPlusWiki-086	回復魔法	E	E	False	+10	10.0	False	永遠の献身	skillPlus:回復魔法:E	True	True	8	10062	ホワイト エンジェル ウイング|ホワイト エンジェル ウェア|ホワイト エンジェル キャップ|ホワイト エンジェル グローブ|ホワイト エンジェル ケープ|ホワイト エンジェル パンツ|ホワイト エンジェル ブーツ|ホワイト エンジェル レッグガード			
+skillPlusWiki-087	回復魔法	F	F	False	+5	5.0	False	月星の力	skillPlus:回復魔法:F	True	True	5	11084	月星のウィッグ|月星のコンタクト|月星のコンタクト（耳装）|月星の帽子|月星の耳飾り			
+skillPlusWiki-088	回復魔法	G	G	False	+10	10.0	False	地母神の加護	skillPlus:回復魔法:G	True	True	9	11460	女神官 なりきりウィッグ|女神官 なりきりウィッグ カラー|女神官 なりきりキャップ|女神官 なりきりキャップ カラー|女神官 なりきりブーツ|女神官 なりきりブーツ カラー|女神官 なりきりローブ|女神官 なりきりローブ カラー|女神官の錫杖			
+skillPlusWiki-089	回復魔法	H	H	False	+10	10.0	False	大司教	skillPlus:回復魔法:H	True	True	15	11468	剣の乙女 なりきりアイマスク|剣の乙女 なりきりアイマスク カラー|剣の乙女 なりきりウィッグ A|剣の乙女 なりきりウィッグ A カラー|剣の乙女 なりきりウィッグ B|剣の乙女 なりきりウィッグ B カラー|剣の乙女 なりきりグローブ|剣の乙女 なりきりグローブ カラー|剣の乙女 なりきりブーツ|剣の乙女 なりきりブーツ カラー|剣の乙女 なりきりマント|剣の乙女 なりきりマント カラー|剣の乙女 なりきりローブ|剣の乙女 なりきりローブ カラー|天秤剣			
+skillPlusWiki-090	回復魔法	I	I	False	+15	15.0	False	聖母の微笑	skillPlus:回復魔法:I	True	True	4	11836	アーシア なりきりウィッグ|アーシア なりきりウィッグ カラー|セクシー シスター ローブ|セクシー シスター ヴェール			
+skillPlusWiki-091	回復魔法	J	J	False	+10	10.0	False	神聖な力	skillPlus:回復魔法:J	True	True	7	12204	セイクリッド ハープ グローブ|セイクリッド ロング ブーツ|セイクリッド ヴェール|レース アイマスク|聖騎士のチャーム|聖騎士の兜|聖騎士の靴			
+skillPlusWiki-092	回復魔法	K	K	False	+5	5.0	False	大魔導士	skillPlus:回復魔法:K	True	True	1	12444	スペルマスター ロングコート			
+skillPlusWiki-093	回復魔法	K？	K	True	+15	15.0	False	高貴な心	skillPlus:回復魔法:K	True	False	1	13827	ロイヤル ハーツ ドレス			group_uncertain
+skillPlusWiki-094	回復魔法	K？	K	True	+15	15.0	False	戦乙女の力	skillPlus:回復魔法:K	True	False	1	14355	ヴァルキリー アーマードレス			group_uncertain
+skillPlusWiki-095	回復魔法	L	L	False	+10	10.0	False	白薔薇の加護	skillPlus:回復魔法:L	True	True	1	12556	クラシック レース ケープ			
+skillPlusWiki-096	回復魔法	L?	L	True	+10	10.0	False	大賢者の知識	skillPlus:回復魔法:L	True	False	1	13693	大賢者のケープ			group_uncertain
+skillPlusWiki-097	回復魔法	M	M	False	+10	10.0	False	オシリスの加護	skillPlus:回復魔法:M	True	True	1	12718	背負いクルック			
+skillPlusWiki-098	回復魔法	M？	M	True	+10	10.0	False	英雄の翼	skillPlus:回復魔法:M	True	False	1	13678	ヒロイック ウイング			group_uncertain
+skillPlusWiki-099	回復魔法	M？	M	True	+15	15.0	False	デボーテッド ラブ	skillPlus:回復魔法:M	True	False	1	14145	バレンタイン ネックリボン			group_uncertain
+skillPlusWiki-100	回復魔法	N	N	False	+5	5.0	False	マジック チャーム	skillPlus:回復魔法:N	True	True	1	12773	ウィッチ ハット チャーム	大魔導士と併用可能		
+skillPlusWiki-101	回復魔法	O	O	False	+15	15.0	False	上級魔術師	skillPlus:回復魔法:O	True	True	1	12763	ツインブレイド ロング ウィッグ			
+skillPlusWiki-102	回復魔法	O？	O	True	+10	10.0	False	錬金術の極意	skillPlus:回復魔法:O	True	False	1	13864	シングル ブレイド ウィッグ			group_uncertain
+skillPlusWiki-103	回復魔法	P	P	False	+10	10.0	False	法力	skillPlus:回復魔法:P	True	True	1	13198	毘盧帽			
+skillPlusWiki-104	回復魔法	Q	Q	False	+10	10.0	False	魔法陣ブースト	skillPlus:回復魔法:Q	True	True	1	13240	マジック レザーグローブ			
+skillPlusWiki-105	回復魔法	R	R	False	+15	15.0	False	天職：治癒師	skillPlus:回復魔法:R	True	True	10	13578	白崎香織 なりきりアームガード|白崎香織 なりきりアームガード カラー|白崎香織 なりきりウィッグ|白崎香織 なりきりウィッグ カラー|白崎香織 なりきりブーツ|白崎香織 なりきりブーツ カラー|白崎香織 なりきりレッグガード|白崎香織 なりきりレッグガード カラー|白崎香織 なりきりローブ|白崎香織 なりきりローブ カラー			
+skillPlusWiki-106	回復魔法	S	S	False	+5	5.0	False	天使の音色	skillPlus:回復魔法:S	True	True	1	13671	天使のハープ			
+skillPlusWiki-107	回復魔法	S？	S	True	+10	10.0	False	叡智の力	skillPlus:回復魔法:S	True	False	1	14146	叡智の魔導書			group_uncertain
+skillPlusWiki-108	回復魔法	T	T	False	+10	10.0	False	レゾナンス ムーン	skillPlus:回復魔法:T	True	True	2	13082	クレセント ムーン|ムーン フォース ティアラ			
+skillPlusWiki-109	回復魔法	U	U	False	+10	10.0	False	女王の威厳	skillPlus:回復魔法:U	True	True	1	13831	ワンド オブ クイーン			
+skillPlusWiki-110	回復魔法	V？	V	True	+20	20.0	False	回復の極意	skillPlus:回復魔法:V	True	False	1	14356	聖職者の帽子			group_uncertain
+skillPlusWiki-111	強化魔法	A	A	False	+10	10.0	False	大地の加護	skillPlus:強化魔法:A	True	True	2	9748	タイタン ロッド|背負いタイタン ロッド		効果量確認は 大地の守り で強化魔法+10なら上昇量が2.0程度増える	
+skillPlusWiki-112	強化魔法	B	B	False	+20	20.0	False	呪術師の極意	skillPlus:強化魔法:B	True	False	15	8685	ダーク シャーマン ウェア|ダーク シャーマン ウェア カラー|ダーク シャーマン キャップ|ダーク シャーマン キャップ カラー|ダーク シャーマン グローブ|ダーク シャーマン グローブ カラー|ダーク シャーマン ショルダー|ダーク シャーマン ショルダー カラー|ダーク シャーマン パンツ|ダーク シャーマン パンツ カラー|ダーク シャーマン ブーツ|ダーク シャーマン ブーツ カラー|ダーク シャーマン ベルト|ダーク シャーマン ベルト カラー|呪術師の仮面	優先度マジカル サポート>神に仕える者>呪術師の極意	効果量確認は 大地の守り で強化魔法+10なら上昇量が2.0程度増える	note_needs_review
+skillPlusWiki-113	強化魔法	B	B	False	+20	20.0	False	マジカル サポート	skillPlus:強化魔法:B	True	False	3	9128	スクワラル ファミリア|マジカル キャット|マジカル ラブリー ウォッチ	優先度マジカル サポート>神に仕える者>呪術師の極意	効果量確認は 大地の守り で強化魔法+10なら上昇量が2.0程度増える	note_needs_review
+skillPlusWiki-114	強化魔法	B	B	False	+15	15.0	False	神に仕える者	skillPlus:強化魔法:B	True	False	3	11160	神巫の衣|神巫の袖|神巫の靴	優先度マジカル サポート>神に仕える者>呪術師の極意	効果量確認は 大地の守り で強化魔法+10なら上昇量が2.0程度増える	note_needs_review
+skillPlusWiki-115	強化魔法	C	C	False	+10	10.0	False	悪魔の瞳	skillPlus:強化魔法:C	True	True	1	10937	デビルアイ		効果量確認は 大地の守り で強化魔法+10なら上昇量が2.0程度増える	
+skillPlusWiki-116	強化魔法	C？	C	True	+10	10.0	False	強化の魔石	skillPlus:強化魔法:C	True	False	1	13475	ノーブル ジャボ		効果量確認は 大地の守り で強化魔法+10なら上昇量が2.0程度増える	group_uncertain
+skillPlusWiki-117	強化魔法	C？	C	True	+10	10.0	False	英雄の翼	skillPlus:強化魔法:C	True	False	1	13678	ヒロイック ウイング		効果量確認は 大地の守り で強化魔法+10なら上昇量が2.0程度増える	group_uncertain
+skillPlusWiki-118	強化魔法	D	D	False	+10	10.0	False	付与術師	skillPlus:強化魔法:D	True	False	12	10681	シロエ なりきりウィッグ|シロエ なりきりウィッグ カラー|シロエ なりきりウェア|シロエ なりきりウェア カラー|シロエ なりきりパンツ|シロエ なりきりパンツ カラー|シロエ なりきりブーツ|シロエ なりきりブーツ カラー|シロエ なりきりベルト|シロエ なりきりベルト カラー|シロエ なりきりローブ|シロエ なりきりローブ カラー	優先度魔法聖女>付与術師	効果量確認は 大地の守り で強化魔法+10なら上昇量が2.0程度増える	note_needs_review
+skillPlusWiki-119	強化魔法	D	D	False	+10	10.0	False	魔法聖女	skillPlus:強化魔法:D	True	False	10	11596	シスターナナ なりきりウィッグ|シスターナナ なりきりウィッグ カラー|シスターナナ なりきりウェア|シスターナナ なりきりウェア カラー|シスターナナ なりきりグローブ|シスターナナ なりきりグローブ カラー|シスターナナ なりきりコンタクト|シスターナナ なりきりコンタクト カラー|シスターナナ なりきりブーツ|シスターナナ なりきりブーツ カラー	優先度魔法聖女>付与術師	効果量確認は 大地の守り で強化魔法+10なら上昇量が2.0程度増える	note_needs_review
+skillPlusWiki-120	強化魔法	E	E	False	+10	10.0	False	大司教	skillPlus:強化魔法:E	True	True	15	11468	剣の乙女 なりきりアイマスク|剣の乙女 なりきりアイマスク カラー|剣の乙女 なりきりウィッグ A|剣の乙女 なりきりウィッグ A カラー|剣の乙女 なりきりウィッグ B|剣の乙女 なりきりウィッグ B カラー|剣の乙女 なりきりグローブ|剣の乙女 なりきりグローブ カラー|剣の乙女 なりきりブーツ|剣の乙女 なりきりブーツ カラー|剣の乙女 なりきりマント|剣の乙女 なりきりマント カラー|剣の乙女 なりきりローブ|剣の乙女 なりきりローブ カラー|天秤剣		効果量確認は 大地の守り で強化魔法+10なら上昇量が2.0程度増える	
+skillPlusWiki-121	強化魔法	F	F	False	+15	15.0	False	赤龍帝の加護	skillPlus:強化魔法:F	True	True	2	11832	一誠 なりきりウィッグ|一誠 なりきりウィッグ カラー		効果量確認は 大地の守り で強化魔法+10なら上昇量が2.0程度増える	
+skillPlusWiki-122	強化魔法	F	F	False	+15	15.0	False	強化の刻印	skillPlus:強化魔法:F	True	True	1	12994	インペリアル ナイト スパルダー		効果量確認は 大地の守り で強化魔法+10なら上昇量が2.0程度増える	
+skillPlusWiki-123	強化魔法	G	G	False	+10	10.0	False	マギア フォース	skillPlus:強化魔法:G	True	True	1	11968	マギア ウイング	マジック チャームと併用可能か不明	効果量確認は 大地の守り で強化魔法+10なら上昇量が2.0程度増える	
+skillPlusWiki-124	強化魔法	G？	G	True	+5	5.0	False	マジック チャーム	skillPlus:強化魔法:G	True	False	1	12773	ウィッチ ハット チャーム	マギア フォースと併用可能か不明大魔導士と併用可能	効果量確認は 大地の守り で強化魔法+10なら上昇量が2.0程度増える	group_uncertain
+skillPlusWiki-125	強化魔法	H	H	False	+5	5.0	False	大魔導士	skillPlus:強化魔法:H	True	True	1	12444	スペルマスター ロングコート		効果量確認は 大地の守り で強化魔法+10なら上昇量が2.0程度増える	
+skillPlusWiki-126	強化魔法	H？	H	True	+15	15.0	False	戦乙女の力	skillPlus:強化魔法:H	True	False	1	14355	ヴァルキリー アーマードレス		効果量確認は 大地の守り で強化魔法+10なら上昇量が2.0程度増える	group_uncertain
+skillPlusWiki-127	強化魔法	I	I	False	+10	10.0	False	法力	skillPlus:強化魔法:I	True	True	1	13198	毘盧帽		効果量確認は 大地の守り で強化魔法+10なら上昇量が2.0程度増える	
+skillPlusWiki-128	強化魔法	J	J	False	+10	10.0	False	魔法陣ブースト	skillPlus:強化魔法:J	True	True	1	13240	マジック レザーグローブ		効果量確認は 大地の守り で強化魔法+10なら上昇量が2.0程度増える	
+skillPlusWiki-129	強化魔法	J？	J	True	+20	20.0	False	魔力回路	skillPlus:強化魔法:J	True	False	1	14346	ノア スレーブ ブレスレット		効果量確認は 大地の守り で強化魔法+10なら上昇量が2.0程度増える	group_uncertain
+skillPlusWiki-130	強化魔法	K	K	False	+10	10.0	False	大賢者の知識	skillPlus:強化魔法:K	True	True	1	13693	大賢者のケープ		効果量確認は 大地の守り で強化魔法+10なら上昇量が2.0程度増える	
+skillPlusWiki-131	強化魔法	L	L	False	+10	10.0	False	レゾナンス ムーン	skillPlus:強化魔法:L	True	True	2	13082	クレセント ムーン|ムーン フォース ティアラ		効果量確認は 大地の守り で強化魔法+10なら上昇量が2.0程度増える	
+skillPlusWiki-132	強化魔法	M	M	False	+10	10.0	False	女王の威厳	skillPlus:強化魔法:M	True	True	1	13831	ワンド オブ クイーン		効果量確認は 大地の守り で強化魔法+10なら上昇量が2.0程度増える	
+skillPlusWiki-133	強化魔法	N	N	False	+10	10.0	False	錬金術の極意	skillPlus:強化魔法:N	True	True	1	13864	シングル ブレイド ウィッグ		効果量確認は 大地の守り で強化魔法+10なら上昇量が2.0程度増える	
+skillPlusWiki-134	強化魔法	O？	O	True	+10	10.0	False	叡智の力	skillPlus:強化魔法:O	True	False	1	14146	叡智の魔導書		効果量確認は 大地の守り で強化魔法+10なら上昇量が2.0程度増える	group_uncertain
+skillPlusWiki-135	強化魔法	P？	P	True	+15	15.0	False	カスタム屋	skillPlus:強化魔法:P	True	False	14	14156	ホトリ なりきりウィッグ|ホトリ なりきりウィッグ カラー|ホトリ なりきりウェア|ホトリ なりきりウェア カラー|ホトリ なりきりグローブ|ホトリ なりきりグローブ カラー|ホトリ なりきりゴーグル|ホトリ なりきりゴーグル カラー|ホトリ なりきりパンツ|ホトリ なりきりパンツ カラー|ホトリ なりきりブーツ|ホトリ なりきりブーツ カラー|ホトリ なりきりレッグポーチ|ホトリ なりきりレッグポーチ カラー		効果量確認は 大地の守り で強化魔法+10なら上昇量が2.0程度増える	group_uncertain
+skillPlusWiki-136	神秘魔法	A	A	False	+10	10.0	False	水神の力	skillPlus:神秘魔法:A	True	True	2	9882	アクア ロッド|背負いアクア ロッド		効果量確認は 鏡花水月 で神秘魔法+10なら効果時間が0.4秒増える ※ただし録画必須なこと、60fps以上であること、特に 可変フレームレート ではなく 固定フレームレート でないと計測が困難なことに留意が必要(一般にはお勧めしない)	
+skillPlusWiki-137	神秘魔法	B	B	False	+20	20.0	False	星屑の加護	skillPlus:神秘魔法:B	True	True	4	9129	星屑のイブニンググローブ|星屑のウイングブーツ|星屑のドレス|星屑の帽子		効果量確認は 鏡花水月 で神秘魔法+10なら効果時間が0.4秒増える ※ただし録画必須なこと、60fps以上であること、特に 可変フレームレート ではなく 固定フレームレート でないと計測が困難なことに留意が必要(一般にはお勧めしない)	
+skillPlusWiki-138	神秘魔法	B	B	False	+20	20.0	False	月の加護	skillPlus:神秘魔法:B	True	True	1	10114	クレセント チョーカー		効果量確認は 鏡花水月 で神秘魔法+10なら効果時間が0.4秒増える ※ただし録画必須なこと、60fps以上であること、特に 可変フレームレート ではなく 固定フレームレート でないと計測が困難なことに留意が必要(一般にはお勧めしない)	
+skillPlusWiki-139	神秘魔法	C	C	False	+10	10.0	False	神秘のオーラ	skillPlus:神秘魔法:C	True	True	2	9789	錬金術師のローブ|錬金術師の帽子		効果量確認は 鏡花水月 で神秘魔法+10なら効果時間が0.4秒増える ※ただし録画必須なこと、60fps以上であること、特に 可変フレームレート ではなく 固定フレームレート でないと計測が困難なことに留意が必要(一般にはお勧めしない)	
+skillPlusWiki-140	神秘魔法	D	D	False	+10	10.0	False	寿	skillPlus:神秘魔法:D	True	True	2	10304	水引のかんざし|水引帯		効果量確認は 鏡花水月 で神秘魔法+10なら効果時間が0.4秒増える ※ただし録画必須なこと、60fps以上であること、特に 可変フレームレート ではなく 固定フレームレート でないと計測が困難なことに留意が必要(一般にはお勧めしない)	
+skillPlusWiki-141	神秘魔法	E	E	False	+10	10.0	False	神祇官	skillPlus:神秘魔法:E	True	True	8	10684	ミノリ なりきりウィッグ|ミノリ なりきりウィッグ カラー|ミノリ なりきりグローブ|ミノリ なりきりグローブ カラー|ミノリ なりきりブーツ|ミノリ なりきりブーツ カラー|ミノリ なりきりローブ|ミノリ なりきりローブ カラー		効果量確認は 鏡花水月 で神秘魔法+10なら効果時間が0.4秒増える ※ただし録画必須なこと、60fps以上であること、特に 可変フレームレート ではなく 固定フレームレート でないと計測が困難なことに留意が必要(一般にはお勧めしない)	
+skillPlusWiki-142	神秘魔法	F	F	False	+10	10.0	False	蝶の加護	skillPlus:神秘魔法:F	True	True	8	11269	ルルパピヨン イヤリング A カラー|ルルパピヨン イヤリング B カラー|ルルパピヨン ウィッグ カラー|ルルパピヨン ウェア カラー|ルルパピヨン グローブ カラー|ルルパピヨン ハット カラー|ルルパピヨン パンツ カラー|ルルパピヨン ブーツ カラー		効果量確認は 鏡花水月 で神秘魔法+10なら効果時間が0.4秒増える ※ただし録画必須なこと、60fps以上であること、特に 可変フレームレート ではなく 固定フレームレート でないと計測が困難なことに留意が必要(一般にはお勧めしない)	
+skillPlusWiki-143	神秘魔法	J	J	False	+10	10.0	False	神聖な力	skillPlus:神秘魔法:J	True	True	7	12204	セイクリッド ハープ グローブ|セイクリッド ロング ブーツ|セイクリッド ヴェール|レース アイマスク|聖騎士のチャーム|聖騎士の兜|聖騎士の靴		効果量確認は 鏡花水月 で神秘魔法+10なら効果時間が0.4秒増える ※ただし録画必須なこと、60fps以上であること、特に 可変フレームレート ではなく 固定フレームレート でないと計測が困難なことに留意が必要(一般にはお勧めしない)	
+skillPlusWiki-144	神秘魔法	H	H	False	+10	10.0	False	月夜の煌き	skillPlus:神秘魔法:H	True	True	1	12203	ムーンライト バタフライ	マジック チャームと併用可能か不明	効果量確認は 鏡花水月 で神秘魔法+10なら効果時間が0.4秒増える ※ただし録画必須なこと、60fps以上であること、特に 可変フレームレート ではなく 固定フレームレート でないと計測が困難なことに留意が必要(一般にはお勧めしない)	
+skillPlusWiki-145	神秘魔法	H？	H	True	+10	10.0	False	七色の奇跡	skillPlus:神秘魔法:H	True	False	2	13787	ステンドグラス バタフライ|ステンドグラス バタフライ カラー	同部位他装備と併用可能か不明	効果量確認は 鏡花水月 で神秘魔法+10なら効果時間が0.4秒増える ※ただし録画必須なこと、60fps以上であること、特に 可変フレームレート ではなく 固定フレームレート でないと計測が困難なことに留意が必要(一般にはお勧めしない)	group_uncertain
+skillPlusWiki-146	神秘魔法	H？	H	True	+5	5.0	False	マジック チャーム	skillPlus:神秘魔法:H	True	False	1	12773	ウィッチ ハット チャーム	月夜の煌きと併用可能か不明大魔導士と併用可能	効果量確認は 鏡花水月 で神秘魔法+10なら効果時間が0.4秒増える ※ただし録画必須なこと、60fps以上であること、特に 可変フレームレート ではなく 固定フレームレート でないと計測が困難なことに留意が必要(一般にはお勧めしない)	group_uncertain
+skillPlusWiki-147	神秘魔法	H？	H	True	+20	20.0	False	白狐の力	skillPlus:神秘魔法:H	True	False	1	14130	白狐		効果量確認は 鏡花水月 で神秘魔法+10なら効果時間が0.4秒増える ※ただし録画必須なこと、60fps以上であること、特に 可変フレームレート ではなく 固定フレームレート でないと計測が困難なことに留意が必要(一般にはお勧めしない)	group_uncertain
+skillPlusWiki-148	神秘魔法	I	I	False	+5	5.0	False	大魔導士	skillPlus:神秘魔法:I	True	True	1	12444	スペルマスター ロングコート		効果量確認は 鏡花水月 で神秘魔法+10なら効果時間が0.4秒増える ※ただし録画必須なこと、60fps以上であること、特に 可変フレームレート ではなく 固定フレームレート でないと計測が困難なことに留意が必要(一般にはお勧めしない)	
+skillPlusWiki-149	神秘魔法	I？	I	True	+15	15.0	False	高貴な心	skillPlus:神秘魔法:I	True	False	1	13827	ロイヤル ハーツ ドレス		効果量確認は 鏡花水月 で神秘魔法+10なら効果時間が0.4秒増える ※ただし録画必須なこと、60fps以上であること、特に 可変フレームレート ではなく 固定フレームレート でないと計測が困難なことに留意が必要(一般にはお勧めしない)	group_uncertain
+skillPlusWiki-150	神秘魔法	I？	I	True	+15	15.0	False	ダークな雰囲気	skillPlus:神秘魔法:I	True	False	1	14312	ゴシック ロリータ サロペット		効果量確認は 鏡花水月 で神秘魔法+10なら効果時間が0.4秒増える ※ただし録画必須なこと、60fps以上であること、特に 可変フレームレート ではなく 固定フレームレート でないと計測が困難なことに留意が必要(一般にはお勧めしない)	group_uncertain
+skillPlusWiki-151	神秘魔法	J	J	False	+10	10.0	False	神眼の力	skillPlus:神秘魔法:J	True	True	1	12870	ゴッドアイ リング		効果量確認は 鏡花水月 で神秘魔法+10なら効果時間が0.4秒増える ※ただし録画必須なこと、60fps以上であること、特に 可変フレームレート ではなく 固定フレームレート でないと計測が困難なことに留意が必要(一般にはお勧めしない)	
+skillPlusWiki-152	神秘魔法	J？	J	True	+15	15.0	False	星光	skillPlus:神秘魔法:J	True	False	1	13686	スターライト リング		効果量確認は 鏡花水月 で神秘魔法+10なら効果時間が0.4秒増える ※ただし録画必須なこと、60fps以上であること、特に 可変フレームレート ではなく 固定フレームレート でないと計測が困難なことに留意が必要(一般にはお勧めしない)	group_uncertain
+skillPlusWiki-153	神秘魔法	K	K	False	+10	10.0	False	魔法陣ブースト	skillPlus:神秘魔法:K	True	True	1	13240	マジック レザーグローブ		効果量確認は 鏡花水月 で神秘魔法+10なら効果時間が0.4秒増える ※ただし録画必須なこと、60fps以上であること、特に 可変フレームレート ではなく 固定フレームレート でないと計測が困難なことに留意が必要(一般にはお勧めしない)	
+skillPlusWiki-154	神秘魔法	L	L	False	+5	5.0	False	ラッキーチャーム	skillPlus:神秘魔法:L	True	True	1	13362	スネーク リング		効果量確認は 鏡花水月 で神秘魔法+10なら効果時間が0.4秒増える ※ただし録画必須なこと、60fps以上であること、特に 可変フレームレート ではなく 固定フレームレート でないと計測が困難なことに留意が必要(一般にはお勧めしない)	
+skillPlusWiki-155	神秘魔法	M	M	False	+15	15.0	False	天職：治癒師	skillPlus:神秘魔法:M	True	True	10	13578	白崎香織 なりきりアームガード|白崎香織 なりきりアームガード カラー|白崎香織 なりきりウィッグ|白崎香織 なりきりウィッグ カラー|白崎香織 なりきりブーツ|白崎香織 なりきりブーツ カラー|白崎香織 なりきりレッグガード|白崎香織 なりきりレッグガード カラー|白崎香織 なりきりローブ|白崎香織 なりきりローブ カラー		効果量確認は 鏡花水月 で神秘魔法+10なら効果時間が0.4秒増える ※ただし録画必須なこと、60fps以上であること、特に 可変フレームレート ではなく 固定フレームレート でないと計測が困難なことに留意が必要(一般にはお勧めしない)	
+skillPlusWiki-156	神秘魔法	N	N	False	+10	10.0	False	英雄の翼	skillPlus:神秘魔法:N	True	True	1	13678	ヒロイック ウイング		効果量確認は 鏡花水月 で神秘魔法+10なら効果時間が0.4秒増える ※ただし録画必須なこと、60fps以上であること、特に 可変フレームレート ではなく 固定フレームレート でないと計測が困難なことに留意が必要(一般にはお勧めしない)	
+skillPlusWiki-157	神秘魔法	N？	N	True	+10	10.0	False	奇術師	skillPlus:神秘魔法:N	True	False	1	13995	マジシャンズ カード		効果量確認は 鏡花水月 で神秘魔法+10なら効果時間が0.4秒増える ※ただし録画必須なこと、60fps以上であること、特に 可変フレームレート ではなく 固定フレームレート でないと計測が困難なことに留意が必要(一般にはお勧めしない)	group_uncertain
+skillPlusWiki-158	神秘魔法	O	O	False	+10	10.0	False	大賢者の知識	skillPlus:神秘魔法:O	True	True	1	13693	大賢者のケープ		効果量確認は 鏡花水月 で神秘魔法+10なら効果時間が0.4秒増える ※ただし録画必須なこと、60fps以上であること、特に 可変フレームレート ではなく 固定フレームレート でないと計測が困難なことに留意が必要(一般にはお勧めしない)	
+skillPlusWiki-159	神秘魔法	P	P	False	+10	10.0	False	レゾナンス ムーン	skillPlus:神秘魔法:P	True	True	2	13082	クレセント ムーン|ムーン フォース ティアラ		効果量確認は 鏡花水月 で神秘魔法+10なら効果時間が0.4秒増える ※ただし録画必須なこと、60fps以上であること、特に 可変フレームレート ではなく 固定フレームレート でないと計測が困難なことに留意が必要(一般にはお勧めしない)	
+skillPlusWiki-160	神秘魔法	Q	Q	False	+10	10.0	False	女王の威厳	skillPlus:神秘魔法:Q	True	True	1	13831	ワンド オブ クイーン		効果量確認は 鏡花水月 で神秘魔法+10なら効果時間が0.4秒増える ※ただし録画必須なこと、60fps以上であること、特に 可変フレームレート ではなく 固定フレームレート でないと計測が困難なことに留意が必要(一般にはお勧めしない)	
+skillPlusWiki-161	神秘魔法	R	R	False	+10	10.0	False	錬金術の極意	skillPlus:神秘魔法:R	True	True	1	13864	シングル ブレイド ウィッグ		効果量確認は 鏡花水月 で神秘魔法+10なら効果時間が0.4秒増える ※ただし録画必須なこと、60fps以上であること、特に 可変フレームレート ではなく 固定フレームレート でないと計測が困難なことに留意が必要(一般にはお勧めしない)	
+skillPlusWiki-162	神秘魔法	S？	S	True	+10	10.0	False	叡智の力	skillPlus:神秘魔法:S	True	False	1	14146	叡智の魔導書		効果量確認は 鏡花水月 で神秘魔法+10なら効果時間が0.4秒増える ※ただし録画必須なこと、60fps以上であること、特に 可変フレームレート ではなく 固定フレームレート でないと計測が困難なことに留意が必要(一般にはお勧めしない)	group_uncertain
+skillPlusWiki-163	死の魔法	A	A	False	+20	20.0	False	深淵の闇	skillPlus:死の魔法:A	True	False	2	8129	イビルアイ チョーカー|裂け眼	優先度邪悪な力>深淵の闇		note_needs_review
+skillPlusWiki-164	死の魔法	A	A	False	+20	20.0	False	邪悪な力	skillPlus:死の魔法:A	True	False	1	10386	シニスター ウイング	優先度邪悪な力>深淵の闇		note_needs_review
+skillPlusWiki-165	死の魔法	B	B	False	+20	20.0	False	バフォメットの刻印	skillPlus:死の魔法:B	True	True	1	9590	バフォメット マスク			
+skillPlusWiki-166	死の魔法	B	B	False	+20	20.0	False	魔界の支配者	skillPlus:死の魔法:B	True	True	1	10876	デーモンロード ウィッグ			
+skillPlusWiki-167	死の魔法	B	B	False	+20	20.0	False	ゴースト マリッジ	skillPlus:死の魔法:B	True	True	1	10934	ホラー ドレス			
+skillPlusWiki-168	死の魔法	C	C	False	+10	10.0	False	夜の王	skillPlus:死の魔法:C	True	True	3	10198	セクシー ヴァンパイア ウェア|セクシー ヴァンパイア パンツ|セクシー ヴァンパイア ブーツ			
+skillPlusWiki-169	死の魔法	C	C	False	+15	15.0	False	スプーキー ソウル	skillPlus:死の魔法:C	True	False	2	13141	スプーキーナイト ウェア|スプーキーナイト パンツ	常にスプーキー ソウルが優先		note_needs_review
+skillPlusWiki-170	死の魔法	D	D	False	+20	20.0	False	死ノ象徴	skillPlus:死の魔法:D	True	True	2	10506	カースド クロウ|死神の首飾り	闇を纏いし者/月夜の煌きと併用可能か不明		
+skillPlusWiki-171	死の魔法	D？	D	True	+10	10.0	False	月夜の煌き	skillPlus:死の魔法:D	True	False	1	12203	ムーンライト バタフライ	死ノ象徴/闇を纏いし者と併用可能か不明		group_uncertain
+skillPlusWiki-172	死の魔法	E	E	False	+10	10.0	False	アヌビスの力	skillPlus:死の魔法:E	True	True	1	11780	アヌビス サイス	2hand		
+skillPlusWiki-173	死の魔法	E？	E	True	+10	10.0	False	バフォメットの力	skillPlus:死の魔法:E	True	False	1	14129	悪魔侯爵の杖			group_uncertain
+skillPlusWiki-174	死の魔法	F	F	False	+15	15.0	False	紅髪の滅殺姫	skillPlus:死の魔法:F	True	True	2	11833	リアス なりきりウィッグ|リアス なりきりウィッグ カラー			
+skillPlusWiki-175	死の魔法	F?	F	True	+15	15.0	False	闇の王	skillPlus:死の魔法:F	True	False	1	13685	シャドウロード ヘッド			group_uncertain
+skillPlusWiki-176	死の魔法	G	G	False	+10	10.0	False	蠍の加護	skillPlus:死の魔法:G	True	True	8	12064	アラクラン ウィッグ A カラー|アラクラン ウィッグ B カラー|アラクラン ウェア カラー|アラクラン ウエストリボン カラー|アラクラン グローブ カラー|アラクラン シューズ カラー|アラクラン ショルダー カラー|アラクラン テイル カラー			
+skillPlusWiki-177	死の魔法	H	H	False	+10	10.0	False	漆黒の魔眼	skillPlus:死の魔法:H	True	True	4	12384	漆黒の右眼|漆黒の右眼（耳装）|漆黒の左眼|漆黒の左眼（耳装）			
+skillPlusWiki-178	死の魔法	I	I	False	+10	10.0	False	オシリスの加護	skillPlus:死の魔法:I	True	True	1	12718	背負いクルック			
+skillPlusWiki-179	死の魔法	I？	I	True	+15	15.0	False	邪悪なオーラ	skillPlus:死の魔法:I	True	False	2	13830	ダーク スピリット オーラ|ダークネス サイス			group_uncertain
+skillPlusWiki-180	死の魔法	J	J	False	+10	10.0	False	漆黒のベール	skillPlus:死の魔法:J	True	True	2	12774	ゴシック ヘッドドレス|ハロウィン ヴェール	邪悪な力と併用可能		
+skillPlusWiki-181	死の魔法	K	K	False	+10	10.0	False	悪魔の力	skillPlus:死の魔法:K	True	True	3	13042	ダークサイド ハンド|デビル ウイング イヤー|悪魔の仮面			
+skillPlusWiki-182	死の魔法	L	L	False	+20	20.0	False	月夜見の加護	skillPlus:死の魔法:L	True	True	1	13083	十五夜の着物			
+skillPlusWiki-183	死の魔法	L？	L	True	+15	15.0	False	ダークな雰囲気	skillPlus:死の魔法:L	True	False	1	14312	ゴシック ロリータ サロペット			group_uncertain
+skillPlusWiki-184	死の魔法	M	M	False	+15	15.0	False	殲滅の魔術師	skillPlus:死の魔法:M	True	True	8	13089	アグレッシブキャスター ウイングウィッグ カラー|アグレッシブキャスター ガーターベルト カラー|アグレッシブキャスター グローブ カラー|アグレッシブキャスター サスペンダー カラー|アグレッシブキャスター タトゥー カラー|アグレッシブキャスター ハイヒールブーツ カラー|アグレッシブキャスター ホットパンツ カラー|アグレッシブキャスター モンスターハット カラー			
+skillPlusWiki-185	死の魔法	N	N	False	+15	15.0	False	死神候補	skillPlus:死の魔法:N	True	True	1	13667	死神の使い魔			
+skillPlusWiki-186	死の魔法	O	O	False	+10	10.0	False	大賢者の知識	skillPlus:死の魔法:O	True	True	1	13693	大賢者のケープ			
+skillPlusWiki-187	死の魔法	O？	O	True	+20	20.0	False	真祖の吸血鬼	skillPlus:死の魔法:O	True	False	1	14069	トゥルー ヴァンパイア コート			group_uncertain
+skillPlusWiki-188	死の魔法	O？	O	True	+？%	0	True	堕天使の魔眼	skillPlus:死の魔法:O	False	False	1	14300	イビルアイ ブローチ			value_uncertain|group_uncertain
+skillPlusWiki-189	死の魔法	P	P	False	+15	15.0	False	小悪魔の翼	skillPlus:死の魔法:P	True	True	2	13829	ゴシック ハーネス ベルト|デビル ウイング シューズ			
+skillPlusWiki-190	死の魔法	Q？	Q	True	+10	10.0	False	魔術師の怨念	skillPlus:死の魔法:Q	True	False	1	14070	スカル スピリット オーラ			group_uncertain
+skillPlusWiki-191	死の魔法	R？	R	True	+15	15.0	False	闇の支配者	skillPlus:死の魔法:R	True	False	14	14072	ダークルーラー アイマスク|ダークルーラー アイマスク カラー|ダークルーラー ウィッグ|ダークルーラー ウィッグ カラー|ダークルーラー ウェア|ダークルーラー ウェア カラー|ダークルーラー スカート|ダークルーラー スカート カラー|ダークルーラー スリーブ|ダークルーラー スリーブ カラー|ダークルーラー ソード|ダークルーラー ソード カラー|ダークルーラー ニーソックス|ダークルーラー ニーソックス カラー			group_uncertain
+skillPlusWiki-192	死の魔法	S？	S	True	+10	10.0	False	叡智の力	skillPlus:死の魔法:S	True	False	1	14146	叡智の魔導書			group_uncertain
+skillPlusWiki-193	死の魔法	T？	T	True	+10	10.0	False	闇を纏いし者	skillPlus:死の魔法:T	True	False	2	11690	カオス サークル|ナイトメア ゴシック ウェア	死ノ象徴/月夜の煌きと併用可能か不明		group_uncertain
+skillPlusWiki-194	死の魔法	U？	U	True	+10	10.0	False	ヤミの力	skillPlus:死の魔法:U	True	False	1	14310	ゴシック ロリータ アイパッチ			group_uncertain
+skillPlusWiki-195	召喚魔法	A	A	False	+10	10.0	False	黒魔術の書	skillPlus:召喚魔法:A	True	True	1	11357	グリモア ロッド			
+skillPlusWiki-196	召喚魔法	B	B	False	+10	10.0	False	大賢者の知識	skillPlus:召喚魔法:B	True	True	1	13693	大賢者のケープ			
+skillPlusWiki-197	召喚魔法	C？	C	True	+10	10.0	False	叡智の力	skillPlus:召喚魔法:C	True	False	1	14146	叡智の魔導書			group_uncertain
+skillPlusWiki-198	魔法熟練	A	A	False	+10	10.0	False	エキスパート マジック	skillPlus:魔法熟練:A	True	True	1	10094	エキスパート マジック リング			
+skillPlusWiki-199	魔法熟練	B	B	False	+10	10.0	False	白百合の加護	skillPlus:魔法熟練:B	True	True	1	10648	ホワイトリリィ ロッド			
+skillPlusWiki-200	魔法熟練	C	C	False	+15	15.0	False	妖狐の力	skillPlus:魔法熟練:C	True	True	2	11951	九重 なりきりウィッグ|九重 なりきりウィッグ カラー			
+skillPlusWiki-201	魔法熟練	D	D	False	+20	20.0	False	自然崇拝	skillPlus:魔法熟練:D	True	True	3	13870	エスニック アームカバー|エスニック ウエストクロース|エスニック ファー シューズ			
+skillPlusWiki-202	魔法熟練	E	E	False	+10	10.0	False	奇術師	skillPlus:魔法熟練:E	True	True	1	13995	マジシャンズ カード			
+skillPlusWiki-203	魔法熟練	F	F	False	+20	20.0	False	陰陽術の極意	skillPlus:魔法熟練:F	True	True	1	14091	陰陽の狩衣			
+skillPlusWiki-204	自然調和	A	A	False	+20	20.0	False	仙術	skillPlus:自然調和:A	True	True	1	11227	仙人の道衣			
+skillPlusWiki-205	自然調和	B	B	False	+20	20.0	False	山紫水明	skillPlus:自然調和:B	True	True	1	11963	山紫水明の袴			
+skillPlusWiki-206	自然調和	C	C	False	+20	20.0	False	ゴルファー	skillPlus:自然調和:C	True	True	5	12784	ゴルフウェア グローブ|ゴルフウェア サンバイザー|ゴルフウェア シャツ|ゴルフウェア シューズ|ゴルフウェア パンツ			
+skillPlusWiki-207	自然調和	D	D	False	+20	20.0	False	闇纏	skillPlus:自然調和:D	True	True	1	12874	暗殺者のマント			
+skillPlusWiki-208	自然調和	？		True	+20	20.0	False	自然崇拝		True	False	3	13870	エスニック アームカバー|エスニック ウエストクロース|エスニック ファー シューズ	併用未確認		group_uncertain
+skillPlusWiki-209	暗黒命令	A	A	False	+10	10.0	False	魔法のお姫様	skillPlus:暗黒命令:A	True	True	2	11600	ルーラ なりきりウィッグ|ルーラ なりきりウィッグ カラー			
+skillPlusWiki-210	暗黒命令	A?	A	True	+15	15.0	False	闇の王	skillPlus:暗黒命令:A	True	False	1	13685	シャドウロード ヘッド			group_uncertain
+skillPlusWiki-211	暗黒命令	B	B	False	+10	10.0	False	闇を纏いし者	skillPlus:暗黒命令:B	True	True	2	11690	カオス サークル|ナイトメア ゴシック ウェア	憑物と部位被りのため併用可能か不明		
+skillPlusWiki-212	暗黒命令	C	C	False	+10	10.0	False	漆黒の魔眼	skillPlus:暗黒命令:C	True	True	4	12384	漆黒の右眼|漆黒の右眼（耳装）|漆黒の左眼|漆黒の左眼（耳装）			
+skillPlusWiki-213	暗黒命令	D	D	False	+10	10.0	False	地雷系	skillPlus:暗黒命令:D	True	True	3	12154	地雷系ウェア|地雷系シューズ|地雷系スカート			
+skillPlusWiki-214	暗黒命令	E	E	False	+10	10.0	False	漆黒のベール	skillPlus:暗黒命令:E	True	True	2	12774	ゴシック ヘッドドレス|ハロウィン ヴェール			
+skillPlusWiki-215	暗黒命令	F	F	False	+10	10.0	False	悪魔の力	skillPlus:暗黒命令:F	True	True	3	13042	ダークサイド ハンド|デビル ウイング イヤー|悪魔の仮面			
+skillPlusWiki-216	暗黒命令	G	G	False	+15	15.0	False	スプーキー ソウル	skillPlus:暗黒命令:G	True	True	2	13141	スプーキーナイト ウェア|スプーキーナイト パンツ			
+skillPlusWiki-217	暗黒命令	H	H	False	+15	15.0	False	死神候補	skillPlus:暗黒命令:H	True	True	1	13667	死神の使い魔			
+skillPlusWiki-218	暗黒命令	I	I	False	+20	20.0	False	自然崇拝	skillPlus:暗黒命令:I	True	True	3	13870	エスニック アームカバー|エスニック ウエストクロース|エスニック ファー シューズ			
+skillPlusWiki-219	暗黒命令	J	J	False	+10	10.0	False	異形の力	skillPlus:暗黒命令:J	True	True	1	13876	異形の尻尾			
+skillPlusWiki-220	暗黒命令	K？	K	True	+5	5.0	False	憑物	skillPlus:暗黒命令:K	True	False	1	13012	イビル スピリット	闇を纏いし者と部位被りのため併用可能か不明		group_uncertain
+skillPlusWiki-221	暗黒命令	L？	L	True	+10	10.0	False	ヤミの力	skillPlus:暗黒命令:L	True	False	1	14310	ゴシック ロリータ アイパッチ			group_uncertain
+skillPlusWiki-222	シャウト	A	A	False	+10	10.0	False	アーティスト	skillPlus:シャウト:A	True	True	2	12383	インナーカラー ロング ウィッグ|ハーフツイン アウターカラー ウィッグ			
+skillPlusWiki-223	シャウト	B	B	False	+20	20.0	False	オープン マイ ハート	skillPlus:シャウト:B	True	True	1	9405	オープン チェスト シャツ			
+skillPlusWiki-224	シャウト	C	C	False	+20	20.0	False	ハードコア・パンク	skillPlus:シャウト:C	True	True	3	10435	クロップド タンクトップ|メイクアップ グローブ|ロングスリーブ メッシュ シャツ			
+skillPlusWiki-225	シャウト	D	D	False	+15	15.0	False	ロックスター	skillPlus:シャウト:D	True	True	2	12833	エレクトリカル スター ギター|プリーツ フレアパンツ			
+skillPlusWiki-226	音楽	A	A	False	+10	10.0	False	マリアッチ	skillPlus:音楽:A	True	True	1	10186	ソンブレロ			
+skillPlusWiki-227	音楽	A	A	False	+20	20.0	False	歌姫	skillPlus:音楽:A	True	True	5	9401	ビッグ ツインテール ウィッグ|歌姫アーサー なりきりウィッグ|歌姫アーサー なりきりウィッグ カラー|歌姫アーサー なりきりドレス|歌姫アーサー なりきりドレス カラー			
+skillPlusWiki-228	音楽	A	A	False	+20	20.0	False	ミュージカル	skillPlus:音楽:A	True	True	2	8763	クロスドレッサー スーツ|音符のイヤリング			
+skillPlusWiki-229	音楽	A	A	False	+20	20.0	False	スーパースター	skillPlus:音楽:A	True	True	4	10637	スタイリッシュ アイドル ウェア|スタイリッシュ アイドル パンツ|スタイリッシュ アイドル ブーツ|スター バックル ベルト			
+skillPlusWiki-230	音楽	B	B	False	+10	10.0	False	吹奏楽団	skillPlus:音楽:B	True	True	3	9894	マーチングバンド ウェア|マーチングバンド キャップ|マーチングバンド パンツ			
+skillPlusWiki-231	音楽	B	B	False	+10	10.0	False	防音グッズ	skillPlus:音楽:B	True	True	1	10248	ラビット イヤーマフ			
+skillPlusWiki-232	音楽	C	C	False	+15	15.0	False	伝説のギタリスト	skillPlus:音楽:C	True	True	1	9265	ダブルネック ギター	精霊の力と併用可能か不明		
+skillPlusWiki-233	音楽	C?	C	True	+10	10.0	False	精霊の力	skillPlus:音楽:C	True	False	1	10690	精霊遊戯のリュート	伝説のギタリストと併用可能か不明		group_uncertain
+skillPlusWiki-234	音楽	D	D	False	+10	10.0	False	サラウンド	skillPlus:音楽:D	True	True	1	10928	フローティング スピーカー			
+skillPlusWiki-235	音楽	E	E	False	+10	10.0	False	スターダム	skillPlus:音楽:E	True	True	1	11524	スターライト ベルト			
+skillPlusWiki-236	音楽	F	F	False	+15	15.0	False	永遠のアイドル	skillPlus:音楽:F	True	True	2	11305	ゴージャス ウエスト フリル|サイドカール ウィッグ			
+skillPlusWiki-237	音楽	G	G	False	+10	10.0	False	小鳥のさえずり	skillPlus:音楽:G	True	True	3	11579	ラッキーバード|文鳥の指輪|肩乗り文鳥			
+skillPlusWiki-238	音楽	H	H	False	+10	10.0	False	森の音楽家	skillPlus:音楽:H	True	True	10	7378	森の音楽家クラムベリー なりきりウィッグ|森の音楽家クラムベリー なりきりウィッグ カラー|森の音楽家クラムベリー なりきりウェア|森の音楽家クラムベリー なりきりウェア カラー|森の音楽家クラムベリー なりきりクラウン|森の音楽家クラムベリー なりきりクラウン カラー|森の音楽家クラムベリー なりきりシューズ|森の音楽家クラムベリー なりきりシューズ カラー|森の音楽家クラムベリー なりきりパンツ|森の音楽家クラムベリー なりきりパンツ カラー			
+skillPlusWiki-239	音楽	I	I	False	+10	10.0	False	アイドルの卵	skillPlus:音楽:I	True	True	7	12219	ダイアロス ダイナー イヤリング|ダイアロス ダイナー ウィッグ|ダイアロス ダイナー ウェア|ダイアロス ダイナー エプロン|ダイアロス ダイナー キャップ|ダイアロス ダイナー パンツ|パフスリーブ ウェア			
+skillPlusWiki-240	音楽	J	J	False	+10	10.0	False	アーティスト	skillPlus:音楽:J	True	True	2	12383	インナーカラー ロング ウィッグ|ハーフツイン アウターカラー ウィッグ			
+skillPlusWiki-241	音楽	K	K	False	+15	15.0	False	妖艶な舞	skillPlus:音楽:K	True	True	2	13175	オリエンタル ダンサー パンツ|ミニ花魁ドレス			
+skillPlusWiki-242	音楽	L	L	False	+5	5.0	False	天使の音色	skillPlus:音楽:L	True	True	1	13671	天使のハープ			
+skillPlusWiki-243	ダンス	A	A	False	+20	20.0	False	赤い靴	skillPlus:ダンス:A	True	False	1	8781	赤い靴	アラビアン ダンサーが優先	効果量確認はライブステージの効果量がスキル+10で2増える	note_needs_review
+skillPlusWiki-244	ダンス	A	A	False	+20	20.0	False	アラビアン ダンサー	skillPlus:ダンス:A	True	False	2	13044	アラビアン ウィッグ|アラビアン ロインクロス	アラビアン ダンサーが優先	効果量確認はライブステージの効果量がスキル+10で2増える	note_needs_review
+skillPlusWiki-245	ダンス	B	B	False	+10	10.0	False	精霊の舞	skillPlus:ダンス:B	True	True	1	9320	スピリット バングル		効果量確認はライブステージの効果量がスキル+10で2増える	
+skillPlusWiki-246	ダンス	C	C	False	+15	15.0	False	チアフリー	skillPlus:ダンス:C	True	True	2	10929	チアリーダー ウェア|チアリーダー パンツ		効果量確認はライブステージの効果量がスキル+10で2増える	
+skillPlusWiki-247	ダンス	D	D	False	+10	10.0	False	スターダム	skillPlus:ダンス:D	True	True	1	11524	スターライト ベルト		効果量確認はライブステージの効果量がスキル+10で2増える	
+skillPlusWiki-248	ダンス	E	E	False	+10	10.0	False	アイドルの卵	skillPlus:ダンス:E	True	True	7	12219	ダイアロス ダイナー イヤリング|ダイアロス ダイナー ウィッグ|ダイアロス ダイナー ウェア|ダイアロス ダイナー エプロン|ダイアロス ダイナー キャップ|ダイアロス ダイナー パンツ|パフスリーブ ウェア		効果量確認はライブステージの効果量がスキル+10で2増える	
+skillPlusWiki-249	ダンス	F	F	False	+15	15.0	False	ロックスター	skillPlus:ダンス:F	True	False	2	12833	エレクトリカル スター ギター|プリーツ フレアパンツ	同部位との併用不明	効果量確認はライブステージの効果量がスキル+10で2増える	note_needs_review
+skillPlusWiki-250	ダンス	F？	F	True	+15	15.0	False	妖艶な舞	skillPlus:ダンス:F	True	False	2	13175	オリエンタル ダンサー パンツ|ミニ花魁ドレス	同部位との併用不明	効果量確認はライブステージの効果量がスキル+10で2増える	group_uncertain|note_needs_review
+skillPlusWiki-251	ダンス	G？	G	True	+20	20.0	False	山の妖精	skillPlus:ダンス:G	True	False	1	14152	肩乗りオコジョ		効果量確認はライブステージの効果量がスキル+10で2増える	group_uncertain

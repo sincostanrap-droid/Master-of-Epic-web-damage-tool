@@ -1,0 +1,31 @@
+{
+  "generatedAt": "2026-07-01T14:30:00.000Z",
+  "source": "MoE Wiki アイテム/追加効果/併用 uploaded HTML",
+  "summary": {
+    "totalRows": 251,
+    "uniqueBuffNames": 188,
+    "skillNames": [
+      "シャウト",
+      "ダンス",
+      "召喚魔法",
+      "回復魔法",
+      "強化魔法",
+      "戦闘技術",
+      "暗黒命令",
+      "死の魔法",
+      "牙",
+      "物まね",
+      "破壊魔法",
+      "神秘魔法",
+      "筋力",
+      "自然調和",
+      "調教",
+      "音楽",
+      "魔法熟練"
+    ],
+    "safeForSkillPlusAutoApply": 246,
+    "safeForConflictAutoApply": 162,
+    "matchedRows": 251,
+    "unmatchedRows": 0
+  }
+}

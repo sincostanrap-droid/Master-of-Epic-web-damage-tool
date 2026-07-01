@@ -10008,6 +10008,7 @@ const CATALOG_SCRIPT_URLS = [
   "src/data/generated/wikiEquipBuffEffects.generated.js",
   "src/data/generated/equipBuffRuleCandidates.generated.js",
   "src/data/generated/skillBuffCompatibility.generated.js",
+  "src/data/generated/damageBuffCompatibility.generated.js",
   "src/data/manual/buffRules.manual.js"
 ];
 let catalogScriptsPromise = null;
@@ -10201,6 +10202,175 @@ function applySkillBuffCompatibilityToEquipment(row, buff, item=null) {
   return applied;
 }
 
+
+function damageBuffCompatibilityItems() {
+  const raw = catalogArray("MOE_DAMAGE_BUFF_COMPATIBILITY_MANUAL", "MOE_DAMAGE_BUFF_COMPATIBILITY", "MOE_DAMAGE_BUFF_COMPATIBILITY_GENERATED");
+  const seen = new Set();
+  const out = [];
+  raw.forEach(item => {
+    if (!item) return;
+    const key = item.id || `${item.sectionName || ""}:${item.groupRaw || ""}:${item.buffName || ""}:${item.valueRaw || ""}`;
+    if (seen.has(key)) return;
+    seen.add(key);
+    out.push(item);
+  });
+  return out;
+}
+
+function damageBuffCompatibilityRulesForBuff(buff, item=null) {
+  const names = [];
+  const add = v => { const s = String(v || "").trim(); if (s && !names.includes(s)) names.push(s); };
+  add(buff?.name);
+  add(item?.equipBuff?.name);
+  const normalized = names.map(catalogNorm).filter(Boolean);
+  if (!normalized.length) return [];
+  return damageBuffCompatibilityItems().filter(rule => normalized.includes(catalogNorm(rule.buffName || rule.name || "")));
+}
+
+function hasDisplayEffect(row, key, name, value) {
+  const n = String(name || "").trim();
+  const v = +value || 0;
+  return normalizeAdditionalEffects(row?.extraEffects || []).some(e =>
+    e && e.key === key && String(e.name || "").trim() === n && (+e.value || 0) === v
+  );
+}
+
+function appendDamageBuffCompatibilitySource(row, rules, applied, directGroups, displayGroups) {
+  const valueLines = rules
+    .filter(r => +r.value && !r.valueUncertain)
+    .map(r => `${r.effectLabel || r.sectionName}${r.valueUnit === "%" ? "+" : " +"}${fmt(+r.value, 2)}${r.valueUnit || ""}（${r.buffName} / ${r.groupRaw || "?"}）`);
+  if (valueLines.length) {
+    row.equipBuffSourceText = appendUniqueText(row.equipBuffSourceText, `Wiki併用2: ${valueLines.join(" / ")}`);
+  }
+
+  const uncertain = rules.filter(r => r.valueUncertain || r.groupUncertain || r.noteNeedsReview || (Array.isArray(r.reviewFlags) && r.reviewFlags.length));
+  if (uncertain.length) {
+    const notes = uncertain.map(r => `${r.sectionName}:${r.valueRaw || "?"}/${r.groupRaw || "?"}`).join(" / ");
+    row.equipBuffSourceText = appendUniqueText(row.equipBuffSourceText, `Wiki併用2レビュー注意: ${notes}`);
+  }
+
+  const allGroups = Array.from(new Set([...(directGroups || []), ...(displayGroups || [])]));
+  if (allGroups.length > 1) {
+    row.equipBuffSourceText = appendUniqueText(row.equipBuffSourceText, `複数ダメージ系競合候補: ${allGroups.join(" / ")}（現行UIは単一競合グループ優先）`);
+  }
+
+  if (applied) {
+    row.equipBuffWikiText = appendUniqueText(row.equipBuffWikiText, "ダメージ系効果は MoE Wiki アイテム/追加効果/併用2 の表から自動投入。物理与ダメ/攻撃力変換/クリ率は既存計算欄へ、魔法・属性・範囲は表示用効果へ入れます。");
+  }
+}
+
+
+function damageBuffCompatibilityCanApplyConflict(rule) {
+  if (!rule || !rule.conflictGroup) return false;
+  // 攻撃力変換は Wiki 併用2の表グループ A/B/C... をそのまま使う。
+  if (String(rule.effectCategory || "") === "attackConversion") return true;
+  return !!rule.safeForConflictAutoApply;
+}
+
+function isGenericAttackConversionConflictGroup(group) {
+  const raw = String(group || "").trim();
+  if (!raw) return false;
+  const n = raw.toLowerCase().replace(/[\s_]+/g, "-");
+  return n === "attack-conversion"
+    || n === "attackconversion"
+    || n === "conversion-attack"
+    || n === "conversion:attack";
+}
+
+function sanitizeGenericAttackConversionConflict(row) {
+  if (!row) return row;
+  if (isGenericAttackConversionConflictGroup(row.equipBuffConflictGroup)) {
+    row.equipBuffConflictGroup = "";
+  }
+  const tags = splitTags(row.tags || "").filter(g => !isGenericAttackConversionConflictGroup(g));
+  row.tags = tags.join(",");
+  return row;
+}
+
+function preferDamageConflictGroup(existing, directGroups) {
+  const groups = Array.from(new Set((directGroups || []).map(g => String(g || "").trim()).filter(Boolean)));
+  const cur = String(existing || "").trim();
+  if (!groups.length) return isGenericAttackConversionConflictGroup(cur) ? "" : cur;
+  const preferred = groups.find(g => g.startsWith("damage:physical:"))
+    || groups.find(g => g.startsWith("conversion:attack:"))
+    || groups.find(g => g.startsWith("critical:"))
+    || groups[0];
+  if (!cur) return preferred;
+  if (cur.startsWith("skillPlus:") && preferred) return preferred;
+  if (isGenericAttackConversionConflictGroup(cur) && preferred) return preferred;
+  return cur;
+}
+
+function applyDamageBuffCompatibilityRule(row, rule) {
+  const value = +rule.value || 0;
+  if (!value || rule.valueUncertain) return false;
+  const kind = String(rule.autoApplyKind || "");
+  const note = [`Wiki併用2`, rule.groupRaw ? `グループ${rule.groupRaw}` : ""].filter(Boolean).join(" / ");
+
+  if (kind === "equipBuffDmgPct") return setIfNumeric(row, "equipBuffDmgPct", value, false);
+  if (kind === "equipBuffExtraCritRatePct") return setIfNumeric(row, "equipBuffExtraCritRatePct", value, false);
+  if (kind === "equipBuffConvMagicRate") return setIfNumeric(row, "equipBuffConvMagicRate", value, false);
+  if (kind === "equipBuffConvSpeedRate") return setIfNumeric(row, "equipBuffConvSpeedRate", value, false);
+
+  if (kind === "displayElement") {
+    const name = rule.element || rule.effectLabel || "属性";
+    if (!hasDisplayEffect(row, "elementDamagePct", name, value)) {
+      pushDisplayEffect(row, "elementDamagePct", value, name, "%", "display", note);
+      return true;
+    }
+    return false;
+  }
+
+  const name = rule.effectLabel || rule.sectionName || "ダメージ系効果";
+  const unit = rule.valueUnit || (String(rule.valueRaw || "").includes("%") ? "%" : "");
+  if (!hasDisplayEffect(row, "custom", name, value)) {
+    pushDisplayEffect(row, "custom", value, name, unit, "display", note);
+    return true;
+  }
+  return false;
+}
+
+function applyDamageBuffCompatibilityToEquipment(row, buff, item=null) {
+  const rules = damageBuffCompatibilityRulesForBuff(buff, item);
+  if (!rules.length) {
+    sanitizeGenericAttackConversionConflict(row);
+    return false;
+  }
+
+  let applied = false;
+  row.equipBuffEnabled = true;
+  row.equipBuffSlot = row.equipBuffSlot !== false;
+
+  rules.forEach(rule => {
+    if (applyDamageBuffCompatibilityRule(row, rule)) applied = true;
+  });
+
+  const directGroups = Array.from(new Set(rules
+    .filter(r => damageBuffCompatibilityCanApplyConflict(r) && r.conflictGroup && r.physicalCalcRelevant)
+    .map(r => String(r.conflictGroup || "").trim())
+    .filter(Boolean)));
+
+  const displayGroups = Array.from(new Set(rules
+    .filter(r => damageBuffCompatibilityCanApplyConflict(r) && r.conflictGroup && !r.physicalCalcRelevant)
+    .map(r => String(r.conflictGroup || "").trim())
+    .filter(Boolean)));
+
+  const chosen = preferDamageConflictGroup(row.equipBuffConflictGroup, directGroups);
+  if (chosen !== row.equipBuffConflictGroup) {
+    row.equipBuffConflictGroup = chosen;
+    if (chosen) row.equipBuffStackRule = "score";
+  }
+
+  const otherGroups = [...directGroups, ...displayGroups].filter(g => g && g !== row.equipBuffConflictGroup);
+  let tags = splitTags(row.tags || "").filter(g => !isGenericAttackConversionConflictGroup(g));
+  otherGroups.forEach(g => { if (!tags.includes(g)) tags.push(g); });
+  row.tags = tags.join(",");
+
+  appendDamageBuffCompatibilitySource(row, rules, applied, directGroups, displayGroups);
+  sanitizeGenericAttackConversionConflict(row);
+  return applied;
+}
+
 function setIfNumeric(row, prop, value, overwrite=false) {
   const v = +value || 0;
   if (!v) return false;
@@ -10229,7 +10399,7 @@ function applyEquipBuffRuleCandidateToEquipment(row, rule, opts={}) {
   row.equipBuffTechnicId = row.equipBuffTechnicId || rule.officialTechnicId || "";
   const autoConflict = row.equipBuffTechnicId ? `technic-${row.equipBuffTechnicId}` : "";
   const ruleConflict = String(rule.conflictGroup || "").trim();
-  if (!row.equipBuffConflictGroup && ruleConflict && ruleConflict !== autoConflict) row.equipBuffConflictGroup = ruleConflict;
+  if (!isGenericAttackConversionConflictGroup(ruleConflict) && !row.equipBuffConflictGroup && ruleConflict && ruleConflict !== autoConflict) row.equipBuffConflictGroup = ruleConflict;
   row.equipBuffStackRule = row.equipBuffStackRule || rule.stackRule || "same-technic";
   row.equipBuffRuleConfidence = row.equipBuffRuleConfidence || rule.confidence || (rule.verified ? "verified" : "candidate");
   row.equipBuffRuleSource = row.equipBuffRuleSource || rule.source || "tsv-candidate";
@@ -10571,9 +10741,11 @@ function catalogEquipmentToRow(item) {
     const candidate = findEquipBuffRuleCandidate(buff, item);
     if (candidate) applyEquipBuffRuleCandidateToEquipment(row, candidate);
     applySkillBuffCompatibilityToEquipment(row, buff, item);
+    applyDamageBuffCompatibilityToEquipment(row, buff, item);
     if (!row.equipBuffWikiText && (buff.info || buff.note)) row.equipBuffWikiText = buff.info || buff.note || "";
   }
 
+  sanitizeGenericAttackConversionConflict(row);
   return normalizeEquipmentCandidate(row);
 }
 

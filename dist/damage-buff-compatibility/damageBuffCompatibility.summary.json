@@ -1,0 +1,30 @@
+{
+  "generatedAt": "2026-07-01T15:30:00Z",
+  "source": "MoE Wiki アイテム/追加効果/併用2 uploaded HTML",
+  "summary": {
+    "totalRows": 130,
+    "uniqueBuffNames": 107,
+    "sections": {
+      "クリティカル率": 29,
+      "効果範囲": 6,
+      "物理攻撃ダメージアップ(物理与ダメージ増加バフ)": 21,
+      "魔法攻撃ダメージアップ(魔法与ダメージ増加バフ)": 13,
+      "火属性効果アップ(火属性ダメージアップ)": 15,
+      "水属性効果アップ(水属性ダメージアップ)": 11,
+      "風属性効果アップ(風属性ダメージアップ)": 9,
+      "地属性効果アップ(地属性ダメージアップ)": 8,
+      "無属性効果アップ(無属性ダメージアップ)": 6,
+      "攻撃力変換": 12
+    },
+    "safeForValueAutoApply": 122,
+    "safeForConflictAutoApply": 89,
+    "matchedRows": 123,
+    "unmatchedRows": 7,
+    "physicalCalcRelevantRows": 62,
+    "directPhysicalDamageRows": 21,
+    "criticalRows": 29,
+    "conversionRows": 12,
+    "conversionConflictRowsPageGrouped": 12
+  },
+  "version": "v15.1"
+}
