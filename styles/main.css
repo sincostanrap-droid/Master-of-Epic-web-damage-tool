@@ -4393,3 +4393,42 @@ button[onclick*="applySkillSimToCalc"],
   }
 }
 /* v16: catalog mobile layout end */
+
+/* v17.1: 装備カタログの追加ステータス数値フィルタを複数条件化 */
+.catalogMultiStatFilters {
+  grid-column: 1 / -1;
+  border: 1px solid var(--border, rgba(127, 127, 127, .28));
+  border-radius: 12px;
+  padding: .55rem .7rem;
+  background: color-mix(in srgb, currentColor 2%, transparent);
+}
+.catalogMultiStatFilters > summary {
+  cursor: pointer;
+  font-weight: 800;
+}
+.catalogMultiStatFilterHelp {
+  margin: .45rem 0 .6rem;
+}
+.catalogMultiStatFilterRows {
+  display: grid;
+  gap: .55rem;
+}
+.catalogMultiStatFilterRow {
+  display: grid;
+  grid-template-columns: minmax(12rem, 1.5fr) minmax(7rem, .75fr) minmax(7rem, .75fr);
+  gap: .55rem;
+  align-items: end;
+}
+.catalogMultiStatFilterRow label {
+  min-width: 0;
+}
+.catalogMultiStatFilterRow select,
+.catalogMultiStatFilterRow input {
+  width: 100%;
+  box-sizing: border-box;
+}
+@media (max-width: 720px) {
+  .catalogMultiStatFilterRow {
+    grid-template-columns: 1fr;
+  }
+}

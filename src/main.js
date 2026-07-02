@@ -125,6 +125,9 @@ const UTILITY_EXTRA_STAT_DEFS = [
   {prop:"extraSteal", equipProp:"equipBuffExtraSteal", label:"盗み補正", step:"0.1"},
   {prop:"extraLockpickingFail", equipProp:"equipBuffExtraLockpickingFail", label:"ピッキング失敗回数補正", step:"0.1"},
   {prop:"extraFangAttack", equipProp:"equipBuffExtraFangAttack", label:"牙攻撃補正", step:"0.1"},
+  {prop:"extraFangHit", equipProp:"equipBuffExtraFangHit", label:"牙命中率補正", step:"0.1"},
+  {prop:"extraKickAttack", equipProp:"equipBuffExtraKickAttack", label:"キック攻撃力補正", step:"0.1"},
+  {prop:"extraKickHit", equipProp:"equipBuffExtraKickHit", label:"キック命中率補正", step:"0.1"},
   {prop:"extraFishingGaugeLength", equipProp:"equipBuffExtraFishingGaugeLength", label:"釣りゲージ長", step:"0.1"},
   {prop:"extraFishingHitZone", equipProp:"equipBuffExtraFishingHitZone", label:"釣りヒットゾーン", step:"0.1"},
   {prop:"extraSmithingGradeZone", equipProp:"equipBuffExtraSmithingGradeZone", label:"鍛冶グレードゾーン", step:"0.1"},
@@ -250,6 +253,12 @@ const OFFICIAL_ADD_STATUS_TO_TOOL_STAT = Object.freeze({
   "盗み補正": "extraSteal",
   "ピッキング失敗回数補正": "extraLockpickingFail",
   "牙攻撃補正": "extraFangAttack",
+  "牙命中率補正": "extraFangHit",
+  "牙命中補正": "extraFangHit",
+  "キック攻撃力補正": "extraKickAttack",
+  "キック攻撃補正": "extraKickAttack",
+  "キック命中率補正": "extraKickHit",
+  "キック命中補正": "extraKickHit",
   "釣りゲージ長": "extraFishingGaugeLength",
   "釣りヒットゾーン": "extraFishingHitZone",
 
@@ -314,6 +323,9 @@ const TOOL_STAT_DISPLAY_NAMES = Object.freeze({
   extraSteal: "盗み補正",
   extraLockpickingFail: "ピッキング失敗回数補正",
   extraFangAttack: "牙攻撃補正",
+  extraFangHit: "牙命中率補正",
+  extraKickAttack: "キック攻撃力補正",
+  extraKickHit: "キック命中率補正",
   extraFishingGaugeLength: "釣りゲージ長",
   extraFishingHitZone: "釣りヒットゾーン",
   extraSmithingGradeZone: "鍛冶グレードゾーン",
@@ -388,66 +400,105 @@ function deriveUtilityAddStatusKey(normalizedName) {
   return "";
 }
 
+function officialSpecializedCombatStatusInfo(name) {
+  const n = normalizeOfficialAddStatusName(name);
+  if (!n) return null;
+
+  // 通常の攻撃力/命中ではない、スキル専用の戦闘補正。
+  // 文字列に「攻撃力」「命中」が含まれていても attack/extraHit へ落とさない。
+  if (/キック.*攻撃(?:力)?(?:率)?補正|キック攻撃力|キック攻撃補正|キックの攻撃力|キック威力/.test(n)) {
+    return {name:"キック攻撃力補正", prop:"extraKickAttack"};
+  }
+  if (/キック.*命中(?:率)?補正|キック命中率|キック命中補正|キック命中/.test(n)) {
+    return {name:"キック命中率補正", prop:"extraKickHit"};
+  }
+  if (/牙.*攻撃(?:力)?(?:率)?補正|牙攻撃力|牙攻撃補正|牙攻撃/.test(n)) {
+    return {name:"牙攻撃補正", prop:"extraFangAttack"};
+  }
+  if (/牙.*命中(?:率)?補正|牙命中率|牙命中補正|牙命中/.test(n)) {
+    return {name:"牙命中率補正", prop:"extraFangHit"};
+  }
+
+  return null;
+}
+
+function addSpecializedCombatStatusToRow(row, name, value) {
+  const info = officialSpecializedCombatStatusInfo(name);
+  const v = +value || 0;
+  if (!info || !info.prop || !v) return false;
+  row[info.prop] = +(row[info.prop] || 0) + v;
+  return true;
+}
+
+function idbApplySpecializedCombatEffectLine(row, s, display, add) {
+  let num;
+
+  if (/(?:キック攻撃力補正|キック攻撃補正|キック攻撃力|キックの攻撃力|キック威力)/.test(s) &&
+      Number.isFinite(num = idbEffectNumberFor(s, ["キック攻撃力補正", "キック攻撃補正", "キック攻撃力", "キックの攻撃力", "キック威力"]))) {
+    add("extraKickAttack", num);
+    return true;
+  }
+  if (/(?:キック命中率補正|キック命中補正|キック命中率|キック命中)/.test(s) &&
+      Number.isFinite(num = idbEffectNumberFor(s, ["キック命中率補正", "キック命中補正", "キック命中率", "キック命中"]))) {
+    add("extraKickHit", num);
+    return true;
+  }
+  if (/(?:牙攻撃力補正|牙攻撃補正|牙攻撃力|牙攻撃)/.test(s) &&
+      Number.isFinite(num = idbEffectNumberFor(s, ["牙攻撃力補正", "牙攻撃補正", "牙攻撃力", "牙攻撃"]))) {
+    add("extraFangAttack", num);
+    return true;
+  }
+  if (/(?:牙命中率補正|牙命中補正|牙命中率|牙命中)/.test(s) &&
+      Number.isFinite(num = idbEffectNumberFor(s, ["牙命中率補正", "牙命中補正", "牙命中率", "牙命中"]))) {
+    add("extraFangHit", num);
+    return true;
+  }
+
+  return false;
+}
+
 function toolStatKeyForOfficialAddStatus(name) {
   const normalized = normalizeOfficialAddStatusName(name);
   if (!normalized || normalized === "なし" || isKnownIgnoredOfficialAddStatus(normalized)) return "";
+
+  const specialized = officialSpecializedCombatStatusInfo(normalized);
+  if (specialized) return specialized.prop || "";
+
   const utilityStatusKey = deriveUtilityAddStatusKey(normalized);
   if (utilityStatusKey) return utilityStatusKey;
   if (OFFICIAL_ADD_STATUS_TO_TOOL_STAT[normalized]) return OFFICIAL_ADD_STATUS_TO_TOOL_STAT[normalized];
-  if (/攻撃力/.test(normalized)) return "attack";
-  if (/魔力/.test(normalized)) return "magic";
-  if (/移動速度|速度/.test(normalized)) return "speed";
-  if (/最大?HP/.test(normalized)) return "extraHP";
-  if (/最大?MP/.test(normalized)) return "extraMP";
-  if (/最大?ST/.test(normalized)) return "extraST";
-  if (/防御力|アーマークラス|AC/.test(normalized)) return "extraAC";
-  if (/最大重量|重量/.test(normalized)) return "extraMaxWeight";
-  if (/命中/.test(normalized)) return "extraHit";
-  if (/回避/.test(normalized)) return "extraAvoid";
-  if (/攻撃ディレイ/.test(normalized)) return "extraAttackDelay";
-  if (/魔法ディレイ/.test(normalized)) return "extraMagicDelay";
-  if (/耐火属性|火耐性|火属性抵抗/.test(normalized)) return "extraFireRes";
-  if (/耐水属性|水耐性|水属性抵抗/.test(normalized)) return "extraWaterRes";
-  if (/耐地属性|地耐性|地属性抵抗/.test(normalized)) return "extraEarthRes";
-  if (/耐風属性|風耐性|風属性抵抗/.test(normalized)) return "extraWindRes";
-  if (/耐無属性|無耐性|無属性抵抗/.test(normalized)) return "extraNeutralRes";
-  if (/BREATH/.test(normalized)) return "extraBreath";
-  if (/HEARING/.test(normalized)) return "extraHearing";
-  if (/SEEING/.test(normalized)) return "extraSeeing";
-  if (/SMELLING/.test(normalized)) return "extraSmelling";
-  if (/満腹度/.test(normalized)) return "extraFullness";
-  if (/潤喉度/.test(normalized)) return "extraThirst";
-  if (/盗み補正/.test(normalized)) return "extraSteal";
-  if (/ピッキング失敗回数補正/.test(normalized)) return "extraLockpickingFail";
-  if (/牙攻撃補正/.test(normalized)) return "extraFangAttack";
-  if (/釣りゲージ長/.test(normalized)) return "extraFishingGaugeLength";
-  if (/釣りヒットゾーン/.test(normalized)) return "extraFishingHitZone";
-  if (/鍛冶グレードゾーン/.test(normalized)) return "extraSmithingGradeZone";
-  if (/鍛冶ゲージ滑り/.test(normalized)) return "extraSmithingGaugeSlip";
-  if (/鍛冶ヒットゾーン/.test(normalized)) return "extraSmithingHitZone";
-  if (/大工グレードゾーン/.test(normalized)) return "extraCarpentryGradeZone";
-  if (/大工ゲージ滑り/.test(normalized)) return "extraCarpentryGaugeSlip";
-  if (/大工ヒットゾーン/.test(normalized)) return "extraCarpentryHitZone";
-  if (/裁縫グレードゾーン/.test(normalized)) return "extraTailoringGradeZone";
-  if (/裁縫ゲージ滑り/.test(normalized)) return "extraTailoringGaugeSlip";
-  if (/裁縫ヒットゾーン/.test(normalized)) return "extraTailoringHitZone";
-  if (/装飾細工グレードゾーン/.test(normalized)) return "extraDecorationGradeZone";
-  if (/装飾細工ゲージ滑り/.test(normalized)) return "extraDecorationGaugeSlip";
-  if (/装飾細工ヒットゾーン/.test(normalized)) return "extraDecorationHitZone";
-  if (/料理グレードゾーン/.test(normalized)) return "extraCookingGradeZone";
-  if (/料理ゲージ滑り/.test(normalized)) return "extraCookingGaugeSlip";
-  if (/料理ヒットゾーン/.test(normalized)) return "extraCookingHitZone";
-  if (/醸造グレードゾーン/.test(normalized)) return "extraBrewingGradeZone";
-  if (/醸造ゲージ滑り/.test(normalized)) return "extraBrewingGaugeSlip";
-  if (/醸造ヒットゾーン/.test(normalized)) return "extraBrewingHitZone";
-  if (/薬調合グレードゾーン/.test(normalized)) return "extraAlchemyGradeZone";
-  if (/薬調合ゲージ滑り/.test(normalized)) return "extraAlchemyGaugeSlip";
-  if (/薬調合ヒットゾーン/.test(normalized)) return "extraAlchemyHitZone";
-  if (/複製グレードゾーン/.test(normalized)) return "extraReplicationGradeZone";
-  if (/複製ゲージ滑り/.test(normalized)) return "extraReplicationGaugeSlip";
-  if (/複製ヒットゾーン/.test(normalized)) return "extraReplicationHitZone";
-  if (/美容ゲージ滑り/.test(normalized)) return "extraBeautyGaugeSlip";
-  if (/美容ヒットゾーン/.test(normalized)) return "extraBeautyHitZone";
+
+  // ここから下は古い/表記揺れデータ向けのフォールバック。
+  // 「キック攻撃力補正」「牙命中率補正」のような専用補正は上で捕捉済み。
+  if (/^攻撃力$/.test(normalized)) return "attack";
+  if (/^魔力$/.test(normalized)) return "magic";
+  if (/^(移動速度|速度)$/.test(normalized)) return "speed";
+  if (/^(最大?HP|最大?ＨＰ|HP|ＨＰ)$/.test(normalized)) return "extraHP";
+  if (/^(最大?MP|最大?ＭＰ|MP|ＭＰ)$/.test(normalized)) return "extraMP";
+  if (/^(最大?ST|最大?ＳＴ|ST|ＳＴ)$/.test(normalized)) return "extraST";
+  if (/^(防御力|アーマークラス|AC)$/.test(normalized)) return "extraAC";
+  if (/^(最大重量|重量)$/.test(normalized)) return "extraMaxWeight";
+  if (/^命中$/.test(normalized)) return "extraHit";
+  if (/^回避$/.test(normalized)) return "extraAvoid";
+  if (/^攻撃ディレイ$/.test(normalized)) return "extraAttackDelay";
+  if (/^魔法ディレイ$/.test(normalized)) return "extraMagicDelay";
+  if (/^(耐火属性|火耐性|火属性抵抗)$/.test(normalized)) return "extraFireRes";
+  if (/^(耐水属性|水耐性|水属性抵抗)$/.test(normalized)) return "extraWaterRes";
+  if (/^(耐地属性|地耐性|地属性抵抗)$/.test(normalized)) return "extraEarthRes";
+  if (/^(耐風属性|風耐性|風属性抵抗)$/.test(normalized)) return "extraWindRes";
+  if (/^(耐無属性|無耐性|無属性抵抗)$/.test(normalized)) return "extraNeutralRes";
+  if (/^BREATH$/.test(normalized)) return "extraBreath";
+  if (/^HEARING$/.test(normalized)) return "extraHearing";
+  if (/^SEEING$/.test(normalized)) return "extraSeeing";
+  if (/^SMELLING$/.test(normalized)) return "extraSmelling";
+  if (/^満腹度$/.test(normalized)) return "extraFullness";
+  if (/^潤喉度$/.test(normalized)) return "extraThirst";
+  if (/^盗み補正$/.test(normalized)) return "extraSteal";
+  if (/^ピッキング失敗回数補正$/.test(normalized)) return "extraLockpickingFail";
+  if (/^牙攻撃補正$/.test(normalized)) return "extraFangAttack";
+  if (/^牙命中率補正$/.test(normalized)) return "extraFangHit";
+  if (/^キック攻撃力補正$/.test(normalized)) return "extraKickAttack";
+  if (/^キック命中率補正$/.test(normalized)) return "extraKickHit";
   return "";
 }
 
@@ -493,9 +544,11 @@ function normalizeExtraStatsOnRow(out, source) {
   return out;
 }
 
-function extraStatsSummary(extra) {
+function extraStatsSummary(extra, options={}) {
   const parts = [];
+  const omitProps = new Set(Array.isArray(options?.omitProps) ? options.omitProps : []);
   extraFieldDefsFor("summary").forEach(d => {
+    if (omitProps.has(d.prop)) return;
     const v = +(extra?.[d.prop] || 0);
     if (v) parts.push(`${d.label} ${v > 0 ? "+" : ""}${fmt(v, 2)}`);
   });
@@ -1225,6 +1278,7 @@ function defaultEquipmentCandidate(slot, enabled=true) {
     equipBuffCatalogId: "",
     equipBuffTechnicId: "",
     equipBuffConflictGroup: "",
+    equipBuffConflictGroups: "",
     equipBuffStackRule: "same-technic",
     equipBuffSourceText: "",
     equipBuffWikiText: "",
@@ -1286,6 +1340,7 @@ function normalizeEquipmentCandidate(row, fallbackSlot) {
     equipBuffCatalogId: row?.equipBuffCatalogId || "",
     equipBuffTechnicId: row?.equipBuffTechnicId || "",
     equipBuffConflictGroup: (row?.equipBuffConflictGroup && row?.equipBuffConflictGroup !== (row?.equipBuffTechnicId ? `technic-${row.equipBuffTechnicId}` : "")) ? row.equipBuffConflictGroup : "",
+    equipBuffConflictGroups: normalizeEquipmentBuffConflictGroupsInput(row?.equipBuffConflictGroups || row?.equipBuffConflictGroup || row?.tags || "").join(","),
     equipBuffStackRule: row?.equipBuffStackRule || "same-technic",
     equipBuffSourceText: row?.equipBuffSourceText || "",
     equipBuffWikiText: row?.equipBuffWikiText || "",
@@ -4142,10 +4197,142 @@ function equipmentBuffDisplayName(r) {
   return r.equipBuffName || (r.name ? `${r.name} 装備Buff` : "装備Buff");
 }
 
+function normalizeEquipmentBuffConflictGroupsInput(value) {
+  if (Array.isArray(value)) return Array.from(new Set(value.map(v => String(v || "").trim()).filter(Boolean)));
+  return splitTags(String(value || ""));
+}
+
+function equipmentBuffCompatibilityCatalogArray(...names) {
+  if (typeof catalogArray === "function") return catalogArray(...names);
+  const out = [];
+  names.forEach(name => {
+    const v = window[name];
+    if (Array.isArray(v)) out.push(...v);
+  });
+  return out;
+}
+
+function equipmentBuffCompatNorm(name) {
+  if (typeof catalogNorm === "function") return catalogNorm(name);
+  return String(name || "")
+    .replace(/[　\s]+/g, "")
+    .replace(/[‐‑‒–—―ー－]/g, "-")
+    .toLowerCase()
+    .trim();
+}
+
+function equipmentBuffCompatibilityCandidateNames(row, item=null) {
+  const names = [];
+  const add = v => {
+    const s = String(v || "").trim();
+    if (s && !names.includes(s)) names.push(s);
+  };
+  add(row?.equipBuffName);
+  add(item?.equipBuff?.name);
+  add(item?.buffName);
+  add(row?.name);
+  return names;
+}
+
+function skillBuffCompatibilityRulesForEquipmentBuff(row, item=null) {
+  const names = equipmentBuffCompatibilityCandidateNames(row, item).map(equipmentBuffCompatNorm).filter(Boolean);
+  if (!names.length) return [];
+  return equipmentBuffCompatibilityCatalogArray("MOE_SKILL_BUFF_COMPATIBILITY_MANUAL", "MOE_SKILL_BUFF_COMPATIBILITY", "MOE_SKILL_BUFF_COMPATIBILITY_GENERATED")
+    .filter(rule => names.includes(equipmentBuffCompatNorm(rule?.buffName || rule?.name || "")));
+}
+
+function damageBuffCompatibilityRulesForEquipmentBuff(row, item=null) {
+  const names = equipmentBuffCompatibilityCandidateNames(row, item).map(equipmentBuffCompatNorm).filter(Boolean);
+  if (!names.length) return [];
+  return equipmentBuffCompatibilityCatalogArray("MOE_DAMAGE_BUFF_COMPATIBILITY_MANUAL", "MOE_DAMAGE_BUFF_COMPATIBILITY", "MOE_DAMAGE_BUFF_COMPATIBILITY_GENERATED")
+    .filter(rule => names.includes(equipmentBuffCompatNorm(rule?.buffName || rule?.name || "")));
+}
+
+function compatibilityRuleConflictGroup(rule, kind) {
+  const group = String(rule?.conflictGroup || "").trim();
+  if (!group) return "";
+  // 併用表の「?」は groupRaw に残す。実際の group key は v14/v15.3 生成時に正規化済み。
+  if (/[?？]/.test(group)) return "";
+  if (kind === "skill") {
+    return rule.safeForConflictAutoApply ? group : "";
+  }
+  if (kind === "damage") {
+    // 物理計算に直接関係するものはもちろん、魔法/属性/範囲も「見える競合情報」として保持する。
+    // 計算に使うかどうかは別で、同時点灯の確認・見せびらかし・TSV復元に必要。
+    if (rule.safeForConflictAutoApply) return group;
+    // v15.3 以前の手動/生成データで safe flag が欠ける場合の保険。
+    if (/^(damage|critical|conversion):/.test(group)) return group;
+  }
+  return "";
+}
+
+function equipmentBuffPrimaryCompatibilityGroup(groups) {
+  const list = normalizeEquipmentBuffConflictGroupsInput(groups);
+  return list.find(g => g.startsWith("damage:physical:"))
+    || list.find(g => g.startsWith("conversion:attack:"))
+    || list.find(g => g.startsWith("critical:"))
+    || list.find(g => g.startsWith("skillPlus:"))
+    || list.find(g => g.startsWith("damage:magic:"))
+    || list.find(g => g.startsWith("damage:element:"))
+    || list.find(g => g.startsWith("damage:range:"))
+    || list[0]
+    || "";
+}
+
+function appendEquipmentBuffConflictGroups(row, groups, options={}) {
+  if (!row) return row;
+  const incoming = normalizeEquipmentBuffConflictGroupsInput(groups)
+    .filter(g => !isGenericAttackConversionConflictGroup(g));
+  if (!incoming.length) return row;
+
+  const existing = normalizeEquipmentBuffConflictGroupsInput(row.equipBuffConflictGroups || row.equipBuffConflictGroup || "");
+  const merged = Array.from(new Set([...existing, ...incoming].filter(Boolean)));
+  row.equipBuffConflictGroups = merged.join(",");
+
+  const primary = equipmentBuffPrimaryCompatibilityGroup(merged);
+  if (primary && (!row.equipBuffConflictGroup || isGenericAttackConversionConflictGroup(row.equipBuffConflictGroup) || options.forcePrimary)) {
+    row.equipBuffConflictGroup = primary;
+    if (!row.equipBuffStackRule || row.equipBuffStackRule === "same-technic") row.equipBuffStackRule = "score";
+  }
+
+  const tags = splitTags(row.tags || "").filter(g => !isGenericAttackConversionConflictGroup(g));
+  merged.forEach(g => { if (!tags.includes(g)) tags.push(g); });
+  row.tags = tags.join(",");
+  return row;
+}
+
+function restoreEquipmentBuffCompatibilityGroups(row, item=null) {
+  if (!row) return row;
+
+  const skillRules = skillBuffCompatibilityRulesForEquipmentBuff(row, item);
+  const damageRules = damageBuffCompatibilityRulesForEquipmentBuff(row, item);
+  const skillGroups = skillRules.map(r => compatibilityRuleConflictGroup(r, "skill")).filter(Boolean);
+  const damageGroups = damageRules.map(r => compatibilityRuleConflictGroup(r, "damage")).filter(Boolean);
+  const groups = Array.from(new Set([...skillGroups, ...damageGroups]));
+
+  if (groups.length) {
+    appendEquipmentBuffConflictGroups(row, groups);
+    const noteParts = [];
+    if (skillGroups.length) noteParts.push(`Wiki併用: ${Array.from(new Set(skillGroups)).join(" / ")}`);
+    if (damageGroups.length) noteParts.push(`Wiki併用2: ${Array.from(new Set(damageGroups)).join(" / ")}`);
+    if (noteParts.length && typeof appendUniqueText === "function") {
+      row.equipBuffSourceText = appendUniqueText(row.equipBuffSourceText, `競合グループ復元: ${noteParts.join(" / ")}`);
+    }
+  }
+
+  sanitizeGenericAttackConversionConflict(row);
+  return row;
+}
+
+function repairEquipmentBuffCompatibilityGroupsOnRows(rows) {
+  return normalizeEquipmentRows(rows).map(r => restoreEquipmentBuffCompatibilityGroups(r));
+}
+
 function equipmentBuffManualConflictGroup(r) {
-  const value = String(r?.equipBuffConflictGroup || "").trim();
-  const auto = r?.equipBuffTechnicId ? `technic-${r.equipBuffTechnicId}` : "";
-  return value && value !== auto ? value : "";
+  const explicit = String(r?.equipBuffConflictGroup || "").trim();
+  if (explicit && !isGenericAttackConversionConflictGroup(explicit)) return explicit;
+  const groups = normalizeEquipmentBuffConflictGroupsInput(r?.equipBuffConflictGroups || r?.tags || "");
+  return equipmentBuffPrimaryCompatibilityGroup(groups);
 }
 
 function equipmentBuffAutoStackGroup(r) {
@@ -4153,10 +4340,48 @@ function equipmentBuffAutoStackGroup(r) {
   return tid ? `__technic-${tid}` : "";
 }
 
+function normalizeEquipmentBuffStackName(name) {
+  return String(name || "")
+    .replace(/[　\s]+/g, "")
+    .replace(/[‐‑‒–—―ー－]/g, "-")
+    .toLowerCase()
+    .trim();
+}
+
+function equipmentBuffStackKey(r) {
+  const tid = String(r?.equipBuffTechnicId || "").trim();
+  if (tid) return `technic:${tid.toLowerCase()}`;
+
+  // 旧TSVや手入力行には technicId が無いことがある。
+  // その場合も「同一Buff名は最新1件のみ」のMoE仕様に寄せる。
+  // equipBuffName が空の行は、装備名から推測してまとめると誤爆しやすいので対象外。
+  const name = normalizeEquipmentBuffStackName(r?.equipBuffName || "");
+  return name ? `name:${name}` : "";
+}
+
+function resolveEquipmentBuffRowsForSameTechnic(rows) {
+  const eligible = normalizeEquipmentRows(rows)
+    .filter(r => r.enabled !== false && r.equipBuffEnabled && equipmentBuffHasEffect(r));
+
+  const latestOrderByKey = new Map();
+  eligible.forEach((r, order) => {
+    const key = equipmentBuffStackKey(r);
+    if (key) latestOrderByKey.set(key, order);
+  });
+
+  return eligible.filter((r, order) => {
+    const key = equipmentBuffStackKey(r);
+    return !key || latestOrderByKey.get(key) === order;
+  });
+}
+
 function equipmentBuffCompositeTags(r) {
-  const tags = splitTags(r.tags || "");
-  const manualGroup = equipmentBuffManualConflictGroup(r);
-  if (manualGroup) tags.unshift(manualGroup);
+  const repaired = restoreEquipmentBuffCompatibilityGroups({...(r || {})});
+  const tags = splitTags(repaired.tags || "");
+  normalizeEquipmentBuffConflictGroupsInput(repaired.equipBuffConflictGroups || repaired.equipBuffConflictGroup || "")
+    .forEach(g => { if (g && !tags.includes(g)) tags.unshift(g); });
+  const manualGroup = equipmentBuffManualConflictGroup(repaired);
+  if (manualGroup && !tags.includes(manualGroup)) tags.unshift(manualGroup);
   return Array.from(new Set(tags.filter(Boolean))).join(",");
 }
 
@@ -4181,6 +4406,7 @@ function equipmentBuffEffectText(r) {
 }
 
 function equipmentBuffToCompositeRow(r) {
+  r = restoreEquipmentBuffCompatibilityGroups({...(r || {})});
   const row = {
     enabled: !!r.equipBuffEnabled,
     slot: r.equipBuffSlot !== false,
@@ -4212,8 +4438,8 @@ function equipmentBuffToCompositeRow(r) {
 function expandEquipmentBuffState(st) {
   const out = clone(st || {});
   out.composite = Array.isArray(out.composite) ? out.composite : [];
-  normalizeEquipmentRows((st || {}).equipment)
-    .filter(r => r.enabled !== false && r.equipBuffEnabled && equipmentBuffHasEffect(r))
+  resolveEquipmentBuffRowsForSameTechnic((st || {}).equipment)
+    .map(r => restoreEquipmentBuffCompatibilityGroups(r))
     .forEach(r => out.composite.push(equipmentBuffToCompositeRow(r)));
   return out;
 }
@@ -5590,7 +5816,7 @@ function makeEquipmentBuffEditor(row, statusButton) {
     grid.appendChild(makeWeaponCalcEditor(row, statusButton));
   }
 
-  grid.appendChild(makeExtraStatsEditor(row, "装備本体の追加ステータス（計算に反映）", "base", statusUpdater));
+  grid.appendChild(makeExtraStatsEditor(row, "装備本体の追加ステータス", "base", statusUpdater));
 
   const buffSection = document.createElement("div");
   buffSection.className = "equipBuffSection equipBuffWide";
@@ -5675,7 +5901,7 @@ function makeEquipmentBuffEditor(row, statusButton) {
   buffGrid.appendChild(equipBuffNumberInput(row, "equipBuffSpecial", "特攻倍率", "0.01"));
   buffDetails.appendChild(buffGrid);
 
-  buffDetails.appendChild(makeExtraStatsEditor(row, "装備Buffの追加ステータス（計算に反映）", "equipBuff", statusUpdater));
+  buffDetails.appendChild(makeExtraStatsEditor(row, "装備Buffの追加ステータス", "equipBuff", statusUpdater));
 
   const help = document.createElement("div");
   help.className = "small";
@@ -8064,7 +8290,7 @@ function equipmentShowcaseText(row) {
     if (+row.weaponDurability) parts.push(`耐久 ${fmt(+row.weaponDurability,0)}`);
     if (row.weaponTwoHanded === "○") parts.push("両手");
   }
-  const extra = extraStatsSummary(row, "base");
+  const extra = extraStatsSummary(row, {omitProps:["attack","magic","speed"]});
   if (extra.length) parts.push(extra.join(" / "));
   return parts.join(" / ") || "補正なし";
 }
@@ -8925,6 +9151,8 @@ function idbApplyAdditionalEffectLine(row, line) {
 
   let num;
 
+  if (idbApplySpecializedCombatEffectLine(row, s, display, add)) return;
+
   if (/(?:攻撃力|ATK)/i.test(s) && Number.isFinite(num = idbEffectNumberFor(s, ["攻撃力", "ATK"]))) return add("attack", num);
   if (/(?:魔力|MGC)/i.test(s) && Number.isFinite(num = idbEffectNumberFor(s, ["魔力", "MGC"]))) return add("magic", num);
   if (/(?:移動速度|速度)/.test(s) && Number.isFinite(num = idbEffectNumberFor(s, ["移動速度", "速度"]))) return add("speed", num);
@@ -9050,10 +9278,14 @@ function idbApplyStructuredStatus(row, name, value, statKey="") {
   const v = parseFloat(value) || 0;
   if (!n || !v || isKnownIgnoredOfficialAddStatus(n)) return;
 
+  // 専用補正名が取れている場合は statKey より名称を優先する。
+  // 旧生成データでキック命中率補正が extraHit になっていても、ここで extraKickHit へ戻す。
+  if (addSpecializedCombatStatusToRow(row, n, v)) return;
+
   const key = statKey || toolStatKeyForOfficialAddStatus(n);
   if (addToolStatValue(row, key, v)) return;
 
-  pushDisplayEffect(row, "custom", v, n, "", "display");
+  pushDisplayEffect(row, "custom", v, n, "", "display", "装備本体の未対応追加ステータス");
 }
 
 function idbWeaponSkillName(item) {
@@ -10534,6 +10766,12 @@ function catalogStatNumericValue(item, stat) {
     if (!st) return;
     const name = String(st.name || st.normalizedName || "").trim();
     const statKey = String(st.statKey || "").trim();
+    const special = officialSpecializedCombatStatusInfo(name);
+    if (special) {
+      // 旧生成データで statKey が attack/extraHit でも、通常攻撃力/命中フィルタには混ぜない。
+      if (key === name || key === special.name || key === special.prop) add(st.value);
+      return;
+    }
     if (statKey === key || name === key) add(st.value);
   });
 
@@ -10545,7 +10783,6 @@ function catalogStatNumericValue(item, stat) {
     return Number.isFinite(v) && v !== 0 ? v : NaN;
   }
 
-  // 念のため、表示名で選ばれた場合も内部キーへ寄せて探す。
   const mappedKey = typeof toolStatKeyForOfficialAddStatus === "function" ? toolStatKeyForOfficialAddStatus(key) : "";
   if (mappedKey && Object.prototype.hasOwnProperty.call(extra, mappedKey)) {
     const v = parseFloat(extra[mappedKey]);
@@ -10581,6 +10818,32 @@ function catalogStatFilterDescription(filter) {
   return `${label} ${raw}${opLabel}`;
 }
 
+function catalogNormalizeStatFilters(filter) {
+  const out = [];
+  const push = f => {
+    const stat = String(f?.stat || "").trim();
+    if (!stat) return;
+    const statValueRaw = f?.statValueRaw ?? f?.valueRaw ?? "";
+    out.push({
+      stat,
+      statOp: String(f?.statOp || f?.op || "any"),
+      statValueRaw: String(statValueRaw ?? "")
+    });
+  };
+
+  if (Array.isArray(filter?.statFilters)) filter.statFilters.forEach(push);
+  else if (filter?.stat) push(filter);
+
+  return out;
+}
+
+
+function catalogStatFiltersDescription(filter) {
+  const filters = catalogNormalizeStatFilters(filter);
+  if (!filters.length) return "";
+  return filters.map(catalogStatFilterDescription).filter(Boolean).join(" / ");
+}
+
 function catalogItemMatches(item, filter) {
   const q = catalogNorm(filter.query);
   if (q && !catalogNorm(catalogText(item)).includes(q)) return false;
@@ -10589,10 +10852,13 @@ function catalogItemMatches(item, filter) {
   const hasBuff = catalogHasBuff(item);
   if (filter.buffMode === "with" && !hasBuff) return false;
   if (filter.buffMode === "without" && hasBuff) return false;
-  if (filter.stat) {
-    const statValue = catalogStatNumericValue(item, filter.stat);
-    if (!catalogStatNumericFilterMatches(statValue, filter.statOp, filter.statValueRaw)) return false;
+
+  const statFilters = catalogNormalizeStatFilters(filter);
+  for (const statFilter of statFilters) {
+    const statValue = catalogStatNumericValue(item, statFilter.stat);
+    if (!catalogStatNumericFilterMatches(statValue, statFilter.statOp, statFilter.statValueRaw)) return false;
   }
+
   return true;
 }
 
@@ -10712,15 +10978,37 @@ function sortCatalogItems(items, filter) {
 }
 
 function catalogFilterState() {
-  const statValueRaw = byId("catalogStatValue")?.value || "";
+  const statFilters = [];
+  for (let i = 1; i <= 4; i++) {
+    const stat = byId(`catalogStat${i}`)?.value || "";
+    const statOp = byId(`catalogStatOp${i}`)?.value || "any";
+    const statValueRaw = byId(`catalogStatValue${i}`)?.value || "";
+    if (stat) statFilters.push({stat, statOp, statValueRaw});
+  }
+
+  // v17単一フィルタUIが残っている環境でも一応読めるようにする。
+  if (!statFilters.length) {
+    const legacyStat = byId("catalogStat")?.value || "";
+    if (legacyStat) {
+      statFilters.push({
+        stat: legacyStat,
+        statOp: byId("catalogStatOp")?.value || "any",
+        statValueRaw: byId("catalogStatValue")?.value || ""
+      });
+    }
+  }
+
+  const firstStat = statFilters[0] || null;
   return {
     query: byId("catalogSearch")?.value || "",
     category: byId("catalogCategory")?.value || "",
     slot: byId("catalogSlot")?.value || "",
-    stat: byId("catalogStat")?.value || "",
-    statOp: byId("catalogStatOp")?.value || "any",
-    statValueRaw,
-    statValue: statValueRaw === "" ? NaN : parseFloat(statValueRaw),
+    statFilters,
+    // 旧コード・デバッグ用に1条件目も残す。
+    stat: firstStat?.stat || "",
+    statOp: firstStat?.statOp || "any",
+    statValueRaw: firstStat?.statValueRaw || "",
+    statValue: firstStat?.statValueRaw === "" || !firstStat ? NaN : parseFloat(firstStat.statValueRaw),
     buffMode: byId("catalogBuffMode")?.value || "",
     sort: byId("catalogSort")?.value || "name",
     sortDir: byId("catalogSortDir")?.value || "asc",
@@ -10814,6 +11102,7 @@ function catalogEquipmentToRow(item) {
     if (!row.equipBuffWikiText && (buff.info || buff.note)) row.equipBuffWikiText = buff.info || buff.note || "";
   }
 
+  restoreEquipmentBuffCompatibilityGroups(row, item);
   sanitizeGenericAttackConversionConflict(row);
   return normalizeEquipmentCandidate(row);
 }
@@ -10884,7 +11173,7 @@ function renderCatalogResults() {
   body.innerHTML = shown.length
     ? shown.map(item => catalogResultRowHtml(item, already.has(String(item.catalogId || item.id || "")))).join("")
     : `<tr><td colspan="10" class="small mutedText">該当する装備がありません。カタログJSが未生成の場合は tools/build-equipment-catalog-from-google-sheet.mjs を実行してください。</td></tr>`;
-  const statFilterText = catalogStatFilterDescription(filter);
+  const statFilterText = catalogStatFiltersDescription(filter);
   summary.textContent = `カタログ ${items.length}件 / 該当 ${filtered.length}件 / 表示 ${shown.length}件${statFilterText ? ` / ${statFilterText}` : ""}`;
   renderCatalogPageControls(filtered.length, catalogPageIndex, pageCount, limit);
   body.querySelectorAll("[data-catalog-add]").forEach(btn => {
@@ -10899,9 +11188,18 @@ function createCatalogTab(panel) {
       <label>検索 <input id="catalogSearch" type="search" placeholder="装備名・効果・Buff名・必要スキル" autocomplete="off"></label>
       <label>カテゴリ <select id="catalogCategory"><option value="">すべて</option><option value="weapon">武器</option><option value="defense">防具/装飾</option><option value="shield">盾</option></select></label>
       <label>部位 <select id="catalogSlot"><option value="">すべて</option></select></label>
-      <label>効果 <select id="catalogStat"><option value="">指定なし</option></select></label>
-      <label>数値条件 <select id="catalogStatOp"><option value="any">有無のみ</option><option value="gte">以上</option><option value="lte">以下</option><option value="gt">超</option><option value="lt">未満</option><option value="eq">等しい</option></select></label>
-      <label>効果値 <input id="catalogStatValue" type="number" step="0.1" placeholder="例: -2 / 4"></label>
+      <details class="catalogMultiStatFilters">
+        <summary>追加ステータス数値フィルタ（最大4条件・すべて満たす）</summary>
+        <div class="small mutedText catalogMultiStatFilterHelp">例: 攻撃力 +4以上 / 攻撃ディレイ -1以下 / 命中 +1以上。複数行を入れるとAND条件で絞り込みます。</div>
+        <div class="catalogMultiStatFilterRows">
+          ${[1,2,3,4].map(i => `
+            <div class="catalogMultiStatFilterRow">
+              <label>効果${i} <select id="catalogStat${i}" data-catalog-stat-select><option value="">指定なし</option></select></label>
+              <label>条件 <select id="catalogStatOp${i}"><option value="any">有無のみ</option><option value="gte">以上</option><option value="lte">以下</option><option value="gt">超</option><option value="lt">未満</option><option value="eq">等しい</option></select></label>
+              <label>値 <input id="catalogStatValue${i}" type="number" step="0.1" placeholder="例: -1 / 4"></label>
+            </div>`).join("")}
+        </div>
+      </details>
       <label>装備Buff <select id="catalogBuffMode"><option value="">すべて</option><option value="with">あり</option><option value="without">なし</option></select></label>
       <label>ソート <select id="catalogSort">
         <option value="name">名称</option><option value="category">種別/部位</option><option value="slot">部位</option><option value="req">装備条件</option><option value="buff">装備Buff名</option><option value="hasBuff">Buff有無</option>
@@ -10925,7 +11223,7 @@ function createCatalogTab(panel) {
     </details>
   `;
 
-  ["catalogSearch", "catalogCategory", "catalogSlot", "catalogStat", "catalogStatOp", "catalogStatValue", "catalogBuffMode", "catalogSort", "catalogSortDir", "catalogLimit"].forEach(id => {
+  ["catalogSearch", "catalogCategory", "catalogSlot", "catalogStat1", "catalogStatOp1", "catalogStatValue1", "catalogStat2", "catalogStatOp2", "catalogStatValue2", "catalogStat3", "catalogStatOp3", "catalogStatValue3", "catalogStat4", "catalogStatOp4", "catalogStatValue4", "catalogBuffMode", "catalogSort", "catalogSortDir", "catalogLimit"].forEach(id => {
     const el = byId(id);
     if (el) {
       const handler = () => { catalogResetPage(); renderCatalogResults(); };
@@ -10944,19 +11242,26 @@ function createCatalogTab(panel) {
 function setupCatalogFilterOptions(force=false) {
   const items = equipmentCatalogItems();
   const slotSelect = byId("catalogSlot");
-  const statSelect = byId("catalogStat");
+  const statSelects = Array.from(document.querySelectorAll('[data-catalog-stat-select]'));
+  const legacyStatSelect = byId("catalogStat");
+  if (legacyStatSelect && !statSelects.includes(legacyStatSelect)) statSelects.push(legacyStatSelect);
+
   if (slotSelect && (force || !slotSelect.dataset.ready)) {
     const current = slotSelect.value;
     slotSelect.innerHTML = catalogSlotOptions(items);
     slotSelect.value = current;
     slotSelect.dataset.ready = "1";
   }
-  if (statSelect && (force || !statSelect.dataset.ready)) {
-    const current = statSelect.value;
-    statSelect.innerHTML = catalogStatOptions(items);
-    statSelect.value = current;
-    statSelect.dataset.ready = "1";
-  }
+
+  statSelects.forEach(statSelect => {
+    if (statSelect && (force || !statSelect.dataset.ready)) {
+      const current = statSelect.value;
+      statSelect.innerHTML = catalogStatOptions(items);
+      statSelect.value = current;
+      statSelect.dataset.ready = "1";
+    }
+  });
+
   renderCatalogResults();
 }
 

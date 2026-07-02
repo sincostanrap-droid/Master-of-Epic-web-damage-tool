@@ -108,7 +108,7 @@ function serializeConfigAsTsv(cfg) {
   ));
 
   out.push(makeTsvSection("equipment",
-    ["enabled", "optimizerFixed", "optimizerExcluded", "slot", "name", "tags", "attack", "magic", "speed", "delay", "weaponDamage", "weaponWeight", "weaponAttackInterval", "weaponRange", "weaponDurability", "weaponTwoHanded", "weaponReqText"].concat(extraTsvFields("base"), ["equipBuffEnabled", "equipBuffSlot", "equipBuffName", "equipBuffAttackPct", "equipBuffMagicPct", "equipBuffSpeedPct", "equipBuffFlatAttack", "equipBuffFlatMagic", "equipBuffFlatSpeed", "equipBuffConvMagicRate", "equipBuffConvSpeedRate", "equipBuffDmgPct", "equipBuffSpecial"], extraTsvFields("equipBuff"), ["equipBuffNote", "extraEffects", "note"]),
+    ["enabled", "optimizerFixed", "optimizerExcluded", "slot", "name", "tags", "attack", "magic", "speed", "delay", "weaponDamage", "weaponWeight", "weaponAttackInterval", "weaponRange", "weaponDurability", "weaponTwoHanded", "weaponReqText"].concat(extraTsvFields("base"), ["equipBuffEnabled", "equipBuffSlot", "equipBuffName", "equipBuffCatalogId", "equipBuffTechnicId", "equipBuffConflictGroup", "equipBuffConflictGroups", "equipBuffStackRule", "equipBuffAttackPct", "equipBuffMagicPct", "equipBuffSpeedPct", "equipBuffFlatAttack", "equipBuffFlatMagic", "equipBuffFlatSpeed", "equipBuffConvMagicRate", "equipBuffConvSpeedRate", "equipBuffDmgPct", "equipBuffSpecial"], extraTsvFields("equipBuff"), ["equipBuffNote", "extraEffects", "note"]),
     normalizeEquipmentRows(st.equipment || []).map(r => ({
       enabled: boolToCell(r.enabled !== false),
       optimizerFixed: boolToCell(r.optimizerFixed),
@@ -644,7 +644,7 @@ function importTsvConfig() {
 
 function equipmentOnlyHeaders() {
   return ["enabled", "optimizerFixed", "optimizerExcluded", "slot", "name", "tags", "attack", "magic", "speed", "weaponDamage", "weaponWeight", "weaponAttackInterval", "weaponRange", "weaponDurability", "weaponTwoHanded", "weaponReqText"]
-    .concat(extraTsvFields("base"), ["equipBuffEnabled", "equipBuffSlot", "equipBuffName", "equipBuffAttackPct", "equipBuffMagicPct", "equipBuffSpeedPct", "equipBuffFlatAttack", "equipBuffFlatMagic", "equipBuffFlatSpeed", "equipBuffConvMagicRate", "equipBuffConvSpeedRate", "equipBuffDmgPct", "equipBuffSpecial"], extraTsvFields("equipBuff"), ["equipBuffNote", "extraEffects", "note"]);
+    .concat(extraTsvFields("base"), ["equipBuffEnabled", "equipBuffSlot", "equipBuffName", "equipBuffCatalogId", "equipBuffTechnicId", "equipBuffConflictGroup", "equipBuffConflictGroups", "equipBuffStackRule", "equipBuffAttackPct", "equipBuffMagicPct", "equipBuffSpeedPct", "equipBuffFlatAttack", "equipBuffFlatMagic", "equipBuffFlatSpeed", "equipBuffConvMagicRate", "equipBuffConvSpeedRate", "equipBuffDmgPct", "equipBuffSpecial"], extraTsvFields("equipBuff"), ["equipBuffNote", "extraEffects", "note"]);
 }
 
 function equipmentOnlyRows(rows=null) {
