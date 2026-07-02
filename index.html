@@ -1148,6 +1148,7 @@ MoE固有の主な仮定:
             <option value="extraMagicDelay">最大魔法ディレイ</option>
             <option value="extraDamageReducePct">最大被ダメ軽減</option>
             <option value="extraCritRatePct">最大クリ率</option>
+            <option value="skillPlus">スキル強化最大</option>
           </select>
         </label>
         <label>同点時に優先
@@ -1166,10 +1167,42 @@ MoE固有の主な仮定:
             <option value="extraMagicDelay">最大魔法ディレイ</option>
             <option value="extraDamageReducePct">最大被ダメ軽減</option>
             <option value="extraCritRatePct">最大クリ率</option>
+            <option value="skillPlus">スキル強化最大</option>
           </select>
         </label>
         <label>狙いたい値<input id="optimizerTargetValue" type="number" step="0.1" placeholder="任意 / クリ率は空欄で100"></label>
         <label>超えてよい幅<input id="optimizerTargetOver" type="number" min="0" step="0.1" placeholder="例: 5"></label>
+        <label class="optimizerSkillPlusTargetRow">スキル強化最大化対象
+          <select id="optimizerSkillPlusTargetSkill" data-skill-plus-objective-select data-empty-label="合計最大（全スキル）">
+            <option value="">合計最大（全スキル）</option>
+          </select>
+        </label>
+        <details class="optimizerSkillPlusFilters">
+          <summary>スキル強化条件（最大4条件・すべて満たす）</summary>
+          <div class="small mutedText optimizerSkillPlusHelp">〇スキル強化を最適化条件として使います。ステータス/成功率/必要スキルには加算しません。</div>
+          <div class="optimizerSkillPlusFilterRows">
+            <div class="optimizerSkillPlusFilterRow">
+              <label>スキル1 <select id="optimizerSkillPlusFilterSkill1" data-skill-plus-filter-select><option value="">指定なし</option></select></label>
+              <label>条件 <select id="optimizerSkillPlusFilterOp1" data-skill-plus-filter-input><option value="gte">以上</option><option value="lte">以下</option><option value="gt">超</option><option value="lt">未満</option><option value="eq">等しい</option><option value="exists">有無のみ</option></select></label>
+              <label>値 <input id="optimizerSkillPlusFilterValue1" data-skill-plus-filter-input type="number" step="0.1" placeholder="例: 20"></label>
+            </div>
+            <div class="optimizerSkillPlusFilterRow">
+              <label>スキル2 <select id="optimizerSkillPlusFilterSkill2" data-skill-plus-filter-select><option value="">指定なし</option></select></label>
+              <label>条件 <select id="optimizerSkillPlusFilterOp2" data-skill-plus-filter-input><option value="gte">以上</option><option value="lte">以下</option><option value="gt">超</option><option value="lt">未満</option><option value="eq">等しい</option><option value="exists">有無のみ</option></select></label>
+              <label>値 <input id="optimizerSkillPlusFilterValue2" data-skill-plus-filter-input type="number" step="0.1" placeholder="例: 20"></label>
+            </div>
+            <div class="optimizerSkillPlusFilterRow">
+              <label>スキル3 <select id="optimizerSkillPlusFilterSkill3" data-skill-plus-filter-select><option value="">指定なし</option></select></label>
+              <label>条件 <select id="optimizerSkillPlusFilterOp3" data-skill-plus-filter-input><option value="gte">以上</option><option value="lte">以下</option><option value="gt">超</option><option value="lt">未満</option><option value="eq">等しい</option><option value="exists">有無のみ</option></select></label>
+              <label>値 <input id="optimizerSkillPlusFilterValue3" data-skill-plus-filter-input type="number" step="0.1" placeholder="例: 20"></label>
+            </div>
+            <div class="optimizerSkillPlusFilterRow">
+              <label>スキル4 <select id="optimizerSkillPlusFilterSkill4" data-skill-plus-filter-select><option value="">指定なし</option></select></label>
+              <label>条件 <select id="optimizerSkillPlusFilterOp4" data-skill-plus-filter-input><option value="gte">以上</option><option value="lte">以下</option><option value="gt">超</option><option value="lt">未満</option><option value="eq">等しい</option><option value="exists">有無のみ</option></select></label>
+              <label>値 <input id="optimizerSkillPlusFilterValue4" data-skill-plus-filter-input type="number" step="0.1" placeholder="例: 20"></label>
+            </div>
+          </div>
+        </details>
       </div>
       <div class="optimizerChecks">
         <label><input id="optimizerIncludeDisabledBuffs" type="checkbox" checked> OFFのBuffも候補として試す</label>
@@ -1208,6 +1241,7 @@ MoE固有の主な仮定:
   <div class="showcaseShareBox">
     <textarea id="showcaseShareUrl" readonly placeholder="共有URLを発行するとここに表示されます。URLには現在使用中の構成だけを入れ、未使用候補は入れません。"></textarea>
   </div>
+  <div id="showcaseSkillPlusTotals" class="showcaseSkillPlusTotals" aria-live="polite"></div>
   <div id="showcaseView" class="showcaseView">-</div>
   <details class="showcaseTextDetails">
     <summary>コピペ用テキスト</summary>

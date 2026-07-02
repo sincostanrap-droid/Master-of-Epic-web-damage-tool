@@ -4432,3 +4432,68 @@ button[onclick*="applySkillSimToCalc"],
     grid-template-columns: 1fr;
   }
 }
+
+/* v21: skillPlus catalog/optimizer filters */
+.catalogSkillPlusFilters,
+.optimizerSkillPlusFilters {
+  grid-column: 1 / -1;
+  border: 1px solid var(--border, rgba(127, 127, 127, .28));
+  border-radius: 12px;
+  padding: .55rem .7rem;
+  background: color-mix(in srgb, currentColor 2%, transparent);
+}
+.catalogSkillPlusFilters > summary,
+.optimizerSkillPlusFilters > summary {
+  cursor: pointer;
+  font-weight: 800;
+}
+.catalogSkillPlusFilterHelp,
+.optimizerSkillPlusHelp {
+  margin: .45rem 0 .6rem;
+}
+.catalogSkillPlusFilterRows,
+.optimizerSkillPlusFilterRows {
+  display: grid;
+  gap: .55rem;
+}
+.catalogSkillPlusFilterRow,
+.optimizerSkillPlusFilterRow {
+  display: grid;
+  grid-template-columns: minmax(12rem, 1.5fr) minmax(7rem, .75fr) minmax(7rem, .75fr);
+  gap: .55rem;
+  align-items: end;
+}
+.catalogSkillPlusFilterRow select,
+.catalogSkillPlusFilterRow input,
+.optimizerSkillPlusFilterRow select,
+.optimizerSkillPlusFilterRow input,
+.optimizerSkillPlusTargetRow select {
+  width: 100%;
+  box-sizing: border-box;
+}
+@media (max-width: 720px) {
+  .catalogSkillPlusFilterRow,
+  .optimizerSkillPlusFilterRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* v21.2: showcase skillPlus total summary */
+.showcaseSkillPlusTotals {
+  margin: 0.75rem 0;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border, #d0d7de);
+  border-radius: 0.75rem;
+  background: var(--panel-bg, rgba(127,127,127,0.08));
+}
+.showcaseSkillPlusTotals[hidden] {
+  display: none !important;
+}
+.showcaseSkillPlusTotalsTitle {
+  font-weight: 700;
+  margin-bottom: 0.35rem;
+}
+.showcaseSkillPlusTotalsBody {
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}

@@ -11200,6 +11200,18 @@ function createCatalogTab(panel) {
             </div>`).join("")}
         </div>
       </details>
+      <details class="catalogSkillPlusFilters">
+        <summary>スキル強化フィルタ（最大4条件・すべて満たす）</summary>
+        <div class="small mutedText catalogSkillPlusFilterHelp">例: 戦闘技術 +20以上 / 物まね +20以上。ステータスや成功率には加算せず、装備Buffの〇スキル強化だけを条件にします。</div>
+        <div class="catalogSkillPlusFilterRows">
+          ${[1,2,3,4].map(i => `
+            <div class="catalogSkillPlusFilterRow">
+              <label>スキル${i} <select id="catalogSkillPlusSkill${i}" data-skill-plus-filter-select><option value="">指定なし</option></select></label>
+              <label>条件 <select id="catalogSkillPlusOp${i}" data-skill-plus-filter-input><option value="gte">以上</option><option value="lte">以下</option><option value="gt">超</option><option value="lt">未満</option><option value="eq">等しい</option><option value="exists">有無のみ</option></select></label>
+              <label>値 <input id="catalogSkillPlusValue${i}" data-skill-plus-filter-input type="number" step="0.1" placeholder="例: 20"></label>
+            </div>`).join("")}
+        </div>
+      </details>
       <label>装備Buff <select id="catalogBuffMode"><option value="">すべて</option><option value="with">あり</option><option value="without">なし</option></select></label>
       <label>ソート <select id="catalogSort">
         <option value="name">名称</option><option value="category">種別/部位</option><option value="slot">部位</option><option value="req">装備条件</option><option value="buff">装備Buff名</option><option value="hasBuff">Buff有無</option>
@@ -12340,3 +12352,555 @@ function renderAnalysisPanel() {
   };
   calc.__analysisWrapped = true;
 })();
+
+
+/* v21: skillPlus catalog filter / optimizer bridge
+ * skillPlus は MoE 仕様上、ステータス・成功率・必要スキルへは加算しない。
+ * ここでは絞り込み条件・最適化の評価軸としてだけ扱う。
+ */
+(function installSkillPlusV21(global) {
+  if (global.__MOE_SKILL_PLUS_V21_INSTALLED__) return;
+  global.__MOE_SKILL_PLUS_V21_INSTALLED__ = true;
+
+  function spNorm(value) {
+    return String(value || "")
+      .replace(/[　\s]+/g, "")
+      .replace(/[‐‑‒–—―ー－]/g, "-")
+      .toLowerCase()
+      .trim();
+  }
+
+  function spNum(value) {
+    const v = parseFloat(value);
+    return Number.isFinite(v) ? v : 0;
+  }
+
+  function spSkillName(value) {
+    return String(value || "").trim();
+  }
+
+  function spEffectList(value) {
+    if (!value) return [];
+    try {
+      if (typeof normalizeAdditionalEffects === "function") return normalizeAdditionalEffects(value);
+    } catch {}
+    if (Array.isArray(value)) return value;
+    if (typeof parseAdditionalEffectsText === "function") {
+      try { return parseAdditionalEffectsText(String(value || "")); } catch {}
+    }
+    return [];
+  }
+
+  function spAddTotal(totals, skill, value) {
+    const name = spSkillName(skill);
+    const v = spNum(value);
+    if (!name || !v) return;
+    totals[name] = (totals[name] || 0) + v;
+  }
+
+  function spTotalsFromEffects(effects) {
+    const totals = {};
+    spEffectList(effects).forEach(e => {
+      if (!e || e.key !== "skillPlus") return;
+      spAddTotal(totals, e.name, e.value);
+    });
+    return totals;
+  }
+
+  function spMergeTotals(...parts) {
+    const out = {};
+    parts.forEach(part => {
+      Object.entries(part || {}).forEach(([k, v]) => spAddTotal(out, k, v));
+    });
+    return out;
+  }
+
+  function spCompatibilityRows() {
+    const out = [];
+    [
+      "MOE_SKILL_BUFF_COMPATIBILITY_MANUAL",
+      "MOE_SKILL_BUFF_COMPATIBILITY",
+      "MOE_SKILL_BUFF_COMPATIBILITY_GENERATED"
+    ].forEach(name => {
+      const rows = global[name];
+      if (Array.isArray(rows)) out.push(...rows);
+    });
+    return out;
+  }
+
+  function spCandidateBuffNames(obj) {
+    const names = [];
+    const add = value => {
+      const s = String(value || "").trim();
+      if (s && !names.includes(s)) names.push(s);
+    };
+    add(obj?.equipBuffName);
+    add(obj?.equipBuff?.name);
+    add(obj?.equipBuff?.buffName);
+    add(obj?.buffName);
+    add(obj?.effectName);
+    add(obj?.name);
+    return names;
+  }
+
+  function spTotalsFromCompatibility(obj) {
+    const names = spCandidateBuffNames(obj).map(spNorm).filter(Boolean);
+    if (!names.length) return {};
+    const totals = {};
+    spCompatibilityRows().forEach(rule => {
+      const buffName = spNorm(rule?.buffName || rule?.name || "");
+      if (!buffName || !names.includes(buffName)) return;
+      const skill = rule.targetSkill || rule.skill || rule.skillName || rule.target || rule.name;
+      const value = rule.value ?? rule.amount ?? rule.skillPlus ?? rule.plus;
+      spAddTotal(totals, skill, value);
+    });
+    return totals;
+  }
+
+  function spTotalsFromObject(obj) {
+    if (!obj) return {};
+    const direct = spTotalsFromEffects(obj.extraEffects);
+    const fromEquipBuffEffects = spTotalsFromEffects(obj.equipBuff?.extraEffects);
+    const fromCompat = spTotalsFromCompatibility(obj);
+    return spMergeTotals(direct, fromEquipBuffEffects, fromCompat);
+  }
+
+  function spTotalsForRows(rows) {
+    const out = {};
+    (rows || []).forEach(row => {
+      Object.entries(spTotalsFromObject(row)).forEach(([skill, value]) => spAddTotal(out, skill, value));
+    });
+    return out;
+  }
+
+  function spTotalForSkill(totals, skill) {
+    const target = spNorm(skill);
+    if (!target) return 0;
+    let sum = 0;
+    Object.entries(totals || {}).forEach(([name, value]) => {
+      if (spNorm(name) === target) sum += spNum(value);
+    });
+    return sum;
+  }
+
+  function spSummary(totals, limit=6) {
+    const entries = Object.entries(totals || {})
+      .map(([name, value]) => [name, spNum(value)])
+      .filter(([, value]) => value)
+      .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], "ja"));
+    if (!entries.length) return "";
+    const shown = entries.slice(0, limit).map(([name, value]) => `${name}+${typeof fmt === "function" ? fmt(value, 2) : value}`);
+    const rest = entries.length > limit ? ` ほか${entries.length - limit}件` : "";
+    return shown.join(" / ") + rest;
+  }
+
+  function spAllSkillNamesFromData() {
+    const set = new Set();
+    if (Array.isArray(global.SKILL_SIM_ALL)) global.SKILL_SIM_ALL.forEach(x => x && set.add(String(x)));
+    spCompatibilityRows().forEach(rule => {
+      const skill = rule.targetSkill || rule.skill || rule.skillName || rule.target;
+      if (skill) set.add(String(skill));
+    });
+    if (typeof equipmentCatalogItems === "function") {
+      try {
+        equipmentCatalogItems().forEach(item => {
+          Object.keys(spTotalsFromObject(item)).forEach(k => set.add(k));
+        });
+      } catch {}
+    }
+    if (global.state) {
+      try {
+        (global.state.equipment || []).forEach(row => Object.keys(spTotalsFromObject(row)).forEach(k => set.add(k)));
+        (global.state.composite || []).forEach(row => Object.keys(spTotalsFromObject(row)).forEach(k => set.add(k)));
+      } catch {}
+    }
+    return Array.from(set).filter(Boolean).sort((a, b) => a.localeCompare(b, "ja"));
+  }
+
+  function spSelectOptions({allowEmpty=true, emptyLabel="指定なし"}={}) {
+    const skills = spAllSkillNamesFromData();
+    const head = allowEmpty ? `<option value="">${emptyLabel}</option>` : "";
+    return head + skills.map(s => `<option value="${typeof escapeHtml === "function" ? escapeHtml(s) : s}">${typeof escapeHtml === "function" ? escapeHtml(s) : s}</option>`).join("");
+  }
+
+  function spReadFilterRows(prefix, count=4) {
+    if (typeof document === "undefined") return [];
+    const rows = [];
+    for (let i = 1; i <= count; i++) {
+      const skill = document.getElementById(`${prefix}Skill${i}`)?.value || "";
+      const op = document.getElementById(`${prefix}Op${i}`)?.value || "gte";
+      const valueRaw = document.getElementById(`${prefix}Value${i}`)?.value || "";
+      if (skill || valueRaw) rows.push({skill, op, valueRaw});
+    }
+    return rows;
+  }
+
+  function spFilterMatchesTotals(totals, filters) {
+    for (const f of filters || []) {
+      const skill = spSkillName(f.skill);
+      const expected = spNum(f.valueRaw === "" ? 0 : f.valueRaw);
+      if (!skill) continue;
+      const value = spTotalForSkill(totals, skill);
+      const op = String(f.op || "gte");
+      if (op === "exists" && !(value !== 0)) return false;
+      else if (op === "gte" && !(value >= expected)) return false;
+      else if (op === "lte" && !(value <= expected)) return false;
+      else if (op === "gt" && !(value > expected)) return false;
+      else if (op === "lt" && !(value < expected)) return false;
+      else if (op === "eq" && !(Math.abs(value - expected) < 1e-9)) return false;
+    }
+    return true;
+  }
+
+  function spFilterDescription(filters) {
+    return (filters || []).filter(f => f.skill).map(f => {
+      const op = {exists:"あり", gte:"以上", lte:"以下", gt:"超", lt:"未満", eq:"="}[f.op || "gte"] || "以上";
+      const raw = f.valueRaw === "" ? "0" : f.valueRaw;
+      return `${f.skill}+${raw}${op}`;
+    }).join(" / ");
+  }
+
+  global.MOESkillPlusV21 = {
+    normalizeName: spNorm,
+    totalsFromObject: spTotalsFromObject,
+    totalsForRows: spTotalsForRows,
+    totalForSkill: spTotalForSkill,
+    summary: spSummary,
+    allSkillNames: spAllSkillNamesFromData,
+    filterMatchesTotals: spFilterMatchesTotals,
+    filterDescription: spFilterDescription,
+    readFilterRows: spReadFilterRows
+  };
+
+  // Worker側ではここまで。以下はブラウザUIだけ。
+  if (typeof document === "undefined") return;
+
+  function spFillSelects() {
+    const selectors = [
+      "[data-skill-plus-filter-select]",
+      "[data-skill-plus-objective-select]"
+    ];
+    selectors.forEach(sel => {
+      document.querySelectorAll(sel).forEach(select => {
+        const current = select.value;
+        const emptyLabel = select.dataset.emptyLabel || "指定なし";
+        select.innerHTML = spSelectOptions({allowEmpty:true, emptyLabel});
+        select.value = current;
+      });
+    });
+  }
+
+  function spInstallCatalogWrappers() {
+    if (global.__MOE_SKILL_PLUS_V21_CATALOG_WRAPPED__) return;
+    global.__MOE_SKILL_PLUS_V21_CATALOG_WRAPPED__ = true;
+
+    const baseState = global.catalogFilterState;
+    if (typeof baseState === "function") {
+      global.catalogFilterState = function catalogFilterStateSkillPlusV21() {
+        const filter = baseState.apply(this, arguments) || {};
+        filter.skillPlusFilters = spReadFilterRows("catalogSkillPlus", 4);
+        return filter;
+      };
+    }
+
+    const baseMatches = global.catalogItemMatches;
+    if (typeof baseMatches === "function") {
+      global.catalogItemMatches = function catalogItemMatchesSkillPlusV21(item, filter) {
+        if (!baseMatches.call(this, item, filter)) return false;
+        const filters = filter?.skillPlusFilters || spReadFilterRows("catalogSkillPlus", 4);
+        if (!filters.length) return true;
+        return spFilterMatchesTotals(spTotalsFromObject(item), filters);
+      };
+    }
+
+    const baseDesc = global.catalogStatFiltersDescription;
+    if (typeof baseDesc === "function") {
+      global.catalogStatFiltersDescription = function catalogStatFiltersDescriptionSkillPlusV21(filter) {
+        const main = baseDesc.call(this, filter) || "";
+        const skill = spFilterDescription(filter?.skillPlusFilters || []);
+        return [main, skill].filter(Boolean).join(" / ");
+      };
+    }
+
+    const baseSetup = global.setupCatalogFilterOptions;
+    if (typeof baseSetup === "function") {
+      global.setupCatalogFilterOptions = function setupCatalogFilterOptionsSkillPlusV21() {
+        const out = baseSetup.apply(this, arguments);
+        spFillSelects();
+        return out;
+      };
+    }
+  }
+
+  function spOptimizerSettingsFromUI() {
+    const targetSkill = document.getElementById("optimizerSkillPlusTargetSkill")?.value || "";
+    const filters = spReadFilterRows("optimizerSkillPlusFilter", 4);
+    return {
+      skillPlusTargetSkill: targetSkill,
+      skillPlusFilters: filters,
+      skillPlusEnabled: !!targetSkill || filters.length > 0
+    };
+  }
+
+  function spInstallWorkerBridge() {
+    if (global.__MOE_SKILL_PLUS_V21_WORKER_BRIDGE__ || typeof global.Worker !== "function") return;
+    global.__MOE_SKILL_PLUS_V21_WORKER_BRIDGE__ = true;
+    const NativeWorker = global.Worker;
+    global.Worker = class WorkerSkillPlusV21 extends NativeWorker {
+      postMessage(message, transfer) {
+        try {
+          if (message && message.type === "optimize" && message.payload) {
+            const extra = spOptimizerSettingsFromUI();
+            message = {
+              ...message,
+              payload: {
+                ...message.payload,
+                settings: {
+                  ...(message.payload.settings || {}),
+                  ...extra
+                }
+              }
+            };
+          }
+        } catch (e) {
+          console.warn("skillPlus v21 settings bridge failed", e);
+        }
+        return super.postMessage(message, transfer);
+      }
+    };
+  }
+
+  function spInstallEvents() {
+    document.querySelectorAll("[data-skill-plus-filter-select], [data-skill-plus-filter-input]").forEach(el => {
+      if (el.dataset.skillPlusV21Ready) return;
+      el.dataset.skillPlusV21Ready = "1";
+      el.addEventListener("input", () => {
+        if (typeof renderCatalogResults === "function") renderCatalogResults();
+      });
+      el.addEventListener("change", () => {
+        if (typeof renderCatalogResults === "function") renderCatalogResults();
+      });
+    });
+  }
+
+  function spBoot() {
+    spInstallCatalogWrappers();
+    spInstallWorkerBridge();
+    spFillSelects();
+    spInstallEvents();
+  }
+
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", spBoot);
+  else spBoot();
+  setTimeout(spBoot, 500);
+})(typeof globalThis !== "undefined" ? globalThis : window);
+
+/* v21.2: showcase skillPlus total summary
+ * skillPlus はステータス/成功率/必要スキル/ダメージ式には加算しない。
+ * 見せびらかしページに現在構成の合計値としてだけ表示する。
+ */
+(function installShowcaseSkillPlusTotalsV212(global) {
+  if (global.__MOE_SKILL_PLUS_SHOWCASE_TOTALS_V21_2_INSTALLED__) return;
+  global.__MOE_SKILL_PLUS_SHOWCASE_TOTALS_V21_2_INSTALLED__ = true;
+
+  function num(value) {
+    const v = parseFloat(value);
+    return Number.isFinite(v) ? v : 0;
+  }
+
+  function addTotal(totals, skill, value) {
+    const name = String(skill || "").trim();
+    const v = num(value);
+    if (!name || !v) return;
+    totals[name] = (totals[name] || 0) + v;
+  }
+
+  function mergeTotals(...parts) {
+    const out = {};
+    parts.forEach(part => {
+      Object.entries(part || {}).forEach(([skill, value]) => addTotal(out, skill, value));
+    });
+    return out;
+  }
+
+  function parseSkillPlusEffects(value) {
+    const totals = {};
+    if (!value) return totals;
+
+    let effects = [];
+    try {
+      if (typeof normalizeAdditionalEffects === "function") effects = normalizeAdditionalEffects(value) || [];
+      else if (Array.isArray(value)) effects = value;
+    } catch {}
+
+    (effects || []).forEach(e => {
+      if (!e || e.key !== "skillPlus") return;
+      addTotal(totals, e.name || e.skill || e.targetSkill, e.value ?? e.amount ?? e.plus);
+    });
+
+    if (!Array.isArray(value)) {
+      String(value || "").split(/[;\n]/).forEach(part => {
+        const cols = part.split("|");
+        if (String(cols[0] || "").trim() !== "skillPlus") return;
+        addTotal(totals, cols[1], cols[2]);
+      });
+    }
+
+    return totals;
+  }
+
+  function rowSkillPlusTotals(row) {
+    // まず行に保存済みの skillPlus を優先する。
+    // カタログ投入済み行では extraEffects に skillPlus が入ることがあるため、
+    // 互換表復元と二重加算しない。
+    const direct = mergeTotals(
+      parseSkillPlusEffects(row?.extraEffects),
+      parseSkillPlusEffects(row?.equipBuff?.extraEffects),
+      parseSkillPlusEffects(row?.equipBuffExtraEffects)
+    );
+    if (Object.keys(direct).length) return direct;
+
+    // 保存済み skillPlus が無い旧データは v21 の互換復元を利用する。
+    try {
+      const api = global.MOESkillPlusV21;
+      if (api && typeof api.totalsFromObject === "function") return api.totalsFromObject(row) || {};
+    } catch {}
+    return {};
+  }
+
+  function activeRowsForSkillPlusTotals() {
+    const rows = [];
+    try {
+      if (typeof state === "undefined" || !state) return rows;
+
+      const equipment = Array.isArray(state.equipment) ? state.equipment : [];
+      if (typeof resolveEquipmentBuffRowsForSameTechnic === "function") {
+        rows.push(...(resolveEquipmentBuffRowsForSameTechnic(equipment) || []));
+      } else {
+        rows.push(...equipment.filter(r => r && r.enabled !== false && r.equipBuffEnabled));
+      }
+
+      // 手動Buff/複合欄に skillPlus を置いた場合も合計表示できるようにする。
+      if (Array.isArray(state.composite)) rows.push(...state.composite.filter(r => r && r.enabled !== false));
+    } catch {}
+    return rows;
+  }
+
+  function currentSkillPlusTotals() {
+    const out = {};
+    activeRowsForSkillPlusTotals().forEach(row => {
+      Object.entries(rowSkillPlusTotals(row)).forEach(([skill, value]) => addTotal(out, skill, value));
+    });
+    return out;
+  }
+
+  function formatValue(value) {
+    const v = num(value);
+    const body = typeof fmt === "function" ? fmt(v, 2) : String(Math.round(v * 100) / 100);
+    return `${v > 0 ? "+" : ""}${body}`;
+  }
+
+  function skillPlusEntries(totals) {
+    return Object.entries(totals || {})
+      .map(([skill, value]) => [skill, num(value)])
+      .filter(([, value]) => value)
+      .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], "ja"));
+  }
+
+  function summaryText(totals) {
+    const entries = skillPlusEntries(totals);
+    if (!entries.length) return "";
+    return entries.map(([skill, value]) => `${skill}強化 ${formatValue(value)}`).join(" / ");
+  }
+
+  function ensurePanel() {
+    let panel = document.getElementById("showcaseSkillPlusTotals");
+    if (panel) return panel;
+    const view = document.getElementById("showcaseView");
+    if (!view || !view.parentNode) return null;
+    panel = document.createElement("div");
+    panel.id = "showcaseSkillPlusTotals";
+    panel.className = "showcaseSkillPlusTotals";
+    panel.setAttribute("aria-live", "polite");
+    view.parentNode.insertBefore(panel, view);
+    return panel;
+  }
+
+  function stripSkillPlusLine(text) {
+    return String(text || "")
+      .replace(/^スキル強化合計:\s*.*(?:\r?\n){1,2}/, "")
+      .replace(/^スキル強化合計:\s*.*/, "");
+  }
+
+  function updateShowcaseSkillPlusTotals() {
+    if (typeof document === "undefined") return;
+    const totals = currentSkillPlusTotals();
+    const body = summaryText(totals);
+    const panel = ensurePanel();
+    if (panel) {
+      if (body) {
+        panel.hidden = false;
+        panel.innerHTML = `<div class="showcaseSkillPlusTotalsTitle">スキル強化合計</div><div class="showcaseSkillPlusTotalsBody">${typeof escapeHtml === "function" ? escapeHtml(body) : body}</div>`;
+      } else {
+        panel.hidden = true;
+        panel.textContent = "";
+      }
+    }
+
+    // コピー用のプレーンテキストにも合計を入れる。
+    const textarea = document.getElementById("showcaseText");
+    if (textarea) {
+      const base = stripSkillPlusLine(textarea.value || "");
+      textarea.value = body ? `スキル強化合計: ${body}\n${base}` : base;
+    }
+  }
+
+  let scheduled = false;
+  function scheduleShowcaseSkillPlusTotalsUpdate() {
+    if (scheduled) return;
+    scheduled = true;
+    setTimeout(() => {
+      scheduled = false;
+      updateShowcaseSkillPlusTotals();
+    }, 0);
+  }
+
+  function wrapRenderFunction(name) {
+    const fn = global[name];
+    if (typeof fn !== "function" || fn.__skillPlusTotalsV212Wrapped) return;
+    const wrapped = function(...args) {
+      const ret = fn.apply(this, args);
+      scheduleShowcaseSkillPlusTotalsUpdate();
+      return ret;
+    };
+    wrapped.__skillPlusTotalsV212Wrapped = true;
+    global[name] = wrapped;
+  }
+
+  function installHooks() {
+    wrapRenderFunction("renderShowcase");
+    wrapRenderFunction("updateShowcase");
+    wrapRenderFunction("renderAll");
+    wrapRenderFunction("render");
+
+    document.addEventListener("input", scheduleShowcaseSkillPlusTotalsUpdate, true);
+    document.addEventListener("change", scheduleShowcaseSkillPlusTotalsUpdate, true);
+    document.addEventListener("click", scheduleShowcaseSkillPlusTotalsUpdate, true);
+
+    const view = document.getElementById("showcaseView");
+    if (view && typeof MutationObserver !== "undefined") {
+      try {
+        new MutationObserver(scheduleShowcaseSkillPlusTotalsUpdate).observe(view, {childList: true, subtree: true, characterData: true});
+      } catch {}
+    }
+
+    scheduleShowcaseSkillPlusTotalsUpdate();
+    setTimeout(scheduleShowcaseSkillPlusTotalsUpdate, 250);
+    setTimeout(scheduleShowcaseSkillPlusTotalsUpdate, 1000);
+  }
+
+  if (typeof document !== "undefined") {
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", installHooks, {once: true});
+    else installHooks();
+  }
+})(typeof globalThis !== "undefined" ? globalThis : window);
