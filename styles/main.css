@@ -4497,3 +4497,14 @@ button[onclick*="applySkillSimToCalc"],
   line-height: 1.6;
   overflow-wrap: anywhere;
 }
+
+/* v23: 装備カタログ描画軽量化 */
+.catalogShowMoreV23 {
+  align-self: end;
+  white-space: nowrap;
+}
+@media (max-width: 720px) {
+  .catalogShowMoreV23 {
+    width: 100%;
+  }
+}

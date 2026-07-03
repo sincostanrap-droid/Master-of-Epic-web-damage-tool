@@ -11012,7 +11012,7 @@ function catalogFilterState() {
     buffMode: byId("catalogBuffMode")?.value || "",
     sort: byId("catalogSort")?.value || "name",
     sortDir: byId("catalogSortDir")?.value || "asc",
-    limit: +(byId("catalogLimit")?.value || 200) || 200
+    limit: +(byId("catalogLimit")?.value || 80) || 200
   };
 }
 
@@ -12353,6 +12353,232 @@ function renderAnalysisPanel() {
   calc.__analysisWrapped = true;
 })();
 
+
+/* v23: catalog render performance pass
+ * 目的: UI構造や計算式を変えず、カタログ表示のDOM生成・再描画・解析コストを減らす。
+ */
+(function installCatalogRenderPerformanceV23(global) {
+  if (global.__MOE_CATALOG_PERF_V23_INSTALLED__) return;
+  global.__MOE_CATALOG_PERF_V23_INSTALLED__ = true;
+
+  const DEFAULT_LIMIT = 80;
+  const DEBOUNCE_MS = 180;
+  const LIMIT_STEPS = [50, 80, 100, 150, 200, 300, 500, 1000];
+  let nativeRender = null;
+  let debounceTimer = 0;
+  let lastArgs = [];
+  let renderingNow = false;
+
+  function byIdV23(id) {
+    return typeof document !== "undefined" ? document.getElementById(id) : null;
+  }
+
+  function nextFrame(fn) {
+    if (typeof requestAnimationFrame === "function") requestAnimationFrame(fn);
+    else setTimeout(fn, 0);
+  }
+
+  function ensureCatalogLimitOptions() {
+    const limit = byIdV23("catalogLimit");
+    if (!limit) return;
+    const currentRaw = limit.value || "";
+    const existing = new Set(Array.from(limit.options || []).map(o => String(o.value)));
+    LIMIT_STEPS.forEach(value => {
+      const key = String(value);
+      if (existing.has(key)) return;
+      const opt = document.createElement("option");
+      opt.value = key;
+      opt.textContent = `${value}件`;
+      limit.appendChild(opt);
+    });
+
+    // 既存UIの初期値が200なら、初回だけ80に落としてDOM常駐量を減らす。
+    if (!limit.dataset.catalogPerfV23Defaulted) {
+      const n = parseInt(currentRaw || "0", 10);
+      if (!Number.isFinite(n) || !currentRaw || n >= 200) limit.value = String(DEFAULT_LIMIT);
+      limit.dataset.catalogPerfV23Defaulted = "1";
+    }
+  }
+
+  function catalogLimitValue() {
+    const limit = byIdV23("catalogLimit");
+    const n = parseInt(limit?.value || String(DEFAULT_LIMIT), 10);
+    return Number.isFinite(n) && n > 0 ? n : DEFAULT_LIMIT;
+  }
+
+  function setCatalogLimitValue(value) {
+    const limit = byIdV23("catalogLimit");
+    if (!limit) return;
+    ensureCatalogLimitOptions();
+    const v = String(value);
+    if (!Array.from(limit.options || []).some(o => String(o.value) === v)) {
+      const opt = document.createElement("option");
+      opt.value = v;
+      opt.textContent = `${v}件`;
+      limit.appendChild(opt);
+    }
+    limit.value = v;
+  }
+
+  function parseCatalogSummary() {
+    const candidates = [
+      byIdV23("catalogSummary"),
+      byIdV23("equipmentCatalogSummary"),
+      byIdV23("catalogResultSummary"),
+    ].filter(Boolean);
+
+    if (!candidates.length && typeof document !== "undefined") {
+      document.querySelectorAll(".small, .mutedText, .catalogSummary, [id*='Summary']").forEach(el => {
+        if (candidates.length < 3 && /カタログ/.test(el.textContent || "")) candidates.push(el);
+      });
+    }
+    const el = candidates.find(x => /該当\s*\d+件/.test(x.textContent || "")) || candidates[0] || null;
+    const text = el?.textContent || "";
+    const matched = text.match(/該当\s*(\d+)件/);
+    const shown = text.match(/表示\s*(\d+)件/);
+    return {
+      el,
+      matched: matched ? parseInt(matched[1], 10) : NaN,
+      shown: shown ? parseInt(shown[1], 10) : NaN,
+      text
+    };
+  }
+
+  function ensureLoadMoreButton() {
+    if (typeof document === "undefined") return;
+    ensureCatalogLimitOptions();
+    const limit = byIdV23("catalogLimit");
+    if (!limit) return;
+
+    let button = byIdV23("catalogShowMoreV23");
+    if (!button) {
+      button = document.createElement("button");
+      button.type = "button";
+      button.id = "catalogShowMoreV23";
+      button.className = "secondary catalogShowMoreV23";
+      button.textContent = "さらに表示";
+      button.addEventListener("click", () => {
+        const current = catalogLimitValue();
+        const parsed = parseCatalogSummary();
+        const target = Number.isFinite(parsed.matched) ? parsed.matched : 1000;
+        const nextStep = LIMIT_STEPS.find(x => x > current) || Math.min(current + 500, target || current + 500);
+        const next = Math.min(nextStep, target || nextStep);
+        setCatalogLimitValue(next);
+        renderCatalogNowV23();
+      });
+
+      const label = limit.closest("label") || limit.parentElement;
+      if (label && label.parentElement) label.parentElement.insertBefore(button, label.nextSibling);
+      else document.body.appendChild(button);
+    }
+
+    const summary = parseCatalogSummary();
+    const hasMore = Number.isFinite(summary.matched) && Number.isFinite(summary.shown) && summary.shown < summary.matched;
+    button.hidden = !hasMore;
+    if (hasMore) button.textContent = `さらに表示（${summary.shown}/${summary.matched}件）`;
+  }
+
+  function renderCatalogNowV23() {
+    if (typeof nativeRender !== "function") return;
+    clearTimeout(debounceTimer);
+    debounceTimer = 0;
+    renderingNow = true;
+    try {
+      const out = nativeRender.apply(global, lastArgs || []);
+      nextFrame(ensureLoadMoreButton);
+      return out;
+    } finally {
+      renderingNow = false;
+    }
+  }
+
+  function renderCatalogDebouncedV23(...args) {
+    lastArgs = args;
+    if (renderingNow) return nativeRender.apply(this, args);
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(renderCatalogNowV23, DEBOUNCE_MS);
+  }
+
+  function wrapRenderCatalogResults() {
+    if (typeof global.renderCatalogResults !== "function") return false;
+    if (global.renderCatalogResults.__catalogPerfV23Wrapped) return true;
+    nativeRender = global.renderCatalogResults;
+    renderCatalogDebouncedV23.__catalogPerfV23Wrapped = true;
+    global.renderCatalogResults = renderCatalogDebouncedV23;
+    global.renderCatalogResultsNowV23 = renderCatalogNowV23;
+    return true;
+  }
+
+  function wrapCatalogStatNumericValue() {
+    if (typeof global.catalogStatNumericValue !== "function") return false;
+    if (global.catalogStatNumericValue.__catalogPerfV23Wrapped) return true;
+    const base = global.catalogStatNumericValue;
+    const itemCache = new WeakMap();
+    function wrapped(item, stat) {
+      if (!item || typeof item !== "object") return base.apply(this, arguments);
+      let cache = itemCache.get(item);
+      if (!cache) {
+        cache = new Map();
+        itemCache.set(item, cache);
+      }
+      const key = String(stat || "");
+      if (cache.has(key)) return cache.get(key);
+      const value = base.apply(this, arguments);
+      cache.set(key, value);
+      return value;
+    }
+    wrapped.__catalogPerfV23Wrapped = true;
+    global.catalogStatNumericValue = wrapped;
+    return true;
+  }
+
+  function wrapSkillPlusTotals() {
+    const api = global.MOESkillPlusV21;
+    if (!api || typeof api.totalsFromObject !== "function") return false;
+    if (api.totalsFromObject.__catalogPerfV23Wrapped) return true;
+    const base = api.totalsFromObject;
+    const cache = new WeakMap();
+    api.totalsFromObject = function totalsFromObjectCachedV23(obj) {
+      if (!obj || typeof obj !== "object") return base.apply(this, arguments);
+      if (cache.has(obj)) return cache.get(obj);
+      const value = base.apply(this, arguments);
+      cache.set(obj, value);
+      return value;
+    };
+    api.totalsFromObject.__catalogPerfV23Wrapped = true;
+    return true;
+  }
+
+  function installCatalogInputDebounceHints() {
+    if (typeof document === "undefined") return;
+    document.querySelectorAll("#catalogSearch, #catalogCategory, #catalogSlot, [id^='catalogStat'], [id^='catalogSkillPlus'], #catalogBuffMode, #catalogSort, #catalogSortDir, #catalogLimit").forEach(el => {
+      if (el.dataset.catalogPerfV23Ready) return;
+      el.dataset.catalogPerfV23Ready = "1";
+      // 既存イベントが即時renderを呼ぶ環境でも、最終状態をもう一度debounce描画して整える。
+      el.addEventListener("input", () => global.renderCatalogResults && global.renderCatalogResults(), {passive: true});
+      el.addEventListener("change", () => global.renderCatalogResults && global.renderCatalogResults(), {passive: true});
+    });
+  }
+
+  function bootCatalogPerf() {
+    wrapRenderCatalogResults();
+    wrapCatalogStatNumericValue();
+    wrapSkillPlusTotals();
+    ensureCatalogLimitOptions();
+    installCatalogInputDebounceHints();
+    nextFrame(ensureLoadMoreButton);
+  }
+
+  if (typeof document !== "undefined") {
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", bootCatalogPerf);
+    else bootCatalogPerf();
+    setTimeout(bootCatalogPerf, 300);
+    setTimeout(bootCatalogPerf, 1000);
+  } else {
+    wrapCatalogStatNumericValue();
+    wrapSkillPlusTotals();
+  }
+})(typeof globalThis !== "undefined" ? globalThis : window);
 
 /* v21: skillPlus catalog filter / optimizer bridge
  * skillPlus は MoE 仕様上、ステータス・成功率・必要スキルへは加算しない。
