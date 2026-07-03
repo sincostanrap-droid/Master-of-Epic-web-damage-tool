@@ -310,3 +310,181 @@ function runOptimizerCore(payload, onProgress=null) {
     }
   };
 }
+
+/* v21: skillPlus objective/filter integration
+ * skillPlus はステータス・成功率・必要スキルには加算しない。
+ * ここでは最適化結果の条件判定/並び替え/表示補助だけを行う。
+ */
+(function installOptimizerSkillPlusV21(global) {
+  if (global.__MOE_OPTIMIZER_SKILL_PLUS_V21_INSTALLED__) return;
+  global.__MOE_OPTIMIZER_SKILL_PLUS_V21_INSTALLED__ = true;
+
+  let currentSettings = null;
+
+  function api() {
+    return global.MOESkillPlusV21 || null;
+  }
+
+  function totalsForResult(result, settings=currentSettings) {
+    const helper = api();
+    if (!helper || !result) return {};
+    if (result.skillPlusTotals && typeof result.skillPlusTotals === "object") return result.skillPlusTotals;
+    let rows = [];
+    try {
+      const equipmentRows = typeof optimizerEquipmentRows === "function" ? optimizerEquipmentRows(settings || {}) : [];
+      (result.equipmentIdxs || []).forEach(idx => {
+        const row = equipmentRows[idx];
+        if (row) rows.push(row);
+      });
+    } catch {}
+    try {
+      const compositeRows = typeof optimizerCompositeRows === "function" ? optimizerCompositeRows(settings || {}) : [];
+      (result.compositeIdxs || []).forEach(idx => {
+        const row = compositeRows[idx];
+        if (row) rows.push(row);
+      });
+    } catch {}
+    return helper.totalsForRows(rows);
+  }
+
+  function skillPlusObjectiveEnabled(settings=currentSettings, objective=null) {
+    const obj = objective || settings?.objective;
+    return obj === "skillPlus";
+  }
+
+  function skillPlusScore(result, settings=currentSettings) {
+    const helper = api();
+    if (!helper) return 0;
+    const totals = totalsForResult(result, settings);
+    const target = settings?.skillPlusTargetSkill || "";
+    if (target) return helper.totalForSkill(totals, target);
+    return Object.values(totals || {}).reduce((sum, value) => sum + (+value || 0), 0);
+  }
+
+  function compareSkillPlus(a, b, settings=currentSettings) {
+    const diff = skillPlusScore(b, settings) - skillPlusScore(a, settings);
+    if (Math.abs(diff) > 1e-9) return diff;
+    const helper = api();
+    if (!helper) return 0;
+    return helper.summary(totalsForResult(a, settings)).localeCompare(helper.summary(totalsForResult(b, settings)), "ja");
+  }
+
+  function resultPassesSkillPlusFilters(result, settings=currentSettings) {
+    const helper = api();
+    const filters = settings?.skillPlusFilters || [];
+    if (!helper || !filters.length) return true;
+    return helper.filterMatchesTotals(totalsForResult(result, settings), filters);
+  }
+
+  function annotateResult(result, settings=currentSettings) {
+    const helper = api();
+    if (!helper || !result) return result;
+    const totals = totalsForResult(result, settings);
+    result.skillPlusTotals = totals;
+    result.skillPlusSummary = helper.summary(totals);
+    result.skillPlusScore = skillPlusScore(result, settings);
+    if (result.equipmentSummary && result.skillPlusSummary && !String(result.equipmentSummary).includes("スキル強化:")) {
+      result.equipmentSummary += ` / スキル強化: ${result.skillPlusSummary}`;
+    }
+    return result;
+  }
+
+  const baseRun = global.runOptimizerCore;
+  if (typeof baseRun === "function") {
+    global.runOptimizerCore = function runOptimizerCoreSkillPlusV21(payload, onProgress=null) {
+      currentSettings = payload?.settings || null;
+      const out = baseRun.call(this, payload, onProgress);
+      try {
+        (out?.results || []).forEach(r => annotateResult(r, currentSettings));
+        if (out?.summary && currentSettings?.skillPlusFilters?.length && api()) {
+          const desc = api().filterDescription(currentSettings.skillPlusFilters);
+          if (desc && !String(out.summary).includes("スキル強化条件")) out.summary += ` / スキル強化条件 ${desc}`;
+        }
+      } catch {}
+      return out;
+    };
+  }
+
+  const basePass = global.optimizerResultPassesDisplayFilters;
+  if (typeof basePass === "function") {
+    global.optimizerResultPassesDisplayFilters = function optimizerResultPassesDisplayFiltersSkillPlusV21(result, settings) {
+      const ok = basePass.call(this, result, settings);
+      if (!ok) return false;
+      return resultPassesSkillPlusFilters(result, settings || currentSettings);
+    };
+  }
+
+  const baseSort = global.optimizerSortByEvaluation;
+  if (typeof baseSort === "function") {
+    global.optimizerSortByEvaluation = function optimizerSortByEvaluationSkillPlusV21(a, b) {
+      const settings = currentSettings || {};
+      if (skillPlusObjectiveEnabled(settings, settings.objective)) {
+        const c = compareSkillPlus(a, b, settings);
+        if (c) return c;
+      }
+      const primary = baseSort.call(this, a, b);
+      if (primary) return primary;
+      if (skillPlusObjectiveEnabled(settings, settings.secondaryObjective)) {
+        return compareSkillPlus(a, b, settings);
+      }
+      return 0;
+    };
+  }
+
+  const baseCompare = global.optimizerCompareEvaluations;
+  if (typeof baseCompare === "function") {
+    global.optimizerCompareEvaluations = function optimizerCompareEvaluationsSkillPlusV21(a, b) {
+      const settings = currentSettings || {};
+      if (skillPlusObjectiveEnabled(settings, settings.objective)) {
+        const c = compareSkillPlus(a, b, settings);
+        if (c) return c < 0 ? 1 : -1;
+      }
+      const primary = baseCompare.call(this, a, b);
+      if (primary) return primary;
+      if (skillPlusObjectiveEnabled(settings, settings.secondaryObjective)) {
+        const c = compareSkillPlus(a, b, settings);
+        return c < 0 ? 1 : c > 0 ? -1 : 0;
+      }
+      return 0;
+    };
+  }
+
+  const baseLabel = global.optimizerObjectiveLabel;
+  if (typeof baseLabel === "function") {
+    global.optimizerObjectiveLabel = function optimizerObjectiveLabelSkillPlusV21(objective) {
+      if (objective === "skillPlus") {
+        const target = currentSettings?.skillPlusTargetSkill || "";
+        return target ? `${target}強化 最大` : "スキル強化合計 最大";
+      }
+      return baseLabel.call(this, objective);
+    };
+  }
+
+  const baseTargetDesc = global.optimizerPrimaryTargetDescription;
+  if (typeof baseTargetDesc === "function") {
+    global.optimizerPrimaryTargetDescription = function optimizerPrimaryTargetDescriptionSkillPlusV21(settings) {
+      const main = baseTargetDesc.call(this, settings) || "";
+      const helper = api();
+      const desc = helper && settings?.skillPlusFilters?.length ? helper.filterDescription(settings.skillPlusFilters) : "";
+      return [main, desc ? `スキル強化条件 ${desc}` : ""].filter(Boolean).join(" / ");
+    };
+  }
+
+  const baseSummaryByIdx = global.optimizerEquipmentSummaryByIdx;
+  if (typeof baseSummaryByIdx === "function") {
+    global.optimizerEquipmentSummaryByIdx = function optimizerEquipmentSummaryByIdxSkillPlusV21(equipmentIdxs, metrics) {
+      const text = String(baseSummaryByIdx.call(this, equipmentIdxs, metrics) || "");
+      const helper = api();
+      if (!helper) return text;
+      try {
+        const rows = typeof optimizerEquipmentRows === "function" ? optimizerEquipmentRows(currentSettings || {}) : [];
+        const picked = (equipmentIdxs || []).map(idx => rows[idx]).filter(Boolean);
+        const summary = helper.summary(helper.totalsForRows(picked));
+        if (!summary || text.includes("スキル強化:")) return text;
+        return text ? `${text} / スキル強化: ${summary}` : `スキル強化: ${summary}`;
+      } catch {
+        return text;
+      }
+    };
+  }
+})(typeof globalThis !== "undefined" ? globalThis : self);
