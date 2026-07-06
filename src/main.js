@@ -5,7 +5,7 @@
   onclick属性から呼ばれる関数があるため、現時点では module ではなく通常scriptとして読み込みます。
 */
 
-const APP_VERSION = "v1.23.23";
+const APP_VERSION = "v1.23.24";
 const APP_VERSION_NOTE = "装備カタログ条件表示・ページ送り・追加効果二重加算修正";
 
 /* 種族係数。攻撃力係数と魔力係数は別管理。 */
@@ -6925,8 +6925,23 @@ function optimizerStateForSelection(equipmentIdxs, compositeIdxs, settings=null)
   return st;
 }
 
+/* __MOE_OPTIMIZER_EQUIP_TAG_CONFLICT_FIX_V1__
+ * 装備行の tags には、装備Buff/効果の競合グループも入る。
+ * それらを装備同士のハード排他に使うと、同じ装備Buff系統の防具を複数装備できなくなる。
+ * Buff効果の重複・競合は expandEquipmentBuffState → applyBuffGroupRules 側で処理する。
+ */
 function optimizerEquipmentConflictKeys(row) {
-  return splitTags(row?.tags).map(x => x.toLowerCase());
+  const effectConflictPrefixes = [
+    "damage:",
+    "critical:",
+    "conversion:",
+    "skillbuff:",
+    "skillplus:"
+  ];
+
+  return splitTags(row?.tags)
+    .map(x => x.toLowerCase())
+    .filter(x => !effectConflictPrefixes.some(prefix => x.startsWith(prefix)));
 }
 
 function optimizerEquipmentWouldConflict(selectedIdxs, candidateIdx, settings=null) {
