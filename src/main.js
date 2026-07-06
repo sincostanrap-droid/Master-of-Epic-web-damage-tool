@@ -5,7 +5,7 @@
   onclick属性から呼ばれる関数があるため、現時点では module ではなく通常scriptとして読み込みます。
 */
 
-const APP_VERSION = "v1.23.25";
+const APP_VERSION = "v1.23.26";
 const APP_VERSION_NOTE = "装備カタログ条件表示・ページ送り・追加効果二重加算修正";
 
 /* 種族係数。攻撃力係数と魔力係数は別管理。 */
@@ -4193,6 +4193,51 @@ function equipmentBuffHasEffect(r) {
   );
 }
 
+
+/* __MOE_CATALOG_EMPTY_EQUIP_BUFF_WARNING_V1__
+ * 装備Buff名だけ入っていて、効果値が空の場合に警告する。
+ * 主目的は「カタログ追加時にBuff名だけ入ったが効果が未投入」の見落とし防止。
+ * 計算・最適化には一切影響しない。
+ */
+function equipmentBuffNeedsEffectWarning(row) {
+  if (!row) return false;
+  const hasBuffName = String(row.equipBuffName || "").trim().length > 0;
+  const buffOn = row.equipBuffEnabled !== false && row.equipBuffEnabled !== 0 && row.equipBuffEnabled !== "0";
+  if (!hasBuffName || !buffOn || equipmentBuffHasEffect(row)) return false;
+
+  // カタログ由来を優先して検出。ただしメタデータ名は履歴で揺れるので少し広めに見る。
+  const sourceText = [
+    row.importSource,
+    row.source,
+    row.addedFrom,
+    row.catalogSource,
+    row.catalogId,
+    row.catalogName,
+    row.originalCatalogName,
+    row.note,
+    row.equipBuffNote
+  ].filter(Boolean).join(" ").toLowerCase();
+
+  const fromCatalog =
+    sourceText.includes("catalog") ||
+    sourceText.includes("カタログ") ||
+    !!row.catalogId ||
+    !!row.catalogName ||
+    !!row.originalCatalogName;
+
+  // カタログ由来メタデータが無い古い行でも、装備名+Buff名があり効果ゼロなら警告対象にする。
+  // 手動入力でもこれは実害のある未入力なので、警告して問題ない。
+  const hasEquipmentName = String(row.name || "").trim().length > 0;
+  return !!(fromCatalog || hasEquipmentName);
+}
+
+function equipmentBuffEffectWarningText(row) {
+  if (!equipmentBuffNeedsEffectWarning(row)) return "";
+  const name = typeof equipmentBuffDisplayName === "function"
+    ? equipmentBuffDisplayName(row)
+    : (String(row?.equipBuffName || "").trim() || "装備Buff");
+  return `⚠ ${name} はBuff名がありますが、効果値が未入力です。計算・最適化には反映されません。`;
+}
 function equipmentBuffDisplayName(r) {
   return r.equipBuffName || (r.name ? `${r.name} 装備Buff` : "装備Buff");
 }
@@ -5751,10 +5796,16 @@ function equipBuffStatusText(row) {
 function updateEquipBuffStatus(button, row) {
   const baseExtra = extraStatsHasEffect(row, "base") || additionalEffectsSummary(row, "display").length;
   const weaponText = weaponCalcStatusText(row);
-  const buffText = row.equipBuffEnabled ? `Buff ON: ${equipmentBuffDisplayName(row)}` : "Buffなし";
+  const buffWarning = equipmentBuffNeedsEffectWarning(row);
+  const buffText = row.equipBuffEnabled
+    ? `${buffWarning ? "⚠ Buff効果未入力: " : "Buff ON: "}${equipmentBuffDisplayName(row)}`
+    : "Buffなし";
   const suffix = [weaponText, baseExtra ? "追加あり" : ""].filter(Boolean).join(" / ");
   button.textContent = suffix ? `詳細: ${buffText} / ${suffix}` : `詳細: ${buffText}`;
-  button.classList.toggle("on", !!row.equipBuffEnabled || baseExtra || !!weaponText);
+  button.classList.toggle("on", !!row.equipBuffEnabled || baseExtra || !!weaponText || buffWarning);
+  button.classList.toggle("warn", !!buffWarning);
+  if (buffWarning) button.title = equipmentBuffEffectWarningText(row);
+  else button.removeAttribute("title");
 }
 
 function equipBuffNumberInput(row, key, label, step="1") {
@@ -5825,6 +5876,14 @@ function makeEquipmentBuffEditor(row, statusButton) {
   buffTitle.className = "extraStatsTitle";
   buffTitle.textContent = "装備Buff";
   buffSection.appendChild(buffTitle);
+
+  
+  if (equipmentBuffNeedsEffectWarning(row)) {
+    const warn = document.createElement("div");
+    warn.className = "small warn equipBuffMissingEffectWarning";
+    warn.textContent = equipmentBuffEffectWarningText(row);
+    buffSection.appendChild(warn);
+  }
 
   const buffTop = document.createElement("div");
   buffTop.className = "equipBuffTopControls";
