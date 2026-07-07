@@ -5,7 +5,7 @@
   onclick属性から呼ばれる関数があるため、現時点では module ではなく通常scriptとして読み込みます。
 */
 
-const APP_VERSION = "v1.23.27";
+const APP_VERSION = "v1.23.28";
 const APP_VERSION_NOTE = "装備カタログ条件表示・ページ送り・追加効果二重加算修正";
 
 /* 種族係数。攻撃力係数と魔力係数は別管理。 */
@@ -1054,8 +1054,50 @@ function makeQuickEffectAdder(row, context, statusButton=null) {
     renderShowcaseTab();
     calc();
   };
+  /* __MOE_QUICK_EFFECT_SELECT_LAZY_OPTIONS_V1_2__
+   * quickEffectType は初期描画ではプレースホルダだけを持つ。
+   * 実際の option/optgroup は、ユーザーが select を開く/触る時に生成する。
+   * select自体・追加処理・テーブル構造は変えない。
+   */
+  const resetQuickEffectOptionsPlaceholder = () => {
+    effect.dataset.quickEffectOptionsReady = "0";
+    effect.innerHTML = `<option value="">効果を選択...</option>`;
 
-  rebuildEffectOptions();
+    if (targetWrap) {
+      targetWrap.innerHTML = "";
+      targetInput = null;
+      const empty = document.createElement("span");
+      empty.className = "small muted";
+      empty.textContent = "効果を選ぶと対象欄が切り替わります";
+      targetWrap.appendChild(empty);
+    }
+
+    if (value) value.placeholder = "値";
+  };
+
+  const ensureQuickEffectOptionsReady = () => {
+    if (effect.dataset.quickEffectOptionsReady !== "1") {
+      rebuildEffectOptions();
+      effect.dataset.quickEffectOptionsReady = "1";
+    }
+  };
+
+  if (scope) {
+    scope.onchange = () => {
+      rebuildEffectOptions();
+      effect.dataset.quickEffectOptionsReady = "1";
+    };
+  }
+
+  effect.onfocus = ensureQuickEffectOptionsReady;
+  effect.onmousedown = ensureQuickEffectOptionsReady;
+  effect.ontouchstart = ensureQuickEffectOptionsReady;
+  effect.onchange = () => {
+    ensureQuickEffectOptionsReady();
+    updateTargetInput();
+  };
+
+  resetQuickEffectOptionsPlaceholder();
   wrap.appendChild(controls);
 
   if (row._lastQuickEffectMessage) {
