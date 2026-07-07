@@ -5,7 +5,7 @@
   onclick属性から呼ばれる関数があるため、現時点では module ではなく通常scriptとして読み込みます。
 */
 
-const APP_VERSION = "v1.23.26";
+const APP_VERSION = "v1.23.27";
 const APP_VERSION_NOTE = "装備カタログ条件表示・ページ送り・追加効果二重加算修正";
 
 /* 種族係数。攻撃力係数と魔力係数は別管理。 */
@@ -5804,7 +5804,8 @@ function updateEquipBuffStatus(button, row) {
   button.textContent = suffix ? `詳細: ${buffText} / ${suffix}` : `詳細: ${buffText}`;
   button.classList.toggle("on", !!row.equipBuffEnabled || baseExtra || !!weaponText || buffWarning);
   button.classList.toggle("warn", !!buffWarning);
-  if (buffWarning) button.title = equipmentBuffEffectWarningText(row);
+    refreshEquipmentInlineBuffSummaryNearButton(button, row);
+if (buffWarning) button.title = equipmentBuffEffectWarningText(row);
   else button.removeAttribute("title");
 }
 
@@ -5973,6 +5974,95 @@ function makeEquipmentBuffEditor(row, statusButton) {
   return grid;
 }
 
+
+/* __MOE_EQUIPMENT_INLINE_BUFF_SUMMARY_CLEAN_V1__
+ * 装備登録の既存「装備名」セル内に、Buff/効果の軽量サマリーを表示する。
+ * 追加の<tr>は作らないため、行追加・削除・カタログ追加の前提を壊しにくい。
+ * 表示専用DOMのみ。input/select/option は増やさない。
+ */
+function equipmentInlineBuffSummaryText(row, maxLen=220) {
+  if (!row) return "";
+
+  const parts = [];
+
+  try {
+    const baseText = typeof equipmentEffectText === "function"
+      ? String(equipmentEffectText(row) || "").trim()
+      : "";
+    if (baseText) parts.push(`装備本体: ${baseText}`);
+  } catch (_) {}
+
+  try {
+    const weaponText = typeof weaponCalcStatusText === "function"
+      ? String(weaponCalcStatusText(row) || "").trim()
+      : "";
+    if (weaponText) parts.push(`武器: ${weaponText}`);
+  } catch (_) {}
+
+  const hasBuffName = String(row.equipBuffName || "").trim().length > 0;
+  const hasBuffEffect = equipmentBuffHasEffect(row);
+  const hasBuffInfo = row.equipBuffEnabled || hasBuffName || hasBuffEffect;
+
+  if (equipmentBuffNeedsEffectWarning(row)) {
+    parts.push(equipmentBuffEffectWarningText(row));
+  } else if (hasBuffInfo) {
+    const stateText = row.equipBuffEnabled ? "Buff ON" : "Buff OFF";
+    const name = equipmentBuffDisplayName(row);
+    const effect = hasBuffEffect ? equipmentBuffEffectText(row) : "効果なし";
+    parts.push(`${stateText}: ${name} / ${effect}`);
+  }
+
+  const full = parts.filter(Boolean).join(" ｜ ");
+  if (!full) return "";
+  return full.length > maxLen ? `${full.slice(0, Math.max(0, maxLen - 1))}…` : full;
+}
+
+function updateEquipmentInlineBuffSummaryElement(el, row) {
+  if (!el) return;
+
+  const text = equipmentInlineBuffSummaryText(row);
+  const warn = equipmentBuffNeedsEffectWarning(row);
+  const hasEffect = equipmentBuffHasEffect(row);
+
+  if (!text) {
+    el.style.display = "none";
+    el.textContent = "";
+    el.removeAttribute("title");
+  } else {
+    el.style.display = "";
+    el.textContent = text;
+    el.title = equipmentInlineBuffSummaryText(row, 4096);
+  }
+
+  el.classList.toggle("warn", !!warn);
+  el.classList.toggle("on", !!(row?.equipBuffEnabled && hasEffect && !warn));
+  el.classList.toggle("off", !!(!row?.equipBuffEnabled && hasEffect && !warn));
+  el.classList.toggle("equipmentOffSummary", row?.enabled === false);
+}
+
+function attachEquipmentInlineBuffSummaryToRow(tr, row) {
+  if (!tr || !tr.querySelector) return;
+
+  const nameInput = tr.querySelector(".equipName");
+  const cell = nameInput && nameInput.closest ? nameInput.closest("td") : null;
+  if (!cell) return;
+
+  let summary = cell.querySelector(".equipInlineBuffSummaryText");
+  if (!summary) {
+    summary = document.createElement("div");
+    summary.className = "small equipInlineBuffSummaryText";
+    cell.appendChild(summary);
+  }
+
+  updateEquipmentInlineBuffSummaryElement(summary, row);
+}
+
+function refreshEquipmentInlineBuffSummaryNearButton(button, row) {
+  const tr = button && button.closest ? button.closest("tr") : null;
+  if (!tr) return;
+  const summary = tr.querySelector(".equipInlineBuffSummaryText");
+  updateEquipmentInlineBuffSummaryElement(summary, row);
+}
 function makeEquipmentBuffButtonCell(row, detailTr) {
   const td = makeCell("td");
   td.className = "equipBuffCell";
@@ -6184,7 +6274,8 @@ function makeEquipmentInputRow(row, includeSlot=true, idx=0) {
   note.oninput = () => { row.note = note.value; };
   tr.appendChild(makeCell("td")).appendChild(note);
 
-  tr.appendChild(equipmentActionCell(idx));
+  tr.appendChild(equipmentActionCell(idx));  attachEquipmentInlineBuffSummaryToRow(tr, row);
+
 
   frag.appendChild(tr);
   frag.appendChild(detailTr);
