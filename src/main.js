@@ -5,7 +5,7 @@
   onclick属性から呼ばれる関数があるため、現時点では module ではなく通常scriptとして読み込みます。
 */
 
-const APP_VERSION = "v1.23.28";
+const APP_VERSION = "v1.23.29";
 const APP_VERSION_NOTE = "装備カタログ条件表示・ページ送り・追加効果二重加算修正";
 
 /* 種族係数。攻撃力係数と魔力係数は別管理。 */
@@ -3838,6 +3838,65 @@ function skillKnowledgeItemHtml(ev, type) {
   </article>`;
 }
 
+
+/* __MOE_SKILL_KNOWLEDGE_CARD_RENDER_LIMIT_V1__
+ * スキルシミュレータの知識カード(skillKnowledgeItem)を初期描画しすぎないための表示制限。
+ * スキル入力・計算・保存形式には触れない。
+ * 検索中/カテゴリ指定中は一致件数を全表示し、通常表示だけグループごとに初期件数を絞る。
+ */
+const SKILL_KNOWLEDGE_INITIAL_RENDER_LIMITS = {
+  masteries: 40,
+  techniques: 80,
+  magic: 80
+};
+
+const skillKnowledgeExpandedGroups = {};
+
+function skillKnowledgeShouldLimitCards(key, filter, visible) {
+  if (!visible || visible.length === 0) return false;
+  if (skillKnowledgeExpandedGroups[key]) return false;
+  if (filter?.text) return false;
+  if (filter?.category && filter.category !== "all") return false;
+  // 「使用可能だけ」「あと少しだけ」など、明示フィルタ時は全件を見せる。
+  if (filter?.status && filter.status !== "all" && filter.status !== "relevant") return false;
+  const limit = SKILL_KNOWLEDGE_INITIAL_RENDER_LIMITS[key] || 80;
+  return visible.length > limit;
+}
+
+function skillKnowledgeVisibleRenderSlice(key, visible, filter) {
+  const limit = SKILL_KNOWLEDGE_INITIAL_RENDER_LIMITS[key] || 80;
+  if (!skillKnowledgeShouldLimitCards(key, filter, visible)) {
+    return { items: visible, hidden: 0, limit };
+  }
+  return {
+    items: visible.slice(0, limit),
+    hidden: Math.max(0, visible.length - limit),
+    limit
+  };
+}
+
+function skillKnowledgeMoreButtonHtml(key, hidden, total) {
+  if (!hidden) return "";
+  return `<div class="skillKnowledgeMore small">
+    <button type="button" class="secondaryBtn" data-skill-knowledge-more="${escapeHtml(key)}">さらに表示</button>
+    <span class="mutedText">初期表示を軽量化中: あと ${hidden}件 / 絞り込み一致 ${total}件</span>
+  </div>`;
+}
+
+function attachSkillKnowledgeMoreButton(containerId) {
+  const root = byId(containerId);
+  if (!root) return;
+  const btn = root.querySelector("[data-skill-knowledge-more]");
+  if (!btn) return;
+  btn.onclick = () => {
+    const key = btn.dataset.skillKnowledgeMore;
+    if (!key) return;
+    skillKnowledgeExpandedGroups[key] = true;
+    renderSkillKnowledge();
+  };
+}
+
+
 function renderSkillKnowledge() {
   if (!byId("skillMasteryList")) return;
   setupSkillKnowledgeControls();
@@ -3861,10 +3920,12 @@ function renderSkillKnowledge() {
     // マスタリーはスキル投入ボタンとBuff枠確認のため、状態フィルタに関係なく常時全件表示。
     // テクニック/魔法だけ「使用可能/あと少し」などの表示絞り込みを適用する。
     const visible = key === "masteries" ? evaluated : evaluated.filter(ev => skillKnowledgeMatches(ev, filter));
-    shown += visible.length;
+    const renderSlice = skillKnowledgeVisibleRenderSlice(key, visible, filter);
+    const renderItems = renderSlice.items;
+    shown += renderItems.length;
 
-    let html = visible.length
-      ? visible.map(ev => skillKnowledgeItemHtml(ev, label)).join("")
+    let html = renderItems.length
+      ? renderItems.map(ev => skillKnowledgeItemHtml(ev, label)).join("") + skillKnowledgeMoreButtonHtml(key, renderSlice.hidden, visible.length)
       : `<p class="small">表示できるものはありません</p>`;
 
     if (key === "masteries" && (data.masteries || []).length < 30) {
@@ -3872,8 +3933,13 @@ function renderSkillKnowledge() {
     }
 
     const countId = key === "masteries" ? "skillMasteryCount" : key === "techniques" ? "skillTechniqueCount" : "skillMagicCount";
-    if (byId(countId)) byId(countId).textContent = `${visible.length}/${evaluated.length}`;
+    if (byId(countId)) {
+      byId(countId).textContent = renderSlice.hidden
+        ? `${renderItems.length}/${evaluated.length} (+${renderSlice.hidden}件省略)`
+        : `${renderItems.length}/${evaluated.length}`;
+    }
     byId(id).innerHTML = html;
+    attachSkillKnowledgeMoreButton(id);
   });
 
   const summary = byId("skillKnowledgeSummary");
