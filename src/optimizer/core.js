@@ -226,6 +226,117 @@ function optimizerMergeCurrentConfigResult(results, currentResult, settings) {
   return withCurrent.slice(0, settings.topN).concat([currentResult]);
 }
 
+
+/* __MOE_OPTIMIZER_EXPLORATION_DIAGNOSTICS_V1__
+ * 最適化検索の探索範囲と現在ON構成比較を表示するための診断ヘルパー。
+ * 探索アルゴリズム・計算式・stateは変更しない。
+ */
+function optimizerDiagnosticFmtInt(n) {
+  const v = Number(n);
+  if (!Number.isFinite(v)) return "";
+  try { return Math.round(v).toLocaleString("ja-JP"); } catch { return String(Math.round(v)); }
+}
+
+function optimizerDiagnosticMetricValue(result, settings) {
+  const m = result?.metrics || {};
+  const objective = settings?.objective || "damage";
+  if (objective === "damage") return Number(m.rawDamage ?? m.damage ?? m.finalDamage ?? result?.score ?? 0);
+  if (objective === "atk") return Number(m.atk ?? result?.score ?? 0);
+  if (objective === "magic") return Number(m.magic ?? result?.score ?? 0);
+  if (objective === "speed") return Number(m.interval ?? m.speed ?? result?.score ?? 0);
+  if (objective === "hit") return Number(m.hit ?? result?.score ?? 0);
+  if (objective === "avoid") return Number(m.avoid ?? result?.score ?? 0);
+  if (objective === "ac") return Number(m.ac ?? result?.score ?? 0);
+  return Number(result?.score ?? 0);
+}
+
+function optimizerDiagnosticCompareText(a, b, settings) {
+  if (!a || !b) return "";
+  const cmp = optimizerCompareEvaluations(a, b);
+  const av = optimizerDiagnosticMetricValue(a, settings);
+  const bv = optimizerDiagnosticMetricValue(b, settings);
+  const diff = av - bv;
+  const diffText = Number.isFinite(diff) && Math.abs(diff) > 0.000001
+    ? ` / 表示値差 ${diff > 0 ? "+" : ""}${fmt(diff, 2)}`
+    : "";
+  if (cmp > 0) return `現在ON構成の方が自動探索1位より強い可能性があります${diffText}`;
+  if (cmp < 0) return `現在ON構成は自動探索1位以下です${diffText}`;
+  return `現在ON構成と自動探索1位は同等評価です${diffText}`;
+}
+
+function makeOptimizerExplorationDiagnostic({settings, equipmentBeams, buffEvalBeams, rawResults, dedupedSortedResults, autoResults, currentResult, results}) {
+  const mode = settings?.optimizerEquipmentSearchMode || "unknown";
+  const exact = mode === "exact";
+  const totalGenerated = (equipmentBeams || []).length;
+  const evaluated = (buffEvalBeams || []).length;
+  const rawCount = (rawResults || []).length;
+  const dedupedCount = (dedupedSortedResults || []).length;
+  const shownCount = (results || []).length;
+  const topAuto = (autoResults && autoResults[0]) || (dedupedSortedResults && dedupedSortedResults[0]) || null;
+
+  const exactTotal = Number(settings?.optimizerEquipmentExactTotal || 0);
+  const exactTotalText = exactTotal && exactTotal !== totalGenerated
+    ? ` / 全組み合わせ推定 ${optimizerDiagnosticFmtInt(exactTotal)}通り`
+    : "";
+
+  const lines = [];
+  const warnings = [];
+
+  lines.push(`探索方式: ${exact ? "全探索候補" : "近似探索"}（mode=${mode}）`);
+  lines.push(`装備候補: 生成 ${optimizerDiagnosticFmtInt(totalGenerated)}件 / Buff評価 ${optimizerDiagnosticFmtInt(evaluated)}件${exactTotalText}`);
+  lines.push(`結果整理: 条件通過 ${optimizerDiagnosticFmtInt(rawCount)}件 / 装備重複整理後 ${optimizerDiagnosticFmtInt(dedupedCount)}件 / 表示 ${optimizerDiagnosticFmtInt(shownCount)}件`);
+
+  if (!exact) {
+    warnings.push("装備候補を途中で間引いているため、手動で作れるシナジー構成が探索結果に出ない可能性があります。");
+  }
+
+  if (settings?.equipmentEvalLimit && totalGenerated > evaluated) {
+    warnings.push(`equipmentEvalLimit により ${optimizerDiagnosticFmtInt(totalGenerated)}件中 ${optimizerDiagnosticFmtInt(evaluated)}件だけをBuff評価しています。`);
+  }
+
+  if (settings?.optimizerBetterThanCurrentFiltered) {
+    lines.push(`現在ON超えフィルタ: ${optimizerDiagnosticFmtInt(settings.optimizerBetterThanCurrentFiltered)}件を除外 / 通過 ${optimizerDiagnosticFmtInt(settings.optimizerBetterThanCurrentCount || 0)}件`);
+  }
+
+  if (currentResult && topAuto) {
+    const cmp = optimizerCompareEvaluations(currentResult, topAuto);
+    lines.push(optimizerDiagnosticCompareText(currentResult, topAuto, settings));
+    if (cmp > 0) {
+      warnings.push("現在ON構成が自動探索1位より高評価です。探索漏れ、表示フィルタ、または近似探索の間引きを確認してください。");
+    }
+  } else if (currentResult && !topAuto) {
+    lines.push("現在ON構成: 評価済み / 比較できる自動探索結果なし");
+    warnings.push("自動探索結果が空です。表示フィルタ、上限条件、候補間引きを確認してください。");
+  } else {
+    lines.push("現在ON構成: 未比較");
+  }
+
+  if (settings?.optimizerCurrentEquipmentSeedStatus) {
+    lines.push(`現在ON装備+最適Buff: ${settings.optimizerCurrentEquipmentSeedStatus}`);
+  }
+
+  const statusText = [
+    "",
+    "▼探索診断",
+    ...lines,
+    ...(warnings.length ? ["警告:", ...warnings.map(x => `- ${x}`)] : [])
+  ].join("\\n");
+
+  return {
+    statusText,
+    approximate: !exact,
+    mode,
+    totalGenerated,
+    evaluated,
+    exactTotal: exactTotal || null,
+    rawCount,
+    dedupedCount,
+    shownCount,
+    currentBetterThanAuto: !!(currentResult && topAuto && optimizerCompareEvaluations(currentResult, topAuto) > 0),
+    warnings
+  };
+}
+
 function runOptimizerCore(payload, onProgress=null) {
   const inputs = {...(payload?.inputs || {})};
   const settings = {...(payload?.settings || {})};
@@ -286,6 +397,9 @@ function runOptimizerCore(payload, onProgress=null) {
     ? optimizerBuildCurrentConfigResult(inputs, settings)
     : null;
 
+  // 探索診断用。結果には混ぜず、現在ON構成との比較だけ行う。
+  const diagnosticCurrentResult = currentResult || optimizerBuildCurrentConfigResult(inputs, settings);
+
   const searchResultsWithSeeds = optimizerMergeSeedResults(rawResults, seedResults, settings);
 
   const dedupedSortedResults = optimizerDedupeResultsByEquipment(searchResultsWithSeeds, settings)
@@ -297,7 +411,21 @@ function runOptimizerCore(payload, onProgress=null) {
   const results = optimizerMergeCurrentConfigResult(autoResults, currentResult, settings);
 
   const elapsed = Math.round(performance.now() - startTime);
-  const statusText = makeOptimizerStatusText({settings, equipmentBeams, buffEvalBeams, results, elapsed});
+  const optimizerDiagnostic = makeOptimizerExplorationDiagnostic({
+    settings,
+    equipmentBeams,
+    buffEvalBeams,
+    rawResults,
+    dedupedSortedResults,
+    autoResults,
+    currentResult: diagnosticCurrentResult,
+    results
+  });
+  settings.optimizerExplorationDiagnostic = optimizerDiagnostic;
+  const statusText = [
+    makeOptimizerStatusText({settings, equipmentBeams, buffEvalBeams, results, elapsed}),
+    optimizerDiagnostic.statusText
+  ].filter(Boolean).join("\n");
 
   return {
     results,
@@ -306,6 +434,7 @@ function runOptimizerCore(payload, onProgress=null) {
       elapsed,
       evaluated: buffEvalBeams.length,
       totalEquipmentCandidates: equipmentBeams.length,
+      optimizerDiagnostic,
       settings
     }
   };
