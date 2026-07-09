@@ -5,7 +5,7 @@
   onclick属性から呼ばれる関数があるため、現時点では module ではなく通常scriptとして読み込みます。
 */
 
-const APP_VERSION = "v1.23.39";
+const APP_VERSION = "v1.23.41";
 const APP_VERSION_NOTE = "装備カタログ条件表示・ページ送り・追加効果二重加算修正";
 
 /* 種族係数。攻撃力係数と魔力係数は別管理。 */
@@ -3846,20 +3846,252 @@ let skillSelectedKnowledgeIndexCache = null;
 
 function ensureSkillSelectedKnowledgePanel() {
   if (typeof document === "undefined") return null;
+
+  installSkillSelectedKnowledgeFloatingStyles();
+
   let panel = byId("skillSelectedKnowledgePanel");
-  if (panel) return panel;
+  if (!panel) {
+    panel = document.createElement("div");
+    panel.id = "skillSelectedKnowledgePanel";
+    panel.innerHTML = `<div class="small mutedText">スキル名をクリックすると、関連テクニック・魔法をここに表示します。</div>`;
+  }
 
-  const root = byId("skillSimGroups");
-  if (!root || !root.parentNode) return null;
+  panel.classList.add("skillSelectedKnowledgePanel", "cardLike", "skillSelectedKnowledgeFloatingPanel");
 
-  panel = document.createElement("div");
-  panel.id = "skillSelectedKnowledgePanel";
-  panel.className = "skillSelectedKnowledgePanel cardLike";
-  panel.innerHTML = `<div class="small mutedText">スキル名をクリックすると、関連テクニック・魔法をここに表示します。</div>`;
+  // Floating popover should not reserve page space. Reparent old in-page panel if needed.
+  if (panel.parentNode !== document.body && document.body) {
+    document.body.appendChild(panel);
+  }
 
-  root.insertAdjacentElement("afterend", panel);
   return panel;
 }
+
+// __MOE_SKILL_SELECTED_PANEL_FLOATING_POPOVER_V1__
+// 選択スキル関連パネルを、スキル名クリック時だけ浮かぶポップオーバーにする。
+// もえかるくの見た目/DOM/画像/固定配置はコピーしない。
+let skillSelectedKnowledgeFloatingAnchor = null;
+let skillSelectedKnowledgeFloatingHandlersBound = false;
+
+function installSkillSelectedKnowledgeFloatingStyles() {
+  if (typeof document === "undefined" || byId("skillSelectedKnowledgeFloatingStyle")) return;
+
+  const style = document.createElement("style");
+  style.id = "skillSelectedKnowledgeFloatingStyle";
+  style.textContent = `
+/* __MOE_SKILL_SELECTED_PANEL_FLOATING_POPOVER_V1__ */
+#skillSelectedKnowledgePanel.skillSelectedKnowledgeFloatingPanel {
+  position:fixed;
+  z-index:10000;
+  display:none;
+  width:min(680px, calc(100vw - 16px));
+  max-height:min(78vh, 760px);
+  overflow:auto;
+  box-sizing:border-box;
+  padding:8px 10px;
+  border:1px solid rgba(0,0,0,.25);
+  box-shadow:0 12px 32px rgba(0,0,0,.24);
+  transform:translateY(4px) scale(.985);
+  opacity:0;
+}
+#skillSelectedKnowledgePanel.skillSelectedKnowledgeFloatingPanel.isOpen {
+  display:block;
+  transform:translateY(0) scale(1);
+  opacity:1;
+  transition:opacity .10s ease-out, transform .10s ease-out;
+}
+#skillSelectedKnowledgePanel.skillSelectedKnowledgeFloatingPanel .skillSelectedKnowledgeHeader {
+  position:sticky;
+  top:0;
+  z-index:1;
+  padding:2px 0 5px;
+  backdrop-filter:blur(6px);
+}
+.skillSelectedKnowledgeFloatingClose {
+  margin-left:auto;
+  padding:1px 7px;
+  line-height:1.25;
+}
+body.skillSelectedKnowledgePopoverOpen .selectedSkillKnowledgeName {
+  font-weight:bold;
+  text-decoration:underline;
+}
+@media (max-width: 720px) {
+  #skillSelectedKnowledgePanel.skillSelectedKnowledgeFloatingPanel {
+    left:8px !important;
+    right:8px;
+    top:8px !important;
+    width:calc(100vw - 16px);
+    max-height:calc(100vh - 16px);
+  }
+}
+`;
+  document.head.appendChild(style);
+}
+
+function clampSkillSelectedKnowledgePanelPosition(value, min, max) {
+  if (!Number.isFinite(value)) return min;
+  if (!Number.isFinite(max) || max < min) return min;
+  return Math.max(min, Math.min(max, value));
+}
+
+function positionSkillSelectedKnowledgeFloatingPanel(anchor=null) {
+  const panel = byId("skillSelectedKnowledgePanel");
+  if (!panel || !panel.classList.contains("isOpen")) return;
+
+  const target = anchor || skillSelectedKnowledgeFloatingAnchor;
+  if (!target || typeof target.getBoundingClientRect !== "function") {
+    panel.style.left = "8px";
+    panel.style.top = "8px";
+    return;
+  }
+
+  const rect = target.getBoundingClientRect();
+  const gap = 8;
+  const margin = 8;
+  const panelWidth = panel.offsetWidth || Math.min(680, window.innerWidth - margin * 2);
+  const panelHeight = panel.offsetHeight || Math.min(760, window.innerHeight - margin * 2);
+
+  let left = rect.right + gap;
+  if (left + panelWidth > window.innerWidth - margin) {
+    left = rect.left - panelWidth - gap;
+  }
+  if (left < margin) {
+    left = rect.left;
+  }
+  left = clampSkillSelectedKnowledgePanelPosition(left, margin, window.innerWidth - panelWidth - margin);
+
+  let top = rect.top - 8;
+  top = clampSkillSelectedKnowledgePanelPosition(top, margin, window.innerHeight - panelHeight - margin);
+
+  panel.style.left = `${Math.round(left)}px`;
+  panel.style.top = `${Math.round(top)}px`;
+}
+
+function closeSelectedSkillKnowledgeFloatingPanel() {
+  const panel = byId("skillSelectedKnowledgePanel");
+  if (panel) panel.classList.remove("isOpen");
+  if (document.body) document.body.classList.remove("skillSelectedKnowledgePopoverOpen");
+}
+
+function bindSkillSelectedKnowledgeFloatingGlobalHandlers() {
+  if (skillSelectedKnowledgeFloatingHandlersBound || typeof document === "undefined") return;
+  skillSelectedKnowledgeFloatingHandlersBound = true;
+
+  document.addEventListener("keydown", ev => {
+    if (ev.key === "Escape") closeSelectedSkillKnowledgeFloatingPanel();
+  });
+
+  document.addEventListener("mousedown", ev => {
+    const panel = byId("skillSelectedKnowledgePanel");
+    if (!panel || !panel.classList.contains("isOpen")) return;
+    if (panel.contains(ev.target)) return;
+    if (ev.target && typeof ev.target.closest === "function" && ev.target.closest(".skillBarNameButton")) return;
+    closeSelectedSkillKnowledgeFloatingPanel();
+  });
+
+  window.addEventListener("resize", () => positionSkillSelectedKnowledgeFloatingPanel());
+  window.addEventListener("scroll", () => positionSkillSelectedKnowledgeFloatingPanel(), true);
+}
+
+function decorateSkillSelectedKnowledgeFloatingPanel() {
+  const panel = ensureSkillSelectedKnowledgePanel();
+  if (!panel) return;
+
+  let header = panel.querySelector(".skillSelectedKnowledgeHeader");
+  if (!header) return;
+
+  if (!header.querySelector(".skillSelectedKnowledgeFloatingClose")) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "skillSelectedKnowledgeFloatingClose";
+    btn.textContent = "閉じる";
+    btn.onclick = closeSelectedSkillKnowledgeFloatingPanel;
+    header.appendChild(btn);
+  }
+}
+
+function showSelectedSkillKnowledgeFloatingPanel(anchor=null) {
+  const panel = ensureSkillSelectedKnowledgePanel();
+  if (!panel) return;
+
+  installSkillSelectedKnowledgeFloatingStyles();
+  installSkillSelectedKnowledgeFloatingFixStyles();
+  bindSkillSelectedKnowledgeFloatingGlobalHandlers();
+
+  skillSelectedKnowledgeFloatingAnchor = anchor || skillSelectedKnowledgeFloatingAnchor;
+  decorateSkillSelectedKnowledgeFloatingPanel();
+
+  panel.classList.add("isOpen");
+  if (document.body) document.body.classList.add("skillSelectedKnowledgePopoverOpen");
+
+  positionSkillSelectedKnowledgeFloatingPanel(skillSelectedKnowledgeFloatingAnchor);
+}
+
+// __MOE_SKILL_SELECTED_PANEL_FLOATING_POPOVER_FIX_V2__
+// 浮遊パネルv1で「枠は出るが中身が空」に見えるケースへの補強。
+// 既存データ/評価/フィルタを使い、表示直前に必ず中身を構築する。
+function installSkillSelectedKnowledgeFloatingFixStyles() {
+  if (typeof document === "undefined" || byId("skillSelectedKnowledgeFloatingFixStyle")) return;
+
+  const style = document.createElement("style");
+  style.id = "skillSelectedKnowledgeFloatingFixStyle";
+  style.textContent = `
+/* __MOE_SKILL_SELECTED_PANEL_FLOATING_POPOVER_FIX_V2__ */
+#skillSelectedKnowledgePanel.skillSelectedKnowledgeFloatingPanel {
+  background:Canvas !important;
+  color:CanvasText !important;
+  opacity:1;
+}
+#skillSelectedKnowledgePanel.skillSelectedKnowledgeFloatingPanel.isOpen {
+  display:block !important;
+  opacity:1 !important;
+  visibility:visible !important;
+}
+#skillSelectedKnowledgePanel.skillSelectedKnowledgeFloatingPanel .skillSelectedKnowledgeList {
+  display:block;
+}
+#skillSelectedKnowledgePanel.skillSelectedKnowledgeFloatingPanel .skillKnowledgeRelatedItem,
+#skillSelectedKnowledgePanel.skillSelectedKnowledgeFloatingPanel .skillSelectedKnowledgeBucket,
+#skillSelectedKnowledgePanel.skillSelectedKnowledgeFloatingPanel .skillSelectedKnowledgeMiniControls {
+  opacity:1;
+  visibility:visible;
+}
+#skillSelectedKnowledgePanel.skillSelectedKnowledgeFloatingPanel .skillSelectedKnowledgeHeader {
+  background:Canvas;
+  color:CanvasText;
+}
+`;
+  document.head.appendChild(style);
+}
+
+function skillSelectedKnowledgeRenderRowsForPopover(selected) {
+  const filters = skillSelectedKnowledgePanelFilters();
+  const all = buildSkillSelectedKnowledgeIndex().get(selected) || [];
+  const evaluatedAll = skillSelectedKnowledgeSortRows(all.map(entry => ({
+    entry,
+    ev: skillKnowledgeEvaluate(entry.item)
+  })));
+  const evaluated = evaluatedAll.filter(row => skillSelectedKnowledgeMatchesPanelFilters(row, filters));
+
+  const allCounts = {
+    available: evaluatedAll.filter(x => skillSelectedKnowledgeBucketKey(x.ev) === "available").length,
+    near: evaluatedAll.filter(x => skillSelectedKnowledgeBucketKey(x.ev) === "near").length,
+    missing: evaluatedAll.filter(x => skillSelectedKnowledgeBucketKey(x.ev) === "missing").length
+  };
+  const counts = {
+    available: evaluated.filter(x => skillSelectedKnowledgeBucketKey(x.ev) === "available").length,
+    near: evaluated.filter(x => skillSelectedKnowledgeBucketKey(x.ev) === "near").length,
+    missing: evaluated.filter(x => skillSelectedKnowledgeBucketKey(x.ev) === "missing").length
+  };
+
+  return {filters, all, evaluatedAll, evaluated, allCounts, counts};
+}
+
+function bindSkillSelectedKnowledgeFloatingCloseButton() {
+  const close = byId("skillSelectedKnowledgeFloatingClose");
+  if (close) close.onclick = closeSelectedSkillKnowledgeFloatingPanel;
+}
+
 
 function skillSelectedKnowledgeDefaultSkill() {
   const fromState = state?.skillSim?.selectedSkillKnowledge || "";
@@ -4178,33 +4410,21 @@ function renderSelectedSkillKnowledgePanel(skillName=null) {
   const panel = ensureSkillSelectedKnowledgePanel();
   if (!panel) return;
 
+  installSkillSelectedKnowledgeFloatingFixStyles();
+
+  const wasOpen = panel.classList.contains("isOpen");
   state.skillSim = normalizeSkillSim(state.skillSim);
+
   const selected = validSkillSimSkillName(skillName || skillSelectedKnowledgeDefaultSkill(), "");
   if (!selected) {
-    panel.innerHTML = `<div class="small mutedText">スキル名をクリックすると、関連テクニック・魔法をここに表示します。</div>`;
+    panel.innerHTML = `<div class="skillSelectedKnowledgeHeader"><b>関連情報</b><button type="button" id="skillSelectedKnowledgeFloatingClose" class="skillSelectedKnowledgeFloatingClose">閉じる</button></div><div class="small mutedText">スキル名をクリックすると、関連テクニック・魔法をここに表示します。</div>`;
+    bindSkillSelectedKnowledgeFloatingCloseButton();
     return;
   }
 
   state.skillSim.selectedSkillKnowledge = selected;
 
-  const filters = skillSelectedKnowledgePanelFilters();
-  const all = buildSkillSelectedKnowledgeIndex().get(selected) || [];
-  const evaluatedAll = skillSelectedKnowledgeSortRows(all.map(entry => ({
-    entry,
-    ev: skillKnowledgeEvaluate(entry.item)
-  })));
-  const evaluated = evaluatedAll.filter(row => skillSelectedKnowledgeMatchesPanelFilters(row, filters));
-
-  const allCounts = {
-    available: evaluatedAll.filter(x => skillSelectedKnowledgeBucketKey(x.ev) === "available").length,
-    near: evaluatedAll.filter(x => skillSelectedKnowledgeBucketKey(x.ev) === "near").length,
-    missing: evaluatedAll.filter(x => skillSelectedKnowledgeBucketKey(x.ev) === "missing").length
-  };
-  const counts = {
-    available: evaluated.filter(x => skillSelectedKnowledgeBucketKey(x.ev) === "available").length,
-    near: evaluated.filter(x => skillSelectedKnowledgeBucketKey(x.ev) === "near").length,
-    missing: evaluated.filter(x => skillSelectedKnowledgeBucketKey(x.ev) === "missing").length
-  };
+  const {filters, all, evaluated, allCounts, counts} = skillSelectedKnowledgeRenderRowsForPopover(selected);
 
   const typeCounts = [
     ["マスタリー", all.filter(x => x.key === "masteries").length],
@@ -4229,6 +4449,7 @@ function renderSelectedSkillKnowledgePanel(skillName=null) {
     <div class="skillSelectedKnowledgeHeader">
       <b>選択スキル: ${escapeHtml(selected)}</b>
       <span class="mutedText">現在 ${fmt(skillSimValue(selected), 1)}</span>
+      <button type="button" id="skillSelectedKnowledgeFloatingClose" class="skillSelectedKnowledgeFloatingClose">閉じる</button>
     </div>
     ${skillSelectedKnowledgeFilterControlsHtml(filters)}
     <div class="small mutedText">
@@ -4239,9 +4460,16 @@ function renderSelectedSkillKnowledgePanel(skillName=null) {
   `;
 
   bindSkillSelectedKnowledgePanelFilters(selected);
+  bindSkillSelectedKnowledgeFloatingCloseButton();
+
+  if (wasOpen) {
+    panel.classList.add("isOpen");
+    if (document.body) document.body.classList.add("skillSelectedKnowledgePopoverOpen");
+    positionSkillSelectedKnowledgeFloatingPanel();
+  }
 }
 
-function selectSkillKnowledge(skill) {
+function selectSkillKnowledge(skill, anchor=null) {
   const selected = validSkillSimSkillName(skill, "");
   if (!selected) return;
   if (!state.skillSim) state.skillSim = defaultSkillSimState();
@@ -4251,7 +4479,9 @@ function selectSkillKnowledge(skill) {
     el.classList.toggle("selectedSkillKnowledgeName", el.dataset.skillName === selected);
   });
 
+  skillSelectedKnowledgeFloatingAnchor = anchor || skillSelectedKnowledgeFloatingAnchor;
   renderSelectedSkillKnowledgePanel(selected);
+  showSelectedSkillKnowledgeFloatingPanel(anchor);
 }
 
 // __MOE_SKILL_KNOWLEDGE_LAZY_FULL_LIST_V1__
@@ -4489,7 +4719,7 @@ function makeSkillBarRow(skill) {
   name.textContent = skill;
   name.dataset.skillName = skill;
   name.title = "関連テクニック・魔法を表示";
-  name.onclick = () => selectSkillKnowledge(skill);
+  name.onclick = ev => selectSkillKnowledge(skill, ev.currentTarget);
   if (state?.skillSim?.selectedSkillKnowledge === skill) name.classList.add("selectedSkillKnowledgeName");
   row.appendChild(name);
 
