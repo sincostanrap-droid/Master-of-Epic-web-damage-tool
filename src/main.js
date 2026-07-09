@@ -5,7 +5,7 @@
   onclick属性から呼ばれる関数があるため、現時点では module ではなく通常scriptとして読み込みます。
 */
 
-const APP_VERSION = "v1.23.37";
+const APP_VERSION = "v1.23.39";
 const APP_VERSION_NOTE = "装備カタログ条件表示・ページ送り・追加効果二重加算修正";
 
 /* 種族係数。攻撃力係数と魔力係数は別管理。 */
@@ -4557,9 +4557,170 @@ function makeSkillBarRow(skill) {
 }
 
 
+// __MOE_SKILL_SIM_COMPACT_UI_V3_NO_TOGGLE__
+// もえかるくの「情報密度」だけを参考にしたコンパクト表示。
+// CSS/HTML/画像/絶対配置はコピーせず、既存DOMをCSSで詰める。
+function skillSimCompactUiEnabled() {
+  return true;
+}
+
+function installSkillSimCompactUiStyles() {
+  if (typeof document === "undefined" || byId("skillSimCompactUiStyle")) return;
+
+  const style = document.createElement("style");
+  style.id = "skillSimCompactUiStyle";
+  style.textContent = `
+/* __MOE_SKILL_SIM_COMPACT_UI_V3_NO_TOGGLE__ */
+#skillSimGroups.skillSimCompactMode {
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(250px, 1fr));
+  gap:8px;
+  align-items:start;
+}
+#skillSimGroups.skillSimCompactMode .skillSimGroupBar {
+  margin:0;
+  padding:6px 8px;
+}
+#skillSimGroups.skillSimCompactMode .skillSimGroupBar h3 {
+  margin:0 0 4px;
+  font-size:13px;
+  line-height:1.2;
+}
+#skillSimGroups.skillSimCompactMode .skillSimBarGrid {
+  display:grid;
+  grid-template-columns:1fr;
+  gap:1px;
+}
+#skillSimGroups.skillSimCompactMode .skillBarRow {
+  display:grid;
+  grid-template-columns:minmax(4.8em, 5.8em) minmax(72px, 1fr) minmax(3.9em, 4.4em);
+  align-items:center;
+  gap:4px;
+  min-height:20px;
+  padding:1px 0;
+}
+#skillSimGroups.skillSimCompactMode .skillBarName,
+#skillSimGroups.skillSimCompactMode .skillBarNameButton {
+  min-width:0;
+  width:auto;
+  margin:0;
+  padding:0 2px;
+  border:0;
+  background:transparent;
+  color:inherit;
+  font:inherit;
+  font-size:12px;
+  line-height:1.15;
+  text-align:left;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  cursor:pointer;
+}
+#skillSimGroups.skillSimCompactMode .skillBarNameButton:hover {
+  text-decoration:underline;
+}
+#skillSimGroups.skillSimCompactMode .selectedSkillKnowledgeName {
+  font-weight:bold;
+  text-decoration:underline;
+}
+#skillSimGroups.skillSimCompactMode .skillBarWrap {
+  min-width:72px;
+  height:14px;
+  min-height:14px;
+  display:flex;
+  align-items:center;
+}
+#skillSimGroups.skillSimCompactMode .skillBarWrap input[type="range"],
+#skillSimGroups.skillSimCompactMode input[type="range"] {
+  width:100%;
+  height:14px;
+  min-height:14px;
+  margin:0;
+}
+#skillSimGroups.skillSimCompactMode input[type="number"],
+#skillSimGroups.skillSimCompactMode .skillBarValue {
+  width:4.2em;
+  min-width:0;
+  box-sizing:border-box;
+  padding:0 2px;
+  height:20px;
+  line-height:18px;
+  font-size:12px;
+  text-align:right;
+}
+body.skillSimCompactModeActive #skillSelectedKnowledgePanel {
+  margin-top:8px;
+  padding:8px 10px;
+}
+body.skillSimCompactModeActive #skillSelectedKnowledgePanel h4 {
+  margin:6px 0 3px;
+  font-size:13px;
+}
+body.skillSimCompactModeActive .skillSelectedKnowledgeHeader {
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:6px 10px;
+}
+body.skillSimCompactModeActive .skillSelectedKnowledgeMiniControls {
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:4px 8px;
+  margin:4px 0;
+}
+body.skillSimCompactModeActive .skillSelectedKnowledgeMiniControls label {
+  display:inline-flex;
+  align-items:center;
+  gap:3px;
+  margin:0;
+}
+body.skillSimCompactModeActive .skillSelectedKnowledgeMiniControls select,
+body.skillSimCompactModeActive .skillSelectedKnowledgeMiniControls input {
+  max-width:10em;
+  height:22px;
+  padding:1px 4px;
+}
+body.skillSimCompactModeActive .skillSelectedKnowledgeMiniControls button {
+  padding:1px 6px;
+  line-height:1.35;
+}
+body.skillSimCompactModeActive .skillSelectedKnowledgeBucket {
+  margin:6px 0;
+}
+body.skillSimCompactModeActive .skillSelectedKnowledgeTypeHeading {
+  margin:4px 0 2px;
+  font-weight:bold;
+}
+body.skillSimCompactModeActive .skillKnowledgeRelatedItem {
+  margin:2px 0;
+  padding:4px 6px;
+}
+@media (max-width: 720px) {
+  #skillSimGroups.skillSimCompactMode {
+    grid-template-columns:1fr;
+  }
+  #skillSimGroups.skillSimCompactMode .skillBarRow {
+    grid-template-columns:minmax(4.8em, 5.5em) minmax(64px, 1fr) minmax(3.8em, 4.2em);
+  }
+}
+`;
+  document.head.appendChild(style);
+}
+
+
+function applySkillSimCompactUiState() {
+  if (typeof document === "undefined") return;
+  const root = byId("skillSimGroups");
+  if (document.body) document.body.classList.add("skillSimCompactModeActive");
+  if (root) root.classList.add("skillSimCompactMode");
+}
+
 function renderSkillSim() {
   if (!state.skillSim) state.skillSim = defaultSkillSimState();
   state.skillSim = normalizeSkillSim(state.skillSim);
+  installSkillSimCompactUiStyles();
 
   const name = byId("skillSimName");
   if (!name) return;
@@ -4608,6 +4769,7 @@ function renderSkillSim() {
   });
 
   const root = byId("skillSimGroups");
+  applySkillSimCompactUiState();
   ensureSkillSelectedKnowledgePanel();
   root.innerHTML = "";
   SKILL_SIM_GROUPS.forEach(([group, list]) => {
