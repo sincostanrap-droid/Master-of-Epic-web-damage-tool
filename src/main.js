@@ -5,7 +5,7 @@
   onclick属性から呼ばれる関数があるため、現時点では module ではなく通常scriptとして読み込みます。
 */
 
-const APP_VERSION = "v1.23.35";
+const APP_VERSION = "v1.23.36";
 const APP_VERSION_NOTE = "装備カタログ条件表示・ページ送り・追加効果二重加算修正";
 
 /* 種族係数。攻撃力係数と魔力係数は別管理。 */
@@ -3956,6 +3956,96 @@ function skillSelectedKnowledgeItemHtml(entry) {
   </div>`;
 }
 
+// __MOE_SKILL_SELECTED_PANEL_GROUPED_VIEW_V1__
+// 選択スキル関連パネルを「使用可能 / もう少し / 不足」で整理する。
+// もえかるくの見た目やデータ構造はコピーしない。
+function skillSelectedKnowledgeMissingScore(ev) {
+  const rows = Array.isArray(ev?.evaluated) ? ev.evaluated : [];
+  return rows.reduce((sum, row) => {
+    const current = Number(row?.current);
+    const min = row?.min === null || row?.min === undefined ? null : Number(row.min);
+    const max = row?.max === null || row?.max === undefined ? null : Number(row.max);
+    let miss = 0;
+    if (Number.isFinite(current) && Number.isFinite(min)) miss += Math.max(0, min - current);
+    if (Number.isFinite(current) && Number.isFinite(max)) miss += Math.max(0, current - max);
+    return sum + miss;
+  }, 0);
+}
+
+function skillSelectedKnowledgeBucketKey(ev) {
+  if (ev?.available || ev?.status === "available") return "available";
+  if (ev?.status === "near") return "near";
+  return "missing";
+}
+
+function skillSelectedKnowledgeBucketLabel(key) {
+  if (key === "available") return "使用可能";
+  if (key === "near") return "もう少し";
+  return "不足";
+}
+
+function skillSelectedKnowledgeBucketClass(key) {
+  if (key === "available") return "ok";
+  if (key === "near") return "warn";
+  return "bad";
+}
+
+function skillSelectedKnowledgeSortRows(rows) {
+  return rows.slice().sort((a, b) => {
+    const bucketOrder = {available: 0, near: 1, missing: 2};
+    const ak = skillSelectedKnowledgeBucketKey(a.ev);
+    const bk = skillSelectedKnowledgeBucketKey(b.ev);
+    if (bucketOrder[ak] !== bucketOrder[bk]) return bucketOrder[ak] - bucketOrder[bk];
+
+    const ao = a.entry?.groupOrder ?? 99;
+    const bo = b.entry?.groupOrder ?? 99;
+    if (ao !== bo) return ao - bo;
+
+    const am = skillSelectedKnowledgeMissingScore(a.ev);
+    const bm = skillSelectedKnowledgeMissingScore(b.ev);
+    if (am !== bm) return am - bm;
+
+    return (a.entry?.order ?? 0) - (b.entry?.order ?? 0);
+  });
+}
+
+function skillSelectedKnowledgeGroupSummary(rows) {
+  const byType = new Map();
+  rows.forEach(x => byType.set(x.entry.label, (byType.get(x.entry.label) || 0) + 1));
+  return ["マスタリー", "テクニック", "魔法"]
+    .filter(label => byType.has(label))
+    .map(label => `${label} ${byType.get(label)}`)
+    .join(" / ");
+}
+
+function skillSelectedKnowledgeBucketHtml(bucketKey, rows) {
+  const label = skillSelectedKnowledgeBucketLabel(bucketKey);
+  const cls = skillSelectedKnowledgeBucketClass(bucketKey);
+  const summary = skillSelectedKnowledgeGroupSummary(rows);
+  if (!rows.length) {
+    return `<section class="skillSelectedKnowledgeBucket ${cls}">
+      <h4>${escapeHtml(label)} <span class="mutedText">0件</span></h4>
+      <div class="small mutedText">該当なし</div>
+    </section>`;
+  }
+
+  let lastType = "";
+  const itemHtml = rows.map(row => {
+    const type = row.entry.label || "";
+    const heading = type !== lastType
+      ? `<div class="skillSelectedKnowledgeTypeHeading">${escapeHtml(type)}</div>`
+      : "";
+    lastType = type;
+    return heading + skillSelectedKnowledgeItemHtml(row.entry);
+  }).join("");
+
+  return `<section class="skillSelectedKnowledgeBucket ${cls}">
+    <h4>${escapeHtml(label)} <span class="mutedText">${rows.length}件${summary ? " / " + escapeHtml(summary) : ""}</span></h4>
+    ${itemHtml}
+  </section>`;
+}
+
+
 function renderSelectedSkillKnowledgePanel(skillName=null) {
   const panel = ensureSkillSelectedKnowledgePanel();
   if (!panel) return;
@@ -3970,29 +4060,49 @@ function renderSelectedSkillKnowledgePanel(skillName=null) {
   state.skillSim.selectedSkillKnowledge = selected;
 
   const all = buildSkillSelectedKnowledgeIndex().get(selected) || [];
-  const evaluated = all.map(entry => ({entry, ev: skillKnowledgeEvaluate(entry.item)}));
-  const available = evaluated.filter(x => x.ev.available).length;
-  const near = evaluated.filter(x => x.ev.status === "near").length;
-  const limit = 80;
-  const shown = evaluated.slice(0, limit);
+  const evaluated = skillSelectedKnowledgeSortRows(all.map(entry => ({
+    entry,
+    ev: skillKnowledgeEvaluate(entry.item)
+  })));
 
-  const counts = [
+  const counts = {
+    available: evaluated.filter(x => skillSelectedKnowledgeBucketKey(x.ev) === "available").length,
+    near: evaluated.filter(x => skillSelectedKnowledgeBucketKey(x.ev) === "near").length,
+    missing: evaluated.filter(x => skillSelectedKnowledgeBucketKey(x.ev) === "missing").length
+  };
+
+  const typeCounts = [
     ["マスタリー", all.filter(x => x.key === "masteries").length],
     ["テクニック", all.filter(x => x.key === "techniques").length],
     ["魔法", all.filter(x => x.key === "magic").length]
   ].filter(([, n]) => n).map(([label, n]) => `${label} ${n}`).join(" / ") || "該当なし";
 
+  const displayLimit = 160;
+  const shown = evaluated.slice(0, displayLimit);
+  const byBucket = {
+    available: shown.filter(x => skillSelectedKnowledgeBucketKey(x.ev) === "available"),
+    near: shown.filter(x => skillSelectedKnowledgeBucketKey(x.ev) === "near"),
+    missing: shown.filter(x => skillSelectedKnowledgeBucketKey(x.ev) === "missing")
+  };
+
   const body = shown.length
-    ? shown.map(x => skillSelectedKnowledgeItemHtml(x.entry)).join("")
+    ? [
+        skillSelectedKnowledgeBucketHtml("available", byBucket.available),
+        skillSelectedKnowledgeBucketHtml("near", byBucket.near),
+        skillSelectedKnowledgeBucketHtml("missing", byBucket.missing)
+      ].join("")
     : `<div class="small mutedText">このスキルに紐づくテクニック・魔法は登録データ内では見つかりませんでした。</div>`;
 
   panel.innerHTML = `
     <div class="skillSelectedKnowledgeHeader">
       <b>選択スキル: ${escapeHtml(selected)}</b>
-      <span class="mutedText">現在 ${fmt(skillSimValue(selected), 1)} / 使用可能 ${available} / 近い ${near}</span>
+      <span class="mutedText">現在 ${fmt(skillSimValue(selected), 1)}</span>
     </div>
-    <div class="small mutedText">${counts}${all.length > limit ? ` / 表示 ${limit}/${all.length}` : ""}</div>
-    <div class="skillSelectedKnowledgeList">${body}</div>
+    <div class="small mutedText">
+      関連 ${all.length}件 / 使用可能 ${counts.available} / もう少し ${counts.near} / 不足 ${counts.missing}<br>
+      ${typeCounts}${all.length > displayLimit ? ` / 表示 ${displayLimit}/${all.length}` : ""}
+    </div>
+    <div class="skillSelectedKnowledgeList skillSelectedKnowledgeGroupedList">${body}</div>
   `;
 }
 
