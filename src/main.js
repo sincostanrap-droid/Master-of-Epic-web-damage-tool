@@ -5,7 +5,7 @@
   onclick属性から呼ばれる関数があるため、現時点では module ではなく通常scriptとして読み込みます。
 */
 
-const APP_VERSION = "v1.23.41";
+const APP_VERSION = "v1.23.43";
 const APP_VERSION_NOTE = "装備カタログ条件表示・ページ送り・追加効果二重加算修正";
 
 /* 種族係数。攻撃力係数と魔力係数は別管理。 */
@@ -4016,6 +4016,8 @@ function showSelectedSkillKnowledgeFloatingPanel(anchor=null) {
 
   installSkillSelectedKnowledgeFloatingStyles();
   installSkillSelectedKnowledgeFloatingFixStyles();
+  installSkillSelectedKnowledgeFullDetailStyles();
+  installSkillSelectedKnowledgeFullDetailGridStyles();
   bindSkillSelectedKnowledgeFloatingGlobalHandlers();
 
   skillSelectedKnowledgeFloatingAnchor = anchor || skillSelectedKnowledgeFloatingAnchor;
@@ -4091,6 +4093,299 @@ function bindSkillSelectedKnowledgeFloatingCloseButton() {
   const close = byId("skillSelectedKnowledgeFloatingClose");
   if (close) close.onclick = closeSelectedSkillKnowledgeFloatingPanel;
 }
+
+// __MOE_SKILL_FLOATING_POPOVER_FULL_DETAILS_V1__
+// 全一覧側にある詳細情報を、浮遊パネル向けの高密度カードとして表示する。
+// もえかるくのDOM/CSS/画像/固定配置はコピーしない。
+function installSkillSelectedKnowledgeFullDetailStyles() {
+  if (typeof document === "undefined" || byId("skillSelectedKnowledgeFullDetailStyle")) return;
+
+  const style = document.createElement("style");
+  style.id = "skillSelectedKnowledgeFullDetailStyle";
+  style.textContent = `
+/* __MOE_SKILL_FLOATING_POPOVER_FULL_DETAILS_V1__ */
+#skillSelectedKnowledgePanel.skillSelectedKnowledgeFloatingPanel {
+  width:min(760px, calc(100vw - 16px));
+}
+.skillKnowledgeRelatedDetailItem {
+  margin:3px 0;
+  padding:5px 7px;
+}
+.skillKnowledgeRelatedDetailItem .skillKnowledgeDetailTitleLine {
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:4px 6px;
+}
+.skillKnowledgeRelatedDetailItem .skillKnowledgeDetailTitle {
+  font-weight:bold;
+}
+.skillKnowledgeDetailMeta {
+  display:flex;
+  flex-wrap:wrap;
+  gap:3px;
+  margin:3px 0;
+}
+.skillKnowledgeDetailChip {
+  display:inline-flex;
+  align-items:center;
+  gap:2px;
+  padding:1px 5px;
+  border:1px solid rgba(127,127,127,.35);
+  border-radius:999px;
+  line-height:1.25;
+  font-size:11px;
+}
+.skillKnowledgeDetailReq {
+  font-size:11px;
+  line-height:1.35;
+  margin:2px 0;
+}
+.skillKnowledgeDetailText {
+  font-size:11px;
+  line-height:1.38;
+  margin-top:3px;
+  padding-top:3px;
+  border-top:1px dashed rgba(127,127,127,.35);
+  max-height:5.4em;
+  overflow:auto;
+  white-space:normal;
+}
+.skillKnowledgeDetailSubText {
+  font-size:11px;
+  line-height:1.35;
+  margin-top:2px;
+}
+.skillKnowledgeDetailSourceLine {
+  display:flex;
+  flex-wrap:wrap;
+  gap:4px 8px;
+  margin-top:3px;
+}
+.skillKnowledgeDetailSourceLine a {
+  text-decoration:underline;
+}
+.skillKnowledgeDetailMuted {
+  opacity:.78;
+}
+`;
+  document.head.appendChild(style);
+}
+
+// __MOE_SKILL_FLOATING_POPOVER_FULL_DETAILS_GRID_V2__
+// 詳細カードを左右2カラム化し、ポップオーバーの横幅を活かす。
+function installSkillSelectedKnowledgeFullDetailGridStyles() {
+  if (typeof document === "undefined" || byId("skillSelectedKnowledgeFullDetailGridStyle")) return;
+
+  const style = document.createElement("style");
+  style.id = "skillSelectedKnowledgeFullDetailGridStyle";
+  style.textContent = `
+/* __MOE_SKILL_FLOATING_POPOVER_FULL_DETAILS_GRID_V2__ */
+#skillSelectedKnowledgePanel.skillSelectedKnowledgeFloatingPanel {
+  width:min(860px, calc(100vw - 16px));
+}
+.skillKnowledgeRelatedDetailItem.skillKnowledgeDetailTwoColumn {
+  display:grid;
+  grid-template-columns:minmax(255px, .85fr) minmax(300px, 1.15fr);
+  gap:4px 10px;
+  align-items:start;
+  padding:5px 7px;
+}
+.skillKnowledgeDetailMain,
+.skillKnowledgeDetailAside {
+  min-width:0;
+}
+.skillKnowledgeDetailAside {
+  border-left:1px dashed rgba(127,127,127,.38);
+  padding-left:9px;
+}
+.skillKnowledgeDetailAside .skillKnowledgeDetailText {
+  margin-top:0;
+  padding-top:0;
+  border-top:0;
+  max-height:6.8em;
+}
+.skillKnowledgeDetailAsideEmpty {
+  display:flex;
+  align-items:center;
+  min-height:2.2em;
+  opacity:.62;
+}
+.skillKnowledgeDetailMain .skillKnowledgeDetailSourceLine {
+  margin-top:4px;
+}
+.skillKnowledgeRelatedDetailItem .skillKnowledgeDetailMeta {
+  margin:3px 0 2px;
+}
+.skillKnowledgeRelatedDetailItem .skillKnowledgeDetailReq {
+  margin:2px 0;
+}
+@media (max-width: 780px) {
+  #skillSelectedKnowledgePanel.skillSelectedKnowledgeFloatingPanel {
+    width:calc(100vw - 16px);
+  }
+  .skillKnowledgeRelatedDetailItem.skillKnowledgeDetailTwoColumn {
+    grid-template-columns:1fr;
+  }
+  .skillKnowledgeDetailAside {
+    border-left:0;
+    border-top:1px dashed rgba(127,127,127,.38);
+    padding-left:0;
+    padding-top:4px;
+  }
+}
+`;
+  document.head.appendChild(style);
+}
+
+
+function skillSelectedKnowledgeHasValue(value) {
+  if (value === null || value === undefined) return false;
+  if (typeof value === "number") return Number.isFinite(value);
+  return String(value).trim() !== "";
+}
+
+function skillSelectedKnowledgeNormalizeText(value) {
+  if (value === null || value === undefined) return "";
+  if (Array.isArray(value)) return value.filter(skillSelectedKnowledgeHasValue).join(" / ");
+  if (typeof value === "object") {
+    if (skillSelectedKnowledgeHasValue(value.note)) return String(value.note);
+    return "";
+  }
+  return String(value).replace(/\r\n/g, "\n").replace(/\r/g, "\n").trim();
+}
+
+function skillSelectedKnowledgeMultilineHtml(value) {
+  const text = skillSelectedKnowledgeNormalizeText(value);
+  if (!text) return "";
+  return escapeHtml(text).replace(/\n/g, "<br>");
+}
+
+function skillSelectedKnowledgeDetailChipHtml(label, value, suffix="") {
+  if (!skillSelectedKnowledgeHasValue(value)) return "";
+  const text = String(value).trim();
+  if (!text) return "";
+  return `<span class="skillKnowledgeDetailChip"><span class="skillKnowledgeDetailMuted">${escapeHtml(label)}</span>${escapeHtml(text)}${suffix ? escapeHtml(suffix) : ""}</span>`;
+}
+
+function skillSelectedKnowledgeCostChipsHtml(item) {
+  const cost = item?.cost || {};
+  const chips = [
+    skillSelectedKnowledgeDetailChipHtml("ST", cost.st ?? item.st ?? item.consumeSt),
+    skillSelectedKnowledgeDetailChipHtml("MP", cost.mp ?? item.mp ?? item.consumeMp),
+    skillSelectedKnowledgeDetailChipHtml("HP", cost.hp ?? item.hp ?? item.consumeHp)
+  ].filter(Boolean);
+  return chips.join("");
+}
+
+function skillSelectedKnowledgeCoreDetailChipsHtml(item) {
+  const chips = [];
+  const cost = skillSelectedKnowledgeCostChipsHtml(item);
+  if (cost) chips.push(cost);
+
+  chips.push(skillSelectedKnowledgeDetailChipHtml("発動", item.castTime ?? item.cast ?? item.castingTime));
+  chips.push(skillSelectedKnowledgeDetailChipHtml("ディレイ", item.delay ?? item.recast ?? item.cooldown));
+  chips.push(skillSelectedKnowledgeDetailChipHtml("射程", item.range));
+  chips.push(skillSelectedKnowledgeDetailChipHtml("触媒", item.reagent ?? item.reagents));
+  chips.push(skillSelectedKnowledgeDetailChipHtml("移動", item.move));
+  chips.push(skillSelectedKnowledgeDetailChipHtml("転送", item.transfer));
+  chips.push(skillSelectedKnowledgeDetailChipHtml("Buff枠", item.usesBuffSlot ? (item.buffSlotCost || 1) : ""));
+
+  return chips.filter(Boolean).join("");
+}
+
+function skillSelectedKnowledgeExtraDetailTextHtml(item) {
+  const rows = [];
+
+  const desc = skillSelectedKnowledgeMultilineHtml(item.description || item.info);
+  if (desc) rows.push(`<div><b>説明</b><br>${desc}</div>`);
+
+  const effect = skillSelectedKnowledgeMultilineHtml(item.effect);
+  if (effect && effect !== desc) rows.push(`<div><b>効果</b><br>${effect}</div>`);
+
+  const buffNote = skillSelectedKnowledgeMultilineHtml(item.buffEffect);
+  if (buffNote) rows.push(`<div><b>Buff</b><br>${buffNote}</div>`);
+
+  const prereq = Array.isArray(item.prerequisiteTechniques) && item.prerequisiteTechniques.length
+    ? item.prerequisiteTechniques.join(" / ")
+    : "";
+  if (prereq) rows.push(`<div><b>関連テク</b><br>${escapeHtml(prereq)}</div>`);
+
+  return rows.join("");
+}
+
+function skillSelectedKnowledgeSourceDetailHtml(item) {
+  const rows = [];
+
+  if (skillSelectedKnowledgeHasValue(item.acquisition)) {
+    rows.push(`<span><b>入手</b> ${skillSelectedKnowledgeMultilineHtml(item.acquisition)}</span>`);
+  }
+  if (skillSelectedKnowledgeHasValue(item.shipEquipment)) {
+    rows.push(`<span><b>試練/装備</b> ${escapeHtml(String(item.shipEquipment))}</span>`);
+  }
+  if (skillSelectedKnowledgeHasValue(item.sourceUrl)) {
+    rows.push(`<a href="${escapeHtml(String(item.sourceUrl))}" target="_blank" rel="noopener">参照元</a>`);
+  } else if (skillSelectedKnowledgeHasValue(item.source)) {
+    rows.push(`<span><b>参照</b> ${escapeHtml(String(item.source))}</span>`);
+  }
+
+  return rows.length ? `<div class="skillKnowledgeDetailSourceLine small">${rows.join("")}</div>` : "";
+}
+
+function skillSelectedKnowledgeRequirementTextHtml(ev) {
+  const rows = Array.isArray(ev?.evaluated) ? ev.evaluated : [];
+  if (!rows.length) return "条件なし";
+  return rows.map(r => {
+    const need = r.max !== null && r.max !== undefined ? `≤${fmt(r.max, 1)}` : fmt(r.min, 1);
+    return `${escapeHtml(r.skill)} ${fmt(r.current, 1)}/${need}`;
+  }).join(" / ");
+}
+
+function skillSelectedKnowledgeSuccessDetailHtml(ev) {
+  if (!ev?.success) return "";
+  return `<div class="skillKnowledgeDetailSubText">成功率の目安${ev.success.estimated ? "（推定）" : ""}: ${fmt(ev.success.rate, 1)}% <span class="mutedText">(${escapeHtml(ev.success.skill)} ${fmt(ev.success.current, 1)}/${fmt(ev.success.required, 1)})</span></div>`;
+}
+
+function skillSelectedKnowledgeFloatingDetailItemHtml(row) {
+  installSkillSelectedKnowledgeFullDetailGridStyles();
+
+  const entry = row?.entry || row || {};
+  const item = entry.item || {};
+  const ev = row?.ev || skillKnowledgeEvaluate(item);
+  const statusClass = skillKnowledgeStatusClass(ev.status);
+  const label = entry.label || item.kind || "";
+  const category = item.category || "";
+  const name = item.name || "(名称未設定)";
+
+  const meta = skillSelectedKnowledgeCoreDetailChipsHtml(item);
+  const detailText = skillSelectedKnowledgeExtraDetailTextHtml(item);
+  const source = skillSelectedKnowledgeSourceDetailHtml(item);
+  const success = skillSelectedKnowledgeSuccessDetailHtml(ev);
+
+  const left = `
+    <div class="skillKnowledgeDetailMain">
+      <div class="skillKnowledgeDetailTitleLine">
+        <span class="skillKnowledgeBadge">${escapeHtml(label)}</span>
+        <span class="skillKnowledgeDetailTitle">${escapeHtml(name)}</span>
+        ${category ? `<span class="mutedText">${escapeHtml(category)}</span>` : ""}
+      </div>
+      ${meta ? `<div class="skillKnowledgeDetailMeta">${meta}</div>` : ""}
+      <div class="skillKnowledgeDetailReq mutedText">条件: ${skillSelectedKnowledgeRequirementTextHtml(ev)}</div>
+      ${success}
+      ${source}
+    </div>`;
+
+  const right = `
+    <div class="skillKnowledgeDetailAside">
+      ${detailText ? `<div class="skillKnowledgeDetailText">${detailText}</div>` : `<div class="skillKnowledgeDetailAsideEmpty small mutedText">説明/効果情報なし</div>`}
+    </div>`;
+
+  return `<div class="skillKnowledgeCard skillKnowledgeRelatedItem skillKnowledgeRelatedDetailItem skillKnowledgeDetailTwoColumn ${statusClass}">
+    ${left}
+    ${right}
+  </div>`;
+}
+
 
 
 function skillSelectedKnowledgeDefaultSkill() {
@@ -4251,6 +4546,9 @@ function skillSelectedKnowledgeGroupSummary(rows) {
 }
 
 function skillSelectedKnowledgeBucketHtml(bucketKey, rows) {
+  installSkillSelectedKnowledgeFullDetailStyles();
+  installSkillSelectedKnowledgeFullDetailGridStyles();
+
   const label = skillSelectedKnowledgeBucketLabel(bucketKey);
   const cls = skillSelectedKnowledgeBucketClass(bucketKey);
   const summary = skillSelectedKnowledgeGroupSummary(rows);
@@ -4268,7 +4566,7 @@ function skillSelectedKnowledgeBucketHtml(bucketKey, rows) {
       ? `<div class="skillSelectedKnowledgeTypeHeading">${escapeHtml(type)}</div>`
       : "";
     lastType = type;
-    return heading + skillSelectedKnowledgeItemHtml(row.entry);
+    return heading + skillSelectedKnowledgeFloatingDetailItemHtml(row);
   }).join("");
 
   return `<section class="skillSelectedKnowledgeBucket ${cls}">
@@ -4411,6 +4709,8 @@ function renderSelectedSkillKnowledgePanel(skillName=null) {
   if (!panel) return;
 
   installSkillSelectedKnowledgeFloatingFixStyles();
+  installSkillSelectedKnowledgeFullDetailStyles();
+  installSkillSelectedKnowledgeFullDetailGridStyles();
 
   const wasOpen = panel.classList.contains("isOpen");
   state.skillSim = normalizeSkillSim(state.skillSim);
