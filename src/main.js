@@ -5,7 +5,7 @@
   onclick属性から呼ばれる関数があるため、現時点では module ではなく通常scriptとして読み込みます。
 */
 
-const APP_VERSION = "v1.23.30";
+const APP_VERSION = "v1.23.31";
 const APP_VERSION_NOTE = "装備カタログ条件表示・ページ送り・追加効果二重加算修正";
 
 /* 種族係数。攻撃力係数と魔力係数は別管理。 */
@@ -12993,27 +12993,42 @@ function renderAnalysisPanel() {
     return shown.join(" / ") + rest;
   }
 
-  function spAllSkillNamesFromData() {
+  // __MOE_SKILL_PLUS_STATIC_SKILL_NAMES_V1__
+  // スキル強化フィルタのスキル名一覧は静的データとして扱う。
+  // カタログ/装備登録/state.composite の全走査は行わない。
+  const SP_STATIC_SKILL_NAMES_FALLBACK = [
+    "筋力", "着こなし", "攻撃回避", "生命力", "知能", "持久力", "精神力", "集中力", "呪文抵抗力",
+    "素手", "刀剣", "こんぼう", "槍", "弓", "銃器", "盾", "投げ", "キック",
+    "破壊魔法", "回復魔法", "強化魔法", "神秘魔法", "召喚魔法", "死の魔法", "魔法熟練",
+    "戦闘技術", "酩酊", "自然調和", "暗黒命令", "牙", "罠", "物まね", "調教", "ダンス", "音楽", "盗み", "シャウト",
+    "自然回復", "包帯", "水泳", "落下耐性", "死体回収", "取引",
+    "料理", "醸造", "鍛冶", "木工", "裁縫", "薬調合", "装飾細工", "複製", "美容",
+    "釣り", "伐採", "採掘", "収穫", "解読"
+  ];
+
+  const SP_STATIC_SKILL_NAMES = (() => {
     const set = new Set();
-    if (Array.isArray(global.SKILL_SIM_ALL)) global.SKILL_SIM_ALL.forEach(x => x && set.add(String(x)));
-    spCompatibilityRows().forEach(rule => {
-      const skill = rule.targetSkill || rule.skill || rule.skillName || rule.target;
-      if (skill) set.add(String(skill));
-    });
-    if (typeof equipmentCatalogItems === "function") {
-      try {
-        equipmentCatalogItems().forEach(item => {
-          Object.keys(spTotalsFromObject(item)).forEach(k => set.add(k));
-        });
-      } catch {}
+
+    if (typeof SKILL_SIM_GROUPS !== "undefined" && Array.isArray(SKILL_SIM_GROUPS)) {
+      SKILL_SIM_GROUPS.forEach(group => {
+        const list = Array.isArray(group) ? group[1] : null;
+        if (Array.isArray(list)) list.forEach(name => name && set.add(String(name)));
+      });
     }
-    if (global.state) {
-      try {
-        (global.state.equipment || []).forEach(row => Object.keys(spTotalsFromObject(row)).forEach(k => set.add(k)));
-        (global.state.composite || []).forEach(row => Object.keys(spTotalsFromObject(row)).forEach(k => set.add(k)));
-      } catch {}
+
+    if (!set.size && typeof SKILL_SIM_ALL !== "undefined" && Array.isArray(SKILL_SIM_ALL)) {
+      SKILL_SIM_ALL.forEach(name => name && set.add(String(name)));
     }
+
+    if (!set.size) {
+      SP_STATIC_SKILL_NAMES_FALLBACK.forEach(name => set.add(name));
+    }
+
     return Array.from(set).filter(Boolean).sort((a, b) => a.localeCompare(b, "ja"));
+  })();
+
+  function spAllSkillNamesFromData() {
+    return SP_STATIC_SKILL_NAMES.slice();
   }
 
   function spSelectOptions({allowEmpty=true, emptyLabel="指定なし"}={}) {
