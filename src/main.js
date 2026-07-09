@@ -5,7 +5,7 @@
   onclick属性から呼ばれる関数があるため、現時点では module ではなく通常scriptとして読み込みます。
 */
 
-const APP_VERSION = "v1.23.43";
+const APP_VERSION = "v1.23.47";
 const APP_VERSION_NOTE = "装備カタログ条件表示・ページ送り・追加効果二重加算修正";
 
 /* 種族係数。攻撃力係数と魔力係数は別管理。 */
@@ -3693,14 +3693,15 @@ function setupSkillKnowledgeControls() {
     el.addEventListener(id === "skillKnowledgeSearch" ? "input" : "change", skillKnowledgeActivateFullList);
     el.dataset.skillKnowledgeReady = "1";
   });
+
+  if (typeof hideSkillKnowledgeRedundantControls === "function") hideSkillKnowledgeRedundantControls();
 }
 
 function clearSkillKnowledgeFilters() {
   if (byId("skillKnowledgeSearch")) byId("skillKnowledgeSearch").value = "";
   if (byId("skillKnowledgeCategory")) byId("skillKnowledgeCategory").value = "all";
   if (byId("skillKnowledgeStatus")) byId("skillKnowledgeStatus").value = "relevant";
-  skillKnowledgeFullListActive = true;
-  renderSkillKnowledge();
+  showSkillMasteryKnowledgePopover();
 }
 
 
@@ -4790,55 +4791,54 @@ let skillKnowledgeFullListActive = false;
 
 function ensureSkillKnowledgeLazyControls() {
   if (typeof document === "undefined") return;
+  installSkillMasteryPopoverOnlyStyles();
+  installSkillMasteryPopoverCleanApplyStyles();
+
   const panel = document.querySelector(".skillKnowledgePanel");
-  if (!panel || byId("skillKnowledgeFullListToggle")) {
-    updateSkillKnowledgeLazyControls();
-    return;
+  if (!panel) return;
+
+  let wrap = byId("skillKnowledgeLazyControls");
+  if (!wrap) {
+    const controls = panel.querySelector(".skillKnowledgeControls");
+    const anchor = controls || byId("skillKnowledgeSummary") || panel.firstElementChild || panel;
+
+    wrap = document.createElement("div");
+    wrap.id = "skillKnowledgeLazyControls";
+    wrap.className = "skillKnowledgeLazyControls small";
+
+    if (anchor.parentNode) anchor.parentNode.insertBefore(wrap, anchor.nextSibling);
+    else panel.insertBefore(wrap, panel.firstChild);
   }
 
-  const controls = panel.querySelector(".skillKnowledgeControls");
-  const anchor = controls || byId("skillKnowledgeSummary") || panel.firstElementChild || panel;
-
-  const wrap = document.createElement("div");
-  wrap.id = "skillKnowledgeLazyControls";
-  wrap.className = "skillKnowledgeLazyControls small";
   wrap.innerHTML = `
-    <button type="button" id="skillKnowledgeFullListToggle">全一覧を表示/更新</button>
-    <span id="skillKnowledgeLazyStatus" class="mutedText">初期表示では選択スキル関連だけを更新します。</span>
+    <button type="button" id="skillKnowledgeMasteryPopoverButton">複合複合シップ一覧を開く</button>
+    <span id="skillKnowledgeLazyStatus" class="mutedText">関連情報はスキル名クリックで確認します。</span>
   `;
 
-  if (anchor.parentNode) anchor.parentNode.insertBefore(wrap, anchor.nextSibling);
-  else panel.insertBefore(wrap, panel.firstChild);
+  const btn = byId("skillKnowledgeMasteryPopoverButton");
+  if (btn) btn.onclick = showSkillMasteryKnowledgePopover;
 
-  byId("skillKnowledgeFullListToggle").onclick = () => {
-    skillKnowledgeFullListActive = !skillKnowledgeFullListActive;
-    if (skillKnowledgeFullListActive) {
-      renderSkillKnowledge();
-    } else {
-      renderSkillKnowledgeLazyPlaceholder();
-    }
-    updateSkillKnowledgeLazyControls();
-  };
+  hideSkillKnowledgeRedundantControls();
 
-  updateSkillKnowledgeLazyControls();
+  if (typeof skillKnowledgeForceCleanupSoon === "function") skillKnowledgeForceCleanupSoon();
 }
 
 function updateSkillKnowledgeLazyControls() {
-  const btn = byId("skillKnowledgeFullListToggle");
-  if (btn) btn.textContent = skillKnowledgeFullListActive ? "全一覧を隠す" : "全一覧を表示/更新";
+  const btn = byId("skillKnowledgeMasteryPopoverButton");
+  if (btn) btn.textContent = "複合複合シップ一覧を開く";
 
   const status = byId("skillKnowledgeLazyStatus");
   if (status) {
-    status.textContent = skillKnowledgeFullListActive
-      ? "全一覧モード中です。検索・カテゴリ・状態フィルタで再描画します。"
-      : "軽量モード中です。スキル名クリックの関連表示だけを更新します。";
+    status.textContent = "関連情報はスキル名クリックで確認します。";
   }
+
+  hideSkillKnowledgeRedundantControls();
+
+  if (typeof skillKnowledgeForceCleanupSoon === "function") skillKnowledgeForceCleanupSoon();
 }
 
 function skillKnowledgeActivateFullList() {
-  skillKnowledgeFullListActive = true;
-  updateSkillKnowledgeLazyControls();
-  renderSkillKnowledge();
+  showSkillMasteryKnowledgePopover();
 }
 
 function setSkillKnowledgeLazyListHtml(id, countId, label, count) {
@@ -4860,23 +4860,627 @@ function clearSkillKnowledgeLazyPlaceholderFlags() {
   });
 }
 
+// __MOE_SKILL_MASTERY_POPOVER_ONLY_V1__
+// テクニック/魔法の全一覧表示は廃止し、マスタリー一覧だけをポップオーバーで表示する。
+// 技/魔法の詳細はスキル名クリックの浮遊パネル側に集約する。
+function skillMasteryPopoverOnlyEnabled() {
+  return true;
+}
+
+function installSkillMasteryPopoverOnlyStyles() {
+  if (typeof document === "undefined" || byId("skillMasteryPopoverOnlyStyle")) return;
+
+  const style = document.createElement("style");
+  style.id = "skillMasteryPopoverOnlyStyle";
+  style.textContent = `
+/* __MOE_SKILL_MASTERY_POPOVER_ONLY_V1__ */
+#skillMasteryKnowledgePopover {
+  position:fixed;
+  z-index:9999;
+  left:50%;
+  top:50%;
+  transform:translate(-50%, -50%);
+  display:none;
+  width:min(760px, calc(100vw - 16px));
+  max-height:min(80vh, 760px);
+  overflow:auto;
+  box-sizing:border-box;
+  padding:8px 10px;
+  border:1px solid rgba(0,0,0,.25);
+  box-shadow:0 12px 32px rgba(0,0,0,.24);
+  background:Canvas;
+  color:CanvasText;
+}
+#skillMasteryKnowledgePopover.isOpen {
+  display:block;
+}
+.skillMasteryPopoverHeader {
+  position:sticky;
+  top:0;
+  z-index:1;
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:6px 10px;
+  padding:2px 0 6px;
+  background:Canvas;
+}
+.skillMasteryPopoverControls {
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:4px 8px;
+  margin:4px 0 6px;
+}
+.skillMasteryPopoverControls label {
+  display:inline-flex;
+  align-items:center;
+  gap:3px;
+}
+.skillMasteryPopoverControls input,
+.skillMasteryPopoverControls select {
+  max-width:12em;
+  height:22px;
+  padding:1px 4px;
+}
+.skillMasteryPopoverClose {
+  margin-left:auto;
+  padding:1px 7px;
+  line-height:1.25;
+}
+.skillMasteryPopoverGrid {
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(260px, 1fr));
+  gap:5px;
+}
+.skillMasteryPopoverItem {
+  margin:0;
+  padding:5px 7px;
+}
+.skillMasteryPopoverItemTitle {
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:4px 6px;
+  font-weight:bold;
+}
+.skillMasteryPopoverItemReq,
+.skillMasteryPopoverItemText,
+.skillMasteryPopoverItemSource {
+  font-size:11px;
+  line-height:1.35;
+  margin-top:3px;
+}
+.skillMasteryPopoverItemText {
+  max-height:5.4em;
+  overflow:auto;
+  padding-top:3px;
+  border-top:1px dashed rgba(127,127,127,.35);
+}
+.skillKnowledgeFullListSuppressed {
+  display:none !important;
+}
+`;
+  document.head.appendChild(style);
+}
+
+function hideSkillKnowledgeTechniqueMagicFullLists() {
+  ["skillTechniqueList", "skillMagicList"].forEach(id => {
+    const el = byId(id);
+    if (!el) return;
+    el.innerHTML = "";
+    el.classList.add("skillKnowledgeFullListSuppressed");
+    const section = el.closest(".skillKnowledgeColumn, .skillKnowledgeSection, .skillKnowledgeBlock, section");
+    if (section && !section.querySelector("#skillMasteryList")) {
+      section.classList.add("skillKnowledgeFullListSuppressed");
+    }
+  });
+  ["skillTechniqueCount", "skillMagicCount"].forEach(id => {
+    const el = byId(id);
+    if (el) {
+      el.textContent = "0件";
+      el.classList.add("skillKnowledgeFullListSuppressed");
+    }
+  });
+}
+
+function ensureSkillMasteryKnowledgePopover() {
+  if (typeof document === "undefined") return null;
+  installSkillMasteryPopoverOnlyStyles();
+
+  let panel = byId("skillMasteryKnowledgePopover");
+  if (!panel) {
+    panel = document.createElement("div");
+    panel.id = "skillMasteryKnowledgePopover";
+    panel.className = "cardLike";
+    if (document.body) document.body.appendChild(panel);
+  }
+  return panel;
+}
+
+function closeSkillMasteryKnowledgePopover() {
+  const panel = byId("skillMasteryKnowledgePopover");
+  if (panel) panel.classList.remove("isOpen");
+}
+
+function bindSkillMasteryPopoverGlobalHandlers() {
+  if (window.__skillMasteryPopoverOnlyHandlersBound) return;
+  window.__skillMasteryPopoverOnlyHandlersBound = true;
+
+  document.addEventListener("keydown", ev => {
+    if (ev.key === "Escape") closeSkillMasteryKnowledgePopover();
+  });
+
+  document.addEventListener("mousedown", ev => {
+    const panel = byId("skillMasteryKnowledgePopover");
+    if (!panel || !panel.classList.contains("isOpen")) return;
+    if (panel.contains(ev.target)) return;
+    if (ev.target && typeof ev.target.closest === "function" && ev.target.closest("#skillKnowledgeMasteryPopoverButton")) return;
+    closeSkillMasteryKnowledgePopover();
+  });
+}
+
+function skillMasteryPopoverText(item) {
+  const rows = [];
+  const desc = item?.description || item?.info || "";
+  const effect = item?.effect || "";
+  const note = item?.note || "";
+  if (desc) rows.push(`<div><b>説明</b><br>${escapeHtml(String(desc)).replace(/\n/g, "<br>")}</div>`);
+  if (effect && effect !== desc) rows.push(`<div><b>効果</b><br>${escapeHtml(String(effect)).replace(/\n/g, "<br>")}</div>`);
+  if (note) rows.push(`<div><b>メモ</b><br>${escapeHtml(String(note)).replace(/\n/g, "<br>")}</div>`);
+  return rows.join("");
+}
+
+function skillMasteryPopoverReqText(ev) {
+  const rows = Array.isArray(ev?.evaluated) ? ev.evaluated : [];
+  if (!rows.length) return "条件なし";
+  return rows.map(r => {
+    const need = r.max !== null && r.max !== undefined ? `≤${fmt(r.max, 1)}` : fmt(r.min, 1);
+    return `${escapeHtml(r.skill)} ${fmt(r.current, 1)}/${need}`;
+  }).join(" / ");
+}
+
+function skillMasteryPopoverItemHtml(item) {
+  const ev = skillKnowledgeEvaluate(item);
+  const statusClass = skillKnowledgeStatusClass(ev.status);
+  const text = skillMasteryPopoverText(item);
+  const source = item?.sourceUrl
+    ? `<a href="${escapeHtml(String(item.sourceUrl))}" target="_blank" rel="noopener">参照元</a>`
+    : (item?.source ? `<span>参照: ${escapeHtml(String(item.source))}</span>` : "");
+  const acquisition = item?.acquisition ? `<span>入手: ${escapeHtml(String(item.acquisition))}</span>` : "";
+  const ship = item?.shipEquipment ? `<span>試練/装備: ${escapeHtml(String(item.shipEquipment))}</span>` : "";
+
+  return `<div class="skillKnowledgeCard skillMasteryPopoverItem ${statusClass}">
+    <div class="skillMasteryPopoverItemTitle">${escapeHtml(item?.name || "(名称未設定)")}</div>
+    <div class="skillMasteryPopoverItemReq mutedText">条件: ${skillMasteryPopoverReqText(ev)}</div>
+    ${skillMasteryPopoverTierButtonsHtml(item)}
+    ${text ? `<div class="skillMasteryPopoverItemText">${text}</div>` : ""}
+    ${(source || acquisition || ship) ? `<div class="skillMasteryPopoverItemSource small">${[acquisition, ship, source].filter(Boolean).join(" / ")}</div>` : ""}
+  </div>`;
+}
+
+function skillMasteryPopoverFilters() {
+  const q = String(byId("skillKnowledgeSearch")?.value || "").trim().toLowerCase();
+  return {q};
+}
+
+function skillMasteryPopoverMatches(item, filters) {
+  if (filters.q) {
+    const haystack = [
+      item?.name,
+      item?.description,
+      item?.effect,
+      item?.note,
+      item?.shipEquipment,
+      item?.acquisition
+    ].filter(Boolean).join(" ").toLowerCase();
+    if (!haystack.includes(filters.q)) return false;
+  }
+  return true;
+}
+
+function renderSkillMasteryKnowledgePopover() {
+  const panel = ensureSkillMasteryKnowledgePopover();
+  if (!panel) return;
+
+  if (typeof installSkillMasteryPopoverCleanApplyStyles === "function") installSkillMasteryPopoverCleanApplyStyles();
+  if (typeof installSkillMasteryPopoverCleanApplyV3Styles === "function") installSkillMasteryPopoverCleanApplyV3Styles();
+  installSkillMasteryPopoverForceCleanupStyles();
+
+  const data = skillKnowledgeData();
+  const filters = skillMasteryPopoverFilters();
+  const items = (data.masteries || []).filter(item => skillMasteryPopoverMatches(item, filters));
+  const allCount = (data.masteries || []).length;
+
+  const body = items.length
+    ? `<div class="skillMasteryPopoverGrid">${items.map(skillMasteryPopoverItemHtml).join("")}</div>`
+    : `<div class="small mutedText">現在の検索条件に一致する項目はありません。</div>`;
+
+  panel.innerHTML = `
+    <div class="skillMasteryPopoverHeader">
+      <b>複合シップ一覧</b>
+      <span class="mutedText">${items.length}/${allCount}件</span>
+      <button type="button" id="skillMasteryPopoverClose" class="skillMasteryPopoverClose">閉じる</button>
+    </div>
+    <div class="skillMasteryPopoverControls small">
+      <label>検索 <input id="skillMasteryPopoverSearchMirror" type="search" value="${escapeHtml(byId("skillKnowledgeSearch")?.value || "")}" placeholder="例: サムライ"></label>
+      <button type="button" id="skillMasteryPopoverApply">適用</button>
+    </div>
+    ${body}
+  `;
+
+  const close = byId("skillMasteryPopoverClose");
+  if (close) close.onclick = closeSkillMasteryKnowledgePopover;
+
+  const apply = () => {
+    const srcQ = byId("skillKnowledgeSearch");
+    const q = byId("skillMasteryPopoverSearchMirror");
+    if (srcQ && q) srcQ.value = q.value;
+    renderSkillMasteryKnowledgePopover();
+  };
+
+  const applyBtn = byId("skillMasteryPopoverApply");
+  if (applyBtn) applyBtn.onclick = apply;
+
+  const q = byId("skillMasteryPopoverSearchMirror");
+  if (q) q.onkeydown = ev => {
+    if (ev.key === "Enter") {
+      ev.preventDefault();
+      apply();
+    }
+  };
+
+  bindSkillMasteryPopoverApplyButtons();
+}
+
+function showSkillMasteryKnowledgePopover() {
+  if (typeof skillUiFinalApply === "function") skillUiFinalApply();
+  if (typeof hideSkillKnowledgeRedundantControls === "function") hideSkillKnowledgeRedundantControls();
+  if (typeof hideSkillKnowledgeRedundantControlsV3 === "function") hideSkillKnowledgeRedundantControlsV3();
+  skillKnowledgeForceCleanupFullListUi();
+
+  bindSkillMasteryPopoverGlobalHandlers();
+  renderSkillMasteryKnowledgePopover();
+  const panel = ensureSkillMasteryKnowledgePopover();
+  if (panel) panel.classList.add("isOpen");
+}
+
+// __MOE_SKILL_MASTERY_POPOVER_ONLY_CLEAN_APPLY_V4_FORCE__
+// 旧全一覧UIを描画後にIDベースで確実に畳む。
+// 対象はスキル知識エリアの既知IDだけ。広域DOM削除はしない。
+function installSkillMasteryPopoverForceCleanupStyles() {
+  if (typeof document === "undefined" || byId("skillMasteryPopoverForceCleanupStyle")) return;
+
+  const style = document.createElement("style");
+  style.id = "skillMasteryPopoverForceCleanupStyle";
+  style.textContent = `
+/* __MOE_SKILL_MASTERY_POPOVER_ONLY_CLEAN_APPLY_V4_FORCE__ */
+.skillKnowledgeForceHidden {
+  display:none !important;
+}
+#skillMasteryList,
+#skillTechniqueList,
+#skillMagicList,
+#skillMasteryCount,
+#skillTechniqueCount,
+#skillMagicCount,
+#skillKnowledgeSearch,
+#skillKnowledgeCategory,
+#skillKnowledgeStatus {
+  display:none !important;
+}
+#skillKnowledgeLazyControls {
+  display:flex !important;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:6px 8px;
+  margin:4px 0 6px;
+}
+#skillKnowledgeMasteryPopoverButton {
+  padding:2px 10px;
+  line-height:1.35;
+  font-weight:600;
+}
+#skillMasteryKnowledgePopover .skillMasteryPopoverControls button#skillMasteryPopoverClear {
+  display:none !important;
+}
+#skillMasteryKnowledgePopover .skillMasteryTierButtons button[data-skill-mastery-apply-tier="0"],
+#skillMasteryKnowledgePopover .skillMasteryTierButtons button[data-skill-mastery-apply-tier=""] {
+  display:none !important;
+}
+`;
+  document.head.appendChild(style);
+}
+
+function skillKnowledgeForceHideElementAndLabel(id) {
+  const el = byId(id);
+  if (!el) return;
+  el.classList.add("skillKnowledgeForceHidden");
+
+  const label = el.closest("label");
+  if (label) label.classList.add("skillKnowledgeForceHidden");
+
+  const wrap = el.closest(".controlRow,.formRow,.filterRow,.inputRow,.skillKnowledgeControl,.skillKnowledgeFilter");
+  if (wrap && !wrap.querySelector("#skillKnowledgeMasteryPopoverButton")) {
+    wrap.classList.add("skillKnowledgeForceHidden");
+  }
+}
+
+function skillKnowledgeForceHideNearestFrameFor(id) {
+  const el = byId(id);
+  if (!el) return;
+
+  el.innerHTML = "";
+  el.classList.add("skillKnowledgeForceHidden");
+
+  let node = el.parentElement;
+  for (let i = 0; i < 8 && node && node !== document.body; i++, node = node.parentElement) {
+    if (node.id === "skillKnowledgeLazyControls") return;
+    if (node.classList && node.classList.contains("skillKnowledgePanel")) return;
+
+    const containsAnyList =
+      !!node.querySelector("#skillMasteryList,#skillTechniqueList,#skillMagicList,#skillMasteryCount,#skillTechniqueCount,#skillMagicCount");
+    const containsOpenButton = !!node.querySelector("#skillKnowledgeMasteryPopoverButton");
+    const text = String(node.querySelector("h2,h3,h4,summary,legend,.sectionTitle,.cardTitle")?.textContent || "").trim();
+
+    if (containsAnyList && !containsOpenButton) {
+      node.classList.add("skillKnowledgeForceHidden");
+      return;
+    }
+
+    if (/マスタリー|テクニック|魔法/.test(text) && !containsOpenButton) {
+      node.classList.add("skillKnowledgeForceHidden");
+      return;
+    }
+  }
+}
+
+function skillKnowledgeForceRenameAndWireButton() {
+  const panel = document.querySelector(".skillKnowledgePanel") || document;
+  let btn = byId("skillKnowledgeMasteryPopoverButton");
+
+  if (!btn) {
+    const host = byId("skillKnowledgeLazyControls") || panel.querySelector(".skillKnowledgeControls") || panel;
+    btn = document.createElement("button");
+    btn.type = "button";
+    btn.id = "skillKnowledgeMasteryPopoverButton";
+    if (host.firstChild) host.insertBefore(btn, host.firstChild);
+    else host.appendChild(btn);
+  }
+
+  btn.textContent = "複合複合複合シップ一覧を開く";
+  btn.classList.remove("skillKnowledgeForceHidden");
+  btn.onclick = showSkillMasteryKnowledgePopover;
+}
+
+function skillKnowledgeForceHideButtonsByText() {
+  const panel = document.querySelector(".skillKnowledgePanel");
+  if (!panel) return;
+
+  panel.querySelectorAll("button").forEach(btn => {
+    if (btn.id === "skillKnowledgeMasteryPopoverButton") return;
+    const text = String(btn.textContent || "").trim();
+    if (/解除|クリア|リセット|全一覧|表示\/更新|全.*表示|隠す|マスタリー一覧/.test(text)) {
+      btn.classList.add("skillKnowledgeForceHidden");
+      const wrap = btn.closest(".controlRow,.formRow,.filterRow,.inputRow,.skillKnowledgeControl,.skillKnowledgeFilter");
+      if (wrap && !wrap.querySelector("#skillKnowledgeMasteryPopoverButton")) {
+        wrap.classList.add("skillKnowledgeForceHidden");
+      }
+    }
+  });
+}
+
+function skillKnowledgeForceCleanupFullListUi() {
+  if (typeof document === "undefined") return;
+
+  installSkillMasteryPopoverForceCleanupStyles();
+
+  ["skillKnowledgeSearch", "skillKnowledgeCategory", "skillKnowledgeStatus"].forEach(skillKnowledgeForceHideElementAndLabel);
+  ["skillMasteryList", "skillTechniqueList", "skillMagicList", "skillMasteryCount", "skillTechniqueCount", "skillMagicCount"].forEach(skillKnowledgeForceHideNearestFrameFor);
+
+  const summary = byId("skillKnowledgeSummary");
+  if (summary) summary.classList.add("skillKnowledgeForceHidden");
+
+  skillKnowledgeForceHideButtonsByText();
+  skillKnowledgeForceRenameAndWireButton();
+}
+
+function skillKnowledgeForceCleanupSoon() {
+  skillKnowledgeForceCleanupFullListUi();
+  setTimeout(skillKnowledgeForceCleanupFullListUi, 0);
+}
+
+
+// __MOE_SKILL_MASTERY_POPOVER_ONLY_CLEAN_APPLY_V2__
+// テク/魔法の全一覧枠と冗長な種別/カテゴリ/状態UIを消し、シップ一覧ポップオーバーへ集約する。
+// 旧マスタリーボタン相当: 1次/2次/3次ボタンで必要スキル値を入力する。
+function installSkillMasteryPopoverCleanApplyStyles() {
+  if (typeof document === "undefined" || byId("skillMasteryPopoverCleanApplyStyle")) return;
+
+  const style = document.createElement("style");
+  style.id = "skillMasteryPopoverCleanApplyStyle";
+  style.textContent = `
+/* __MOE_SKILL_MASTERY_POPOVER_ONLY_CLEAN_APPLY_V2__ */
+#skillTechniqueList,
+#skillMagicList,
+#skillTechniqueCount,
+#skillMagicCount,
+#skillMasteryList,
+#skillMasteryCount {
+  display:none !important;
+}
+.skillKnowledgeFullListSuppressed,
+.skillKnowledgeRedundantControl {
+  display:none !important;
+}
+.skillKnowledgeLazyControls {
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:6px 8px;
+}
+#skillKnowledgeMasteryPopoverButton {
+  padding:2px 8px;
+  line-height:1.35;
+}
+#skillMasteryKnowledgePopover {
+  width:min(700px, calc(100vw - 16px));
+}
+.skillMasteryPopoverControls {
+  margin:3px 0 6px;
+}
+.skillMasteryPopoverControls input {
+  max-width:16em;
+}
+.skillMasteryPopoverGrid {
+  grid-template-columns:repeat(auto-fit, minmax(230px, 1fr));
+  gap:4px;
+}
+.skillMasteryPopoverItem {
+  padding:5px 7px;
+}
+.skillMasteryPopoverItemTitle {
+  display:block;
+  font-weight:bold;
+  line-height:1.3;
+}
+.skillMasteryPopoverItemReq {
+  margin-top:2px;
+}
+.skillMasteryTierButtons {
+  display:flex;
+  flex-wrap:wrap;
+  gap:3px;
+  margin-top:4px;
+}
+.skillMasteryTierButtons button {
+  padding:1px 6px;
+  line-height:1.3;
+  font-size:11px;
+}
+.skillMasteryPopoverItemText {
+  max-height:4.8em;
+}
+`;
+  document.head.appendChild(style);
+}
+
+function hideSkillKnowledgeRedundantControls() {
+  if (typeof document === "undefined") return;
+
+  ["skillKnowledgeCategory", "skillKnowledgeStatus"].forEach(id => {
+    const el = byId(id);
+    if (!el) return;
+    el.classList.add("skillKnowledgeRedundantControl");
+    const label = el.closest("label");
+    if (label) label.classList.add("skillKnowledgeRedundantControl");
+  });
+
+  hideSkillKnowledgeTechniqueMagicFullLists();
+  const masteryList = byId("skillMasteryList");
+  if (masteryList) {
+    masteryList.innerHTML = "";
+    masteryList.classList.add("skillKnowledgeFullListSuppressed");
+  }
+  const masteryCount = byId("skillMasteryCount");
+  if (masteryCount) {
+    masteryCount.textContent = "";
+    masteryCount.classList.add("skillKnowledgeFullListSuppressed");
+  }
+}
+
+function skillMasteryPopoverFindItem(itemId) {
+  const id = String(itemId || "");
+  if (!id) return null;
+  if (typeof skillKnowledgeFindMastery === "function") {
+    const found = skillKnowledgeFindMastery(id);
+    if (found) return found;
+  }
+  const data = skillKnowledgeData();
+  return (data.masteries || []).find(item => String(item.id || "") === id) || null;
+}
+
+function skillMasteryPopoverTierButtonsHtml(item) {
+  const id = String(item?.id || "");
+  if (!id) return "";
+
+  if (Array.isArray(item.tiers) && item.tiers.length) {
+    const buttons = item.tiers.map((tier, idx) => {
+      const step = idx === 0 ? "1次" : idx === 1 ? "2次" : idx === 2 ? "3次" : `${idx + 1}段階`;
+      const min = +tier.min || 0;
+      const label = `${step}${tier.name ? " " + tier.name : ""} ${min}`;
+      return `<button type="button" data-skill-mastery-apply-id="${escapeHtml(id)}" data-skill-mastery-apply-tier="${min}">${escapeHtml(label)}</button>`;
+    }).join("");
+    return `<div class="skillMasteryTierButtons">${buttons}</div>`;
+  }
+
+  const hasReq = Array.isArray(item.requirements) && item.requirements.length;
+  if (!hasReq) return "";
+  return `<div class="skillMasteryTierButtons"><button type="button" data-skill-mastery-apply-id="${escapeHtml(id)}" data-skill-mastery-apply-tier="">条件を入力</button></div>`;
+}
+
+function applySkillMasteryPopoverRequirements(itemId, tierMinRaw="") {
+  const item = skillMasteryPopoverFindItem(itemId);
+  if (!item) return;
+
+  const tierMin = Number(tierMinRaw);
+  const hasTierMin = Number.isFinite(tierMin) && tierMin > 0;
+
+  if (!state.skillSim) state.skillSim = defaultSkillSimState();
+  state.skillSim = normalizeSkillSim(state.skillSim);
+  if (!state.skillSim.skills) state.skillSim.skills = {};
+
+  (item.requirements || []).forEach(req => {
+    const skill = req.skill || req.name;
+    if (!skill) return;
+    const raw = hasTierMin ? tierMin : (req.min ?? req.required ?? req.value ?? 0);
+    const value = Math.max(0, Math.min(100, Math.round((parseFloat(raw) || 0) * 10) / 10));
+
+    if (typeof setSkillSimSkillValue === "function") setSkillSimSkillValue(skill, value);
+    else state.skillSim.skills[skill] = Math.max(+(state.skillSim.skills[skill] || 0), value);
+  });
+
+  if (typeof renderSkillSim === "function") renderSkillSim();
+  if (typeof syncSkillSimToCalcInputs === "function") syncSkillSimToCalcInputs(false, false);
+  if (typeof calc === "function") calc();
+
+  // renderSkillSim() may rebuild the skill simulator controls; reopen this lightweight popover.
+  setTimeout(() => {
+    if (typeof showSkillMasteryKnowledgePopover === "function") showSkillMasteryKnowledgePopover();
+  }, 0);
+}
+
+function bindSkillMasteryPopoverApplyButtons() {
+  const panel = byId("skillMasteryKnowledgePopover");
+  if (!panel) return;
+  panel.querySelectorAll("[data-skill-mastery-apply-id]").forEach(btn => {
+    if (btn.dataset.skillMasteryApplyBound === "1") return;
+    btn.dataset.skillMasteryApplyBound = "1";
+    btn.onclick = () => applySkillMasteryPopoverRequirements(
+      btn.dataset.skillMasteryApplyId || "",
+      btn.dataset.skillMasteryApplyTier || ""
+    );
+  });
+}
+
+
 function renderSkillKnowledgeLazyPlaceholder() {
   if (!byId("skillMasteryList")) return;
   setupSkillKnowledgeControls();
   ensureSkillKnowledgeLazyControls();
 
   const data = skillKnowledgeData();
-  setSkillKnowledgeLazyListHtml("skillMasteryList", "skillMasteryCount", "マスタリー", (data.masteries || []).length);
-  setSkillKnowledgeLazyListHtml("skillTechniqueList", "skillTechniqueCount", "テクニック", (data.techniques || []).length);
-  setSkillKnowledgeLazyListHtml("skillMagicList", "skillMagicCount", "魔法", (data.magic || []).length);
+  hideSkillKnowledgeRedundantControls();
 
   const summary = byId("skillKnowledgeSummary");
   if (summary) {
     const dataSource = data.dataSource || "内蔵/生成データ";
-    summary.innerHTML = `軽量モード: 全一覧は未描画<br><span class="small mutedText">マスタリー ${(data.masteries || []).length}件 / テク ${(data.techniques || []).length}件 / 魔法 ${(data.magic || []).length}件 / 参照元： ${escapeHtml(dataSource)}</span>`;
+    summary.innerHTML = `<span class="small mutedText">一覧は必要時だけ開きます。参照元： ${escapeHtml(dataSource)}</span>`;
   }
 
   updateSkillKnowledgeLazyControls();
+
+  if (typeof skillKnowledgeForceCleanupSoon === "function") skillKnowledgeForceCleanupSoon();
 }
 
 
@@ -4941,7 +5545,14 @@ function attachSkillKnowledgeMoreButton(containerId) {
 
 
 function renderSkillKnowledge() {
+  if (typeof skillUiFinalRemoveOldVisibleKnowledgePanel === "function") skillUiFinalRemoveOldVisibleKnowledgePanel();
+  if (typeof skillUiFinalPlaceCompoundShipButton === "function") skillUiFinalPlaceCompoundShipButton();
+  return;
   if (!byId("skillMasteryList")) return;
+  if (skillMasteryPopoverOnlyEnabled()) {
+    renderSkillKnowledgeLazyPlaceholder();
+    return;
+  }
   setupSkillKnowledgeControls();
   ensureSkillKnowledgeLazyControls();
   if (!skillKnowledgeFullListActive) {
@@ -4998,6 +5609,8 @@ function renderSkillKnowledge() {
     const sampleNote = `<span class="skillKnowledgeSampleNote">${usingFallback ? "内蔵マスタリー使用" : "マスタリー実データ"} / テク・魔法はサンプル</span>`;
     summary.innerHTML = `${shown}/${total}件表示 / 使用可能 ${okCount}件 ${sampleNote}<br><span class="small mutedText">マスタリー ${data.masteries.length}件 / テク ${data.techniques.length}件 / 魔法 ${data.magic.length}件 / 参照元： ${escapeHtml(dataSource)}</span>`;
   }
+
+  if (typeof skillKnowledgeForceCleanupSoon === "function") skillKnowledgeForceCleanupSoon();
 }
 
 
@@ -5123,7 +5736,7 @@ function installSkillSimCompactUiStyles() {
 }
 #skillSimGroups.skillSimCompactMode .skillBarRow {
   display:grid;
-  grid-template-columns:minmax(4.8em, 5.8em) minmax(72px, 1fr) minmax(3.9em, 4.4em);
+  grid-template-columns:minmax(4.8em, 5.8em) minmax(72px, 1fr) minmax(6.8em, 7.6em);
   align-items:center;
   gap:4px;
   min-height:20px;
@@ -5170,7 +5783,7 @@ function installSkillSimCompactUiStyles() {
 }
 #skillSimGroups.skillSimCompactMode input[type="number"],
 #skillSimGroups.skillSimCompactMode .skillBarValue {
-  width:4.2em;
+  width:7.2em;
   min-width:0;
   box-sizing:border-box;
   padding:0 2px;
@@ -5232,7 +5845,7 @@ body.skillSimCompactModeActive .skillKnowledgeRelatedItem {
     grid-template-columns:1fr;
   }
   #skillSimGroups.skillSimCompactMode .skillBarRow {
-    grid-template-columns:minmax(4.8em, 5.5em) minmax(64px, 1fr) minmax(3.8em, 4.2em);
+    grid-template-columns:minmax(4.8em, 5.5em) minmax(64px, 1fr) minmax(6.6em, 7.2em);
   }
 }
 `;
@@ -5245,6 +5858,150 @@ function applySkillSimCompactUiState() {
   const root = byId("skillSimGroups");
   if (document.body) document.body.classList.add("skillSimCompactModeActive");
   if (root) root.classList.add("skillSimCompactMode");
+}
+
+// __MOE_SKILL_UI_FINAL_COMPOUND_SHIP_CLEANUP_V6__
+// 旧スキル知識パネルは index.html 側で hidden シェル化済み。
+// ここでは、複合シップ一覧ボタンを操作列へ移動し、数値手入力欄を広げる。
+function installSkillUiFinalCompoundShipStyles() {
+  if (typeof document === "undefined" || byId("skillUiFinalCompoundShipStyle")) return;
+
+  const style = document.createElement("style");
+  style.id = "skillUiFinalCompoundShipStyle";
+  style.textContent = `
+/* __MOE_SKILL_UI_FINAL_COMPOUND_SHIP_CLEANUP_V6__ */
+.skillKnowledgePanelRemoved,
+.skillKnowledgePanel[hidden],
+.skillKnowledgePanelRemoved * {
+  display:none !important;
+}
+.skillKnowledgePanelRemoved {
+  visibility:hidden !important;
+  width:0 !important;
+  height:0 !important;
+  overflow:hidden !important;
+  margin:0 !important;
+  padding:0 !important;
+  border:0 !important;
+}
+#skillKnowledgeMasteryPopoverButton {
+  padding:2px 10px;
+  line-height:1.35;
+  font-weight:600;
+  white-space:nowrap;
+}
+#skillSimGroups.skillSimCompactMode .skillBarRow {
+  grid-template-columns:minmax(4.8em, 5.8em) minmax(72px, 1fr) minmax(6.8em, 7.6em) !important;
+}
+#skillSimGroups.skillSimCompactMode input[type="number"],
+#skillSimGroups.skillSimCompactMode .skillBarValue {
+  width:7.2em !important;
+  min-width:7.2em !important;
+  max-width:7.8em !important;
+}
+.skillBarValue,
+input.skillBarValue,
+.skillBarRow input[type="number"] {
+  width:7.2em !important;
+  min-width:7.2em !important;
+}
+@media (max-width: 720px) {
+  #skillSimGroups.skillSimCompactMode .skillBarRow {
+    grid-template-columns:minmax(4.8em, 5.5em) minmax(64px, 1fr) minmax(6.6em, 7.2em) !important;
+  }
+}
+`;
+  document.head.appendChild(style);
+}
+
+function skillUiFinalFindButtonByText(pattern) {
+  return Array.from(document.querySelectorAll("button")).find(btn => pattern.test(String(btn.textContent || "").trim())) || null;
+}
+
+function skillUiFinalEnsureCompoundShipButton() {
+  let btn = byId("skillKnowledgeMasteryPopoverButton");
+
+  if (!btn) {
+    btn = document.createElement("button");
+    btn.type = "button";
+    btn.id = "skillKnowledgeMasteryPopoverButton";
+  }
+
+  btn.hidden = false;
+  btn.removeAttribute("aria-hidden");
+  btn.classList.remove("skillKnowledgeForceHidden", "skillKnowledgeIntroHidden", "skillKnowledgeLazyControlsHidden");
+  btn.textContent = "複合複合シップ一覧を開く";
+  btn.onclick = showSkillMasteryKnowledgePopover;
+  return btn;
+}
+
+function skillUiFinalButtonHost() {
+  const resetButton = skillUiFinalFindButtonByText(/スキルをリセット|リセット/);
+  if (resetButton && resetButton.parentElement) return {parent: resetButton.parentElement, before: resetButton};
+
+  const upperButton = skillUiFinalFindButtonByText(/上限合計/);
+  if (upperButton && upperButton.parentElement) return {parent: upperButton.parentElement, after: upperButton};
+
+  const groups = byId("skillSimGroups");
+  if (groups && groups.parentElement) return {parent: groups.parentElement, before: groups};
+
+  return {parent: document.body, before: null};
+}
+
+function skillUiFinalPlaceCompoundShipButton() {
+  if (typeof document === "undefined") return;
+  installSkillUiFinalCompoundShipStyles();
+
+  const btn = skillUiFinalEnsureCompoundShipButton();
+  const host = skillUiFinalButtonHost();
+
+  if (host.before) {
+    host.parent.insertBefore(btn, host.before);
+  } else if (host.after) {
+    host.after.insertAdjacentElement("afterend", btn);
+  } else {
+    host.parent.appendChild(btn);
+  }
+}
+
+function skillUiFinalRemoveOldVisibleKnowledgePanel() {
+  const panel = document.querySelector(".skillKnowledgePanel");
+  if (!panel) return;
+
+  panel.hidden = true;
+  panel.setAttribute("aria-hidden", "true");
+  panel.classList.add("skillKnowledgePanelRemoved");
+
+  const header = panel.querySelector(".skillKnowledgeHeader");
+  if (header) header.innerHTML = "";
+
+  const summary = byId("skillKnowledgeSummary");
+  if (summary) summary.innerHTML = "";
+
+  ["skillMasteryList", "skillTechniqueList", "skillMagicList"].forEach(id => {
+    const el = byId(id);
+    if (el) el.innerHTML = "";
+  });
+}
+
+function skillUiFinalWidenSkillNumberInputs() {
+  document.querySelectorAll("#skillSimGroups input[type='number'], #skillSimGroups .skillBarValue").forEach(el => {
+    el.style.width = "7.2em";
+    el.style.minWidth = "7.2em";
+  });
+}
+
+function skillUiFinalApply() {
+  if (typeof document === "undefined") return;
+  installSkillUiFinalCompoundShipStyles();
+  skillUiFinalRemoveOldVisibleKnowledgePanel();
+  skillUiFinalPlaceCompoundShipButton();
+  skillUiFinalWidenSkillNumberInputs();
+}
+
+function skillUiFinalApplySoon() {
+  skillUiFinalApply();
+  setTimeout(skillUiFinalApply, 0);
 }
 
 function renderSkillSim() {
@@ -5322,6 +6079,10 @@ function renderSkillSim() {
   setupSkillKnowledgeControls();
   updateSkillSimSummary();
   renderSelectedSkillKnowledgePanel();
+
+  if (typeof skillKnowledgeForceCleanupSoon === "function") skillKnowledgeForceCleanupSoon();
+
+  if (typeof skillUiFinalApplySoon === "function") skillUiFinalApplySoon();
 }
 
 function updateSkillSimSummary() {
@@ -5357,6 +6118,10 @@ function updateSkillSimSummary() {
   }
   renderSkillKnowledge();
   renderSelectedSkillKnowledgePanel();
+
+  if (typeof skillKnowledgeForceCleanupSoon === "function") skillKnowledgeForceCleanupSoon();
+
+  if (typeof skillUiFinalApplySoon === "function") skillUiFinalApplySoon();
 }
 
 function applySkillSimToCalc(silent=false) {
