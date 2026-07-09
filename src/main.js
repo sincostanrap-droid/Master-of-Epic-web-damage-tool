@@ -5,7 +5,7 @@
   onclick属性から呼ばれる関数があるため、現時点では module ではなく通常scriptとして読み込みます。
 */
 
-const APP_VERSION = "v1.23.31";
+const APP_VERSION = "v1.23.33";
 const APP_VERSION_NOTE = "装備カタログ条件表示・ページ送り・追加効果二重加算修正";
 
 /* 種族係数。攻撃力係数と魔力係数は別管理。 */
@@ -11022,7 +11022,9 @@ function catalogResetPage() {
 
 
 function catalogStatNumericValue(item, stat) {
-  const key = String(stat || "").trim();
+  // __MOE_CATALOG_SORT_MAX_WEIGHT_FIX_V2__: normalize catalog sort/filter alias before numeric lookup.
+  let key = String(stat || "").trim();
+  if (key === "maxWeight" || key === "最大重量") key = "extraMaxWeight";
   if (!key) return NaN;
 
   let total = 0;
@@ -11228,6 +11230,7 @@ function catalogItemSortValue(item, key) {
   if (key === "hp") return +(item.extraStats?.extraHP || 0);
   if (key === "mp") return +(item.extraStats?.extraMP || 0);
   if (key === "st") return +(item.extraStats?.extraST || 0);
+  if (key === "maxWeight") return catalogStatNumericValue(item, "extraMaxWeight");
   if (key === "hit") return +(item.extraStats?.extraHit || 0);
   if (key === "avoid") return +(item.extraStats?.extraAvoid || 0);
   if (key === "attackDelay") return +(item.extraStats?.extraAttackDelay || 0);
@@ -11237,7 +11240,7 @@ function catalogItemSortValue(item, key) {
 function sortCatalogItems(items, filter) {
   const key = filter.sort || "name";
   const dir = filter.sortDir === "desc" ? -1 : 1;
-  const numericKeys = new Set(["weaponDamage", "weaponDelay", "attack", "magic", "speed", "ac", "hp", "mp", "st", "hit", "avoid", "attackDelay", "hasBuff"]);
+  const numericKeys = new Set(["weaponDamage", "weaponDelay", "attack", "magic", "speed", "ac", "hp", "mp", "st", "maxWeight", "hit", "avoid", "attackDelay", "hasBuff"]);
   return items.slice().sort((a, b) => {
     const av = catalogItemSortValue(a, key);
     const bv = catalogItemSortValue(b, key);
@@ -11490,7 +11493,7 @@ function createCatalogTab(panel) {
         <option value="name">名称</option><option value="category">種別/部位</option><option value="slot">部位</option><option value="req">装備条件</option><option value="buff">装備Buff名</option><option value="hasBuff">Buff有無</option>
         <option value="weaponDamage">武器ダメージ</option><option value="weaponDelay">攻撃間隔</option>
         <option value="attack">攻撃力</option><option value="magic">魔力</option><option value="speed">速度</option><option value="ac">AC</option>
-        <option value="hp">HP</option><option value="mp">MP</option><option value="st">ST</option><option value="hit">命中</option><option value="avoid">回避</option><option value="attackDelay">攻撃ディレイ</option>
+        <option value="hp">HP</option><option value="mp">MP</option><option value="st">ST</option><option value="maxWeight">最大重量</option><option value="hit">命中</option><option value="avoid">回避</option><option value="attackDelay">攻撃ディレイ</option>
       </select></label>
       <label>順序 <select id="catalogSortDir"><option value="asc">昇順</option><option value="desc">降順</option></select></label>
       <label>1ページ <select id="catalogLimit"><option value="50">50件</option><option value="100">100件</option><option value="200" selected>200件</option><option value="500">500件</option><option value="1000">1000件</option></select></label>
