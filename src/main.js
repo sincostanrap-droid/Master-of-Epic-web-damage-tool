@@ -5,7 +5,7 @@
   onclick属性から呼ばれる関数があるため、現時点では module ではなく通常scriptとして読み込みます。
 */
 
-const APP_VERSION = "v1.23.36";
+const APP_VERSION = "v1.23.37";
 const APP_VERSION_NOTE = "装備カタログ条件表示・ページ送り・追加効果二重加算修正";
 
 /* 種族係数。攻撃力係数と魔力係数は別管理。 */
@@ -4045,6 +4045,134 @@ function skillSelectedKnowledgeBucketHtml(bucketKey, rows) {
   </section>`;
 }
 
+// __MOE_SKILL_SELECTED_PANEL_FILTERS_V1__
+// 選択スキル関連パネル内だけを絞り込む軽量フィルタ。
+function skillSelectedKnowledgePanelFilters() {
+  state.skillSim = normalizeSkillSim(state.skillSim);
+  const s = state.skillSim;
+  const statusValues = new Set(["all", "available", "near", "missing"]);
+  const typeValues = new Set(["all", "masteries", "techniques", "magic"]);
+
+  const status = statusValues.has(s.selectedSkillKnowledgeStatusFilter)
+    ? s.selectedSkillKnowledgeStatusFilter
+    : "all";
+  const type = typeValues.has(s.selectedSkillKnowledgeTypeFilter)
+    ? s.selectedSkillKnowledgeTypeFilter
+    : "all";
+  const text = String(s.selectedSkillKnowledgeTextFilter || "").trim();
+
+  s.selectedSkillKnowledgeStatusFilter = status;
+  s.selectedSkillKnowledgeTypeFilter = type;
+  s.selectedSkillKnowledgeTextFilter = text;
+
+  return {status, type, text};
+}
+
+function skillSelectedKnowledgeTypeFilterLabel(type) {
+  if (type === "masteries") return "マスタリー";
+  if (type === "techniques") return "テクニック";
+  if (type === "magic") return "魔法";
+  return "すべて";
+}
+
+function skillSelectedKnowledgeStatusFilterLabel(status) {
+  if (status === "available") return "使用可能";
+  if (status === "near") return "もう少し";
+  if (status === "missing") return "不足";
+  return "すべて";
+}
+
+function skillSelectedKnowledgeMatchesPanelFilters(row, filters) {
+  if (!row) return false;
+
+  const bucket = skillSelectedKnowledgeBucketKey(row.ev);
+  if (filters.status !== "all" && filters.status !== bucket) return false;
+
+  if (filters.type !== "all" && row.entry?.key !== filters.type) return false;
+
+  const q = String(filters.text || "").trim().toLowerCase();
+  if (q) {
+    const item = row.entry?.item || {};
+    const haystack = [
+      item.name,
+      item.category,
+      item.type,
+      item.note,
+      item.description,
+      row.entry?.label
+    ].filter(Boolean).join(" ").toLowerCase();
+    if (!haystack.includes(q)) return false;
+  }
+
+  return true;
+}
+
+function skillSelectedKnowledgeFilterControlsHtml(filters) {
+  const selected = (value, current) => value === current ? " selected" : "";
+  const text = escapeHtml(filters.text || "");
+  return `<div class="skillSelectedKnowledgeMiniControls small">
+    <label>状態
+      <select id="skillSelectedKnowledgeStatusFilter">
+        <option value="all"${selected("all", filters.status)}>すべて</option>
+        <option value="available"${selected("available", filters.status)}>使用可能</option>
+        <option value="near"${selected("near", filters.status)}>もう少し</option>
+        <option value="missing"${selected("missing", filters.status)}>不足</option>
+      </select>
+    </label>
+    <label>種別
+      <select id="skillSelectedKnowledgeTypeFilter">
+        <option value="all"${selected("all", filters.type)}>すべて</option>
+        <option value="masteries"${selected("masteries", filters.type)}>マスタリー</option>
+        <option value="techniques"${selected("techniques", filters.type)}>テクニック</option>
+        <option value="magic"${selected("magic", filters.type)}>魔法</option>
+      </select>
+    </label>
+    <label>名前検索
+      <input id="skillSelectedKnowledgeTextFilter" type="search" value="${text}" placeholder="例: バーサーク">
+    </label>
+    <button type="button" id="skillSelectedKnowledgeApplyFilter">適用</button>
+    <button type="button" id="skillSelectedKnowledgeClearFilter">クリア</button>
+  </div>`;
+}
+
+function bindSkillSelectedKnowledgePanelFilters(selected) {
+  const status = byId("skillSelectedKnowledgeStatusFilter");
+  const type = byId("skillSelectedKnowledgeTypeFilter");
+  const text = byId("skillSelectedKnowledgeTextFilter");
+  const apply = byId("skillSelectedKnowledgeApplyFilter");
+  const clear = byId("skillSelectedKnowledgeClearFilter");
+
+  const applyFilters = () => {
+    state.skillSim = normalizeSkillSim(state.skillSim);
+    if (status) state.skillSim.selectedSkillKnowledgeStatusFilter = status.value;
+    if (type) state.skillSim.selectedSkillKnowledgeTypeFilter = type.value;
+    if (text) state.skillSim.selectedSkillKnowledgeTextFilter = text.value;
+    renderSelectedSkillKnowledgePanel(selected);
+  };
+
+  if (status) status.onchange = applyFilters;
+  if (type) type.onchange = applyFilters;
+  if (apply) apply.onclick = applyFilters;
+  if (text) {
+    text.onkeydown = ev => {
+      if (ev.key === "Enter") {
+        ev.preventDefault();
+        applyFilters();
+      }
+    };
+  }
+  if (clear) {
+    clear.onclick = () => {
+      state.skillSim = normalizeSkillSim(state.skillSim);
+      state.skillSim.selectedSkillKnowledgeStatusFilter = "all";
+      state.skillSim.selectedSkillKnowledgeTypeFilter = "all";
+      state.skillSim.selectedSkillKnowledgeTextFilter = "";
+      renderSelectedSkillKnowledgePanel(selected);
+    };
+  }
+}
+
+
 
 function renderSelectedSkillKnowledgePanel(skillName=null) {
   const panel = ensureSkillSelectedKnowledgePanel();
@@ -4059,12 +4187,19 @@ function renderSelectedSkillKnowledgePanel(skillName=null) {
 
   state.skillSim.selectedSkillKnowledge = selected;
 
+  const filters = skillSelectedKnowledgePanelFilters();
   const all = buildSkillSelectedKnowledgeIndex().get(selected) || [];
-  const evaluated = skillSelectedKnowledgeSortRows(all.map(entry => ({
+  const evaluatedAll = skillSelectedKnowledgeSortRows(all.map(entry => ({
     entry,
     ev: skillKnowledgeEvaluate(entry.item)
   })));
+  const evaluated = evaluatedAll.filter(row => skillSelectedKnowledgeMatchesPanelFilters(row, filters));
 
+  const allCounts = {
+    available: evaluatedAll.filter(x => skillSelectedKnowledgeBucketKey(x.ev) === "available").length,
+    near: evaluatedAll.filter(x => skillSelectedKnowledgeBucketKey(x.ev) === "near").length,
+    missing: evaluatedAll.filter(x => skillSelectedKnowledgeBucketKey(x.ev) === "missing").length
+  };
   const counts = {
     available: evaluated.filter(x => skillSelectedKnowledgeBucketKey(x.ev) === "available").length,
     near: evaluated.filter(x => skillSelectedKnowledgeBucketKey(x.ev) === "near").length,
@@ -4079,31 +4214,31 @@ function renderSelectedSkillKnowledgePanel(skillName=null) {
 
   const displayLimit = 160;
   const shown = evaluated.slice(0, displayLimit);
-  const byBucket = {
-    available: shown.filter(x => skillSelectedKnowledgeBucketKey(x.ev) === "available"),
-    near: shown.filter(x => skillSelectedKnowledgeBucketKey(x.ev) === "near"),
-    missing: shown.filter(x => skillSelectedKnowledgeBucketKey(x.ev) === "missing")
-  };
+  const bucketOrder = filters.status === "all"
+    ? ["available", "near", "missing"]
+    : [filters.status];
 
   const body = shown.length
-    ? [
-        skillSelectedKnowledgeBucketHtml("available", byBucket.available),
-        skillSelectedKnowledgeBucketHtml("near", byBucket.near),
-        skillSelectedKnowledgeBucketHtml("missing", byBucket.missing)
-      ].join("")
-    : `<div class="small mutedText">このスキルに紐づくテクニック・魔法は登録データ内では見つかりませんでした。</div>`;
+    ? bucketOrder.map(bucket => {
+        const rows = shown.filter(x => skillSelectedKnowledgeBucketKey(x.ev) === bucket);
+        return skillSelectedKnowledgeBucketHtml(bucket, rows);
+      }).join("")
+    : `<div class="small mutedText">現在の絞り込み条件に一致する関連項目はありません。</div>`;
 
   panel.innerHTML = `
     <div class="skillSelectedKnowledgeHeader">
       <b>選択スキル: ${escapeHtml(selected)}</b>
       <span class="mutedText">現在 ${fmt(skillSimValue(selected), 1)}</span>
     </div>
+    ${skillSelectedKnowledgeFilterControlsHtml(filters)}
     <div class="small mutedText">
-      関連 ${all.length}件 / 使用可能 ${counts.available} / もう少し ${counts.near} / 不足 ${counts.missing}<br>
-      ${typeCounts}${all.length > displayLimit ? ` / 表示 ${displayLimit}/${all.length}` : ""}
+      表示 ${evaluated.length}/${all.length}件 / 使用可能 ${counts.available}/${allCounts.available} / もう少し ${counts.near}/${allCounts.near} / 不足 ${counts.missing}/${allCounts.missing}<br>
+      種別 ${escapeHtml(skillSelectedKnowledgeTypeFilterLabel(filters.type))} / 状態 ${escapeHtml(skillSelectedKnowledgeStatusFilterLabel(filters.status))} / ${typeCounts}${evaluated.length > displayLimit ? ` / 表示上限 ${displayLimit}件` : ""}
     </div>
     <div class="skillSelectedKnowledgeList skillSelectedKnowledgeGroupedList">${body}</div>
   `;
+
+  bindSkillSelectedKnowledgePanelFilters(selected);
 }
 
 function selectSkillKnowledge(skill) {
