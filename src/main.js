@@ -5,7 +5,7 @@
   onclick属性から呼ばれる関数があるため、現時点では module ではなく通常scriptとして読み込みます。
 */
 
-const APP_VERSION = "v1.23.34";
+const APP_VERSION = "v1.23.35";
 const APP_VERSION_NOTE = "装備カタログ条件表示・ページ送り・追加効果二重加算修正";
 
 /* 種族係数。攻撃力係数と魔力係数は別管理。 */
@@ -3690,7 +3690,7 @@ function setupSkillKnowledgeControls() {
   ["skillKnowledgeSearch", "skillKnowledgeCategory", "skillKnowledgeStatus"].forEach(id => {
     const el = byId(id);
     if (!el || el.dataset.skillKnowledgeReady === "1") return;
-    el.addEventListener(id === "skillKnowledgeSearch" ? "input" : "change", renderSkillKnowledge);
+    el.addEventListener(id === "skillKnowledgeSearch" ? "input" : "change", skillKnowledgeActivateFullList);
     el.dataset.skillKnowledgeReady = "1";
   });
 }
@@ -3699,6 +3699,7 @@ function clearSkillKnowledgeFilters() {
   if (byId("skillKnowledgeSearch")) byId("skillKnowledgeSearch").value = "";
   if (byId("skillKnowledgeCategory")) byId("skillKnowledgeCategory").value = "all";
   if (byId("skillKnowledgeStatus")) byId("skillKnowledgeStatus").value = "relevant";
+  skillKnowledgeFullListActive = true;
   renderSkillKnowledge();
 }
 
@@ -4008,6 +4009,102 @@ function selectSkillKnowledge(skill) {
   renderSelectedSkillKnowledgePanel(selected);
 }
 
+// __MOE_SKILL_KNOWLEDGE_LAZY_FULL_LIST_V1__
+// 選択スキル関連パネルを主役にし、全マスタリー/テクニック/魔法カードは必要時だけ描画する。
+let skillKnowledgeFullListActive = false;
+
+function ensureSkillKnowledgeLazyControls() {
+  if (typeof document === "undefined") return;
+  const panel = document.querySelector(".skillKnowledgePanel");
+  if (!panel || byId("skillKnowledgeFullListToggle")) {
+    updateSkillKnowledgeLazyControls();
+    return;
+  }
+
+  const controls = panel.querySelector(".skillKnowledgeControls");
+  const anchor = controls || byId("skillKnowledgeSummary") || panel.firstElementChild || panel;
+
+  const wrap = document.createElement("div");
+  wrap.id = "skillKnowledgeLazyControls";
+  wrap.className = "skillKnowledgeLazyControls small";
+  wrap.innerHTML = `
+    <button type="button" id="skillKnowledgeFullListToggle">全一覧を表示/更新</button>
+    <span id="skillKnowledgeLazyStatus" class="mutedText">初期表示では選択スキル関連だけを更新します。</span>
+  `;
+
+  if (anchor.parentNode) anchor.parentNode.insertBefore(wrap, anchor.nextSibling);
+  else panel.insertBefore(wrap, panel.firstChild);
+
+  byId("skillKnowledgeFullListToggle").onclick = () => {
+    skillKnowledgeFullListActive = !skillKnowledgeFullListActive;
+    if (skillKnowledgeFullListActive) {
+      renderSkillKnowledge();
+    } else {
+      renderSkillKnowledgeLazyPlaceholder();
+    }
+    updateSkillKnowledgeLazyControls();
+  };
+
+  updateSkillKnowledgeLazyControls();
+}
+
+function updateSkillKnowledgeLazyControls() {
+  const btn = byId("skillKnowledgeFullListToggle");
+  if (btn) btn.textContent = skillKnowledgeFullListActive ? "全一覧を隠す" : "全一覧を表示/更新";
+
+  const status = byId("skillKnowledgeLazyStatus");
+  if (status) {
+    status.textContent = skillKnowledgeFullListActive
+      ? "全一覧モード中です。検索・カテゴリ・状態フィルタで再描画します。"
+      : "軽量モード中です。スキル名クリックの関連表示だけを更新します。";
+  }
+}
+
+function skillKnowledgeActivateFullList() {
+  skillKnowledgeFullListActive = true;
+  updateSkillKnowledgeLazyControls();
+  renderSkillKnowledge();
+}
+
+function setSkillKnowledgeLazyListHtml(id, countId, label, count) {
+  const el = byId(id);
+  if (!el) return;
+  const html = `<div class="small mutedText">軽量モード中です。「全一覧を表示/更新」を押すと${escapeHtml(label)}一覧を描画します。</div>`;
+  if (el.dataset.skillKnowledgeLazyPlaceholder !== "1" || el.innerHTML !== html) {
+    el.innerHTML = html;
+    el.dataset.skillKnowledgeLazyPlaceholder = "1";
+  }
+  const countEl = byId(countId);
+  if (countEl) countEl.textContent = `${count || 0}件`;
+}
+
+function clearSkillKnowledgeLazyPlaceholderFlags() {
+  ["skillMasteryList", "skillTechniqueList", "skillMagicList"].forEach(id => {
+    const el = byId(id);
+    if (el) delete el.dataset.skillKnowledgeLazyPlaceholder;
+  });
+}
+
+function renderSkillKnowledgeLazyPlaceholder() {
+  if (!byId("skillMasteryList")) return;
+  setupSkillKnowledgeControls();
+  ensureSkillKnowledgeLazyControls();
+
+  const data = skillKnowledgeData();
+  setSkillKnowledgeLazyListHtml("skillMasteryList", "skillMasteryCount", "マスタリー", (data.masteries || []).length);
+  setSkillKnowledgeLazyListHtml("skillTechniqueList", "skillTechniqueCount", "テクニック", (data.techniques || []).length);
+  setSkillKnowledgeLazyListHtml("skillMagicList", "skillMagicCount", "魔法", (data.magic || []).length);
+
+  const summary = byId("skillKnowledgeSummary");
+  if (summary) {
+    const dataSource = data.dataSource || "内蔵/生成データ";
+    summary.innerHTML = `軽量モード: 全一覧は未描画<br><span class="small mutedText">マスタリー ${(data.masteries || []).length}件 / テク ${(data.techniques || []).length}件 / 魔法 ${(data.magic || []).length}件 / 参照元： ${escapeHtml(dataSource)}</span>`;
+  }
+
+  updateSkillKnowledgeLazyControls();
+}
+
+
 
 
 /* __MOE_SKILL_KNOWLEDGE_CARD_RENDER_LIMIT_V1__
@@ -4071,6 +4168,12 @@ function attachSkillKnowledgeMoreButton(containerId) {
 function renderSkillKnowledge() {
   if (!byId("skillMasteryList")) return;
   setupSkillKnowledgeControls();
+  ensureSkillKnowledgeLazyControls();
+  if (!skillKnowledgeFullListActive) {
+    renderSkillKnowledgeLazyPlaceholder();
+    return;
+  }
+  clearSkillKnowledgeLazyPlaceholderFlags();
   const data = skillKnowledgeData();
   const filter = skillKnowledgeFilterState();
 
