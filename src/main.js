@@ -5,7 +5,7 @@
   onclick属性から呼ばれる関数があるため、現時点では module ではなく通常scriptとして読み込みます。
 */
 
-const APP_VERSION = "v1.23.33";
+const APP_VERSION = "v1.23.34";
 const APP_VERSION_NOTE = "装備カタログ条件表示・ページ送り・追加効果二重加算修正";
 
 /* 種族係数。攻撃力係数と魔力係数は別管理。 */
@@ -3838,6 +3838,177 @@ function skillKnowledgeItemHtml(ev, type) {
   </article>`;
 }
 
+// __MOE_SKILL_SIM_SELECTED_SKILL_RELATED_PANEL_V1__
+// もえかるくの「スキル名クリックで関連テクニック表示」という操作思想だけを参考にする。
+// UI/CSS/DOM/画像はコピーせず、このツール既存の skillKnowledgeData()/skillKnowledgeEvaluate() を使う。
+let skillSelectedKnowledgeIndexCache = null;
+
+function ensureSkillSelectedKnowledgePanel() {
+  if (typeof document === "undefined") return null;
+  let panel = byId("skillSelectedKnowledgePanel");
+  if (panel) return panel;
+
+  const root = byId("skillSimGroups");
+  if (!root || !root.parentNode) return null;
+
+  panel = document.createElement("div");
+  panel.id = "skillSelectedKnowledgePanel";
+  panel.className = "skillSelectedKnowledgePanel cardLike";
+  panel.innerHTML = `<div class="small mutedText">スキル名をクリックすると、関連テクニック・魔法をここに表示します。</div>`;
+
+  root.insertAdjacentElement("afterend", panel);
+  return panel;
+}
+
+function skillSelectedKnowledgeDefaultSkill() {
+  const fromState = state?.skillSim?.selectedSkillKnowledge || "";
+  if (fromState && SKILL_SIM_ALL.includes(fromState)) return fromState;
+  if (SKILL_SIM_ALL.includes("戦闘技術")) return "戦闘技術";
+  return SKILL_SIM_ALL[0] || "";
+}
+
+function skillKnowledgeRequirementSkillNames(item) {
+  const set = new Set();
+  const addName = value => {
+    if (!value) return;
+    const name = String(value).trim();
+    if (name && SKILL_SIM_ALL.includes(name)) set.add(name);
+  };
+
+  const addReq = req => {
+    if (!req) return;
+    if (typeof req === "string") {
+      addName(req);
+      return;
+    }
+    if (Array.isArray(req)) {
+      req.forEach(addReq);
+      return;
+    }
+    addName(req.skill || req.name || req.skillName || req.targetSkill || req.target);
+  };
+
+  ["requirements", "requiredSkills", "skills", "skillRequirements"].forEach(key => {
+    const value = item?.[key];
+    if (Array.isArray(value)) value.forEach(addReq);
+    else addReq(value);
+  });
+
+  addName(item?.successSkill);
+  addName(item?.skill);
+  addName(item?.targetSkill);
+
+  return Array.from(set);
+}
+
+function buildSkillSelectedKnowledgeIndex() {
+  if (skillSelectedKnowledgeIndexCache) return skillSelectedKnowledgeIndexCache;
+
+  const data = skillKnowledgeData();
+  const map = new Map();
+  const groups = [
+    ["masteries", "マスタリー"],
+    ["techniques", "テクニック"],
+    ["magic", "魔法"]
+  ];
+
+  groups.forEach(([key, label], groupOrder) => {
+    (data[key] || []).forEach((item, order) => {
+      skillKnowledgeRequirementSkillNames(item).forEach(skill => {
+        if (!map.has(skill)) map.set(skill, []);
+        map.get(skill).push({key, label, item, groupOrder, order});
+      });
+    });
+  });
+
+  map.forEach(list => {
+    list.sort((a, b) => a.groupOrder - b.groupOrder || a.order - b.order);
+  });
+
+  skillSelectedKnowledgeIndexCache = map;
+  return map;
+}
+
+function skillSelectedKnowledgeItemHtml(entry) {
+  const ev = skillKnowledgeEvaluate(entry.item);
+  const item = ev.item || entry.item || {};
+  const status = ev.status || (ev.available ? "available" : "missing");
+  const cls = skillKnowledgeStatusClass(status);
+  const reqText = Array.isArray(ev.evaluated) && ev.evaluated.length
+    ? ev.evaluated.map(r => `${escapeHtml(r.skill)} ${fmt(r.current, 1)}/${r.max !== null && r.max !== undefined ? "≤" + fmt(r.max, 1) : fmt(r.min, 1)}`).join(" / ")
+    : "条件なし";
+  const success = ev.success
+    ? ` / 成功 ${fmt(ev.success.rate, 1)}%`
+    : "";
+  const costParts = [];
+  if (item.cost?.st) costParts.push(`ST ${escapeHtml(item.cost.st)}`);
+  if (item.cost?.mp) costParts.push(`MP ${escapeHtml(item.cost.mp)}`);
+  const cost = costParts.length ? ` / ${costParts.join(" / ")}` : "";
+  const category = item.category ? ` <span class="mutedText">${escapeHtml(item.category)}</span>` : "";
+  const source = item.sourceUrl
+    ? ` <a href="${escapeHtml(item.sourceUrl)}" target="_blank" rel="noopener noreferrer">参照</a>`
+    : "";
+
+  return `<div class="skillKnowledgeRelatedItem ${cls}">
+    <div><b>${escapeHtml(entry.label)}: ${escapeHtml(item.name || "名称不明")}</b>${category}${source}</div>
+    <div class="small mutedText">${reqText}${success}${cost}</div>
+  </div>`;
+}
+
+function renderSelectedSkillKnowledgePanel(skillName=null) {
+  const panel = ensureSkillSelectedKnowledgePanel();
+  if (!panel) return;
+
+  state.skillSim = normalizeSkillSim(state.skillSim);
+  const selected = validSkillSimSkillName(skillName || skillSelectedKnowledgeDefaultSkill(), "");
+  if (!selected) {
+    panel.innerHTML = `<div class="small mutedText">スキル名をクリックすると、関連テクニック・魔法をここに表示します。</div>`;
+    return;
+  }
+
+  state.skillSim.selectedSkillKnowledge = selected;
+
+  const all = buildSkillSelectedKnowledgeIndex().get(selected) || [];
+  const evaluated = all.map(entry => ({entry, ev: skillKnowledgeEvaluate(entry.item)}));
+  const available = evaluated.filter(x => x.ev.available).length;
+  const near = evaluated.filter(x => x.ev.status === "near").length;
+  const limit = 80;
+  const shown = evaluated.slice(0, limit);
+
+  const counts = [
+    ["マスタリー", all.filter(x => x.key === "masteries").length],
+    ["テクニック", all.filter(x => x.key === "techniques").length],
+    ["魔法", all.filter(x => x.key === "magic").length]
+  ].filter(([, n]) => n).map(([label, n]) => `${label} ${n}`).join(" / ") || "該当なし";
+
+  const body = shown.length
+    ? shown.map(x => skillSelectedKnowledgeItemHtml(x.entry)).join("")
+    : `<div class="small mutedText">このスキルに紐づくテクニック・魔法は登録データ内では見つかりませんでした。</div>`;
+
+  panel.innerHTML = `
+    <div class="skillSelectedKnowledgeHeader">
+      <b>選択スキル: ${escapeHtml(selected)}</b>
+      <span class="mutedText">現在 ${fmt(skillSimValue(selected), 1)} / 使用可能 ${available} / 近い ${near}</span>
+    </div>
+    <div class="small mutedText">${counts}${all.length > limit ? ` / 表示 ${limit}/${all.length}` : ""}</div>
+    <div class="skillSelectedKnowledgeList">${body}</div>
+  `;
+}
+
+function selectSkillKnowledge(skill) {
+  const selected = validSkillSimSkillName(skill, "");
+  if (!selected) return;
+  if (!state.skillSim) state.skillSim = defaultSkillSimState();
+  state.skillSim.selectedSkillKnowledge = selected;
+
+  document.querySelectorAll(".skillBarName[data-skill-name]").forEach(el => {
+    el.classList.toggle("selectedSkillKnowledgeName", el.dataset.skillName === selected);
+  });
+
+  renderSelectedSkillKnowledgePanel(selected);
+}
+
+
 
 /* __MOE_SKILL_KNOWLEDGE_CARD_RENDER_LIMIT_V1__
  * スキルシミュレータの知識カード(skillKnowledgeItem)を初期描画しすぎないための表示制限。
@@ -3964,9 +4135,14 @@ function makeSkillBarRow(skill) {
   const row = document.createElement("div");
   row.className = "skillBarRow";
 
-  const name = document.createElement("div");
-  name.className = "skillBarName";
+  const name = document.createElement("button");
+  name.type = "button";
+  name.className = "skillBarName skillBarNameButton";
   name.textContent = skill;
+  name.dataset.skillName = skill;
+  name.title = "関連テクニック・魔法を表示";
+  name.onclick = () => selectSkillKnowledge(skill);
+  if (state?.skillSim?.selectedSkillKnowledge === skill) name.classList.add("selectedSkillKnowledgeName");
   row.appendChild(name);
 
   const barWrap = document.createElement("div");
@@ -4084,6 +4260,7 @@ function renderSkillSim() {
   });
 
   const root = byId("skillSimGroups");
+  ensureSkillSelectedKnowledgePanel();
   root.innerHTML = "";
   SKILL_SIM_GROUPS.forEach(([group, list]) => {
     const box = document.createElement("section");
@@ -4104,6 +4281,7 @@ function renderSkillSim() {
 
   setupSkillKnowledgeControls();
   updateSkillSimSummary();
+  renderSelectedSkillKnowledgePanel();
 }
 
 function updateSkillSimSummary() {
@@ -4138,6 +4316,7 @@ function updateSkillSimSummary() {
     masterySummaryEl.innerHTML += `<br>${skillSimMasterySummaryText()}`;
   }
   renderSkillKnowledge();
+  renderSelectedSkillKnowledgePanel();
 }
 
 function applySkillSimToCalc(silent=false) {
