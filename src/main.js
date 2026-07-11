@@ -5,7 +5,7 @@
   onclick属性から呼ばれる関数があるため、現時点では module ではなく通常scriptとして読み込みます。
 */
 
-const APP_VERSION = "v1.23.47";
+const APP_VERSION = "v1.23.48";
 const APP_VERSION_NOTE = "装備カタログ条件表示・ページ送り・追加効果二重加算修正";
 
 /* 種族係数。攻撃力係数と魔力係数は別管理。 */
@@ -12561,23 +12561,39 @@ function buffCatalogItems() {
 }
 
 function equipBuffRuleCandidateItems() {
-  const raw = catalogArray("MOE_EQUIP_BUFF_RULE_CANDIDATES_MANUAL", "MOE_EQUIP_BUFF_RULE_CANDIDATES", "MOE_EQUIP_BUFF_RULE_CANDIDATES_GENERATED");
+  // __MOE_MANUAL_BUFF_RULES_PRIORITY_FIX_V1__
+  // verified/manual rules must override generated candidates with the same key.
+  const generated = catalogArray(
+    "MOE_EQUIP_BUFF_RULE_CANDIDATES_MANUAL",
+    "MOE_EQUIP_BUFF_RULE_CANDIDATES",
+    "MOE_EQUIP_BUFF_RULE_CANDIDATES_GENERATED"
+  );
+
+  const manualItems = [];
   const manual = window.MOE_BUFF_RULES_MANUAL;
   if (manual && typeof manual === "object") {
     Object.entries(manual).forEach(([catalogId, rule]) => {
       if (!rule || typeof rule !== "object") return;
-      raw.push({catalogId, id:catalogId, ...rule, source:rule.source || "manual"});
+      manualItems.push({
+        catalogId,
+        id: catalogId,
+        ...rule,
+        source: rule.source || "manual"
+      });
     });
   }
+
   const seen = new Set();
   const out = [];
-  raw.forEach(item => {
+
+  [...manualItems, ...generated].forEach(item => {
     if (!item) return;
     const key = item.catalogId || item.id || item.officialTechnicId || item.name;
     if (seen.has(key)) return;
     seen.add(key);
     out.push(item);
   });
+
   return out;
 }
 
