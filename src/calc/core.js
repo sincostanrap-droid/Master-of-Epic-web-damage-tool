@@ -110,7 +110,14 @@ function computeMetrics(st, inputs) {
   const attackMultiplier = attackMultiplierFromInputs(weaponInputs);
   const dmgBonusSum = (st.dmg || []).filter(r => r.enabled && !r.excluded).reduce((s, r) => s + (+r.value || 0), 0);
   const dmgMultiplier = 1 + dmgBonusSum;
-  const specialMultiplier = (st.special || []).filter(r => r.enabled && !r.excluded).reduce((p, r) => p * (+r.value || 1), 1);
+  const targetRace = normalizeTargetRaceKey(inputs.targetRace || "");
+  const specialMultiplier = (st.special || [])
+    .filter(r => r.enabled && !r.excluded)
+    .filter(r => {
+      const target = normalizeTargetRaceKey(r.target || r.targetRace || "");
+      return !target || (targetRace && target === targetRace);
+    })
+    .reduce((p, r) => p * (+r.value || 1), 1);
 
   let defenseFactor = 1;
   if (ac > 0) {
@@ -135,7 +142,9 @@ function computeMetrics(st, inputs) {
     stats, pctStats, conv, pctAtkCalc, spirit, magicCoeff, baseMagicFromSpirit, flatStatRaw, equipmentRaw, extraStats,
     racialAtk, weaponAtk, weaponDamage, weaponWeight, selectedWeapon, skillModInfo, baseNaturalAtk, conversionAtk, baseAtk, flatAtkRaw, extraRawBeforePct, cappedAddRawBeforePct, cappedAddBeforePct, atkBeforePct, atkPctMode, atkBuffRaw, atkCap, atkBuffCapped, atk,
     attackMultiplier, dmgMultiplier, defenseFactor, critAvg, postMultiplier, baseNoTech,
-    rawDamage, finalDamage, slots, specialMultiplier
+    rawDamage, finalDamage, slots, specialMultiplier,
+    forcedEvasion: activeForcedEvasionFromState(st),
+    targetRace
   };
 }
 /* バフ枠一覧に表示する行名を作る。 */

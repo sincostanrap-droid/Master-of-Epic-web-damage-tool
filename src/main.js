@@ -5,7 +5,7 @@
   onclick属性から呼ばれる関数があるため、現時点では module ではなく通常scriptとして読み込みます。
 */
 
-const APP_VERSION = "v1.23.49";
+const APP_VERSION = "v1.23.50";
 const APP_VERSION_NOTE = "装備カタログ条件表示・ページ送り・追加効果二重加算修正";
 
 /* 種族係数。攻撃力係数と魔力係数は別管理。 */
@@ -1338,6 +1338,8 @@ function defaultEquipmentCandidate(slot, enabled=true) {
     equipBuffConvSpeedRate: 0,
     equipBuffDmgPct: 0,
     equipBuffSpecial: 1,
+    equipBuffSpecialTarget: "",
+    equipBuffForcedEvasion: null,
     equipBuffNote: "",
     ...extraDefaultFields("base"),
     ...extraDefaultFields("buff"),
@@ -1400,6 +1402,8 @@ function normalizeEquipmentCandidate(row, fallbackSlot) {
     equipBuffConvSpeedRate: +(row?.equipBuffConvSpeedRate || 0),
     equipBuffDmgPct: +(row?.equipBuffDmgPct || 0),
     equipBuffSpecial: row?.equipBuffSpecial === undefined || row?.equipBuffSpecial === "" ? 1 : +(row?.equipBuffSpecial || 1),
+    equipBuffSpecialTarget: String(row?.equipBuffSpecialTarget || "").trim().toLowerCase(),
+    equipBuffForcedEvasion: Number.isFinite(Number(row?.equipBuffForcedEvasion)) ? Number(row.equipBuffForcedEvasion) : null,
     extraEffects: normalizeAdditionalEffects(row?.extraEffects || row?.additionalEffects || [])
   };
   normalizeExtraStatsOnRow(out, row || {});
@@ -6697,6 +6701,8 @@ function equipmentBuffToCompositeRow(r) {
     convSpeedRate: +r.equipBuffConvSpeedRate || 0,
     dmgPct: +r.equipBuffDmgPct || 0,
     special: +r.equipBuffSpecial || 1,
+    specialTarget: normalizeTargetRaceKey(r.equipBuffSpecialTarget || ""),
+    forcedEvasion: Number.isFinite(Number(r.equipBuffForcedEvasion)) ? Number(r.equipBuffForcedEvasion) : null,
     extraEffects: normalizeAdditionalEffects(r.extraEffects),
     stackRule: r.equipBuffStackRule || "same-technic",
     note: [r.equipBuffNote || `装備由来: ${r.name || r.slot || "装備"}`, r.equipBuffRuleConfidence ? `候補精度: ${r.equipBuffRuleConfidence}` : ""].filter(Boolean).join(" / ")
@@ -6743,6 +6749,8 @@ function normalizeCompositeRows(rows) {
         ? (+r.dmgPct || 0)
         : ((+r.dmg || 0) > 0 && (+r.dmg || 0) <= 1 ? (+r.dmg || 0) * 100 : (+r.dmg || 0)),
       special: +r.special || 1,
+      specialTarget: normalizeTargetRaceKey(r.specialTarget || r.targetRace || r.target || ""),
+      forcedEvasion: Number.isFinite(Number(r.forcedEvasion)) ? Number(r.forcedEvasion) : null,
       extraEffects: normalizeAdditionalEffects(r.extraEffects || r.additionalEffects || []),
       note: r.note || ""
     };
@@ -6759,6 +6767,7 @@ function compositeHasEffect(r) {
     +r.flatAttack || +r.flatMagic || +r.flatSpeed ||
     +r.convMagicRate || +r.convMagicSpeedRate || +r.convSpeedRate || +r.dmgPct ||
     (+r.special && +r.special !== 1) ||
+    Number.isFinite(Number(r.forcedEvasion)) ||
     extraStatsHasEffect(r, "buff") ||
     additionalEffectsSummary(r, "display").length
   );
@@ -6776,7 +6785,11 @@ function compositeEffectText(r) {
   if (+r.convMagicSpeedRate) parts.push(`魔力→移動速度 ${r.convMagicSpeedRate}%`);
   if (+r.convSpeedRate) parts.push(`速度→攻撃力 ${r.convSpeedRate}%`);
   if (+r.dmgPct) parts.push(`与ダメ+${r.dmgPct}%`);
-  if (+r.special && +r.special !== 1) parts.push(`特攻×${r.special}`);
+  if (+r.special && +r.special !== 1) {
+    const target = r.specialTarget ? `${targetRaceLabel(r.specialTarget)} ` : "";
+    parts.push(`${target}特攻×${r.special}`);
+  }
+  if (Number.isFinite(Number(r.forcedEvasion))) parts.push(`回避${Number(r.forcedEvasion)}固定`);
   const extra = extraStatsEffectText(r, false);
   if (extra) parts.push(extra);
   const displayOnly = additionalEffectsSummary(r, "display");
@@ -6816,7 +6829,10 @@ function expandCompositeState(st) {
     if (+r.convMagicRate) out.conv.push({enabled:true, slot:false, name:`${baseName} 魔力→攻撃力`, source:"magic", rate:+r.convMagicRate, baseOffset:0, offset:0, capped:false, note});
     if (+r.convSpeedRate) out.conv.push({enabled:true, slot:false, name:`${baseName} 速度→攻撃力`, source:"speed", rate:+r.convSpeedRate, baseOffset:0, offset:0, capped:false, note});
     if (+r.dmgPct) out.dmg.push({enabled:true, slot:false, name:`${baseName} 与ダメ`, value:(+r.dmgPct) / 100, category:"装備以外Buff", note});
-    if (+r.special && +r.special !== 1) out.special.push({enabled:true, slot:false, name:`${baseName} 特攻`, value:+r.special, note});
+    if (+r.special && +r.special !== 1) out.special.push({
+      enabled:true, slot:false, name:`${baseName} 特攻`, value:+r.special,
+      target:normalizeTargetRaceKey(r.specialTarget || ""), note
+    });
   });
   return out;
 }
@@ -7317,10 +7333,77 @@ function actionCell(arr, idx, renderFn) {
  * 基本設定フォームから現在値を集める。
  * テーブル類はstate側に持つため、ここではキャラ/武器/攻撃/上限などを読む。
  */
+// __MOE_GENERIC_TARGET_SPECIAL_AND_FORCED_EVASION_V2B__
+const TARGET_RACE_OPTIONS = [
+  ["", "指定なし"],
+  ["dragon", "ドラゴン"], ["chaos", "カオス"], ["undead", "アンデッド"],
+  ["giant", "巨人"], ["goblin", "ゴブリン"], ["demon", "悪魔"],
+  ["bull", "猛牛"], ["bird", "鳥"]
+];
+
+function normalizeTargetRaceKey(value) {
+  const raw = String(value || "").trim().toLowerCase();
+  const aliases = {
+    "竜":"dragon", "龍":"dragon", "ドラゴン":"dragon",
+    "カオス":"chaos",
+    "アンデッド":"undead", "不死":"undead",
+    "巨人":"giant",
+    "ゴブリン":"goblin",
+    "悪魔":"demon",
+    "猛牛":"bull", "牛":"bull",
+    "鳥":"bird", "鳥系":"bird"
+  };
+  return aliases[raw] || raw;
+}
+
+function targetRaceLabel(value) {
+  const key = normalizeTargetRaceKey(value);
+  return TARGET_RACE_OPTIONS.find(([id]) => id === key)?.[1] || String(value || "指定なし");
+}
+
+function ensureTargetRaceSelector() {
+  if (typeof document === "undefined") return null;
+  let select = byId("targetRace");
+  if (select) return select;
+  const targetAC = byId("targetAC");
+  if (!targetAC) return null;
+
+  select = document.createElement("select");
+  select.id = "targetRace";
+  select.innerHTML = TARGET_RACE_OPTIONS
+    .map(([value, label]) => `<option value="${escapeAttr(value)}">${escapeHtml(label)}</option>`)
+    .join("");
+  select.addEventListener("change", () => calc());
+
+  const label = document.createElement("label");
+  label.className = "targetRaceControl";
+  label.append("対象種族 ");
+  label.appendChild(select);
+
+  const host = targetAC.closest("label,.inputPair,.formRow,.controlRow");
+  if (host) host.insertAdjacentElement("afterend", label);
+  else targetAC.insertAdjacentElement("afterend", label);
+  return select;
+}
+
+function activeForcedEvasionFromState(st) {
+  const values = normalizeCompositeRows(st?.composite)
+    .filter(r => r.enabled && !r.excluded)
+    .map(r => Number(r.forcedEvasion))
+    .filter(Number.isFinite);
+  return values.length ? Math.min(...values) : null;
+}
+
+function effectiveAvoidValue(d, m) {
+  if (Number.isFinite(m?.forcedEvasion)) return m.forcedEvasion;
+  const e = m?.extraStats || {};
+  return totalStatValue(d?.avoid || 0, e.extraAvoid, e.extraAvoidPct);
+}
+
 function collectInputs() {
   const ids = [
     "raceSelect","raceCoeff","str","spirit","magic","weaponSkill","requiredSkill","weaponReqMode","weaponDamage","weaponWeight",
-    "speed","drunk","targetAC","attackType","heavyFormula","heavyManualMultiplier","techMultiplier",
+    "speed","drunk","targetAC","targetRace","attackType","heavyFormula","heavyManualMultiplier","techMultiplier",
     "allowCrit","critRate","critMultiplier","atkCap","atkPctMode","finalCap"
   ];
   const inputs = {};
@@ -9050,7 +9133,7 @@ function optimizerStatCapRows(m, settings=null) {
     {label:"命中上昇量", value: optimizerEffectiveIncrease(d.hit, +extra.extraHit || 0, +extra.extraHitPct || 0), cap:500},
     {label:"AC", value: optimizerEffectiveTotal(0, +extra.extraAC || 0, +extra.extraACPct || 0), cap:500},
     {label:"魔力", value: +m.stats.magic || 0, cap:500},
-    {label:"回避", value: optimizerEffectiveTotal(d.avoid, +extra.extraAvoid || 0, +extra.extraAvoidPct || 0), cap:500},
+    {label:"回避", value: effectiveAvoidValue(d, m), cap:500},
     {label:"ST", value: optimizerEffectiveTotal(d.st, +extra.extraST || 0, +extra.extraSTPct || 0), cap:500},
     {label:"HP", value: optimizerEffectiveTotal(d.hp, +extra.extraHP || 0, +extra.extraHPPct || 0), cap:1000},
     {label:"MP", value: optimizerEffectiveTotal(d.mp, +extra.extraMP || 0, +extra.extraMPPct || 0), cap:1000},
@@ -10730,7 +10813,7 @@ function showcaseTotalStats(d, m) {
     ["ST", totalStatValue(d.st, e.extraST, e.extraSTPct)],
     ["最大重量", totalStatValue(d.weight, e.extraMaxWeight, e.extraMaxWeightPct)],
     ["命中", totalStatValue(d.hit, e.extraHit, e.extraHitPct)],
-    ["回避", totalStatValue(d.avoid, e.extraAvoid, e.extraAvoidPct)],
+    ["回避", effectiveAvoidValue(d, m)],
     ["防御/AC", totalStatValue(d.def, e.extraAC, e.extraACPct)],
     ["耐火属性", totalStatValue(d.resist, e.extraFireRes, e.extraFireResPct)],
     ["耐水属性", totalStatValue(d.resist, e.extraWaterRes, e.extraWaterResPct)],
@@ -13084,6 +13167,24 @@ function applyEquipBuffRuleCandidateToEquipment(row, rule, opts={}) {
     if (name || value) { pushDisplayEffect(row, "custom", value, name, e.unit || "", "display", "TSV候補"); applied = true; }
   });
   const misc = rule.misc || {};
+  if (Object.prototype.hasOwnProperty.call(misc, "forcedEvasion")) {
+    const forced = Number(misc.forcedEvasion);
+    if (Number.isFinite(forced)) {
+      row.equipBuffForcedEvasion = forced;
+      pushDisplayEffect(row, "custom", forced, "回避固定", "", "display", "manual");
+      applied = true;
+    }
+  }
+  {
+    const target = normalizeTargetRaceKey(misc.targetRace || misc.target || rule.targetRace || "");
+    const multiplier = Number(misc.targetMultiplier ?? rule.targetMultiplier ?? 0);
+    if (target && Number.isFinite(multiplier) && multiplier > 0) {
+      row.equipBuffSpecialTarget = target;
+      row.equipBuffSpecial = multiplier;
+      pushDisplayEffect(row, "custom", multiplier, `${targetRaceLabel(target)}特攻`, "倍", "display", "manual");
+      applied = true;
+    }
+  }
   if (misc.jumpMultiplier) { pushDisplayEffect(row, "custom", misc.jumpMultiplier, "ジャンプ力倍率", "倍", "display", "TSV候補"); applied = true; }
   if (misc.forcedSpeed) { pushDisplayEffect(row, "custom", misc.forcedSpeed, "強制移動速度", "", "display", "TSV候補"); applied = true; }
   if (misc.targetDamageEffects) { pushDisplayEffect(row, "custom", 0, misc.targetDamageEffects, "", "display", "TSV候補"); applied = true; }
@@ -13999,6 +14100,7 @@ function updateTotalStatsSummary(m=null) {
 }
 
 function calc() {
+  ensureTargetRaceSelector();
   syncSkillSimToCalcInputs(false, false);
   syncSelectedWeaponToHiddenInputs();
   syncRaceCoeff();
