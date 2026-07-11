@@ -5,7 +5,7 @@
   onclick属性から呼ばれる関数があるため、現時点では module ではなく通常scriptとして読み込みます。
 */
 
-const APP_VERSION = "v1.23.48";
+const APP_VERSION = "v1.23.49";
 const APP_VERSION_NOTE = "装備カタログ条件表示・ページ送り・追加効果二重加算修正";
 
 /* 種族係数。攻撃力係数と魔力係数は別管理。 */
@@ -3588,6 +3588,112 @@ function skillKnowledgeMasteryTierInfo(item) {
   return {tiers, achieved, next, nextShortage, nextEvaluated};
 }
 
+// __MOE_SKILL_SUCCESS_AND_RESOURCE_REDUCTION_V2__
+function skillKnowledgeSuccessRequirements(item, reqs) {
+  const rows = [];
+  const add = (skill, required) => {
+    const name = String(skill || "").trim();
+    const need = +required;
+    if (!name || !Number.isFinite(need) || need < 0) return;
+    if (rows.some(r => r.skill === name)) return;
+    rows.push({skill:name, current:skillKnowledgeCurrentValue(name), required:need});
+  };
+
+  if (item?.successSkill || item?.successRequired !== undefined) {
+    add(
+      item.successSkill || reqs?.[0]?.skill || reqs?.[0]?.name,
+      item.successRequired ?? reqs?.[0]?.min ?? reqs?.[0]?.required ?? reqs?.[0]?.value
+    );
+  }
+
+  (Array.isArray(reqs) ? reqs : []).forEach(req => {
+    if (!req || (req.max !== null && req.max !== undefined)) return;
+    add(req.skill || req.name, req.min ?? req.required ?? req.value);
+  });
+
+  return rows;
+}
+
+function skillKnowledgeIsAlwaysSuccessTrade(item, requirements) {
+  return String(item?.name || "").trim() === "トレード"
+    && requirements.some(r => r.skill === "取引" && Math.abs(r.required - 1) < 0.0001);
+}
+
+function skillKnowledgeTechniqueSuccess(item, reqs) {
+  const requirements = skillKnowledgeSuccessRequirements(item, reqs);
+  if (!requirements.length) return null;
+
+  if (skillKnowledgeIsAlwaysSuccessTrade(item, requirements)) {
+    const first = requirements[0];
+    return {
+      skill:first.skill, current:first.current, required:first.required,
+      rate:100, alwaysSuccess:true, composite:false, count:1,
+      lowerBound:100, components:requirements
+    };
+  }
+
+  const n = requirements.length;
+  let totalShortage = 0;
+  let totalSurplus = 0;
+  let allPlusEight = true;
+
+  const components = requirements.map(row => {
+    const diff = Math.round((row.current - row.required) * 10) / 10;
+    const shortage = Math.max(0, -diff);
+    const surplus = Math.min(8, Math.max(0, diff));
+    totalShortage += shortage;
+    totalSurplus += surplus;
+    if (diff < 8) allPlusEight = false;
+    return {...row, diff, shortage, surplus};
+  });
+
+  const lowerBound = 1 / n;
+  let rate = 80 + totalShortage * (-10 / n) + totalSurplus * (2.5 / n);
+  rate = Math.max(lowerBound, Math.min(100, rate));
+
+  if (!allPlusEight && rate >= 100) rate = 100 - 0.0001;
+  if (allPlusEight) rate = 100;
+
+  return {
+    skill:n === 1 ? requirements[0].skill : `複合 ${n}種`,
+    current:n === 1 ? requirements[0].current : null,
+    required:n === 1 ? requirements[0].required : null,
+    rate:Math.round(rate * 10000) / 10000,
+    alwaysSuccess:false,
+    composite:n > 1,
+    count:n,
+    lowerBound,
+    totalShortage,
+    totalSurplus,
+    allPlusEight,
+    components
+  };
+}
+
+function skillKnowledgeSingleResourceReduction(item) {
+  const reqs = Array.isArray(item?.requirements) ? item.requirements : [];
+  const success = skillKnowledgeTechniqueSuccess(item, reqs);
+  if (!success || success.composite || success.alwaysSuccess) return null;
+
+  const surplus = Math.max(0, success.current - success.required);
+  const steps = Math.max(0, Math.floor(surplus * 10 + 1e-9));
+  const reductionPct = Math.min(20, steps * 0.2);
+
+  return {
+    reductionPct: Math.round(reductionPct * 10) / 10,
+    skill: success.skill,
+    current: success.current,
+    required: success.required
+  };
+}
+
+function skillKnowledgeReducedResourceValue(base, reductionPct) {
+  const n = +base;
+  if (!Number.isFinite(n)) return null;
+  return n * (1 - reductionPct / 100);
+}
+
+
 function skillKnowledgeEvaluate(item) {
   const reqs = Array.isArray(item.requirements) ? item.requirements : [];
   const evaluated = reqs.map(skillKnowledgeEvaluateRequirement);
@@ -3596,18 +3702,9 @@ function skillKnowledgeEvaluate(item) {
   let available = missing.length === 0;
 
   const tierInfo = skillKnowledgeMasteryTierInfo(item);
-  if (tierInfo) {
-    available = !!tierInfo.achieved;
-  }
+  if (tierInfo) available = !!tierInfo.achieved;
 
-  let success = null;
-  if (item.successSkill || item.successRequired) {
-    const skill = item.successSkill || (reqs[0]?.skill || "");
-    const current = skillKnowledgeCurrentValue(skill);
-    const required = Math.max(0.000001, +(item.successRequired || reqs[0]?.min || reqs[0]?.required || 0));
-    const rate = required <= 0 ? 100 : Math.max(0, Math.min(100, (current / required) * 100));
-    success = {skill, current, required, rate, estimated:true};
-  }
+  const success = skillKnowledgeTechniqueSuccess(item, reqs);
 
   let status = available ? "available" : (totalShortage <= 10 ? "near" : "missing");
   if (tierInfo && !tierInfo.achieved && tierInfo.nextShortage <= 10) status = "near";
@@ -4271,12 +4368,30 @@ function skillSelectedKnowledgeDetailChipHtml(label, value, suffix="") {
 
 function skillSelectedKnowledgeCostChipsHtml(item) {
   const cost = item?.cost || {};
-  const chips = [
-    skillSelectedKnowledgeDetailChipHtml("ST", cost.st ?? item.st ?? item.consumeSt),
-    skillSelectedKnowledgeDetailChipHtml("MP", cost.mp ?? item.mp ?? item.consumeMp),
-    skillSelectedKnowledgeDetailChipHtml("HP", cost.hp ?? item.hp ?? item.consumeHp)
-  ].filter(Boolean);
-  return chips.join("");
+  const reduction = skillKnowledgeSingleResourceReduction(item);
+
+  const resourceChip = (label, base) => {
+    if (!skillSelectedKnowledgeHasValue(base)) return "";
+    const baseValue = +base;
+    if (!Number.isFinite(baseValue)) return skillSelectedKnowledgeDetailChipHtml(label, base);
+
+    if (!reduction || reduction.reductionPct <= 0) {
+      return skillSelectedKnowledgeDetailChipHtml(label, baseValue);
+    }
+
+    const reduced = skillKnowledgeReducedResourceValue(baseValue, reduction.reductionPct);
+    return `<span class="skillKnowledgeDetailChip" title="${escapeHtml(reduction.skill)} ${fmt(reduction.current,1)}/${fmt(reduction.required,1)}">
+      <span class="skillKnowledgeDetailMuted">${escapeHtml(label)}</span>
+      ${fmt(baseValue,1)} → ${fmt(reduced,1)}
+      <span class="skillKnowledgeDetailMuted">(-${fmt(reduction.reductionPct,1)}%)</span>
+    </span>`;
+  };
+
+  return [
+    resourceChip("ST", cost.st ?? item.st ?? item.consumeSt),
+    resourceChip("MP", cost.mp ?? item.mp ?? item.consumeMp),
+    resourceChip("HP", cost.hp ?? item.hp ?? item.consumeHp)
+  ].filter(Boolean).join("");
 }
 
 function skillSelectedKnowledgeCoreDetailChipsHtml(item) {
@@ -4343,8 +4458,29 @@ function skillSelectedKnowledgeRequirementTextHtml(ev) {
 }
 
 function skillSelectedKnowledgeSuccessDetailHtml(ev) {
-  if (!ev?.success) return "";
-  return `<div class="skillKnowledgeDetailSubText">成功率の目安${ev.success.estimated ? "（推定）" : ""}: ${fmt(ev.success.rate, 1)}% <span class="mutedText">(${escapeHtml(ev.success.skill)} ${fmt(ev.success.current, 1)}/${fmt(ev.success.required, 1)})</span></div>`;
+  const success = ev?.success;
+  if (!success) return "";
+
+  if (success.alwaysSuccess) {
+    return `<div class="skillKnowledgeDetailSubText">成功率: 100.0% <span class="mutedText">（取引1「トレード」固定）</span></div>`;
+  }
+
+  if (success.composite) {
+    const parts = (success.components || []).map(row =>
+      `${escapeHtml(row.skill)} ${fmt(row.current, 1)}/${fmt(row.required, 1)}`
+    ).join(" / ");
+
+    return `<div class="skillKnowledgeDetailSubText">
+      成功率: ${fmt(success.rate, 1)}%
+      <span class="mutedText">（複合 ${success.count}種 / 下限 ${fmt(success.lowerBound, 2)}%）</span>
+      ${parts ? `<br><span class="mutedText">${parts}</span>` : ""}
+    </div>`;
+  }
+
+  return `<div class="skillKnowledgeDetailSubText">
+    成功率: ${fmt(success.rate, 1)}%
+    <span class="mutedText">(${escapeHtml(success.skill)} ${fmt(success.current, 1)}/${fmt(success.required, 1)})</span>
+  </div>`;
 }
 
 function skillSelectedKnowledgeFloatingDetailItemHtml(row) {
