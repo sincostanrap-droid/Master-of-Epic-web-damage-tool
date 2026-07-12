@@ -6985,7 +6985,8 @@ function collectActiveBuffConflictCandidates(st) {
   let order = 0;
 
   normalizeCompositeRows(st.composite || []).forEach((row, idx) => {
-    if (!(row.enabled && compositeHasEffect(row))) return;
+    // __MOE_EXCLUDED_BUFF_CONFLICT_CANDIDATE_FIX_V1__
+    if (!(row.enabled && !row.excluded && compositeHasEffect(row))) return;
     const group = buffGroupName(row);
     if (!group) return;
     candidates.push({
