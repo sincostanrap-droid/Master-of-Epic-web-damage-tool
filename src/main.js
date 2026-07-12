@@ -6250,8 +6250,8 @@ function updateSkillSimSummary() {
     `種族 → ${escapeHtml(raceLabel)}`,
     `筋力 → ${fmt(skillSimValue("筋力"), 1)}`,
     `精神力 → ${fmt(skillSimValue("精神力"), 1)}`,
-    `酩酊度 → ${fmt(d.drunk, 1)}`,
-    `計算タブへ常時自動反映`
+    `酩酊スキル → ${fmt(d.drunk, 1)}`,
+    `計算タブへ自動反映（酩酊度は計算タブで独立入力）`
   ].map(x => `<div>${x}</div>`).join("");
 
   const masterySummaryEl = byId("skillSimSummary");
