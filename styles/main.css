@@ -4508,3 +4508,366 @@ button[onclick*="applySkillSimToCalc"],
     width: 100%;
   }
 }
+
+/* __MOE_BUFF_HEADER_UI_STYLE_V1__ */
+.buffHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 4px 2px 16px;
+}
+
+.buffHeaderIntro {
+  min-width: 0;
+  max-width: 860px;
+}
+
+.buffHeaderEyebrow {
+  margin-bottom: 5px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  opacity: 0.58;
+}
+
+.buffHeader h2 {
+  margin: 0;
+  font-size: clamp(1.45rem, 2.4vw, 2rem);
+  line-height: 1.15;
+}
+
+.buffHeaderLead {
+  margin: 9px 0 0;
+  max-width: 760px;
+  line-height: 1.75;
+  opacity: 0.82;
+}
+
+.buffHeaderAction {
+  flex: 0 0 auto;
+  padding-top: 20px;
+}
+
+.buffClearButton {
+  min-height: 42px;
+  padding: 0 17px;
+  white-space: nowrap;
+}
+
+.buffHeaderStats {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(112px, 1fr));
+  gap: 10px;
+  margin: 0 0 12px;
+}
+
+.buffHeaderStat {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 58px;
+  padding: 12px 14px;
+  border: 1px solid var(--border, rgba(127,127,127,.24));
+  border-radius: 12px;
+  background: var(--panel-bg, rgba(127,127,127,.055));
+}
+
+.buffHeaderStatLabel {
+  font-size: 0.78rem;
+  opacity: 0.68;
+}
+
+.buffHeaderStat strong {
+  font-size: 1.12rem;
+  line-height: 1;
+}
+
+.buffHeaderStatWarn.isActive {
+  border-color: rgba(220, 145, 50, .7);
+  box-shadow: inset 0 0 0 1px rgba(220, 145, 50, .14);
+}
+
+.buffHeaderHint {
+  margin: 0 0 14px;
+  opacity: 0.68;
+}
+
+@media (max-width: 900px) {
+  .buffHeaderStats {
+    grid-template-columns: repeat(3, minmax(100px, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .buffHeader {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .buffHeaderAction {
+    width: 100%;
+    padding-top: 0;
+  }
+
+  .buffClearButton {
+    width: 100%;
+  }
+
+  .buffHeaderStats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* __MOE_BUFF_ADD_MANAGE_STYLE_V2__ */
+.buffAddPanel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 24px;
+  margin: 4px 0 22px;
+  padding: 18px 20px;
+  border: 1px solid var(--border, rgba(127,127,127,.24));
+  border-radius: 14px;
+  background:
+    linear-gradient(135deg, rgba(90,125,210,.08), transparent 58%),
+    var(--panel-bg, rgba(127,127,127,.045));
+}
+
+.buffAddPanelCopy h3,
+.buffRegisteredHeader h3 {
+  margin: 2px 0 6px;
+  font-size: 1.05rem;
+}
+
+.buffAddPanelCopy p,
+.buffRegisteredHeader p {
+  margin: 0;
+  line-height: 1.65;
+  opacity: .74;
+}
+
+.buffSectionKicker {
+  display: block;
+  font-size: .67rem;
+  font-weight: 800;
+  letter-spacing: .13em;
+  opacity: .5;
+}
+
+.buffAddPanelActions {
+  display: flex;
+  align-items: stretch;
+  gap: 9px;
+}
+
+.reviewedBuffCatalogToolbarPrimary {
+  height: 100%;
+  margin: 0;
+}
+
+.buffCatalogPrimaryButton {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 54px;
+  padding: 8px 16px;
+  text-align: left;
+}
+
+.buffCatalogPrimaryButton > span:last-child {
+  display: grid;
+  gap: 2px;
+}
+
+.buffCatalogPrimaryButton small {
+  font-size: .69rem;
+  font-weight: 400;
+  opacity: .68;
+}
+
+.buffCatalogPrimaryIcon {
+  display: grid;
+  place-items: center;
+  width: 27px;
+  height: 27px;
+  border-radius: 9px;
+  font-size: 1.08rem;
+  background: rgba(255,255,255,.13);
+}
+
+.buffManualAddButton {
+  min-height: 54px;
+  white-space: nowrap;
+  opacity: .82;
+}
+
+.buffRegisteredHeader {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  margin: 0 2px 10px;
+}
+
+.buffRegisteredHeader p {
+  max-width: 520px;
+  text-align: right;
+  font-size: .78rem;
+}
+
+.buffRegisteredTableWrap {
+  border: 1px solid var(--border, rgba(127,127,127,.22));
+  border-radius: 12px;
+}
+
+.buffRegisteredTableWrap > table {
+  margin: 0;
+}
+
+.buffTableFooter {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin-top: 10px;
+}
+
+.buffManualAddButtonSecondary {
+  padding: 6px 12px;
+  opacity: .72;
+}
+
+@media (max-width: 820px) {
+  .buffAddPanel {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .buffAddPanelActions {
+    flex-wrap: wrap;
+  }
+
+  .buffCatalogPrimaryButton,
+  .buffManualAddButton {
+    flex: 1 1 240px;
+  }
+
+  .buffRegisteredHeader {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .buffRegisteredHeader p {
+    text-align: left;
+  }
+}
+
+@media (max-width: 520px) {
+  .buffAddPanel {
+    padding: 15px;
+  }
+
+  .buffAddPanelActions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .buffCatalogPrimaryButton,
+  .buffManualAddButton {
+    width: 100%;
+  }
+
+  .buffTableFooter {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+/* __MOE_BUFF_TABLE_8COL_STYLE_V3__ */
+#compositeBuffTable {
+  width: 100%;
+  min-width: 0;
+  table-layout: fixed;
+}
+
+#compositeBuffTable th,
+#compositeBuffTable td {
+  box-sizing: border-box;
+}
+
+#compositeBuffTable .checkCol {
+  width: 48px;
+}
+
+#compositeBuffTable .buffNameCol {
+  width: 38%;
+}
+
+#compositeBuffTable .buffDetailCol {
+  width: 96px;
+}
+
+#compositeBuffTable .buffMemoCol {
+  width: 24%;
+}
+
+#compositeBuffTable .buffActionCol {
+  width: 112px;
+}
+
+#compositeBuffTable .compactCompositeSummaryCell {
+  min-width: 0 !important;
+  width: auto;
+}
+
+#compositeBuffTable .compactCompositeNameLine {
+  min-width: 0;
+}
+
+#compositeBuffTable .compactCompositeNameLine input {
+  min-width: 0;
+  width: 100%;
+}
+
+#compositeBuffTable .compactCompositeEffectSummary {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#compositeBuffTable .compactCompositeNoteCell {
+  min-width: 0;
+}
+
+#compositeBuffTable .compactCompositeNoteCell input {
+  min-width: 0 !important;
+  width: 100%;
+}
+
+#compositeBuffTable .compositeExtraCell {
+  text-align: center;
+}
+
+#compositeBuffTable .actionCell {
+  white-space: nowrap;
+}
+
+.buffRegisteredTableWrap {
+  overflow-x: auto;
+}
+
+@media (max-width: 760px) {
+  #compositeBuffTable {
+    min-width: 720px;
+  }
+
+  #compositeBuffTable .buffNameCol {
+    width: 270px;
+  }
+
+  #compositeBuffTable .buffMemoCol {
+    width: 180px;
+  }
+}

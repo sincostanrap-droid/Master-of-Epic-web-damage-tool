@@ -65,7 +65,7 @@ MoE固有の主な仮定:
 </head>
 <body>
 <h1>Master of Epic 物理ダメージ計算webツール</h1>
-<p id="appBuildStamp" class="small appBuildStamp">スキルシミュレータ拡張版 v1.22.28</p>
+<p id="appBuildStamp" class="small appBuildStamp">スキルシミュレータ拡張版 v1.22.31</p>
 <section class="heroCard">
   <div>
     <div class="heroBadge">MoE / Physical Damage Calculator</div>
@@ -840,32 +840,100 @@ MoE固有の主な仮定:
 </section>
 
 <section class="card wide compositeMainSection" data-tab-target="buffs">
-  <h2>Buff登録</h2>
-  <p class="small compositeLead">
-    装備とは別に付け外しするBuffを登録するタブです。
-    自己Buff、外部Buff、歌、変身などをここにまとめて入力します。
-    %欄は10%なら「10」と入力してください。複数の効果を1行にまとめても、バフ枠は1枠として数えます。
-  </p>
-  <div class="bulkActionBar">
-    <button type="button" onclick="clearAllBuffUsage()">Buffの使用を全解除</button>
-    <span class="small">登録したBuffは残して、いま使用中のチェックだけ外します。</span>
+  <!-- __MOE_BUFF_HEADER_UI_V1__ -->
+  <div class="buffHeader">
+    <div class="buffHeaderIntro">
+      <div class="buffHeaderEyebrow">BUFF LOADOUT</div>
+      <h2>Buff構成</h2>
+      <p class="buffHeaderLead">
+        自己Buff・外部Buff・歌・変身など、装備以外の効果をまとめて管理します。
+        カタログから追加し、使用・固定・除外を切り替えて構成を作成してください。
+      </p>
+    </div>
+    <div class="buffHeaderAction">
+      <button type="button" class="buffClearButton" onclick="clearAllBuffUsage()"
+        title="登録内容は残したまま、使用中のチェックだけをすべて外します">
+        使用を全解除
+      </button>
+    </div>
   </div>
-  <div class="scrollX">
+
+  <div class="buffHeaderStats" aria-label="Buff構成サマリー">
+    <div class="buffHeaderStat">
+      <span class="buffHeaderStatLabel">登録</span>
+      <strong id="buffHeaderRegistered">0</strong>
+    </div>
+    <div class="buffHeaderStat">
+      <span class="buffHeaderStatLabel">使用中</span>
+      <strong id="buffHeaderActive">0</strong>
+    </div>
+    <div class="buffHeaderStat">
+      <span class="buffHeaderStatLabel">Buff枠</span>
+      <strong id="buffHeaderSlots">0 / 24</strong>
+    </div>
+    <div class="buffHeaderStat">
+      <span class="buffHeaderStatLabel">除外</span>
+      <strong id="buffHeaderExcluded">0</strong>
+    </div>
+    <div class="buffHeaderStat buffHeaderStatWarn">
+      <span class="buffHeaderStatLabel">競合中</span>
+      <strong id="buffHeaderConflicts">0</strong>
+    </div>
+  </div>
+
+  <p class="small buffHeaderHint">
+    手動入力では、10%を「10」と入力します。複数効果を1行にまとめても、Buff枠は1枠として数えます。
+  </p>
+  <!-- __MOE_BUFF_ADD_MANAGE_UI_V2__ -->
+  <div class="buffAddPanel">
+    <div class="buffAddPanelCopy">
+      <span class="buffSectionKicker">ADD BUFF</span>
+      <h3>Buffを追加</h3>
+      <p>
+        基本はレビュー済みカタログから選択します。
+        カタログにない効果や検証用データだけ、手動行として追加してください。
+      </p>
+    </div>
+    <div class="buffAddPanelActions">
+      <div id="reviewedBuffCatalogOpenHost"></div>
+      <button type="button" class="buffManualAddButton" onclick="addCompositeRow('blank')">
+        手動で空の行を追加
+      </button>
+    </div>
+  </div>
+
+  <div class="buffRegisteredHeader">
+    <div>
+      <span class="buffSectionKicker">REGISTERED BUFFS</span>
+      <h3>登録済みBuff</h3>
+    </div>
+    <p>使用・固定・除外を切り替え、必要な項目だけ「詳細」から調整します。</p>
+  </div>
+
+  <div class="scrollX buffRegisteredTableWrap">
     <table id="compositeBuffTable" class="compactTable compositeTable">
+      <!-- __MOE_BUFF_TABLE_8COL_V3__ -->
       <thead>
         <tr>
-          <th class="checkCol">使用</th><th class="checkCol">枠</th><th class="checkCol">固定</th><th class="checkCol">除外</th><th>名称</th><th>競合グループ</th>
-          <th>攻撃力%</th><th>魔力%</th><th>速度%</th>
-          <th>攻撃力+</th><th>魔力+</th><th>速度+</th>
-          <th>魔力→攻撃力%</th><th>速度→攻撃力%</th>
-          <th>与ダメ%</th><th>特攻倍率</th>
-          <th>詳細</th><th>メモ</th><th>操作</th>
+          <th class="checkCol">使用</th>
+          <th class="checkCol">枠</th>
+          <th class="checkCol">固定</th>
+          <th class="checkCol">除外</th>
+          <th class="buffNameCol">Buff</th>
+          <th class="buffDetailCol">詳細</th>
+          <th class="buffMemoCol">メモ</th>
+          <th class="buffActionCol">操作</th>
         </tr>
       </thead>
       <tbody></tbody>
     </table>
   </div>
-  <button onclick="addCompositeRow('blank')">Buff行を追加</button>
+  <div class="buffTableFooter">
+    <button type="button" class="buffManualAddButtonSecondary" onclick="addCompositeRow('blank')">
+      手動行を追加
+    </button>
+    <span class="small">通常は上の「カタログから選ぶ」を使用してください。</span>
+  </div>
 </section>
 
 <section class="card wide tagLinkSection" data-tab-target="groups">

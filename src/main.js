@@ -7074,6 +7074,53 @@ function applyBuffGroupRules(st) {
   return resolveAllBuffRowsForGroups(st).state;
 }
 
+/* __MOE_BUFF_HEADER_STATS_V1__
+ * Buffタブ上部へ、登録数・使用中・枠数・除外数・現在競合中のグループ数を表示する。
+ * 計算値そのものには影響しない表示専用処理。
+ */
+function updateBuffHeaderStats() {
+  if (typeof document === "undefined") return;
+
+  const composite = normalizeCompositeRows(state?.composite || []);
+  const post = Array.isArray(state?.post) ? state.post : [];
+  const other = Array.isArray(state?.other) ? state.other : [];
+  const allRows = [...composite, ...post, ...other];
+
+  const registered = allRows.length;
+  const active = allRows.filter(row => row?.enabled && !row?.excluded).length;
+  const excluded = allRows.filter(row => row?.excluded).length;
+  const slots = allRows.filter(row => row?.enabled && !row?.excluded && row?.slot !== false).length;
+
+  let conflicts = 0;
+  try {
+    const resolved = resolveAllBuffRowsForGroups({
+      composite,
+      post: post.map(row => ({...row})),
+      other: other.map(row => ({...row}))
+    });
+    conflicts = (resolved?.groups || []).filter(group =>
+      Array.isArray(group?.skipped) && group.skipped.length > 0
+    ).length;
+  } catch (_) {
+    conflicts = 0;
+  }
+
+  const setText = (id, value) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = String(value);
+  };
+
+  setText("buffHeaderRegistered", registered);
+  setText("buffHeaderActive", active);
+  setText("buffHeaderSlots", `${slots} / 24`);
+  setText("buffHeaderExcluded", excluded);
+  setText("buffHeaderConflicts", conflicts);
+
+  const conflictCard = document.getElementById("buffHeaderConflicts")?.closest(".buffHeaderStat");
+  if (conflictCard) conflictCard.classList.toggle("isActive", conflicts > 0);
+}
+
+
 
 function tagInputCell(row, className="tagInput") {
   const input = makeCell("input", {
@@ -7750,7 +7797,7 @@ function makeCompositeExtraDetailRow(row) {
   detailTr.style.display = row._compositeExtraOpen ? "" : "none";
 
   const td = makeCell("td");
-  td.colSpan = 17;
+  td.colSpan = 8; // __MOE_BUFF_TABLE_8COL_RUNTIME_V3__
   td.className = "compositeExtraDetailCell";
 
   const title = document.createElement("div");
@@ -8165,19 +8212,31 @@ function installReviewedBuffCatalogStyles() {
 }
 
 function ensureReviewedBuffCatalogButton() {
+  // __MOE_BUFF_ADD_PANEL_BUTTON_V2__
   installReviewedBuffCatalogStyles();
   if (byId("reviewedBuffCatalogOpen")) return;
+
   const table = byId("compositeBuffTable") || document.querySelector("#compositeBuffTable");
   if (!table) return;
+
+  const host = byId("reviewedBuffCatalogOpenHost");
   const toolbar = document.createElement("div");
-  toolbar.className = "reviewedBuffCatalogToolbar";
+  toolbar.className = "reviewedBuffCatalogToolbar reviewedBuffCatalogToolbarPrimary";
+
   const button = document.createElement("button");
   button.type = "button";
   button.id = "reviewedBuffCatalogOpen";
-  button.textContent = "Buffカタログから追加";
+  button.className = "buffCatalogPrimaryButton";
+  button.innerHTML = `<span class="buffCatalogPrimaryIcon">＋</span><span><b>カタログから選ぶ</b><small>レビュー済みBuffを検索して追加</small></span>`;
   button.onclick = openReviewedBuffCatalog;
+
   toolbar.appendChild(button);
-  table.insertAdjacentElement("beforebegin", toolbar);
+
+  if (host) {
+    host.appendChild(toolbar);
+  } else {
+    table.insertAdjacentElement("beforebegin", toolbar);
+  }
 }
 
 // __MOE_BUFF_REGISTRATION_COMPACT_ROWS_V1__
@@ -8284,7 +8343,7 @@ function renderCompositeTable() {
   state.composite = normalizeCompositeRows(state.composite);
 
   if (!state.composite.length) {
-    renderEmptyRow(tbody, 19, "まだ装備以外Buffがありません。『Buff行を追加』または『Buffカタログから追加』から追加してください。");
+    renderEmptyRow(tbody, 8, "まだ装備以外Buffがありません。『Buff行を追加』または『Buffカタログから追加』から追加してください。");
     return;
   }
 
@@ -8301,7 +8360,7 @@ function renderCompositeTable() {
     tr.appendChild(excludeCheckboxCell(row, renderCompositeTable));
 
     const summaryCell = makeCell("td");
-    summaryCell.colSpan = 12;
+    summaryCell.colSpan = 1;
     summaryCell.className = "compactCompositeSummaryCell";
     const nameLine = document.createElement("div");
     nameLine.className = "compactCompositeNameLine";
@@ -14710,6 +14769,8 @@ function calc() {
   renderRaceTable();
   renderValueTable();
   renderTagLinkSummary();
+
+  if (typeof updateBuffHeaderStats === "function") updateBuffHeaderStats();
 }
 
 /* 分析用: 現在構成をA/B比較スナップショットへ保存する。 */
