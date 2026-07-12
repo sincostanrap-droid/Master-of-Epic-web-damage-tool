@@ -1903,6 +1903,7 @@ window.MOE_REVIEWED_BUFF_CATALOG_MANUAL = [
     return { note: "134件レビュー済みBuffマスター / 要参照 / 身体能力強化 / 数値確定後に反映" };
   }
 },
+/* __MOE_WEREWOLF_MANUAL_FIELDS_FIX_V1__ */
 {
   id: "werewolf",
   name: "ワーウルフ",
@@ -1913,11 +1914,13 @@ window.MOE_REVIEWED_BUFF_CATALOG_MANUAL = [
   conflictGroup: "",
   reference: true,
   manualRequired: true,
-  manualFields: ["対象値", "耐風低下"],
-  description: "牙100で48、耐風低下50。48の対象能力が未確定のため、対象値は手入力扱い。",
+  manualFields: ["耐風低下"],
+  description: "耐風低下量を手入力。牙100で耐風低下50の参考値あり。別途記録されている48の対象能力は未確定のため、計算効果には含めない。",
   evaluate(input) {
     const skill = Math.max(0, Number(input.skill) || 0);
-    return { note: `134件レビュー済みBuffマスター / 参考値・手入力 / 牙${skill} / 牙100で48 / 耐風低下50 / 48の対象は要確認` };
+    return {
+      note: `134件レビュー済みBuffマスター / 参考値・手入力 / 牙${skill} / 牙100で耐風低下50 / 未確定の48は計算対象外`
+    };
   }
 },
 {
