@@ -5,7 +5,7 @@
   onclick属性から呼ばれる関数があるため、現時点では module ではなく通常scriptとして読み込みます。
 */
 
-const APP_VERSION = "v1.23.50";
+const APP_VERSION = "v1.23.59";
 const APP_VERSION_NOTE = "装備カタログ条件表示・ページ送り・追加効果二重加算修正";
 
 /* 種族係数。攻撃力係数と魔力係数は別管理。 */
@@ -634,6 +634,7 @@ const QUICK_EFFECT_DEFS = [
   {key:"convMagicRate", category:"ダメージ系", label:"魔力→攻撃力%", valueLabel:"%", unit:"%", scopes:["equipBuff","buff"]},
   {key:"convMagicSpeedRate", category:"ダメージ系", label:"魔力→移動速度%", valueLabel:"%", unit:"%", scopes:["equipBuff","buff"]},
   {key:"convSpeedRate", category:"ダメージ系", label:"速度→攻撃力%", valueLabel:"%", unit:"%", scopes:["equipBuff","buff"]},
+  {key:"convDrunkRate", category:"ダメージ系", label:"酩酊度→攻撃力%", valueLabel:"%", unit:"%", scopes:["buff"]},
   {key:"dmgPct", category:"ダメージ系", label:"与ダメ%", valueLabel:"%", unit:"%", scopes:["equipBuff","buff"]},
   {key:"specialMultiplier", category:"ダメージ系", label:"特攻倍率", valueLabel:"倍率", unit:"倍", scopes:["equipBuff","buff"]},
 
@@ -1403,7 +1404,9 @@ function normalizeEquipmentCandidate(row, fallbackSlot) {
     equipBuffDmgPct: +(row?.equipBuffDmgPct || 0),
     equipBuffSpecial: row?.equipBuffSpecial === undefined || row?.equipBuffSpecial === "" ? 1 : +(row?.equipBuffSpecial || 1),
     equipBuffSpecialTarget: String(row?.equipBuffSpecialTarget || "").trim().toLowerCase(),
-    equipBuffForcedEvasion: Number.isFinite(Number(row?.equipBuffForcedEvasion)) ? Number(row.equipBuffForcedEvasion) : null,
+    equipBuffForcedEvasion: hasForcedEvasionValue(row?.equipBuffForcedEvasion)
+      ? Number(row.equipBuffForcedEvasion)
+      : null,
     extraEffects: normalizeAdditionalEffects(row?.extraEffects || row?.additionalEffects || [])
   };
   normalizeExtraStatsOnRow(out, row || {});
@@ -1598,7 +1601,6 @@ function syncSkillSimToCalcInputs(force=false, updateWeaponReqName=false) {
   if (byId("raceSelect")) byId("raceSelect").value = state.skillSim.race || "newtar";
   if (byId("str")) byId("str").value = fmt(skillSimValue("筋力"), 1);
   if (byId("spirit")) byId("spirit").value = fmt(skillSimValue("精神力"), 1);
-  if (byId("drunk")) byId("drunk").value = fmt(d.drunk, 1);
 
   // 旧形式・未統合武器用の互換データも更新しておく。
   state.weaponReq = normalizeWeaponReqRows(state.weaponReq, collectInputs());
@@ -6264,6 +6266,8 @@ function updateSkillSimSummary() {
   if (typeof skillUiFinalApplySoon === "function") skillUiFinalApplySoon();
 }
 
+// __MOE_DECOUPLE_CALC_DRUNK_FROM_SKILL_SIM_V1__
+// 計算画面の酩酊度は独立入力。スキルシミュレータから同期しない。
 function applySkillSimToCalc(silent=false) {
   syncSkillSimToCalcInputs(true, true);
 
@@ -6702,7 +6706,9 @@ function equipmentBuffToCompositeRow(r) {
     dmgPct: +r.equipBuffDmgPct || 0,
     special: +r.equipBuffSpecial || 1,
     specialTarget: normalizeTargetRaceKey(r.equipBuffSpecialTarget || ""),
-    forcedEvasion: Number.isFinite(Number(r.equipBuffForcedEvasion)) ? Number(r.equipBuffForcedEvasion) : null,
+    forcedEvasion: hasForcedEvasionValue(r.equipBuffForcedEvasion)
+      ? Number(r.equipBuffForcedEvasion)
+      : null,
     extraEffects: normalizeAdditionalEffects(r.extraEffects),
     stackRule: r.equipBuffStackRule || "same-technic",
     note: [r.equipBuffNote || `装備由来: ${r.name || r.slot || "装備"}`, r.equipBuffRuleConfidence ? `候補精度: ${r.equipBuffRuleConfidence}` : ""].filter(Boolean).join(" / ")
@@ -6743,6 +6749,7 @@ function normalizeCompositeRows(rows) {
       convMagicRate: +r.convMagicRate || 0,
       convMagicSpeedRate: +r.convMagicSpeedRate || 0,
       convSpeedRate: +r.convSpeedRate || 0,
+      convDrunkRate: +r.convDrunkRate || 0,
       // 装備以外Buffの与ダメは、攻撃力%などと同じく「10%なら10」で保持する。
       // 旧データで dmg:0.1 のような小数が来た場合は 10% として移行する。
       dmgPct: r.dmgPct !== undefined
@@ -6750,7 +6757,9 @@ function normalizeCompositeRows(rows) {
         : ((+r.dmg || 0) > 0 && (+r.dmg || 0) <= 1 ? (+r.dmg || 0) * 100 : (+r.dmg || 0)),
       special: +r.special || 1,
       specialTarget: normalizeTargetRaceKey(r.specialTarget || r.targetRace || r.target || ""),
-      forcedEvasion: Number.isFinite(Number(r.forcedEvasion)) ? Number(r.forcedEvasion) : null,
+      forcedEvasion: hasForcedEvasionValue(r.forcedEvasion)
+        ? Number(r.forcedEvasion)
+        : null,
       extraEffects: normalizeAdditionalEffects(r.extraEffects || r.additionalEffects || []),
       note: r.note || ""
     };
@@ -6761,13 +6770,21 @@ function normalizeCompositeRows(rows) {
   });
 }
 /* 装備以外Buff行が実際に何かしらの効果を持っているか判定する。 */
+// __MOE_FORCED_EVASION_EXACT_FIX_V3__
+function hasForcedEvasionValue(value) {
+  return value !== null
+    && value !== undefined
+    && value !== ""
+    && Number.isFinite(Number(value));
+}
+
 function compositeHasEffect(r) {
   return !!(
     +r.attackPct || +r.magicPct || +r.speedPct ||
     +r.flatAttack || +r.flatMagic || +r.flatSpeed ||
-    +r.convMagicRate || +r.convMagicSpeedRate || +r.convSpeedRate || +r.dmgPct ||
+    +r.convMagicRate || +r.convMagicSpeedRate || +r.convSpeedRate || +r.convDrunkRate || +r.dmgPct ||
     (+r.special && +r.special !== 1) ||
-    Number.isFinite(Number(r.forcedEvasion)) ||
+    hasForcedEvasionValue(r.forcedEvasion) ||
     extraStatsHasEffect(r, "buff") ||
     additionalEffectsSummary(r, "display").length
   );
@@ -6784,12 +6801,13 @@ function compositeEffectText(r) {
   if (+r.convMagicRate) parts.push(`魔力→攻撃力 ${r.convMagicRate}%`);
   if (+r.convMagicSpeedRate) parts.push(`魔力→移動速度 ${r.convMagicSpeedRate}%`);
   if (+r.convSpeedRate) parts.push(`速度→攻撃力 ${r.convSpeedRate}%`);
+  if (+r.convDrunkRate) parts.push(`酩酊度→攻撃力 ${r.convDrunkRate}%`);
   if (+r.dmgPct) parts.push(`与ダメ+${r.dmgPct}%`);
   if (+r.special && +r.special !== 1) {
     const target = r.specialTarget ? `${targetRaceLabel(r.specialTarget)} ` : "";
     parts.push(`${target}特攻×${r.special}`);
   }
-  if (Number.isFinite(Number(r.forcedEvasion))) parts.push(`回避${Number(r.forcedEvasion)}固定`);
+  if (hasForcedEvasionValue(r.forcedEvasion)) parts.push(`回避${Number(r.forcedEvasion)}固定`);
   const extra = extraStatsEffectText(r, false);
   if (extra) parts.push(extra);
   const displayOnly = additionalEffectsSummary(r, "display");
@@ -6828,6 +6846,7 @@ function expandCompositeState(st) {
     if (+r.flatSpeed) out.flat.push({enabled:true, slot:false, name:`${baseName} 速度+`, target:"speed", value:+r.flatSpeed, note});
     if (+r.convMagicRate) out.conv.push({enabled:true, slot:false, name:`${baseName} 魔力→攻撃力`, source:"magic", rate:+r.convMagicRate, baseOffset:0, offset:0, capped:false, note});
     if (+r.convSpeedRate) out.conv.push({enabled:true, slot:false, name:`${baseName} 速度→攻撃力`, source:"speed", rate:+r.convSpeedRate, baseOffset:0, offset:0, capped:false, note});
+    if (+r.convDrunkRate) out.conv.push({enabled:true, slot:false, name:`${baseName} 酩酊度→攻撃力`, source:"drunk", rate:+r.convDrunkRate, baseOffset:0, offset:0, capped:false, note});
     if (+r.dmgPct) out.dmg.push({enabled:true, slot:false, name:`${baseName} 与ダメ`, value:(+r.dmgPct) / 100, category:"装備以外Buff", note});
     if (+r.special && +r.special !== 1) out.special.push({
       enabled:true, slot:false, name:`${baseName} 特攻`, value:+r.special,
@@ -7389,8 +7408,9 @@ function ensureTargetRaceSelector() {
 function activeForcedEvasionFromState(st) {
   const values = normalizeCompositeRows(st?.composite)
     .filter(r => r.enabled && !r.excluded)
-    .map(r => Number(r.forcedEvasion))
-    .filter(Number.isFinite);
+    .map(r => r.forcedEvasion)
+    .filter(hasForcedEvasionValue)
+    .map(Number);
   return values.length ? Math.min(...values) : null;
 }
 
@@ -7765,51 +7785,555 @@ function compositeExtraCell(row, detailTr) {
 }
 
 
+// __MOE_BUFF_CATALOG_PHASE1_V1__
+// __MOE_BATTLE_BUFF_TABLE_INTERPOLATION_FIX_V2C__
+function reviewedBuffInterpolateTable(skill, points) {
+  const x = Math.max(0, Number(skill) || 0);
+  if (!Array.isArray(points) || !points.length) return 0;
+  if (x <= points[0][0]) return points[0][1];
+  for (let i = 1; i < points.length; i += 1) {
+    const [x1, y1] = points[i - 1];
+    const [x2, y2] = points[i];
+    if (x <= x2) {
+      const t = (x - x1) / Math.max(0.000001, x2 - x1);
+      return y1 + (y2 - y1) * t;
+    }
+  }
+  return points[points.length - 1][1];
+}
+
+function reviewedBuffRound1(value) {
+  return Math.round(Number(value || 0) * 10) / 10;
+}
+
+// __MOE_KUNG_FU_SOUL_TABLE_FIX_V1__
+// __MOE_WILD_ROAR_TABLE_PRECISION_V1__
+// __MOE_REVIEWED_BUFF_CATALOG_DATA_SPLIT_V1__
+// Buff定義本体は src/data/manual/reviewedBuffCatalog.manual.js に分離。
+// __MOE_REVIEWED_BUFF_CATALOG_EXCLUSION_LAYER_V1__
+function reviewedBuffCatalogNormalizedName(value) {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/[\s　・･_\-]+/g, "");
+}
+
+const REVIEWED_BUFF_CATALOG_EXCLUDED_NAMES = new Set(
+  (Array.isArray(window.MOE_REVIEWED_BUFF_CATALOG_EXCLUDED_NAMES)
+    ? window.MOE_REVIEWED_BUFF_CATALOG_EXCLUDED_NAMES
+    : []
+  ).map(reviewedBuffCatalogNormalizedName)
+);
+
+const REVIEWED_BUFF_CATALOG_PHASE1 = (
+  Array.isArray(window.MOE_REVIEWED_BUFF_CATALOG_MANUAL)
+    ? window.MOE_REVIEWED_BUFF_CATALOG_MANUAL
+    : []
+).filter(rule =>
+  !REVIEWED_BUFF_CATALOG_EXCLUDED_NAMES.has(
+    reviewedBuffCatalogNormalizedName(rule?.name)
+  )
+);
+
+function reviewedBuffCatalogDefaultRow() {
+  return {
+    enabled:true, slot:true, fixed:false, excluded:false,
+    name:"装備以外Buff", tags:"",
+    attackPct:0, magicPct:0, speedPct:0,
+    flatAttack:0, flatMagic:0, flatSpeed:0,
+    convMagicRate:0, convMagicSpeedRate:0, convSpeedRate:0,
+    dmgPct:0, special:1,
+    ...extraDefaultFields("buff"),
+    extraEffects:[],
+    note:""
+  };
+}
+
+function reviewedBuffCatalogEffectSummary(effect) {
+  const parts = [];
+  if (+effect.attackPct) parts.push(`攻撃力${effect.attackPct > 0 ? "+" : ""}${fmt(effect.attackPct, 3)}%`);
+  if (+effect.flatAttack) parts.push(`攻撃力+${fmt(effect.flatAttack, 3)}`);
+  if (+effect.extraAC) parts.push(`AC${effect.extraAC > 0 ? "+" : ""}${fmt(effect.extraAC, 3)}`);
+  if (+effect.extraACPct) parts.push(`AC${effect.extraACPct > 0 ? "+" : ""}${fmt(effect.extraACPct, 3)}%`);
+  if (+effect.extraHP) parts.push(`最大HP+${fmt(effect.extraHP, 3)}`);
+  if (+effect.extraMP) parts.push(`最大MP+${fmt(effect.extraMP, 3)}`);
+  if (+effect.extraHit) parts.push(`命中+${fmt(effect.extraHit, 3)}`);
+  if (+effect.extraAvoid) parts.push(`回避+${fmt(effect.extraAvoid, 3)}`);
+  if (+effect.flatSpeed) parts.push(`速度+${fmt(effect.flatSpeed, 3)}`);
+  if (+effect.extraAttackDelay) parts.push(`攻撃ディレイ${effect.extraAttackDelay > 0 ? "+" : ""}${fmt(effect.extraAttackDelay, 3)}`);
+  if (+effect.extraAttackDelayPct) parts.push(`攻撃ディレイ${effect.extraAttackDelayPct > 0 ? "+" : ""}${fmt(effect.extraAttackDelayPct, 3)}%`);
+  if (+effect.extraCritRatePct) parts.push(`クリ率+${fmt(effect.extraCritRatePct, 3)}%`);
+  if (+effect.durationSeconds) parts.push(`持続${fmt(effect.durationSeconds, 1)}秒`);
+  return parts.join(" / ") || "計算効果なし";
+}
+
+function reviewedBuffCatalogInputs() {
+  return {
+    skill:Number(byId("reviewedBuffCatalogSkill")?.value || 0),
+    magic:Number(byId("reviewedBuffCatalogMagic")?.value || 0)
+  };
+}
+
+// __MOE_BUFF_CATALOG_SCALABLE_UI_V1__
+let reviewedBuffCatalogSelectedId = REVIEWED_BUFF_CATALOG_PHASE1[0]?.id || "";
+
+function reviewedBuffCatalogCategories() {
+  return Array.from(new Set(
+    REVIEWED_BUFF_CATALOG_PHASE1.map(rule => rule.category || "その他")
+  )).sort((a, b) => a.localeCompare(b, "ja"));
+}
+
+function reviewedBuffCatalogInputTypeLabel(rule) {
+  if (rule.inputKind === "skillMagic") return "スキル・魔力";
+  if (rule.inputKind === "skill") return "スキル";
+  if (rule.inputKind === "magic") return "魔力";
+  return "固定値";
+}
+
+function reviewedBuffCatalogFilterState() {
+  return {
+    text: String(byId("reviewedBuffCatalogSearch")?.value || "").trim().toLowerCase(),
+    category: byId("reviewedBuffCatalogCategory")?.value || "all",
+    inputKind: byId("reviewedBuffCatalogInputKind")?.value || "all"
+  };
+}
+
+function reviewedBuffCatalogFilteredRules() {
+  const filter = reviewedBuffCatalogFilterState();
+  return REVIEWED_BUFF_CATALOG_PHASE1.filter(rule => {
+    if (filter.category !== "all" && (rule.category || "その他") !== filter.category) return false;
+    if (filter.inputKind !== "all") {
+      const kind = rule.inputKind === "none" ? "fixed" : "formula";
+      if (kind !== filter.inputKind) return false;
+    }
+    if (filter.text) {
+      const hay = [
+        rule.name,
+        rule.category,
+        rule.description,
+        rule.conflictGroup,
+        reviewedBuffCatalogInputTypeLabel(rule)
+      ].filter(Boolean).join(" ").toLowerCase();
+      const terms = filter.text.split(/\s+/).filter(Boolean);
+      if (!terms.every(term => hay.includes(term))) return false;
+    }
+    return true;
+  });
+}
+
+function reviewedBuffCatalogCardHtml(rule) {
+  const selected = rule.id === reviewedBuffCatalogSelectedId;
+  const effect = rule.evaluate({
+    skill: rule.defaultSkill ?? 90,
+    magic: rule.defaultMagic ?? 100
+  });
+  return `
+    <button type="button"
+      class="reviewedBuffCatalogCard${selected ? " selected" : ""}"
+      data-buff-catalog-id="${escapeAttr(rule.id)}">
+      <span class="reviewedBuffCatalogCardTitle">${escapeHtml(rule.name)}</span>
+      <span class="reviewedBuffCatalogCardMeta">
+        ${escapeHtml(rule.category || "その他")} / ${escapeHtml(reviewedBuffCatalogInputTypeLabel(rule))}${rule.reference ? " / 参考値" : ""}
+      </span>
+      <span class="reviewedBuffCatalogCardEffect">
+        ${escapeHtml(reviewedBuffCatalogEffectSummary(effect))}
+      </span>
+      ${rule.conflictGroup
+        ? `<span class="reviewedBuffCatalogCardGroup">${escapeHtml(rule.conflictGroup)}</span>`
+        : ""}
+    </button>
+  `;
+}
+
+function renderReviewedBuffCatalogList() {
+  const list = byId("reviewedBuffCatalogList");
+  const count = byId("reviewedBuffCatalogCount");
+  if (!list) return;
+
+  const rules = reviewedBuffCatalogFilteredRules();
+  if (count) count.textContent = `${rules.length}件`;
+
+  if (!rules.length) {
+    list.innerHTML = `<div class="small mutedText reviewedBuffCatalogEmpty">条件に一致するBuffがありません。</div>`;
+    return;
+  }
+
+  if (!rules.some(rule => rule.id === reviewedBuffCatalogSelectedId)) {
+    reviewedBuffCatalogSelectedId = rules[0].id;
+  }
+
+  list.innerHTML = rules.map(reviewedBuffCatalogCardHtml).join("");
+  list.querySelectorAll("[data-buff-catalog-id]").forEach(button => {
+    button.onclick = () => {
+      reviewedBuffCatalogSelectedId = button.dataset.buffCatalogId || "";
+      renderReviewedBuffCatalogList();
+      renderReviewedBuffCatalogPreview();
+    };
+  });
+}
+
+function reviewedBuffCatalogSelectedRule() {
+  return REVIEWED_BUFF_CATALOG_PHASE1.find(
+    rule => rule.id === reviewedBuffCatalogSelectedId
+  ) || REVIEWED_BUFF_CATALOG_PHASE1[0];
+}
+
+function renderReviewedBuffCatalogPreview() {
+  const rule = reviewedBuffCatalogSelectedRule();
+  const preview = byId("reviewedBuffCatalogPreview");
+  const skillWrap = byId("reviewedBuffCatalogSkillWrap");
+  const magicWrap = byId("reviewedBuffCatalogMagicWrap");
+  if (!rule || !preview) return;
+
+  if (skillWrap) {
+    skillWrap.hidden = !(rule.inputKind === "skill" || rule.inputKind === "skillMagic");
+    const label = skillWrap.querySelector(".reviewedBuffCatalogSkillLabel");
+    if (label) label.textContent = rule.skillLabel || "使用者スキル値";
+  }
+  if (magicWrap) magicWrap.hidden = !(rule.inputKind === "magic" || rule.inputKind === "skillMagic");
+
+  const skill = byId("reviewedBuffCatalogSkill");
+  const magic = byId("reviewedBuffCatalogMagic");
+  if (skill && skill.dataset.ruleId !== rule.id) {
+    skill.value = rule.defaultSkill ?? 90;
+    skill.dataset.ruleId = rule.id;
+  }
+  if (magic && magic.dataset.ruleId !== rule.id) {
+    magic.value = rule.defaultMagic ?? 100;
+    magic.dataset.ruleId = rule.id;
+  }
+
+  const effect = rule.evaluate(reviewedBuffCatalogInputs());
+  preview.innerHTML = `
+    <div><b>${escapeHtml(rule.name)}</b> <span class="small mutedText">${escapeHtml(rule.category || "")}</span></div>
+    <div class="small">${escapeHtml(rule.description || "")}</div>
+    <div class="reviewedBuffCatalogEffect">${escapeHtml(reviewedBuffCatalogEffectSummary(effect))}</div>
+    ${rule.conflictGroup ? `<div class="small">競合グループ: <code>${escapeHtml(rule.conflictGroup)}</code></div>` : ""}
+  `;
+}
+
+function closeReviewedBuffCatalog() {
+  byId("reviewedBuffCatalogOverlay")?.remove();
+}
+
+function addReviewedBuffCatalogSelection() {
+  const rule = reviewedBuffCatalogSelectedRule();
+  if (!rule) return;
+  const inputs = reviewedBuffCatalogInputs();
+  const effect = rule.evaluate(inputs);
+  const row = {
+    ...reviewedBuffCatalogDefaultRow(),
+    ...effect,
+    name:rule.name,
+    tags:rule.conflictGroup || "",
+    catalogRuleId:rule.id,
+    catalogSource:"reviewed-buff-catalog-v1",
+    catalogInputs:inputs,
+    note:effect.note || "カタログ由来"
+  };
+
+  state.composite = normalizeCompositeRows(state.composite);
+  state.composite.push(row);
+  renderCompositeTable();
+  renderTagLinkSummary();
+  renderShowcaseTab();
+  calc();
+  closeReviewedBuffCatalog();
+}
+
+function openReviewedBuffCatalog() {
+  closeReviewedBuffCatalog();
+
+  if (!reviewedBuffCatalogSelectedId) {
+    reviewedBuffCatalogSelectedId = REVIEWED_BUFF_CATALOG_PHASE1[0]?.id || "";
+  }
+
+  const overlay = document.createElement("div");
+  overlay.id = "reviewedBuffCatalogOverlay";
+  overlay.className = "reviewedBuffCatalogOverlay";
+  overlay.innerHTML = `
+    <div class="reviewedBuffCatalogDialog reviewedBuffCatalogDialogScalable" role="dialog" aria-modal="true">
+      <div class="reviewedBuffCatalogHeader">
+        <div>
+          <h3>Buffカタログから追加</h3>
+          <div class="small mutedText">自己Buff・外部Buffを問わず、使用者側の値を手入力します。</div>
+        </div>
+        <button type="button" id="reviewedBuffCatalogClose">閉じる</button>
+      </div>
+
+      <div class="reviewedBuffCatalogSearchBar">
+        <input id="reviewedBuffCatalogSearch" type="search" placeholder="Buff名・効果・競合グループを検索">
+        <select id="reviewedBuffCatalogCategory">
+          <option value="all">全カテゴリ</option>
+          ${reviewedBuffCatalogCategories().map(category =>
+            `<option value="${escapeAttr(category)}">${escapeHtml(category)}</option>`
+          ).join("")}
+        </select>
+        <select id="reviewedBuffCatalogInputKind">
+          <option value="all">固定値・計算式すべて</option>
+          <option value="fixed">固定値のみ</option>
+          <option value="formula">スキル・魔力入力あり</option>
+        </select>
+        <span id="reviewedBuffCatalogCount" class="small mutedText"></span>
+      </div>
+
+      <div class="reviewedBuffCatalogBody">
+        <div id="reviewedBuffCatalogList" class="reviewedBuffCatalogList"></div>
+
+        <div class="reviewedBuffCatalogRight">
+          <div class="reviewedBuffCatalogControls">
+            <label id="reviewedBuffCatalogSkillWrap">
+              <span class="reviewedBuffCatalogSkillLabel">使用者スキル値</span>
+              <input id="reviewedBuffCatalogSkill" type="number" min="0" max="200" step="0.1" value="90">
+            </label>
+            <label id="reviewedBuffCatalogMagicWrap">使用者魔力
+              <input id="reviewedBuffCatalogMagic" type="number" min="0" max="1000" step="0.1" value="100">
+            </label>
+          </div>
+
+          <div id="reviewedBuffCatalogPreview" class="reviewedBuffCatalogPreview"></div>
+
+          <div class="reviewedBuffCatalogActions">
+            <button type="button" id="reviewedBuffCatalogAdd">このBuffを追加</button>
+            <button type="button" id="reviewedBuffCatalogCancel">キャンセル</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  overlay.addEventListener("mousedown", event => {
+    if (event.target === overlay) closeReviewedBuffCatalog();
+  });
+  document.body.appendChild(overlay);
+
+  byId("reviewedBuffCatalogClose").onclick = closeReviewedBuffCatalog;
+  byId("reviewedBuffCatalogCancel").onclick = closeReviewedBuffCatalog;
+  byId("reviewedBuffCatalogAdd").onclick = addReviewedBuffCatalogSelection;
+  byId("reviewedBuffCatalogSkill").oninput = renderReviewedBuffCatalogPreview;
+  byId("reviewedBuffCatalogMagic").oninput = renderReviewedBuffCatalogPreview;
+
+  ["reviewedBuffCatalogSearch", "reviewedBuffCatalogCategory", "reviewedBuffCatalogInputKind"].forEach(id => {
+    const element = byId(id);
+    if (!element) return;
+    element.addEventListener(id === "reviewedBuffCatalogSearch" ? "input" : "change", () => {
+      renderReviewedBuffCatalogList();
+      renderReviewedBuffCatalogPreview();
+    });
+  });
+
+  renderReviewedBuffCatalogList();
+  renderReviewedBuffCatalogPreview();
+}
+
+function installReviewedBuffCatalogStyles() {
+  if (byId("reviewedBuffCatalogStyle")) return;
+  const style = document.createElement("style");
+  style.id = "reviewedBuffCatalogStyle";
+  style.textContent = `
+    .reviewedBuffCatalogToolbar{display:flex;justify-content:flex-end;margin:0 0 6px}
+    .reviewedBuffCatalogOverlay{position:fixed;inset:0;z-index:100000;display:flex;align-items:flex-start;justify-content:center;padding:8vh 12px 24px;background:rgba(0,0,0,.45)}
+    .reviewedBuffCatalogDialog{width:min(720px,calc(100vw - 24px));max-height:84vh;overflow:auto;padding:14px;border:1px solid rgba(127,127,127,.45);border-radius:10px;background:Canvas;color:CanvasText;box-shadow:0 14px 48px rgba(0,0,0,.35)}
+    .reviewedBuffCatalogHeader{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+    .reviewedBuffCatalogHeader h3{margin:0 0 3px}
+    .reviewedBuffCatalogControls{display:grid;grid-template-columns:minmax(180px,1fr) minmax(120px,.55fr) minmax(120px,.55fr);gap:8px;margin:12px 0}
+    .reviewedBuffCatalogControls label{display:grid;gap:3px}
+    .reviewedBuffCatalogPreview{min-height:86px;padding:10px;border:1px solid rgba(127,127,127,.35);border-radius:8px}
+    .reviewedBuffCatalogEffect{margin:8px 0 4px;font-weight:bold}
+    .reviewedBuffCatalogActions{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}
+    @media(max-width:720px){.reviewedBuffCatalogControls{grid-template-columns:1fr}}
+
+    .reviewedBuffCatalogDialogScalable{width:min(980px,calc(100vw - 24px))}
+    .reviewedBuffCatalogSearchBar{display:grid;grid-template-columns:minmax(220px,1.4fr) minmax(130px,.65fr) minmax(170px,.8fr) auto;align-items:center;gap:8px;margin:12px 0}
+    .reviewedBuffCatalogBody{display:grid;grid-template-columns:minmax(270px,.9fr) minmax(340px,1.1fr);gap:12px;min-height:360px}
+    .reviewedBuffCatalogList{display:grid;align-content:start;gap:6px;max-height:60vh;overflow:auto;padding-right:4px}
+    .reviewedBuffCatalogCard{display:grid;gap:2px;width:100%;padding:8px 9px;border:1px solid rgba(127,127,127,.32);border-radius:7px;background:Canvas;color:CanvasText;text-align:left;cursor:pointer}
+    .reviewedBuffCatalogCard:hover{border-color:rgba(80,120,200,.8)}
+    .reviewedBuffCatalogCard.selected{border-width:2px;border-color:Highlight;padding:7px 8px}
+    .reviewedBuffCatalogCardTitle{font-weight:bold}
+    .reviewedBuffCatalogCardMeta,.reviewedBuffCatalogCardGroup{font-size:11px;opacity:.72}
+    .reviewedBuffCatalogCardEffect{font-size:12px}
+    .reviewedBuffCatalogRight{min-width:0}
+    .reviewedBuffCatalogEmpty{padding:16px 8px;text-align:center}
+    @media(max-width:780px){
+      .reviewedBuffCatalogSearchBar{grid-template-columns:1fr}
+      .reviewedBuffCatalogBody{grid-template-columns:1fr}
+      .reviewedBuffCatalogList{max-height:34vh}
+    }
+  `;
+  document.head.appendChild(style);
+}
+
+function ensureReviewedBuffCatalogButton() {
+  installReviewedBuffCatalogStyles();
+  if (byId("reviewedBuffCatalogOpen")) return;
+  const table = byId("compositeBuffTable") || document.querySelector("#compositeBuffTable");
+  if (!table) return;
+  const toolbar = document.createElement("div");
+  toolbar.className = "reviewedBuffCatalogToolbar";
+  const button = document.createElement("button");
+  button.type = "button";
+  button.id = "reviewedBuffCatalogOpen";
+  button.textContent = "Buffカタログから追加";
+  button.onclick = openReviewedBuffCatalog;
+  toolbar.appendChild(button);
+  table.insertAdjacentElement("beforebegin", toolbar);
+}
+
+// __MOE_BUFF_REGISTRATION_COMPACT_ROWS_V1__
+const COMPACT_COMPOSITE_PRIMARY_FIELDS = [
+  ["attackPct", "攻撃力%", "1"],
+  ["magicPct", "魔力%", "1"],
+  ["speedPct", "速度%", "1"],
+  ["flatAttack", "攻撃力+", "0.1"],
+  ["flatMagic", "魔力+", "0.1"],
+  ["flatSpeed", "速度+", "0.1"],
+  ["convMagicRate", "魔力→攻撃力%", "1"],
+  ["convSpeedRate", "速度→攻撃力%", "1"],
+  ["dmgPct", "与ダメ%", "1"],
+  ["special", "特攻倍率", "0.01"]
+];
+
+function installCompactCompositeRowStyles() {
+  if (byId("compactCompositeRowStyle")) return;
+  const style = document.createElement("style");
+  style.id = "compactCompositeRowStyle";
+  style.textContent = `
+    #compositeBuffTable .compactCompositeMainRow .compactCompositeSummaryCell{min-width:280px;padding:5px 7px}
+    .compactCompositeNameLine{display:flex;align-items:center;gap:6px}
+    .compactCompositeNameLine input{min-width:180px;width:min(320px,100%);font-weight:bold}
+    .compactCompositeSourceBadge{display:inline-block;padding:1px 5px;border:1px solid rgba(127,127,127,.35);border-radius:999px;font-size:10px;white-space:nowrap}
+    .compactCompositeEffectSummary{margin-top:3px;font-size:12px;line-height:1.35;overflow-wrap:anywhere}
+    .compactCompositePrimaryEditor{margin-bottom:8px;padding:8px;border:1px solid rgba(127,127,127,.3);border-radius:7px}
+    .compactCompositePrimaryEditorTitle{margin-bottom:6px;font-weight:bold}
+    .compactCompositePrimaryGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:5px 8px}
+    .compactCompositePrimaryGrid label{display:grid;grid-template-columns:minmax(0,1fr) 72px;align-items:center;gap:5px;font-size:12px}
+    .compactCompositePrimaryGrid input{width:72px}
+    .compactCompositeTagRow{display:grid;grid-template-columns:minmax(100px,.7fr) minmax(220px,1.3fr);gap:8px;margin-top:8px}
+    .compactCompositeTagRow label{display:grid;gap:3px;font-size:12px}
+    #compositeBuffTable .compactCompositeNoteCell input{min-width:150px;width:100%}
+    @media(max-width:800px){.compactCompositeTagRow{grid-template-columns:1fr}#compositeBuffTable .compactCompositeMainRow .compactCompositeSummaryCell{min-width:210px}}
+  `;
+  document.head.appendChild(style);
+}
+
+function compactCompositeRefreshSummary(row, summaryElement, statusButton=null) {
+  if (summaryElement) summaryElement.textContent = compositeEffectText(row);
+  if (statusButton) updateCompositeExtraStatus(statusButton, row);
+  renderTagLinkSummary();
+  renderShowcaseTab();
+  calc();
+}
+
+function makeCompactCompositePrimaryEditor(row, summaryElement, statusButton=null) {
+  const box = document.createElement("div");
+  box.className = "compactCompositePrimaryEditor";
+  const title = document.createElement("div");
+  title.className = "compactCompositePrimaryEditorTitle";
+  title.textContent = "基本効果・競合";
+  box.appendChild(title);
+
+  const grid = document.createElement("div");
+  grid.className = "compactCompositePrimaryGrid";
+  COMPACT_COMPOSITE_PRIMARY_FIELDS.forEach(([prop,labelText,step]) => {
+    const label = document.createElement("label");
+    const text = document.createElement("span");
+    text.textContent = labelText;
+    const input = makeCell("input", {type:"number",step,value:row[prop] ?? (prop === "special" ? 1 : 0)});
+    input.oninput = () => {
+      const value = parseFloat(input.value);
+      row[prop] = Number.isFinite(value) ? value : (prop === "special" ? 1 : 0);
+      compactCompositeRefreshSummary(row, summaryElement, statusButton);
+    };
+    label.appendChild(text);
+    label.appendChild(input);
+    grid.appendChild(label);
+  });
+  box.appendChild(grid);
+
+  const lower = document.createElement("div");
+  lower.className = "compactCompositeTagRow";
+  const tagsLabel = document.createElement("label");
+  tagsLabel.append("競合グループ");
+  const tags = makeCell("input", {value:row.tags || ""});
+  tags.oninput = () => { row.tags = tags.value; compactCompositeRefreshSummary(row, summaryElement, statusButton); };
+  tagsLabel.appendChild(tags);
+
+  const noteLabel = document.createElement("label");
+  noteLabel.append("メモ");
+  const note = makeCell("input", {value:row.note || ""});
+  note.oninput = () => { row.note = note.value; renderShowcaseTab(); };
+  noteLabel.appendChild(note);
+
+  lower.appendChild(tagsLabel);
+  lower.appendChild(noteLabel);
+  box.appendChild(lower);
+  return box;
+}
+
+function compactCompositeSourceLabel(row) {
+  return (row.catalogSource || row.catalogRuleId) ? "カタログ" : "手動";
+}
+
 function renderCompositeTable() {
+  if (typeof ensureReviewedBuffCatalogButton === "function") ensureReviewedBuffCatalogButton();
+  installCompactCompositeRowStyles();
   const tbody = document.querySelector("#compositeBuffTable tbody");
   if (!tbody) return;
   tbody.innerHTML = "";
   state.composite = normalizeCompositeRows(state.composite);
 
   if (!state.composite.length) {
-    renderEmptyRow(tbody, 19, "まだ装備以外Buffがありません。「Buff行を追加」から追加してください。");
+    renderEmptyRow(tbody, 19, "まだ装備以外Buffがありません。『Buff行を追加』または『Buffカタログから追加』から追加してください。");
     return;
   }
 
   state.composite.forEach((row, idx) => {
     const frag = document.createDocumentFragment();
     const tr = document.createElement("tr");
+    tr.className = "compactCompositeMainRow";
     if (row.excluded) tr.classList.add("excludedRow");
     if (row.fixed) tr.classList.add("fixedRow");
+
     tr.appendChild(checkboxCell(row, "enabled"));
     tr.appendChild(checkboxCell(row, "slot"));
     tr.appendChild(fixedCheckboxCell(row));
     tr.appendChild(excludeCheckboxCell(row, renderCompositeTable));
 
-    const name = makeCell("input", {value: row.name || ""});
-    name.oninput = () => { row.name = name.value; renderTagLinkSummary(); calc(); };
-    tr.appendChild(makeCell("td")).appendChild(name);
+    const summaryCell = makeCell("td");
+    summaryCell.colSpan = 12;
+    summaryCell.className = "compactCompositeSummaryCell";
+    const nameLine = document.createElement("div");
+    nameLine.className = "compactCompositeNameLine";
+    const name = makeCell("input", {value:row.name || ""});
+    const source = document.createElement("span");
+    source.className = "compactCompositeSourceBadge";
+    source.textContent = compactCompositeSourceLabel(row);
+    nameLine.appendChild(name);
+    nameLine.appendChild(source);
 
-    tr.appendChild(tagInputCell(row));
-    tr.appendChild(compositeNumberCell(row, "attackPct", "1"));
-    tr.appendChild(compositeNumberCell(row, "magicPct", "1"));
-    tr.appendChild(compositeNumberCell(row, "speedPct", "1"));
-    tr.appendChild(compositeNumberCell(row, "flatAttack", "0.1"));
-    tr.appendChild(compositeNumberCell(row, "flatMagic", "0.1"));
-    tr.appendChild(compositeNumberCell(row, "flatSpeed", "0.1"));
-    tr.appendChild(compositeNumberCell(row, "convMagicRate", "1"));
-    tr.appendChild(compositeNumberCell(row, "convSpeedRate", "1"));
-    tr.appendChild(compositeNumberCell(row, "dmgPct", "1"));
-    tr.appendChild(compositeNumberCell(row, "special", "0.01"));
+    const summary = document.createElement("div");
+    summary.className = "compactCompositeEffectSummary";
+    summary.textContent = compositeEffectText(row);
+    name.oninput = () => { row.name = name.value; renderTagLinkSummary(); renderShowcaseTab(); calc(); };
+    summaryCell.appendChild(nameLine);
+    summaryCell.appendChild(summary);
+    tr.appendChild(summaryCell);
 
     const detailTr = makeCompositeExtraDetailRow(row);
     if (row.excluded) detailTr.classList.add("excludedRow");
     if (row.fixed) detailTr.classList.add("fixedRow");
-    tr.appendChild(compositeExtraCell(row, detailTr));
+    const extraCell = compositeExtraCell(row, detailTr);
+    const statusButton = extraCell.querySelector(".compositeExtraToggle");
+    const holder = detailTr.querySelector(".compositeExtraEditor");
+    if (holder) holder.insertBefore(makeCompactCompositePrimaryEditor(row, summary, statusButton), holder.firstChild);
+    tr.appendChild(extraCell);
 
-    const note = makeCell("input", {value: row.note || ""});
-    note.oninput = () => { row.note = note.value; };
-    tr.appendChild(makeCell("td")).appendChild(note);
+    const noteCell = makeCell("td");
+    noteCell.className = "compactCompositeNoteCell";
+    const note = makeCell("input", {value:row.note || "", placeholder:"メモ"});
+    note.oninput = () => { row.note = note.value; renderShowcaseTab(); };
+    noteCell.appendChild(note);
+    tr.appendChild(noteCell);
     tr.appendChild(actionCell(state.composite, idx, renderCompositeTable));
 
     frag.appendChild(tr);
@@ -15659,3 +16183,7 @@ function renderAnalysisPanel() {
     else installHooks();
   }
 })(typeof globalThis !== "undefined" ? globalThis : window);
+
+
+
+

@@ -77,7 +77,7 @@ function serializeConfigAsTsv(cfg) {
   ));
 
   out.push(makeTsvSection("composite",
-    ["enabled", "slot", "name", "tags", "attackPct", "magicPct", "speedPct", "flatAttack", "flatMagic", "flatSpeed", "convMagicRate", "convSpeedRate", "dmgPct", "special"].concat(extraTsvFields("buff"), ["extraEffects", "note"]),
+    ["enabled", "slot", "name", "tags", "attackPct", "magicPct", "speedPct", "flatAttack", "flatMagic", "flatSpeed", "convMagicRate", "convSpeedRate", "convDrunkRate", "dmgPct", "special"].concat(extraTsvFields("buff"), ["extraEffects", "note"]),
     normalizeCompositeRows(st.composite || []).map(r => ({
       enabled: boolToCell(r.enabled),
       slot: boolToCell(r.slot),
@@ -91,6 +91,7 @@ function serializeConfigAsTsv(cfg) {
       flatSpeed: r.flatSpeed ?? 0,
       convMagicRate: r.convMagicRate ?? 0,
       convSpeedRate: r.convSpeedRate ?? 0,
+    convDrunkRate: r.convDrunkRate ?? 0,
       dmgPct: r.dmgPct ?? 0,
       special: r.special ?? 1,
       ...extraTsvExportFields(r, "buff"),
@@ -305,6 +306,7 @@ function parseConfigFromTsv(text) {
       flatSpeed: cellToNum(r.flatSpeed),
       convMagicRate: cellToNum(r.convMagicRate),
       convSpeedRate: cellToNum(r.convSpeedRate),
+    convDrunkRate: cellToNum(r.convDrunkRate),
       dmgPct: r.dmgPct !== undefined && r.dmgPct !== ""
         ? cellToNum(r.dmgPct)
         : (cellToNum(r.dmg) > 0 && cellToNum(r.dmg) <= 1 ? cellToNum(r.dmg) * 100 : cellToNum(r.dmg)),
