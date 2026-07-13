@@ -1,3 +1,4 @@
+/* __MOE_BATCH1_RUNTIME_AND_LIMIT_BREAK_V3__ */
 // __MOE_REVIEWED_BUFF_CATALOG_DATA_SPLIT_V1__
 // Master of Epic 物理ダメージ計算webツール
 //
@@ -709,16 +710,19 @@ window.MOE_REVIEWED_BUFF_CATALOG_MANUAL = [
   id: "reviewed-manual-771",
   name: "全力全開",
   category: "複合技/補助",
-  inputKind: "none",
+  inputKind: "skill",
+  skillLabel: "魔法熟練",
+  defaultSkill: 100,
   conflictGroup: "magic-power:full-burst",
   reference: true,
-  manualRequired: true,
-  manualFields: ["魔力"],
   sourceCandidateNo: 771,
-  description: "魔力上昇量を手入力。ホーリー ブレスと同位で後掛け優先。フルバースト マジックと競合。",
-  evaluate() {
+  description: "魔法熟練値から魔力上昇量を低信頼の一次式で推定。AC低下はデータ不足のため未計算。",
+  evaluate(input) {
+    const skill = Math.max(0, Number(input.skill) || 0);
+    const value = reviewedBuffRound1(skill * 0.32 + 7.6);
     return {
-      note: "134件レビュー済みBuffマスター / 手入力必須 / 魔力上昇量を手入力。ホーリー ブレスと同位で後掛け優先。フルバースト マジックと競合。"
+      flatMagic: value,
+      note: `134件レビュー済みBuffマスター / 低信頼推定・外挿対応 / 魔法熟練${skill} / 魔力+${value}推定 / AC低下は未計算`
     };
   }
 },
@@ -726,16 +730,19 @@ window.MOE_REVIEWED_BUFF_CATALOG_MANUAL = [
   id: "reviewed-manual-781",
   name: "フルバースト マジック",
   category: "複合技/補助",
-  inputKind: "none",
+  inputKind: "skill",
+  skillLabel: "魔法熟練",
+  defaultSkill: 100,
   conflictGroup: "magic-power:full-burst",
   reference: true,
-  manualRequired: true,
-  manualFields: ["魔力"],
   sourceCandidateNo: 781,
-  description: "魔力上昇量を手入力。ホーリー ブレス・全力全開と併用不可で常に本Buff優先。",
-  evaluate() {
+  description: "魔法熟練値から魔力上昇量を一次式で推定。無属性強化補正は未計算。",
+  evaluate(input) {
+    const skill = Math.max(0, Number(input.skill) || 0);
+    const value = reviewedBuffRound1(skill * 0.42066 + 1.4747);
     return {
-      note: "134件レビュー済みBuffマスター / 手入力必須 / 魔力上昇量を手入力。ホーリー ブレス・全力全開と併用不可で常に本Buff優先。"
+      flatMagic: value,
+      note: `134件レビュー済みBuffマスター / 参考値・外挿対応 / 魔法熟練${skill} / 魔力+${value}推定 / 無属性強化補正は未計算`
     };
   }
 },
@@ -880,16 +887,21 @@ window.MOE_REVIEWED_BUFF_CATALOG_MANUAL = [
   id: "reviewed-manual-904",
   name: "ホーリー ブレス",
   category: "魔法熟練",
-  inputKind: "none",
+  inputKind: "skill",
+  skillLabel: "前提スキル",
+  defaultSkill: 100,
   conflictGroup: "magic-power:full-burst",
   reference: true,
-  manualRequired: true,
-  manualFields: ["魔力"],
   sourceCandidateNo: 904,
-  description: "魔力上昇量を手入力。",
-  evaluate() {
+  description: "前提1番目のスキル値から魔力上昇量と効果時間を一次式で推定。",
+  evaluate(input) {
+    const skill = Math.max(0, Number(input.skill) || 0);
+    const value = reviewedBuffRound1(skill * 0.174833 + 8.48778);
+    const seconds = reviewedBuffRound1(skill * 0.16 + 6.956);
     return {
-      note: "134件レビュー済みBuffマスター / 手入力必須 / 魔力上昇量を手入力。"
+      flatMagic: value,
+      durationSeconds: Math.max(0, seconds),
+      note: `134件レビュー済みBuffマスター / 参考値・外挿対応 / スキル${skill} / 魔力+${value}推定 / 持続${Math.max(0, seconds)}秒`
     };
   }
 },
@@ -982,16 +994,24 @@ window.MOE_REVIEWED_BUFF_CATALOG_MANUAL = [
   id: "reviewed-manual-1238",
   name: "プロモーション・ナイト",
   category: "複合魔法/補助",
-  inputKind: "none",
+  inputKind: "skillMagic",
+  skillLabel: "強化魔法",
+  defaultSkill: 100,
+  defaultMagic: 100,
   conflictGroup: "promotion:class",
   reference: true,
-  manualRequired: true,
-  manualFields: ["回避", "移動速度", "魔力", "AC"],
   sourceCandidateNo: 1238,
-  description: "回避・移動速度上昇量、魔力・防御力低下量を手入力。プロモーション系と競合。",
-  evaluate() {
+  description: "回避・移動速度上昇、魔力・防御低下。",
+  evaluate(input) {
+    const skill = Math.max(0, Number(input.skill) || 0);
+    const magic = Math.max(0, Number(input.magic) || 0);
+    const value = reviewedBuffRound1(magic * 0.06725 + skill * 0.11183 + 4.3756);
     return {
-      note: "134件レビュー済みBuffマスター / 手入力必須 / 回避・移動速度上昇量、魔力・防御力低下量を手入力。プロモーション系と競合。"
+      extraAvoid: value,
+      flatSpeed: value,
+      flatMagic: -value,
+      extraAC: -value,
+      note: `134件レビュー済みBuffマスター / 参考値・外挿対応 / 強化魔法${skill}・魔力${magic} / 回避/移動速度+${value}・魔力/防御-${value}推定`
     };
   }
 },
@@ -999,16 +1019,24 @@ window.MOE_REVIEWED_BUFF_CATALOG_MANUAL = [
   id: "reviewed-manual-1239",
   name: "プロモーション・ビショップ",
   category: "複合魔法/補助",
-  inputKind: "none",
+  inputKind: "skillMagic",
+  skillLabel: "強化魔法",
+  defaultSkill: 100,
+  defaultMagic: 100,
   conflictGroup: "promotion:class",
   reference: true,
-  manualRequired: true,
-  manualFields: ["魔力", "攻撃力", "AC"],
   sourceCandidateNo: 1239,
-  description: "魔力上昇量、攻撃力・防御力低下量を手入力。破壊魔法スキル+10は固定だが物理計算対象外。",
-  evaluate() {
+  description: "魔力上昇、攻撃・防御低下。破壊魔法+10は別途skillPlusで反映。",
+  evaluate(input) {
+    const skill = Math.max(0, Number(input.skill) || 0);
+    const magic = Math.max(0, Number(input.magic) || 0);
+    const value = reviewedBuffRound1(magic * 0.06725 + skill * 0.11183 + 4.3756);
     return {
-      note: "134件レビュー済みBuffマスター / 手入力必須 / 魔力上昇量、攻撃力・防御力低下量を手入力。破壊魔法スキル+10は固定だが物理計算対象外。"
+      extraEffects: [{ key: "skillPlus", name: "破壊魔法", value: 10, unit: "", scope: "display" }],
+      flatMagic: value,
+      flatAttack: -value,
+      extraAC: -value,
+      note: `134件レビュー済みBuffマスター / 参考値・外挿対応 / 強化魔法${skill}・魔力${magic} / 魔力+${value}・攻撃/防御-${value}推定 / 破壊魔法+10は別途skillPlus`
     };
   }
 },
@@ -1016,16 +1044,24 @@ window.MOE_REVIEWED_BUFF_CATALOG_MANUAL = [
   id: "reviewed-manual-1240",
   name: "プロモーション・ルーク",
   category: "複合魔法/補助",
-  inputKind: "none",
+  inputKind: "skillMagic",
+  skillLabel: "強化魔法",
+  defaultSkill: 100,
+  defaultMagic: 100,
   conflictGroup: "promotion:class",
   reference: true,
-  manualRequired: true,
-  manualFields: ["攻撃力", "AC", "回避", "移動速度"],
   sourceCandidateNo: 1240,
-  description: "攻撃力・AC上昇量、回避・移動速度低下量を手入力。プロモーション系と競合。",
-  evaluate() {
+  description: "攻撃・防御上昇、回避・移動速度低下。",
+  evaluate(input) {
+    const skill = Math.max(0, Number(input.skill) || 0);
+    const magic = Math.max(0, Number(input.magic) || 0);
+    const value = reviewedBuffRound1(magic * 0.06725 + skill * 0.11183 + 4.3756);
     return {
-      note: "134件レビュー済みBuffマスター / 手入力必須 / 攻撃力・AC上昇量、回避・移動速度低下量を手入力。プロモーション系と競合。"
+      flatAttack: value,
+      extraAC: value,
+      extraAvoid: -value,
+      flatSpeed: -value,
+      note: `134件レビュー済みBuffマスター / 参考値・外挿対応 / 強化魔法${skill}・魔力${magic} / 攻撃/防御+${value}・回避/移動速度-${value}推定`
     };
   }
 },
@@ -1101,16 +1137,24 @@ window.MOE_REVIEWED_BUFF_CATALOG_MANUAL = [
   id: "reviewed-manual-1258",
   name: "エアリアル",
   category: "複合魔法/補助",
-  inputKind: "none",
+  inputKind: "skillMagic",
+  skillLabel: "強化魔法",
+  defaultSkill: 100,
+  defaultMagic: 100,
   conflictGroup: "",
   reference: true,
-  manualRequired: true,
-  manualFields: ["攻撃力", "AC", "移動速度"],
   sourceCandidateNo: 1258,
-  description: "攻撃力と防御力は同値、移動速度はやや少なめの値を手入力。風属性強化1.2倍は固定だが物理計算対象外。",
-  evaluate() {
+  description: "強化魔法と魔力から攻撃・防御・移動速度を推定。風属性強化補正は未計算。",
+  evaluate(input) {
+    const skill = Math.max(0, Number(input.skill) || 0);
+    const magic = Math.max(0, Number(input.magic) || 0);
+    const atkDef = reviewedBuffRound1(skill * 0.12375779 + magic * 0.05741985 + 3.2949085);
+    const speed = reviewedBuffRound1(skill * 0.12 + magic * 0.05670103 - 3.82164948);
     return {
-      note: "134件レビュー済みBuffマスター / 手入力必須 / 攻撃力と防御力は同値、移動速度はやや少なめの値を手入力。風属性強化1.2倍は固定だが物理計算対象外。"
+      flatAttack: Math.max(0, atkDef),
+      extraAC: Math.max(0, atkDef),
+      flatSpeed: Math.max(0, speed),
+      note: `134件レビュー済みBuffマスター / 参考値・外挿対応 / 強化魔法${skill}・魔力${magic} / 攻撃/防御+${Math.max(0, atkDef)}・移動速度+${Math.max(0, speed)}推定 / 風属性強化補正未計算`
     };
   }
 },
@@ -1170,16 +1214,25 @@ window.MOE_REVIEWED_BUFF_CATALOG_MANUAL = [
   id: "reviewed-manual-1272",
   name: "プロモーション・クイーン",
   category: "複合魔法/補助",
-  inputKind: "none",
+  inputKind: "skillMagic",
+  skillLabel: "強化魔法",
+  defaultSkill: 100,
+  defaultMagic: 100,
   conflictGroup: "promotion:class",
   reference: true,
-  manualRequired: true,
-  manualFields: ["攻撃力", "魔力", "回避", "AC", "移動速度"],
   sourceCandidateNo: 1272,
-  description: "攻撃力・魔力・回避・防御力・移動速度上昇量を手入力。",
-  evaluate() {
+  description: "攻撃・魔力・回避・防御・移動速度を上昇。クイーンは他プロモーションより効果量約1低い。",
+  evaluate(input) {
+    const skill = Math.max(0, Number(input.skill) || 0);
+    const magic = Math.max(0, Number(input.magic) || 0);
+    const value = reviewedBuffRound1(magic * 0.06725 + skill * 0.11183 + 3.3756);
     return {
-      note: "134件レビュー済みBuffマスター / 手入力必須 / 攻撃力・魔力・回避・防御力・移動速度上昇量を手入力。"
+      flatAttack: value,
+      flatMagic: value,
+      extraAvoid: value,
+      extraAC: value,
+      flatSpeed: value,
+      note: `134件レビュー済みBuffマスター / 参考値・外挿対応 / 強化魔法${skill}・魔力${magic} / 攻撃・魔力・回避・防御・移動速度+${value}推定 / クイーン補正済み`
     };
   }
 },
@@ -1187,16 +1240,25 @@ window.MOE_REVIEWED_BUFF_CATALOG_MANUAL = [
   id: "reviewed-manual-1273",
   name: "リインフォース",
   category: "複合魔法/補助",
-  inputKind: "none",
+  inputKind: "skillMagic",
+  skillLabel: "強化魔法",
+  defaultSkill: 100,
   conflictGroup: "",
   reference: true,
-  manualRequired: true,
-  manualFields: ["攻撃力", "命中", "魔力", "回避", "AC", "移動速度"],
   sourceCandidateNo: 1273,
-  description: "攻撃力・命中・魔力・回避・防御力・移動速度上昇量を手入力。",
-  evaluate() {
+  description: "強化魔法と魔力から、攻撃・命中・回避・防御・魔力・移動速度の上昇量を推定。",
+  evaluate(input) {
+    const skill = Math.max(0, Number(input.skill) || 0);
+    const magic = Math.max(0, Number(input.magic) || 0);
+    const value = reviewedBuffRound1(skill * 0.16463 + magic * 0.03954 + 4.557);
     return {
-      note: "134件レビュー済みBuffマスター / 手入力必須 / 攻撃力・命中・魔力・回避・防御力・移動速度上昇量を手入力。"
+      flatAttack: value,
+      extraHit: value,
+      extraAvoid: value,
+      extraAC: value,
+      flatMagic: value,
+      flatSpeed: value,
+      note: `134件レビュー済みBuffマスター / 参考値・外挿対応 / 強化魔法${skill}・魔力${magic} / 攻撃・命中・回避・防御・魔力・移動速度+${value}推定`
     };
   }
 },
@@ -1221,16 +1283,28 @@ window.MOE_REVIEWED_BUFF_CATALOG_MANUAL = [
   id: "reviewed-manual-1279",
   name: "プリズム エフェクト",
   category: "複合魔法/補助",
-  inputKind: "none",
+  inputKind: "skillMagic",
+  skillLabel: "強化魔法",
+  defaultSkill: 100,
   conflictGroup: "",
   reference: true,
-  manualRequired: true,
-  manualFields: ["最大HP", "最大ST", "最大MP", "攻撃力", "AC", "命中", "回避"],
   sourceCandidateNo: 1279,
-  description: "HP・ST・MP・攻撃力・防御力・命中・回避上昇量を手入力。",
-  evaluate() {
+  description: "強化魔法と魔力からHP・ST・MP・攻撃・防御・命中・回避の上昇量を推定。神秘魔法は発動条件。",
+  evaluate(input) {
+    const skill = Math.max(0, Number(input.skill) || 0);
+    const magic = Math.max(0, Number(input.magic) || 0);
+    const value = reviewedBuffRound1(magic * 0.055736 + skill * 0.090239 - 4.69476);
+    const safeValue = Math.max(0, value);
     return {
-      note: "134件レビュー済みBuffマスター / 手入力必須 / HP・ST・MP・攻撃力・防御力・命中・回避上昇量を手入力。"
+      extraHP: safeValue,
+      extraST: safeValue,
+      extraMP: safeValue,
+      flatAttack: safeValue,
+      extraAC: safeValue,
+      extraHit: safeValue,
+      extraAvoid: safeValue,
+      durationSeconds: 115,
+      note: `134件レビュー済みBuffマスター / 参考値・外挿対応 / 強化魔法${skill}・魔力${magic} / HP・ST・MP・攻撃・防御・命中・回避+${safeValue}推定 / 持続115秒参考`
     };
   }
 },
@@ -1238,16 +1312,20 @@ window.MOE_REVIEWED_BUFF_CATALOG_MANUAL = [
   id: "reviewed-manual-1282",
   name: "アクムレイト マナ",
   category: "複合魔法/補助",
-  inputKind: "none",
-  conflictGroup: "",
+  inputKind: "skillMagic",
+  skillLabel: "強化魔法",
+  defaultSkill: 100,
+  conflictGroup: "battle:attack-enhancement",
   reference: true,
-  manualRequired: true,
-  manualFields: ["攻撃力"],
   sourceCandidateNo: 1282,
-  description: "攻撃力上昇量を手入力。キーン エッジ系。",
-  evaluate() {
+  description: "強化魔法と魔力から攻撃力上昇量を一次式で推定。キーン エッジ系統と競合。",
+  evaluate(input) {
+    const skill = Math.max(0, Number(input.skill) || 0);
+    const magic = Math.max(0, Number(input.magic) || 0);
+    const value = reviewedBuffRound1(skill * 0.304 + magic * 0.235 - 12.54);
     return {
-      note: "134件レビュー済みBuffマスター / 手入力必須 / 攻撃力上昇量を手入力。キーン エッジ系。"
+      flatAttack: Math.max(0, value),
+      note: `134件レビュー済みBuffマスター / 参考値・外挿対応 / 強化魔法${skill}・魔力${magic} / 攻撃力+${Math.max(0, value)}推定 / キーン エッジ系統と競合`
     };
   }
 },
@@ -1255,16 +1333,31 @@ window.MOE_REVIEWED_BUFF_CATALOG_MANUAL = [
   id: "reviewed-manual-1286",
   name: "グレーター フルポテンシャル",
   category: "複合魔法/補助",
-  inputKind: "none",
+  inputKind: "skillMagic",
+  skillLabel: "強化魔法",
+  defaultSkill: 100,
+  defaultMagic: 100,
   conflictGroup: "",
   reference: true,
-  manualRequired: true,
-  manualFields: ["攻撃力", "命中", "AC", "回避", "魔力", "全抵抗"],
   sourceCandidateNo: 1286,
-  description: "攻撃力・命中・防御力・回避・魔力・全抵抗上昇量を手入力。",
-  evaluate() {
+  description: "強化魔法と魔力から攻撃・命中・防御・回避・魔力・全耐性を推定。風属性強化補正は未計算。",
+  evaluate(input) {
+    const skill = Math.max(0, Number(input.skill) || 0);
+    const magic = Math.max(0, Number(input.magic) || 0);
+    const value = reviewedBuffRound1(skill * 0.1785034 + magic * 0.06442177 - 14.72653061);
+    const safeValue = Math.max(0, value);
     return {
-      note: "134件レビュー済みBuffマスター / 手入力必須 / 攻撃力・命中・防御力・回避・魔力・全抵抗上昇量を手入力。"
+      flatAttack: safeValue,
+      extraHit: safeValue,
+      extraAC: safeValue,
+      extraAvoid: safeValue,
+      flatMagic: safeValue,
+      extraFireRes: safeValue,
+      extraWaterRes: safeValue,
+      extraEarthRes: safeValue,
+      extraWindRes: safeValue,
+      extraNeutralRes: safeValue,
+      note: `134件レビュー済みBuffマスター / 参考値・外挿対応 / 強化魔法${skill}・魔力${magic} / 攻撃・命中・防御・回避・魔力・全耐性+${safeValue}推定 / 風属性強化補正未計算`
     };
   }
 },
@@ -1272,16 +1365,28 @@ window.MOE_REVIEWED_BUFF_CATALOG_MANUAL = [
   id: "reviewed-manual-1305",
   name: "シャイニング フォース",
   category: "複合魔法/防御",
-  inputKind: "none",
+  inputKind: "skillMagic",
+  skillLabel: "神秘魔法",
+  defaultSkill: 100,
   conflictGroup: "",
   reference: true,
-  manualRequired: true,
-  manualFields: ["全抵抗"],
   sourceCandidateNo: 1305,
-  description: "全抵抗上昇量を手入力。",
-  evaluate() {
+  description: "神秘魔法と魔力から全耐性上昇・ダメージカット率・効果時間を推定。",
+  evaluate(input) {
+    const skill = Math.max(0, Number(input.skill) || 0);
+    const magic = Math.max(0, Number(input.magic) || 0);
+    const resist = reviewedBuffRound1(skill * 0.12043 + magic * 0.08880 + 16.828);
+    const damageReduce = reviewedBuffRound1(skill * 0.01440 + magic * 0.02643 + 16.848);
+    const seconds = reviewedBuffRound1(skill * 0.85051 + magic * 0.46778 + 77.953);
     return {
-      note: "134件レビュー済みBuffマスター / 手入力必須 / 全抵抗上昇量を手入力。"
+      extraFireRes: resist,
+      extraWaterRes: resist,
+      extraEarthRes: resist,
+      extraWindRes: resist,
+      extraNeutralRes: resist,
+      extraDamageReducePct: damageReduce,
+      durationSeconds: Math.max(0, seconds),
+      note: `134件レビュー済みBuffマスター / 参考値・外挿対応 / 神秘魔法${skill}・魔力${magic} / 全耐性+${resist}・ダメージカット${damageReduce}%推定 / 持続${Math.max(0, seconds)}秒`
     };
   }
 },
@@ -1456,10 +1561,11 @@ window.MOE_REVIEWED_BUFF_CATALOG_MANUAL = [
   category: "複合技/補助",
   inputKind: "none",
   conflictGroup: "",
-  description: "キックスキル+7.5。物理計算では注記のみ。",
+  description: "キックスキル+10。skillPlusとして表示・集計・最適化へ反映。",
   evaluate() {
     return {
-      note: "134件レビュー済みBuffマスター / 固定値 / キックスキル+7.5"
+      extraEffects: [{ key: "skillPlus", name: "キック", value: 10, unit: "", scope: "display" }],
+      note: "134件レビュー済みBuffマスター / 固定値 / キックスキル+10 / キックスキル+10をskillPlusへ反映"
     };
   }
 },
@@ -1583,10 +1689,11 @@ window.MOE_REVIEWED_BUFF_CATALOG_MANUAL = [
   category: "複合技/補助",
   inputKind: "none",
   conflictGroup: "",
-  description: "破壊魔法スキル+30。物理計算では注記のみ。",
+  description: "破壊魔法スキル+30。skillPlusとして表示・集計・最適化へ反映。",
   evaluate() {
     return {
-      note: "134件レビュー済みBuffマスター / 固定値 / 破壊魔法スキル+30"
+      extraEffects: [{ key: "skillPlus", name: "破壊魔法", value: 30, unit: "", scope: "display" }],
+      note: "134件レビュー済みBuffマスター / 固定値 / 破壊魔法スキル+30 / 破壊魔法スキル+30をskillPlusへ反映"
     };
   }
 },
@@ -1604,19 +1711,20 @@ window.MOE_REVIEWED_BUFF_CATALOG_MANUAL = [
     };
   }
 },
+/* __MOE_RAGE_ACCUMULATE_FIX_AND_HEROES_AUDIT_V1__ */
 {
   id: "rage-drive",
   name: "レイジ ドライブ",
   category: "複合技/補助",
   inputKind: "none",
   conflictGroup: "",
-  description: "与ダメージ+20% / 攻撃ディレイ-10 / 回避-50。",
+  description: "与ダメージ+20% / 攻撃ディレイ-10 / 回避-50%。",
   evaluate() {
     return {
       dmgPct: 20,
       attackDelayPct: -10,
-      extraAvoid: -50,
-      note: "134件レビュー済みBuffマスター / 固定値・固定割合 / 与ダメージ+20% / 攻撃ディレイ-10 / 回避-50"
+      extraAvoidPct: -50,
+      note: "134件レビュー済みBuffマスター / 固定値・固定割合 / 与ダメージ+20% / 攻撃ディレイ-10 / 回避-50%"
     };
   }
 },
@@ -1797,16 +1905,18 @@ window.MOE_REVIEWED_BUFF_CATALOG_MANUAL = [
     };
   }
 },
+/* __MOE_REVIEWED_BUFF_SKILLPLUS_BATCH4_V1__ */
 {
   id: "elixir",
   name: "エリクシール",
   category: "複合魔法/補助",
   inputKind: "none",
   conflictGroup: "",
-  description: "回復魔法スキル+30。物理計算では注記のみ。",
+  description: "回復魔法スキル+30。skillPlusとして表示・集計・最適化へ反映。",
   evaluate() {
     return {
-      note: "134件レビュー済みBuffマスター / 固定値 / 回復魔法スキル+30"
+      extraEffects: [{ key: "skillPlus", name: "回復魔法", value: 30, unit: "", scope: "display" }],
+      note: "134件レビュー済みBuffマスター / 固定値 / 回復魔法スキル+30 / 回復魔法スキル+30をskillPlusへ反映"
     };
   }
 },
@@ -1890,17 +2000,32 @@ window.MOE_REVIEWED_BUFF_CATALOG_MANUAL = [
     };
   }
 },
+/* __MOE_REVIEWED_BUFF_FORMULA_BATCH2_V2__ */
 {
   id: "reverse-fusion",
   name: "りばーす・ふゅーじょん",
   category: "暗黒命令",
-  inputKind: "none",
+  inputKind: "skill",
+  skillLabel: "暗黒命令",
+  defaultSkill: 100,
   conflictGroup: "",
   reference: true,
-  referenceOnly: true,
-  description: "身体能力強化。効果量はScrapbox参照対象で、現時点では計算へ反映しない。",
-  evaluate() {
-    return { note: "134件レビュー済みBuffマスター / 要参照 / 身体能力強化 / 数値確定後に反映" };
+  description: "暗黒命令値からHP・ST・MP・攻撃力・防御力・魔力の上昇量と効果時間を推定。",
+  evaluate(input) {
+    const skill = Math.max(0, Number(input.skill) || 0);
+    const value = reviewedBuffRound1(skill * 0.34862 - 11.0888);
+    const seconds = reviewedBuffRound1(skill * 3.9329 - 309.69);
+    const safeValue = Math.max(0, value);
+    return {
+      extraHP: safeValue,
+      extraST: safeValue,
+      extraMP: safeValue,
+      flatAttack: safeValue,
+      extraAC: safeValue,
+      flatMagic: safeValue,
+      durationSeconds: Math.max(0, seconds),
+      note: `134件レビュー済みBuffマスター / 参考値・外挿対応 / 暗黒命令${skill} / HP・ST・MP・攻撃力・防御力・魔力+${safeValue}推定 / 持続${Math.max(0, seconds)}秒`
+    };
   }
 },
 /* __MOE_WEREWOLF_MANUAL_FIELDS_FIX_V1__ */
@@ -1985,39 +2110,71 @@ window.MOE_REVIEWED_BUFF_CATALOG_MANUAL = [
     };
   }
 },
+/* __MOE_REVIEWED_BUFF_FORMULA_BATCH3_V1__ */
 {
   id: "ignis-form",
   name: "イグニス フォーム",
   category: "複合技/補助",
-  inputKind: "none",
-  conflictGroup: "",
+  inputKind: "skillMagic",
+  skillLabel: "強化魔法",
+  defaultSkill: 100,
+  defaultMagic: 100,
+  conflictGroup: "battle:attack-enhancement",
   reference: true,
-  referenceOnly: true,
-  description: "攻撃力上昇など。Scrapbox参照対象で、数値確定までは計算へ反映しない。",
-  evaluate() { return { note: "134件レビュー済みBuffマスター / 要参照 / イグニス フォーム Scrapbox参照" }; }
+  description: "強化魔法値から攻撃力上昇量を推定。火属性強化補正は未計算。",
+  evaluate(input) {
+    const skill = Math.max(0, Number(input.skill) || 0);
+    const value = reviewedBuffRound1(skill * 0.22229 + 15.359);
+    return {
+      flatAttack: Math.max(0, value),
+      note: `134件レビュー済みBuffマスター / 参考値・外挿対応 / 強化魔法${skill} / 攻撃力+${Math.max(0, value)}推定 / 火属性強化補正未計算 / キーン エッジ系統と競合`
+    };
+  }
 },
+/* __MOE_REVIEWED_BUFF_FORMULA_BATCH1_V2__ */
 {
   id: "dialos-pops",
   name: "ダイアロス ポップス",
   category: "複合技/補助",
-  inputKind: "none",
+  inputKind: "skill",
+  skillLabel: "音楽",
+  defaultSkill: 100,
   conflictGroup: "",
   reference: true,
-  referenceOnly: true,
-  description: "攻撃力上昇。Scrapbox参照対象で、数値確定までは計算へ反映しない。",
-  evaluate() { return { note: "134件レビュー済みBuffマスター / 要参照 / ダイアロス ポップス Scrapbox参照" }; }
+  description: "音楽値から攻撃力上昇量と効果時間を一次式で推定。確認範囲外も外挿。",
+  evaluate(input) {
+    const skill = Math.max(0, Number(input.skill) || 0);
+    const value = reviewedBuffRound1(skill * 0.33249 - 4.1243);
+    const seconds = reviewedBuffRound1(skill * 0.4 - 6);
+    return {
+      flatAttack: value,
+      durationSeconds: Math.max(0, seconds),
+      note: `134件レビュー済みBuffマスター / 参考値・外挿対応 / 音楽${skill} / 攻撃力+${value}推定 / 持続${Math.max(0, seconds)}秒`
+    };
+  }
 },
 {
   id: "limit-break",
   name: "リミット ブレイク",
   category: "複合技/補助",
-  inputKind: "none",
+  inputKind: "skill",
+  skillLabel: "強化魔法",
+  defaultSkill: 100,
   conflictGroup: "",
   reference: true,
-  referenceOnly: true,
-  description: "攻撃力上昇。Scrapbox参照対象で、数値確定までは計算へ反映しない。",
-  evaluate() { return { note: "134件レビュー済みBuffマスター / 要参照 / リミット ブレイク Scrapbox参照" }; }
+  description: "強化魔法値から攻撃力上昇量と効果時間を一次式で推定。確認範囲外も外挿。",
+  evaluate(input) {
+    const skill = Math.max(0, Number(input.skill) || 0);
+    const value = reviewedBuffRound1(skill * 0.243794 + 5.4988);
+    const seconds = reviewedBuffRound1(skill * 0.812727 - 48.9858);
+    return {
+      flatAttack: value,
+      durationSeconds: Math.max(0, seconds),
+      note: `134件レビュー済みBuffマスター / 参考値・外挿対応 / 強化魔法${skill} / 攻撃力+${value}推定 / 持続${Math.max(0, seconds)}秒`
+    };
+  }
 },
+/* __MOE_HEROES_FANTASIA_FORMULA_V1__ */
 {
   id: "heroes-fantasia",
   name: "ヒーローズ ファンタジア",
@@ -2027,19 +2184,24 @@ window.MOE_REVIEWED_BUFF_CATALOG_MANUAL = [
   defaultSkill: 98,
   conflictGroup: "",
   reference: true,
-  description: "攻撃・命中・回避・防御・魔力・全耐性上昇。音楽98と153の既知点を補間。",
+  description: "攻撃・命中・回避・防御・魔力・全耐性上昇。音楽98/153の実測から一次式で推定し、確認範囲外も外挿。",
   evaluate(input) {
     const skill = Math.max(0, Number(input.skill) || 0);
-    const value = reviewedBuffRound1(reviewedBuffInterpolateTable(skill, [[98,20.45],[153,29.3]]));
-    const seconds = reviewedBuffRound1(reviewedBuffInterpolateTable(skill, [[98,49],[153,95]]));
+    const value = reviewedBuffRound1(skill * 0.1609090909 + 4.6745454545);
+    const seconds = reviewedBuffRound1(skill * 0.8363636364 - 32.9636363636);
     return {
       flatAttack: value,
       extraHit: value,
       extraAvoid: value,
       extraAC: value,
       flatMagic: value,
-      durationSeconds: seconds,
-      note: `134件レビュー済みBuffマスター / 参考値 / 音楽${skill} / 各能力+${value}推定 / 持続${seconds}秒 / 全耐性も同程度`
+      extraFireRes: value,
+      extraWaterRes: value,
+      extraEarthRes: value,
+      extraWindRes: value,
+      extraNeutralRes: value,
+      durationSeconds: Math.max(0, seconds),
+      note: `134件レビュー済みBuffマスター / 参考値・外挿対応 / 音楽${skill} / 攻撃・命中・回避・防御・魔力・全耐性+${value}推定 / 持続${Math.max(0, seconds)}秒`
     };
   }
 },

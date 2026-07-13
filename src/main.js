@@ -7835,19 +7835,31 @@ function compositeExtraCell(row, detailTr) {
 
 // __MOE_BUFF_CATALOG_PHASE1_V1__
 // __MOE_BATTLE_BUFF_TABLE_INTERPOLATION_FIX_V2C__
-function reviewedBuffInterpolateTable(skill, points) {
-  const x = Math.max(0, Number(skill) || 0);
-  if (!Array.isArray(points) || !points.length) return 0;
-  if (x <= points[0][0]) return points[0][1];
-  for (let i = 1; i < points.length; i += 1) {
-    const [x1, y1] = points[i - 1];
-    const [x2, y2] = points[i];
-    if (x <= x2) {
-      const t = (x - x1) / Math.max(0.000001, x2 - x1);
-      return y1 + (y2 - y1) * t;
-    }
+function reviewedBuffInterpolateTable(value, points) {
+  // __MOE_REVIEWED_BUFF_TABLE_EXTRAPOLATION_V1__
+  const x = Number(value);
+  const rows = (Array.isArray(points) ? points : [])
+    .map(point => [Number(point?.[0]), Number(point?.[1])])
+    .filter(point => Number.isFinite(point[0]) && Number.isFinite(point[1]))
+    .sort((a, b) => a[0] - b[0]);
+
+  if (!Number.isFinite(x) || rows.length === 0) return 0;
+  if (rows.length === 1) return rows[0][1];
+
+  const interpolate = (left, right) => {
+    const dx = right[0] - left[0];
+    if (!Number.isFinite(dx) || dx === 0) return right[1];
+    const ratio = (x - left[0]) / dx;
+    return left[1] + (right[1] - left[1]) * ratio;
+  };
+
+  if (x <= rows[0][0]) return interpolate(rows[0], rows[1]);
+  if (x >= rows[rows.length - 1][0]) return interpolate(rows[rows.length - 2], rows[rows.length - 1]);
+
+  for (let i = 1; i < rows.length; i += 1) {
+    if (x <= rows[i][0]) return interpolate(rows[i - 1], rows[i]);
   }
-  return points[points.length - 1][1];
+  return rows[rows.length - 1][1];
 }
 
 function reviewedBuffRound1(value) {
@@ -7911,6 +7923,10 @@ function reviewedBuffCatalogEffectSummary(effect) {
   if (+effect.extraAttackDelayPct) parts.push(`攻撃ディレイ${effect.extraAttackDelayPct > 0 ? "+" : ""}${fmt(effect.extraAttackDelayPct, 3)}%`);
   if (+effect.extraCritRatePct) parts.push(`クリ率+${fmt(effect.extraCritRatePct, 3)}%`);
   if (+effect.durationSeconds) parts.push(`持続${fmt(effect.durationSeconds, 1)}秒`);
+  // __MOE_REVIEWED_BUFF_SKILLPLUS_PREVIEW_V1__
+  normalizeAdditionalEffects(effect?.extraEffects || []).forEach(extra => {
+    if (extra?.key === "skillPlus") parts.push(additionalEffectLabel(extra));
+  });
   return parts.join(" / ") || "計算効果なし";
 }
 
