@@ -4871,3 +4871,114 @@ button[onclick*="applySkillSimToCalc"],
     width: 180px;
   }
 }
+
+/* __MOE_EQUIPMENT_CATALOG_APPLY_SEARCH_CACHE_V1__ */
+.catalogSearchApplyActions{
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:8px;
+  width:100%;
+}
+.catalogSearchApplyActions #catalogSearchApplyHint{
+  flex:1 1 260px;
+}
+#catalogApplySearch.catalogSearchPending{
+  outline:2px solid currentColor;
+  outline-offset:2px;
+}
+
+/* __MOE_OPTIMIZER_EQUIPMENT_CONTRIBUTION_V1__ */
+.optimizerEquipmentContributionPanel{
+  margin-top:14px;
+  padding:14px;
+  border:1px solid rgba(127,127,127,.35);
+  border-radius:10px;
+  background:color-mix(in srgb, Canvas 94%, Highlight 6%);
+}
+.optimizerContributionHeader{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:12px;
+  margin-bottom:10px;
+}
+.optimizerContributionHeader h3{margin:0 0 3px}
+.optimizerContributionCards{display:grid;gap:8px}
+.optimizerContributionCard{
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr);
+  gap:10px;
+  padding:10px;
+  border:1px solid rgba(127,127,127,.3);
+  border-radius:8px;
+  background:Canvas;
+}
+.optimizerContributionCard.isPrimary{
+  border-width:2px;
+  border-color:Highlight;
+}
+.optimizerContributionRank{
+  align-self:start;
+  padding:3px 7px;
+  border-radius:999px;
+  background:color-mix(in srgb, Highlight 15%, Canvas);
+  font-size:11px;
+  font-weight:bold;
+  white-space:nowrap;
+}
+.optimizerContributionMain{min-width:0}
+.optimizerContributionEffects{
+  display:flex;
+  flex-wrap:wrap;
+  gap:5px;
+  margin:6px 0;
+}
+.optimizerContributionEffects span{
+  padding:2px 6px;
+  border:1px solid rgba(127,127,127,.3);
+  border-radius:999px;
+  font-size:11px;
+}
+.optimizerContributionNote{margin-top:9px}
+@media(max-width:650px){
+  .optimizerContributionHeader{display:block}
+  .optimizerContributionCard{grid-template-columns:1fr}
+}
+
+/* __MOE_OPTIMIZER_BUFF_CONTRIBUTION_V1__ */
+.optimizerBuffContributionPanel{
+  margin-top:10px;
+}
+.optimizerContributionTitleRow{
+  display:flex;
+  align-items:baseline;
+  flex-wrap:wrap;
+  gap:8px;
+}
+.optimizerBuffContributionCard .optimizerContributionEffects{
+  margin-bottom:4px;
+}
+
+/* __MOE_OPTIMIZER_REPLACEMENT_THRESHOLDS_V1__ */
+.optimizerReplacementThresholds{
+  margin-top:9px;
+  padding:9px;
+  border:1px dashed rgba(127,127,127,.45);
+  border-radius:7px;
+  background:color-mix(in srgb, Canvas 96%, Highlight 4%);
+}
+.optimizerReplacementThresholdChips{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin:6px 0 4px;
+}
+.optimizerReplacementThresholdChips span{
+  padding:3px 7px;
+  border-radius:999px;
+  background:color-mix(in srgb, Highlight 13%, Canvas);
+  border:1px solid rgba(127,127,127,.3);
+  font-size:12px;
+  font-weight:600;
+}

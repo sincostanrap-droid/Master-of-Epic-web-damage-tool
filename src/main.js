@@ -5,8 +5,8 @@
   onclick属性から呼ばれる関数があるため、現時点では module ではなく通常scriptとして読み込みます。
 */
 
-const APP_VERSION = "v1.23.59";
-const APP_VERSION_NOTE = "装備カタログ条件表示・ページ送り・追加効果二重加算修正";
+const APP_VERSION = "v1.23.63";
+const APP_VERSION_NOTE = "装備・Buffの代替ステータス目安を追加";
 
 /* 種族係数。攻撃力係数と魔力係数は別管理。 */
 const RACE_COEFFS = {
@@ -16262,6 +16262,1184 @@ function renderAnalysisPanel() {
   }
 })(typeof globalThis !== "undefined" ? globalThis : window);
 
+/* __MOE_EQUIPMENT_CATALOG_APPLY_SEARCH_CACHE_V1__
+ * 装備カタログ:
+ * - 入力中は全件filter/sortを行わない
+ * - 「検索」またはEnterで条件を適用
+ * - 適用済み検索結果をキャッシュ
+ * - ページ送りはcache.sliceのみ
+ * - 既存のSkill+フィルタ拡張をそのまま利用
+ */
+(function installEquipmentCatalogApplySearchCacheV1(global) {
+  if (!global || global.__MOE_EQUIPMENT_CATALOG_APPLY_SEARCH_CACHE_V1__) return;
+  global.__MOE_EQUIPMENT_CATALOG_APPLY_SEARCH_CACHE_V1__ = true;
 
+  const cache = {
+    filter: null,
+    items: [],
+    filtered: [],
+    total: 0,
+    ready: false,
+    applying: false,
+    sourceSignature: "",
+    lastRenderedPage: -1
+  };
 
+  function applySearch(resetPage=true) {
+    if (cache.applying) return;
+    cache.applying = true;
 
+    try {
+      const items = typeof global.equipmentCatalogItems === "function"
+        ? global.equipmentCatalogItems()
+        : [];
+      const filter = typeof global.catalogFilterState === "function"
+        ? (global.catalogFilterState() || {})
+        : {};
+      const matched = items.filter(item =>
+        typeof global.catalogItemMatches !== "function"
+          || global.catalogItemMatches(item, filter)
+      );
+      const filtered = typeof global.sortCatalogItems === "function"
+        ? global.sortCatalogItems(matched, filter)
+        : matched;
+
+      cache.filter = filter;
+      cache.items = items;
+      cache.filtered = filtered;
+      cache.total = items.length;
+      cache.ready = true;
+
+      if (resetPage && typeof global.catalogResetPage === "function") {
+        global.catalogResetPage();
+      } else if (resetPage) {
+        global.catalogPageIndex = 0;
+      }
+
+      renderPage();
+      updateDirtyHint(false);
+    } finally {
+      cache.applying = false;
+    }
+  }
+
+  function renderPage() {
+    const body = typeof global.byId === "function"
+      ? global.byId("catalogResultsBody")
+      : document.getElementById("catalogResultsBody");
+    const summary = typeof global.byId === "function"
+      ? global.byId("catalogSummary")
+      : document.getElementById("catalogSummary");
+
+    if (!body || !summary) return;
+
+    if (!cache.ready) {
+      applySearch(false);
+      return;
+    }
+
+    const filter = cache.filter || {};
+    const filtered = cache.filtered || [];
+    const limit = Math.max(25, Math.min(1000, +(filter.limit || 200)));
+    const pageCount = filtered.length ? Math.ceil(filtered.length / limit) : 0;
+
+    global.catalogPageIndex = Math.max(
+      0,
+      Math.min(
+        +(global.catalogPageIndex || 0),
+        Math.max(0, pageCount - 1)
+      )
+    );
+
+    const start = global.catalogPageIndex * limit;
+    const shown = filtered.slice(start, start + limit);
+    const already = typeof global.registeredCatalogIds === "function"
+      ? global.registeredCatalogIds()
+      : new Set();
+
+    body.innerHTML = shown.length
+      ? shown.map(item =>
+          global.catalogResultRowHtml(
+            item,
+            already.has(String(item.catalogId || item.id || ""))
+          )
+        ).join("")
+      : `<tr><td colspan="10" class="small mutedText">該当する装備がありません。</td></tr>`;
+
+    const statText = typeof global.catalogStatFiltersDescription === "function"
+      ? global.catalogStatFiltersDescription(filter)
+      : "";
+
+    summary.textContent =
+      `カタログ ${cache.total}件 / 該当 ${filtered.length}件 / 表示 ${shown.length}件` +
+      (statText ? ` / ${statText}` : "");
+
+    if (typeof global.renderCatalogPageControls === "function") {
+      global.renderCatalogPageControls(
+        filtered.length,
+        global.catalogPageIndex,
+        pageCount,
+        limit
+      );
+    }
+
+    body.querySelectorAll("[data-catalog-add]").forEach(btn => {
+      btn.onclick = () => {
+        if (typeof global.addCatalogEquipmentToRegistered === "function") {
+          global.addCatalogEquipmentToRegistered(btn.dataset.catalogAdd);
+        }
+        renderPage();
+      };
+    });
+  }
+
+  function updateDirtyHint(dirty=true) {
+    const button = document.getElementById("catalogApplySearch");
+    const hint = document.getElementById("catalogSearchApplyHint");
+
+    if (button) button.classList.toggle("catalogSearchPending", !!dirty);
+    if (hint) {
+      hint.textContent = dirty
+        ? "条件が変更されています。「検索」で反映してください。"
+        : "表示中の条件を適用済みです。";
+      hint.classList.toggle("warnText", !!dirty);
+    }
+  }
+
+  function clearDraftControls() {
+    const direct = {
+      catalogSearch: "",
+      catalogCategory: "",
+      catalogSlot: "",
+      catalogBuffMode: "",
+      catalogSort: "name",
+      catalogSortDir: "asc"
+    };
+
+    Object.entries(direct).forEach(([id, value]) => {
+      const el = document.getElementById(id);
+      if (el) el.value = value;
+    });
+
+    for (let i = 1; i <= 4; i++) {
+      const stat = document.getElementById(`catalogStat${i}`);
+      const op = document.getElementById(`catalogStatOp${i}`);
+      const value = document.getElementById(`catalogStatValue${i}`);
+      if (stat) stat.value = "";
+      if (op) op.value = "any";
+      if (value) value.value = "";
+
+      const skill = document.getElementById(`catalogSkillPlusSkill${i}`);
+      const skillOp = document.getElementById(`catalogSkillPlusOp${i}`);
+      const skillValue = document.getElementById(`catalogSkillPlusValue${i}`);
+      if (skill) skill.value = "";
+      if (skillOp) skillOp.value = "gte";
+      if (skillValue) skillValue.value = "";
+    }
+  }
+
+  function ensureControls() {
+    const toolbar = document.querySelector(".catalogToolbar");
+    const search = document.getElementById("catalogSearch");
+    if (!toolbar || !search) return false;
+
+    let actions = document.getElementById("catalogSearchApplyActions");
+    if (!actions) {
+      actions = document.createElement("div");
+      actions.id = "catalogSearchApplyActions";
+      actions.className = "catalogSearchApplyActions";
+
+      const apply = document.createElement("button");
+      apply.type = "button";
+      apply.id = "catalogApplySearch";
+      apply.className = "primary";
+      apply.textContent = "検索";
+      apply.onclick = () => applySearch(true);
+
+      const clear = document.createElement("button");
+      clear.type = "button";
+      clear.id = "catalogClearSearch";
+      clear.textContent = "条件クリア";
+      clear.onclick = () => {
+        clearDraftControls();
+        applySearch(true);
+      };
+
+      const hint = document.createElement("span");
+      hint.id = "catalogSearchApplyHint";
+      hint.className = "small mutedText";
+      hint.textContent = "条件を入力して「検索」で反映します。";
+
+      actions.append(apply, clear, hint);
+      toolbar.appendChild(actions);
+    }
+
+    if (search.dataset.catalogApplyEnterReady !== "1") {
+      search.addEventListener("keydown", event => {
+        if (event.key !== "Enter") return;
+        event.preventDefault();
+        event.stopPropagation();
+        applySearch(true);
+      }, true);
+      search.dataset.catalogApplyEnterReady = "1";
+    }
+
+    const draftSelector = [
+      "#catalogSearch",
+      "#catalogCategory",
+      "#catalogSlot",
+      "#catalogBuffMode",
+      "#catalogSort",
+      "#catalogSortDir",
+      "#catalogLimit",
+      "[data-catalog-stat-filter-input]",
+      "[data-catalog-stat-filter-select]",
+      "[data-skill-plus-filter-input]",
+      "[data-skill-plus-filter-select]"
+    ].join(",");
+
+    document.querySelectorAll(draftSelector).forEach(el => {
+      if (el.dataset.catalogApplyDirtyReady === "1") return;
+      const mark = () => updateDirtyHint(true);
+      el.addEventListener("input", mark, true);
+      el.addEventListener("change", mark, true);
+      el.dataset.catalogApplyDirtyReady = "1";
+    });
+
+    return true;
+  }
+
+  function installRenderOverride() {
+    global.renderCatalogResults = renderPage;
+    global.applyCatalogSearch = applySearch;
+    global.renderCatalogCachedPage = renderPage;
+  }
+
+  function boot() {
+    installRenderOverride();
+    if (!ensureControls()) return;
+    if (!cache.ready) applySearch(false);
+  }
+
+  if (typeof document !== "undefined") {
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", boot);
+    } else {
+      boot();
+    }
+
+    const observer = new MutationObserver(() => {
+      if (document.getElementById("catalogSearch")) boot();
+    });
+    observer.observe(document.documentElement, {childList:true, subtree:true});
+
+    [250, 700, 1300, 2500].forEach(ms => setTimeout(boot, ms));
+  } else {
+    installRenderOverride();
+  }
+})(typeof window !== "undefined" ? window : globalThis);
+
+/* __MOE_OPTIMIZER_EQUIPMENT_CONTRIBUTION_V1__
+ * 最適化1位構成の装備を1件ずつ外し、同じBuff構成のまま再評価する。
+ * 探索は再実行せず、選択装備数ぶんだけcomputeMetricsを追加実行する。
+ */
+(function installOptimizerEquipmentContributionV1() {
+  if (typeof renderIntegratedOptimizerResults !== "function") return;
+  if (renderIntegratedOptimizerResults.__equipmentContributionV1) return;
+
+  const baseRenderIntegratedOptimizerResults = renderIntegratedOptimizerResults;
+
+  function contributionSettingsFromLastPayload() {
+    const payload = optimizerLastPayload || {};
+    const settings = {...(payload.settings || {})};
+    const payloadState = payload.state || state || {};
+
+    settings._equipmentRows = normalizeEquipmentRows(
+      Array.isArray(payloadState.equipment) ? payloadState.equipment : (state.equipment || [])
+    );
+    settings._compositeRows = normalizeCompositeRows(
+      Array.isArray(payloadState.composite) ? payloadState.composite : (state.composite || [])
+    );
+    settings._otherRows = Array.isArray(payloadState.other)
+      ? payloadState.other
+      : (Array.isArray(state.other) ? state.other : []);
+    settings._postRows = Array.isArray(payloadState.post)
+      ? payloadState.post
+      : (Array.isArray(state.post) ? state.post : []);
+    settings._evaluationCache = new Map();
+    settings._compositeCandidates = null;
+    settings._equipmentConflictKeyCache = new Map();
+
+    return settings;
+  }
+
+  function rowVisibleForContribution(row) {
+    if (!row) return false;
+    if (typeof optimizerEquipmentRowHasVisibleData === "function") {
+      return optimizerEquipmentRowHasVisibleData(row);
+    }
+    if (typeof equipmentCandidateHasData === "function") {
+      return equipmentCandidateHasData(row);
+    }
+    return !!(row.name || row.attack || row.magic || row.speed || row.weaponDamage);
+  }
+
+  function contributionLoss(baseRaw, removedRaw, objective) {
+    if (typeof optimizerObjectiveIsMinimize === "function" && optimizerObjectiveIsMinimize(objective)) {
+      return removedRaw - baseRaw;
+    }
+    return baseRaw - removedRaw;
+  }
+
+  function contributionDirectEffects(row) {
+    const parts = [];
+
+    const push = (label, value, suffix="") => {
+      const n = Number(value);
+      if (!Number.isFinite(n) || Math.abs(n) < 0.0000001) return;
+      const sign = n > 0 ? "+" : "";
+      parts.push(`${label}${sign}${fmt(n, 1)}${suffix}`);
+    };
+
+    push("攻撃力", row.attack);
+    push("魔力", row.magic);
+    push("移動速度", row.speed);
+    push("ディレイ", row.delay);
+    push("武器ダメージ", row.weaponDamage);
+    push("攻撃間隔", row.weaponAttackInterval);
+
+    if (typeof extraStatsEffectText === "function") {
+      const baseExtra = String(extraStatsEffectText(row, "base") || "").trim();
+      if (baseExtra) parts.push(baseExtra);
+      const buffExtra = String(extraStatsEffectText(row, "equipBuff") || "").trim();
+      if (buffExtra) parts.push(buffExtra);
+    }
+
+    if (typeof additionalEffectsSummary === "function") {
+      const extras = additionalEffectsSummary(row, "display");
+      if (Array.isArray(extras) && extras.length) parts.push(...extras);
+    }
+
+    if (row.equipBuffName) {
+      parts.push(`装備Buff: ${row.equipBuffName}`);
+    }
+
+    return Array.from(new Set(parts)).slice(0, 8);
+  }
+
+  function analyzeTopOptimizerEquipmentContribution() {
+    const top = (integratedOptimizerResults || []).find(result =>
+      result &&
+      Array.isArray(result.equipmentIdxs) &&
+      result.equipmentIdxs.length &&
+      result.metrics &&
+      !result.currentConfig &&
+      !result.baselineReference
+    ) || (integratedOptimizerResults || []).find(result =>
+      result &&
+      Array.isArray(result.equipmentIdxs) &&
+      result.equipmentIdxs.length &&
+      result.metrics
+    );
+
+    if (!top) return null;
+
+    const payload = optimizerLastPayload || {};
+    const inputs = {...(payload.inputs || {})};
+    const settings = contributionSettingsFromLastPayload();
+    const equipmentRows = optimizerEquipmentRows(settings);
+    const objective = settings.objective || "damage";
+    const baseRaw = optimizerObjectiveRawValue(top.metrics, objective);
+    const baseIdxs = optimizerCanonicalEquipmentIdxs(top.equipmentIdxs || [], settings);
+    const compositeIdxs = Array.isArray(top.compositeIdxs) ? top.compositeIdxs : [];
+
+    const contributions = [];
+
+    baseIdxs.forEach(idx => {
+      const row = equipmentRows[idx];
+      if (!rowVisibleForContribution(row)) return;
+
+      const trialIdxs = baseIdxs.filter(x => x !== idx);
+      const evaluated = optimizerEvaluateBuffSelection(
+        trialIdxs,
+        compositeIdxs,
+        inputs,
+        settings
+      );
+      const removedRaw = optimizerObjectiveRawValue(evaluated.metrics, objective);
+      const loss = contributionLoss(baseRaw, removedRaw, objective);
+      const ratio = Math.abs(baseRaw) > 0.0000001
+        ? loss / Math.abs(baseRaw) * 100
+        : 0;
+
+      contributions.push({
+        idx,
+        row,
+        slot: row.slot || "部位不明",
+        name: row.name || "名称未設定",
+        baseRaw,
+        removedRaw,
+        loss,
+        ratio,
+        effects: contributionDirectEffects(row),
+        invalidAfterRemoval:
+          evaluated.score <= OPTIMIZER_INVALID_SCORE / 2 ||
+          (evaluated.violations || []).length > 0
+      });
+    });
+
+    contributions.sort((a, b) => {
+      if (a.invalidAfterRemoval !== b.invalidAfterRemoval) {
+        return a.invalidAfterRemoval ? 1 : -1;
+      }
+      if (a.loss !== b.loss) return a.loss - b.loss;
+      return String(a.slot).localeCompare(String(b.slot), "ja");
+    });
+
+    return {
+      top,
+      objective,
+      objectiveLabel: optimizerObjectiveLabel(objective),
+      baseRaw,
+      contributions,
+      evaluatedCount: contributions.length
+    };
+  }
+
+  function contributionValueText(value, objective) {
+    const suffix = objective === "extraCritRatePct" ||
+      objective === "extraDamageReducePct" ||
+      /Pct$/.test(objective)
+      ? "%"
+      : "";
+    return `${fmt(value, 2)}${suffix}`;
+  }
+
+  function contributionCardHtml(item, rank, objective) {
+    const slot = String(item.slot || "")
+      .replace(/^武器:\s*/, "")
+      .replace(/^防具:\s*/, "")
+      .replace(/^装飾:\s*/, "");
+    const effects = item.effects.length
+      ? item.effects.map(x => `<span>${escapeHtml(x)}</span>`).join("")
+      : `<span>直接効果の要約なし</span>`;
+
+    const recommendation = item.loss <= 0
+      ? "この装備を外しても主目的が悪化していません。構成条件や副目的を確認しつつ、優先的に見直せます。"
+      : `少なくとも現在の主な効果を維持し、${optimizerObjectiveLabel(objective)}をさらに伸ばす装備が更新候補です。`;
+
+    return `
+      <div class="optimizerContributionCard ${rank === 0 ? "isPrimary" : ""}">
+        <div class="optimizerContributionRank">${rank === 0 ? "最小寄与" : `候補${rank + 1}`}</div>
+        <div class="optimizerContributionMain">
+          <b>${escapeHtml(slot)}：${escapeHtml(item.name)}</b>
+          <div class="small">
+            外した場合の主目的低下:
+            <strong>${escapeHtml(contributionValueText(item.loss, objective))}</strong>
+            （${escapeHtml(fmt(item.ratio, 3))}%）
+          </div>
+          <div class="optimizerContributionEffects">${effects}</div>
+          <div class="small mutedText">${escapeHtml(recommendation)}</div>
+        </div>
+      </div>`;
+  }
+
+  function renderOptimizerEquipmentContribution() {
+    const resultHost = byId("optimizerResults");
+    if (!resultHost) return;
+
+    let panel = byId("optimizerEquipmentContributionPanel");
+    if (!panel) {
+      panel = document.createElement("section");
+      panel.id = "optimizerEquipmentContributionPanel";
+      panel.className = "optimizerEquipmentContributionPanel";
+      resultHost.insertAdjacentElement("afterend", panel);
+    }
+
+    try {
+      const analysis = analyzeTopOptimizerEquipmentContribution();
+
+      if (!analysis || !analysis.contributions.length) {
+        panel.innerHTML = `<div class="small mutedText">装備寄与分析を表示できる最適化結果がありません。</div>`;
+        return;
+      }
+
+      const shown = analysis.contributions.slice(0, 3);
+
+      panel.innerHTML = `
+        <div class="optimizerContributionHeader">
+          <div>
+            <h3>装備更新の目安</h3>
+            <div class="small mutedText">
+              1位構成のBuffを固定し、装備を1件ずつ外して
+              ${escapeHtml(analysis.objectiveLabel)}への単体寄与を比較しています。
+            </div>
+          </div>
+          <span class="small">${analysis.evaluatedCount}件を追加評価</span>
+        </div>
+        <div class="optimizerContributionCards">
+          ${shown.map((item, rank) =>
+            contributionCardHtml(item, rank, analysis.objective)
+          ).join("")}
+        </div>
+        <div class="small mutedText optimizerContributionNote">
+          「単体寄与が小さい」は、装備要件・セット効果・副目的まで含めた絶対的な弱さを意味しません。
+          現在の主目的で交換候補を探すための目安です。
+        </div>`;
+    } catch (error) {
+      panel.innerHTML = `
+        <div class="small badText">
+          装備寄与分析エラー: ${escapeHtml(error?.message || String(error))}
+        </div>`;
+    }
+  }
+
+  renderIntegratedOptimizerResults = function renderIntegratedOptimizerResultsWithContributionV1() {
+    const out = baseRenderIntegratedOptimizerResults.apply(this, arguments);
+    renderOptimizerEquipmentContribution();
+    return out;
+  };
+
+  renderIntegratedOptimizerResults.__equipmentContributionV1 = true;
+  window.renderOptimizerEquipmentContribution = renderOptimizerEquipmentContribution;
+})();
+
+/* __MOE_OPTIMIZER_BUFF_CONTRIBUTION_V1__
+ * 最適化1位構成のBuffを1件ずつ外し、同じ装備構成のまま再評価する。
+ * 探索は再実行せず、選択Buff数ぶんだけcomputeMetricsを追加実行する。
+ */
+(function installOptimizerBuffContributionV1() {
+  if (typeof renderIntegratedOptimizerResults !== "function") return;
+  if (renderIntegratedOptimizerResults.__buffContributionV1) return;
+
+  const baseRenderIntegratedOptimizerResults = renderIntegratedOptimizerResults;
+
+  function buffContributionSettingsFromLastPayload() {
+    const payload = optimizerLastPayload || {};
+    const settings = {...(payload.settings || {})};
+    const payloadState = payload.state || state || {};
+
+    settings._equipmentRows = normalizeEquipmentRows(
+      Array.isArray(payloadState.equipment) ? payloadState.equipment : (state.equipment || [])
+    );
+    settings._compositeRows = normalizeCompositeRows(
+      Array.isArray(payloadState.composite) ? payloadState.composite : (state.composite || [])
+    );
+    settings._otherRows = Array.isArray(payloadState.other)
+      ? payloadState.other
+      : (Array.isArray(state.other) ? state.other : []);
+    settings._postRows = Array.isArray(payloadState.post)
+      ? payloadState.post
+      : (Array.isArray(state.post) ? state.post : []);
+    settings._evaluationCache = new Map();
+    settings._compositeCandidates = null;
+    settings._equipmentConflictKeyCache = new Map();
+
+    return settings;
+  }
+
+  function buffContributionLoss(baseRaw, removedRaw, objective) {
+    if (typeof optimizerObjectiveIsMinimize === "function" && optimizerObjectiveIsMinimize(objective)) {
+      return removedRaw - baseRaw;
+    }
+    return baseRaw - removedRaw;
+  }
+
+  function buffContributionTypeLabel(row) {
+    const raw = String(
+      row?.sourceType ||
+      row?.buffType ||
+      row?.category ||
+      row?.kind ||
+      ""
+    ).toLowerCase();
+
+    if (/equip|装備/.test(raw)) return "装備Buff";
+    if (/external|外部/.test(raw)) return "外部Buff";
+    if (/self|自己/.test(raw)) return "自己Buff";
+    if (/other|その他/.test(raw)) return "その他Buff";
+    return "Buff";
+  }
+
+  function buffContributionEffectParts(row) {
+    const parts = [];
+    const push = (label, value, suffix="") => {
+      const n = Number(value);
+      if (!Number.isFinite(n) || Math.abs(n) < 0.0000001) return;
+      const sign = n > 0 ? "+" : "";
+      parts.push(`${label}${sign}${fmt(n, 1)}${suffix}`);
+    };
+
+    push("攻撃力", row.attack ?? row.flatAttack);
+    push("攻撃力%", row.attackPct, "%");
+    push("ダメージ", row.dmgPct, "%");
+    push("命中", row.hit ?? row.extraHit);
+    push("回避", row.avoid ?? row.extraAvoid);
+    push("AC", row.ac ?? row.extraAC);
+    push("魔力", row.magic ?? row.flatMagic);
+    push("移動速度", row.speed ?? row.flatSpeed);
+    push("HP", row.hp ?? row.extraHP);
+    push("MP", row.mp ?? row.extraMP);
+    push("ST", row.st ?? row.extraST);
+    push("クリ率", row.critRate ?? row.extraCritRatePct, "%");
+    push("攻撃ディレイ", row.attackDelay ?? row.attackDelayPct, "%");
+    push("ダメージカット", row.damageReduce ?? row.extraDamageReducePct, "%");
+
+    if (typeof additionalEffectsSummary === "function") {
+      try {
+        const extras = additionalEffectsSummary(row, "display");
+        if (Array.isArray(extras) && extras.length) parts.push(...extras);
+      } catch (_) {}
+    }
+
+    if (row.note) {
+      const note = String(row.note).trim();
+      if (note && note.length <= 120) parts.push(note);
+    }
+
+    return Array.from(new Set(parts)).slice(0, 10);
+  }
+
+  function buffContributionConflictGroups(row) {
+    const raw = [
+      row?.conflictGroup,
+      ...(Array.isArray(row?.conflictGroups) ? row.conflictGroups : []),
+      row?.equipBuffConflictGroup,
+      ...(Array.isArray(row?.equipBuffConflictGroups) ? row.equipBuffConflictGroups : [])
+    ]
+      .flat()
+      .map(x => String(x || "").trim())
+      .filter(Boolean);
+
+    return Array.from(new Set(raw));
+  }
+
+  function analyzeTopOptimizerBuffContribution() {
+    const top = (integratedOptimizerResults || []).find(result =>
+      result &&
+      Array.isArray(result.compositeIdxs) &&
+      result.compositeIdxs.length &&
+      result.metrics &&
+      !result.currentConfig &&
+      !result.baselineReference
+    ) || (integratedOptimizerResults || []).find(result =>
+      result &&
+      Array.isArray(result.compositeIdxs) &&
+      result.compositeIdxs.length &&
+      result.metrics
+    );
+
+    if (!top) return null;
+
+    const payload = optimizerLastPayload || {};
+    const inputs = {...(payload.inputs || {})};
+    const settings = buffContributionSettingsFromLastPayload();
+    const compositeRows = optimizerCompositeRows(settings);
+    const equipmentIdxs = Array.isArray(top.equipmentIdxs) ? top.equipmentIdxs : [];
+    const compositeIdxs = Array.from(new Set(top.compositeIdxs || [])).sort((a, b) => a - b);
+    const objective = settings.objective || "damage";
+    const baseRaw = optimizerObjectiveRawValue(top.metrics, objective);
+
+    const contributions = [];
+
+    compositeIdxs.forEach(idx => {
+      const row = compositeRows[idx];
+      if (!row) return;
+
+      const trialBuffIdxs = compositeIdxs.filter(x => x !== idx);
+      const evaluated = optimizerEvaluateBuffSelection(
+        equipmentIdxs,
+        trialBuffIdxs,
+        inputs,
+        settings
+      );
+
+      const removedRaw = optimizerObjectiveRawValue(evaluated.metrics, objective);
+      const loss = buffContributionLoss(baseRaw, removedRaw, objective);
+      const ratio = Math.abs(baseRaw) > 0.0000001
+        ? loss / Math.abs(baseRaw) * 100
+        : 0;
+
+      contributions.push({
+        idx,
+        row,
+        name: row.name || row.buffName || row.label || "名称未設定",
+        typeLabel: buffContributionTypeLabel(row),
+        baseRaw,
+        removedRaw,
+        loss,
+        ratio,
+        effects: buffContributionEffectParts(row),
+        conflicts: buffContributionConflictGroups(row),
+        invalidAfterRemoval:
+          evaluated.score <= OPTIMIZER_INVALID_SCORE / 2 ||
+          (evaluated.violations || []).length > 0
+      });
+    });
+
+    contributions.sort((a, b) => {
+      if (a.invalidAfterRemoval !== b.invalidAfterRemoval) {
+        return a.invalidAfterRemoval ? 1 : -1;
+      }
+      if (a.loss !== b.loss) return a.loss - b.loss;
+      return String(a.name).localeCompare(String(b.name), "ja");
+    });
+
+    return {
+      objective,
+      objectiveLabel: optimizerObjectiveLabel(objective),
+      baseRaw,
+      contributions,
+      evaluatedCount: contributions.length
+    };
+  }
+
+  function buffContributionValueText(value, objective) {
+    const suffix = objective === "extraCritRatePct" ||
+      objective === "extraDamageReducePct" ||
+      /Pct$/.test(objective)
+      ? "%"
+      : "";
+    return `${fmt(value, 2)}${suffix}`;
+  }
+
+  function buffContributionCardHtml(item, rank, objective) {
+    const effects = item.effects.length
+      ? item.effects.map(x => `<span>${escapeHtml(x)}</span>`).join("")
+      : `<span>効果要約なし</span>`;
+
+    const conflicts = item.conflicts.length
+      ? `<div class="small mutedText">競合: ${escapeHtml(item.conflicts.join(" / "))}</div>`
+      : "";
+
+    const recommendation = item.loss <= 0
+      ? "このBuffを外しても主目的が悪化していません。競合や副目的を確認しつつ、優先的に見直せます。"
+      : `現在の主目的では寄与が小さめです。維持コストや効果時間も含めて採用優先度を見直せます。`;
+
+    return `
+      <div class="optimizerContributionCard optimizerBuffContributionCard ${rank === 0 ? "isPrimary" : ""}">
+        <div class="optimizerContributionRank">${rank === 0 ? "最小寄与" : `候補${rank + 1}`}</div>
+        <div class="optimizerContributionMain">
+          <div class="optimizerContributionTitleRow">
+            <b>${escapeHtml(item.name)}</b>
+            <span class="small mutedText">${escapeHtml(item.typeLabel)}</span>
+          </div>
+          <div class="small">
+            外した場合の主目的低下:
+            <strong>${escapeHtml(buffContributionValueText(item.loss, objective))}</strong>
+            （${escapeHtml(fmt(item.ratio, 3))}%）
+          </div>
+          <div class="optimizerContributionEffects">${effects}</div>
+          ${conflicts}
+          <div class="small mutedText">${escapeHtml(recommendation)}</div>
+        </div>
+      </div>`;
+  }
+
+  function renderOptimizerBuffContribution() {
+    const equipmentPanel = byId("optimizerEquipmentContributionPanel");
+    const resultHost = byId("optimizerResults");
+    const anchor = equipmentPanel || resultHost;
+    if (!anchor) return;
+
+    let panel = byId("optimizerBuffContributionPanel");
+    if (!panel) {
+      panel = document.createElement("section");
+      panel.id = "optimizerBuffContributionPanel";
+      panel.className = "optimizerEquipmentContributionPanel optimizerBuffContributionPanel";
+      anchor.insertAdjacentElement("afterend", panel);
+    }
+
+    try {
+      const analysis = analyzeTopOptimizerBuffContribution();
+
+      if (!analysis || !analysis.contributions.length) {
+        panel.innerHTML = `<div class="small mutedText">Buff寄与分析を表示できる最適化結果がありません。</div>`;
+        return;
+      }
+
+      const shown = analysis.contributions.slice(0, 3);
+
+      panel.innerHTML = `
+        <div class="optimizerContributionHeader">
+          <div>
+            <h3>Buff見直しの目安</h3>
+            <div class="small mutedText">
+              1位構成の装備を固定し、Buffを1件ずつ外して
+              ${escapeHtml(analysis.objectiveLabel)}への単体寄与を比較しています。
+            </div>
+          </div>
+          <span class="small">${analysis.evaluatedCount}件を追加評価</span>
+        </div>
+        <div class="optimizerContributionCards">
+          ${shown.map((item, rank) =>
+            buffContributionCardHtml(item, rank, analysis.objective)
+          ).join("")}
+        </div>
+        <div class="small mutedText optimizerContributionNote">
+          Buffを外しても競合相手が自動で代替されるわけではありません。
+          現在の採用構成内での単体寄与を見るための目安です。
+        </div>`;
+    } catch (error) {
+      panel.innerHTML = `
+        <div class="small badText">
+          Buff寄与分析エラー: ${escapeHtml(error?.message || String(error))}
+        </div>`;
+    }
+  }
+
+  renderIntegratedOptimizerResults = function renderIntegratedOptimizerResultsWithBuffContributionV1() {
+    const out = baseRenderIntegratedOptimizerResults.apply(this, arguments);
+    renderOptimizerBuffContribution();
+    return out;
+  };
+
+  renderIntegratedOptimizerResults.__buffContributionV1 = true;
+  window.renderOptimizerBuffContribution = renderOptimizerBuffContribution;
+})();
+
+/* __MOE_OPTIMIZER_REPLACEMENT_THRESHOLDS_V1__
+ * 最小寄与の装備/Buffを外した状態へ仮想ステータスを1種類ずつ追加し、
+ * 元の主目的値を回復する最小量を二分探索する。
+ */
+(function installOptimizerReplacementThresholdsV1() {
+  if (typeof renderIntegratedOptimizerResults !== "function") return;
+  if (renderIntegratedOptimizerResults.__replacementThresholdsV1) return;
+
+  const baseRenderIntegratedOptimizerResults = renderIntegratedOptimizerResults;
+
+  function replacementSettings() {
+    const payload = optimizerLastPayload || {};
+    const settings = {...(payload.settings || {})};
+    const payloadState = payload.state || state || {};
+
+    settings._equipmentRows = normalizeEquipmentRows(
+      Array.isArray(payloadState.equipment) ? payloadState.equipment : (state.equipment || [])
+    );
+    settings._compositeRows = normalizeCompositeRows(
+      Array.isArray(payloadState.composite) ? payloadState.composite : (state.composite || [])
+    );
+    settings._otherRows = Array.isArray(payloadState.other)
+      ? payloadState.other
+      : (Array.isArray(state.other) ? state.other : []);
+    settings._postRows = Array.isArray(payloadState.post)
+      ? payloadState.post
+      : (Array.isArray(state.post) ? state.post : []);
+    settings._evaluationCache = new Map();
+    settings._equipmentConflictKeyCache = new Map();
+    return settings;
+  }
+
+  function topOptimizationResult(requireBuff=false) {
+    const list = integratedOptimizerResults || [];
+    const preferred = list.find(result =>
+      result &&
+      Array.isArray(result.equipmentIdxs) &&
+      result.equipmentIdxs.length &&
+      result.metrics &&
+      (!requireBuff || (Array.isArray(result.compositeIdxs) && result.compositeIdxs.length)) &&
+      !result.currentConfig &&
+      !result.baselineReference
+    );
+    if (preferred) return preferred;
+
+    return list.find(result =>
+      result &&
+      Array.isArray(result.equipmentIdxs) &&
+      result.equipmentIdxs.length &&
+      result.metrics &&
+      (!requireBuff || (Array.isArray(result.compositeIdxs) && result.compositeIdxs.length))
+    ) || null;
+  }
+
+  function objectiveLoss(baseRaw, changedRaw, objective) {
+    return optimizerObjectiveIsMinimize(objective)
+      ? changedRaw - baseRaw
+      : baseRaw - changedRaw;
+  }
+
+  function objectiveRecovered(raw, targetRaw, objective) {
+    const epsilon = Math.max(1e-7, Math.abs(targetRaw) * 1e-9);
+    return optimizerObjectiveIsMinimize(objective)
+      ? raw <= targetRaw + epsilon
+      : raw >= targetRaw - epsilon;
+  }
+
+  function replacementCandidates(objective) {
+    if (objective === "damage") {
+      return [
+        {label:"攻撃力", field:"attack", initial:1, max:1000, step:0.1},
+        {label:"攻撃力", field:"attackPct", suffix:"%", initial:0.5, max:300, step:0.1},
+        {label:"ダメージ", field:"dmgPct", suffix:"%", initial:0.25, max:300, step:0.1},
+        {label:"クリティカル率", field:"extraCritRatePct", suffix:"%", initial:0.5, max:200, step:0.1}
+      ];
+    }
+    if (objective === "attack") {
+      return [
+        {label:"攻撃力", field:"attack", initial:1, max:2000, step:0.1},
+        {label:"攻撃力", field:"attackPct", suffix:"%", initial:0.5, max:500, step:0.1}
+      ];
+    }
+    if (objective === "magic") {
+      return [{label:"魔力", field:"magic", initial:1, max:2000, step:0.1}];
+    }
+    if (objective === "speed") {
+      return [{label:"移動速度", field:"speed", initial:0.5, max:500, step:0.1}];
+    }
+    if (String(objective || "").startsWith("extra")) {
+      return [{
+        label: TOOL_STAT_DISPLAY_NAMES[objective] || objective,
+        field: objective,
+        suffix: /Pct$/.test(objective) ? "%" : "",
+        initial:0.5,
+        max:5000,
+        step:0.1
+      }];
+    }
+    return [];
+  }
+
+  function evaluateWithSyntheticStat(equipmentIdxs, compositeIdxs, inputs, settings, candidate, amount) {
+    const st = optimizerStateForSelection(equipmentIdxs, compositeIdxs, settings);
+
+    const synthetic = {
+      name:"寄与分析用 仮想効果",
+      enabled:true,
+      excluded:false,
+      fixed:true,
+      conflictGroup:"",
+      conflictGroups:[],
+      [candidate.field]:amount
+    };
+
+    st.other = [
+      ...(Array.isArray(st.other) ? st.other : []),
+      synthetic
+    ];
+
+    const metrics = computeMetrics(st, inputs);
+    return {
+      metrics,
+      raw: optimizerObjectiveRawValue(metrics, settings.objective || "damage")
+    };
+  }
+
+  function findRequiredAmount(equipmentIdxs, compositeIdxs, inputs, settings, targetRaw, candidate) {
+    let high = candidate.initial;
+    let highRaw = null;
+
+    while (high <= candidate.max) {
+      const evaluated = evaluateWithSyntheticStat(
+        equipmentIdxs,
+        compositeIdxs,
+        inputs,
+        settings,
+        candidate,
+        high
+      );
+      highRaw = evaluated.raw;
+
+      if (objectiveRecovered(highRaw, targetRaw, settings.objective || "damage")) break;
+      high *= 2;
+    }
+
+    if (high > candidate.max || highRaw === null ||
+        !objectiveRecovered(highRaw, targetRaw, settings.objective || "damage")) {
+      return null;
+    }
+
+    let low = 0;
+    for (let i = 0; i < 16; i++) {
+      const mid = (low + high) / 2;
+      const evaluated = evaluateWithSyntheticStat(
+        equipmentIdxs,
+        compositeIdxs,
+        inputs,
+        settings,
+        candidate,
+        mid
+      );
+
+      if (objectiveRecovered(evaluated.raw, targetRaw, settings.objective || "damage")) {
+        high = mid;
+      } else {
+        low = mid;
+      }
+    }
+
+    const step = candidate.step || 0.1;
+    return Math.ceil(high / step - 1e-9) * step;
+  }
+
+  function analyzeWeakestEquipment() {
+    const top = topOptimizationResult(false);
+    if (!top) return null;
+
+    const payload = optimizerLastPayload || {};
+    const inputs = {...(payload.inputs || {})};
+    const settings = replacementSettings();
+    const rows = optimizerEquipmentRows(settings);
+    const objective = settings.objective || "damage";
+    const baseRaw = optimizerObjectiveRawValue(top.metrics, objective);
+    const equipmentIdxs = optimizerCanonicalEquipmentIdxs(top.equipmentIdxs || [], settings);
+    const compositeIdxs = Array.isArray(top.compositeIdxs) ? top.compositeIdxs : [];
+
+    const contributions = equipmentIdxs.map(idx => {
+      const trial = equipmentIdxs.filter(x => x !== idx);
+      const evaluated = optimizerEvaluateBuffSelection(trial, compositeIdxs, inputs, settings);
+      const raw = optimizerObjectiveRawValue(evaluated.metrics, objective);
+      return {
+        idx,
+        row:rows[idx],
+        trialEquipmentIdxs:trial,
+        compositeIdxs,
+        loss:objectiveLoss(baseRaw, raw, objective),
+        invalid:(evaluated.violations || []).length > 0 ||
+          evaluated.score <= OPTIMIZER_INVALID_SCORE / 2
+      };
+    }).filter(x => x.row);
+
+    contributions.sort((a,b) => {
+      if (a.invalid !== b.invalid) return a.invalid ? 1 : -1;
+      return a.loss - b.loss;
+    });
+
+    const weakest = contributions[0];
+    if (!weakest || weakest.invalid) return null;
+
+    return {top, inputs, settings, objective, baseRaw, weakest};
+  }
+
+  function analyzeWeakestBuff() {
+    const top = topOptimizationResult(true);
+    if (!top) return null;
+
+    const payload = optimizerLastPayload || {};
+    const inputs = {...(payload.inputs || {})};
+    const settings = replacementSettings();
+    const rows = optimizerCompositeRows(settings);
+    const objective = settings.objective || "damage";
+    const baseRaw = optimizerObjectiveRawValue(top.metrics, objective);
+    const equipmentIdxs = Array.isArray(top.equipmentIdxs) ? top.equipmentIdxs : [];
+    const compositeIdxs = Array.from(new Set(top.compositeIdxs || [])).sort((a,b) => a-b);
+
+    const contributions = compositeIdxs.map(idx => {
+      const trial = compositeIdxs.filter(x => x !== idx);
+      const evaluated = optimizerEvaluateBuffSelection(equipmentIdxs, trial, inputs, settings);
+      const raw = optimizerObjectiveRawValue(evaluated.metrics, objective);
+      return {
+        idx,
+        row:rows[idx],
+        equipmentIdxs,
+        trialCompositeIdxs:trial,
+        loss:objectiveLoss(baseRaw, raw, objective),
+        invalid:(evaluated.violations || []).length > 0 ||
+          evaluated.score <= OPTIMIZER_INVALID_SCORE / 2
+      };
+    }).filter(x => x.row);
+
+    contributions.sort((a,b) => {
+      if (a.invalid !== b.invalid) return a.invalid ? 1 : -1;
+      return a.loss - b.loss;
+    });
+
+    const weakest = contributions[0];
+    if (!weakest || weakest.invalid) return null;
+
+    return {top, inputs, settings, objective, baseRaw, weakest};
+  }
+
+  function calculateThresholds(analysis, kind) {
+    if (!analysis) return [];
+
+    const candidates = replacementCandidates(analysis.objective);
+    const equipmentIdxs = kind === "equipment"
+      ? analysis.weakest.trialEquipmentIdxs
+      : analysis.weakest.equipmentIdxs;
+    const compositeIdxs = kind === "equipment"
+      ? analysis.weakest.compositeIdxs
+      : analysis.weakest.trialCompositeIdxs;
+
+    return candidates.map(candidate => {
+      const amount = findRequiredAmount(
+        equipmentIdxs,
+        compositeIdxs,
+        analysis.inputs,
+        analysis.settings,
+        analysis.baseRaw,
+        candidate
+      );
+      return amount === null ? null : {...candidate, amount};
+    }).filter(Boolean).slice(0, 4);
+  }
+
+  function thresholdHtml(title, thresholds) {
+    if (!thresholds.length) {
+      return `
+        <div class="optimizerReplacementThresholds">
+          <b>${escapeHtml(title)}</b>
+          <div class="small mutedText">
+            現在の条件では、単一ステータスだけで元の主目的値へ戻る目安を算出できませんでした。
+          </div>
+        </div>`;
+    }
+
+    return `
+      <div class="optimizerReplacementThresholds">
+        <b>${escapeHtml(title)}</b>
+        <div class="optimizerReplacementThresholdChips">
+          ${thresholds.map(item =>
+            `<span>${escapeHtml(item.label)} +${escapeHtml(fmt(item.amount, 1))}${escapeHtml(item.suffix || "")}以上</span>`
+          ).join("")}
+        </div>
+        <div class="small mutedText">
+          各項目を単独で付与した場合に、元の主目的値へ戻る推定最小量です。
+        </div>
+      </div>`;
+  }
+
+  function appendReplacementThresholds() {
+    try {
+      const equipment = analyzeWeakestEquipment();
+      const equipmentPanel = byId("optimizerEquipmentContributionPanel");
+      if (equipment && equipmentPanel) {
+        const card = equipmentPanel.querySelector(".optimizerContributionCard.isPrimary");
+        if (card && !card.querySelector(".optimizerReplacementThresholds")) {
+          card.querySelector(".optimizerContributionMain")?.insertAdjacentHTML(
+            "beforeend",
+            thresholdHtml(
+              "更新できるステータスの目安",
+              calculateThresholds(equipment, "equipment")
+            )
+          );
+        }
+      }
+
+      const buff = analyzeWeakestBuff();
+      const buffPanel = byId("optimizerBuffContributionPanel");
+      if (buff && buffPanel) {
+        const card = buffPanel.querySelector(".optimizerContributionCard.isPrimary");
+        if (card && !card.querySelector(".optimizerReplacementThresholds")) {
+          card.querySelector(".optimizerContributionMain")?.insertAdjacentHTML(
+            "beforeend",
+            thresholdHtml(
+              "代替Buffの効果量目安",
+              calculateThresholds(buff, "buff")
+            )
+          );
+        }
+      }
+    } catch (error) {
+      console.warn("optimizer replacement threshold analysis failed", error);
+    }
+  }
+
+  renderIntegratedOptimizerResults = function renderIntegratedOptimizerResultsWithReplacementThresholdsV1() {
+    const out = baseRenderIntegratedOptimizerResults.apply(this, arguments);
+    appendReplacementThresholds();
+    return out;
+  };
+
+  renderIntegratedOptimizerResults.__replacementThresholdsV1 = true;
+  window.appendOptimizerReplacementThresholds = appendReplacementThresholds;
+})();
