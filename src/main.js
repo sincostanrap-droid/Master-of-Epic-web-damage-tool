@@ -5,8 +5,8 @@
   onclick属性から呼ばれる関数があるため、現時点では module ではなく通常scriptとして読み込みます。
 */
 
-const APP_VERSION = "v1.23.63";
-const APP_VERSION_NOTE = "装備・Buffの代替ステータス目安を追加";
+const APP_VERSION = "v1.23.64";
+const APP_VERSION_NOTE = "装備カタログのキャッシュページ送りを修正";
 
 /* 種族係数。攻撃力係数と魔力係数は別管理。 */
 const RACE_COEFFS = {
@@ -16282,7 +16282,8 @@ function renderAnalysisPanel() {
     ready: false,
     applying: false,
     sourceSignature: "",
-    lastRenderedPage: -1
+    lastRenderedPage: -1,
+    page: 0
   };
 
   function applySearch(resetPage=true) {
@@ -16310,10 +16311,11 @@ function renderAnalysisPanel() {
       cache.total = items.length;
       cache.ready = true;
 
-      if (resetPage && typeof global.catalogResetPage === "function") {
-        global.catalogResetPage();
-      } else if (resetPage) {
-        global.catalogPageIndex = 0;
+      if (resetPage) {
+        cache.page = 0;
+        if (typeof global.catalogResetPage === "function") {
+          global.catalogResetPage();
+        }
       }
 
       renderPage();
@@ -16321,6 +16323,36 @@ function renderAnalysisPanel() {
     } finally {
       cache.applying = false;
     }
+  }
+
+  function renderCachedPageControls(filteredLength, pageCount, limit) {
+    const box = typeof global.byId === "function"
+      ? global.byId("catalogPageControls")
+      : document.getElementById("catalogPageControls");
+    if (!box) return;
+
+    const page = cache.page;
+    const start = filteredLength ? page * limit + 1 : 0;
+    const end = filteredLength ? Math.min(filteredLength, (page + 1) * limit) : 0;
+
+    box.innerHTML = `
+      <button type="button" id="catalogPrevPage" ${page <= 0 ? "disabled" : ""}>前へ</button>
+      <span class="small">${pageCount ? page + 1 : 0} / ${pageCount || 0} ページ（${start}-${end} / ${filteredLength}件）</span>
+      <button type="button" id="catalogNextPage" ${page >= pageCount - 1 ? "disabled" : ""}>次へ</button>
+    `;
+
+    const prev = document.getElementById("catalogPrevPage");
+    const next = document.getElementById("catalogNextPage");
+
+    if (prev) prev.onclick = () => {
+      cache.page = Math.max(0, cache.page - 1);
+      renderPage();
+    };
+
+    if (next) next.onclick = () => {
+      cache.page = Math.min(Math.max(0, pageCount - 1), cache.page + 1);
+      renderPage();
+    };
   }
 
   function renderPage() {
@@ -16343,15 +16375,15 @@ function renderAnalysisPanel() {
     const limit = Math.max(25, Math.min(1000, +(filter.limit || 200)));
     const pageCount = filtered.length ? Math.ceil(filtered.length / limit) : 0;
 
-    global.catalogPageIndex = Math.max(
+    cache.page = Math.max(
       0,
       Math.min(
-        +(global.catalogPageIndex || 0),
+        +(cache.page || 0),
         Math.max(0, pageCount - 1)
       )
     );
 
-    const start = global.catalogPageIndex * limit;
+    const start = cache.page * limit;
     const shown = filtered.slice(start, start + limit);
     const already = typeof global.registeredCatalogIds === "function"
       ? global.registeredCatalogIds()
@@ -16374,14 +16406,11 @@ function renderAnalysisPanel() {
       `カタログ ${cache.total}件 / 該当 ${filtered.length}件 / 表示 ${shown.length}件` +
       (statText ? ` / ${statText}` : "");
 
-    if (typeof global.renderCatalogPageControls === "function") {
-      global.renderCatalogPageControls(
-        filtered.length,
-        global.catalogPageIndex,
-        pageCount,
-        limit
-      );
-    }
+    renderCachedPageControls(
+      filtered.length,
+      pageCount,
+      limit
+    );
 
     body.querySelectorAll("[data-catalog-add]").forEach(btn => {
       btn.onclick = () => {
@@ -17443,3 +17472,5 @@ function renderAnalysisPanel() {
   renderIntegratedOptimizerResults.__replacementThresholdsV1 = true;
   window.appendOptimizerReplacementThresholds = appendReplacementThresholds;
 })();
+
+/* __MOE_EQUIPMENT_CATALOG_CACHE_PAGINATION_V2__ */
