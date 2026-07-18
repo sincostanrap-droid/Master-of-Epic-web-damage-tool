@@ -1,3 +1,10 @@
+/* ============================================================
+ * main.js organization note
+ * This file is intentionally kept as a single module.
+ * Refactoring phase 1: comments/organization only.
+ * No behavioral changes.
+ * ============================================================ */
+
 /*
   Master of Epic 物理ダメージ計算webツール
   Split version: main application script.
@@ -5,8 +12,8 @@
   onclick属性から呼ばれる関数があるため、現時点では module ではなく通常scriptとして読み込みます。
 */
 
-const APP_VERSION = "v1.23.64";
-const APP_VERSION_NOTE = "装備カタログのキャッシュページ送りを修正";
+const APP_VERSION = "v1.23.73";
+const APP_VERSION_NOTE = "最適化のメイン武器種指定・仮想空欄・武器探索順を修正";
 
 /* 種族係数。攻撃力係数と魔力係数は別管理。 */
 const RACE_COEFFS = {
@@ -7626,7 +7633,54 @@ function weaponRowHasCalcData(row) {
 function selectedWeaponForCalc(st) {
   const rows = normalizeEquipmentRows(st?.equipment).filter(r => r.enabled !== false && isWeaponEquipmentRow(r));
   const withData = rows.filter(weaponRowHasCalcData);
-  return withData.find(r => r.slot === "武器: 右手") || withData[0] || null;
+  // 「武器: 弾丸」は武器本体ではない。右手、左手の順で計算武器を選ぶ。
+  return withData.find(r => r.slot === "武器: 右手")
+    || withData.find(r => r.slot === "武器: 左手")
+    || withData.find(r => r.slot !== "武器: 弾丸")
+    || null;
+}
+
+function selectedAmmoForCalc(st) {
+  return normalizeEquipmentRows(st?.equipment)
+    .find(r => r.enabled !== false && r.slot === "武器: 弾丸" && weaponRowHasCalcData(r))
+    || null;
+}
+
+function projectileWeaponKind(row) {
+  if (!row) return "";
+  const reqNames = normalizeWeaponReqRowsForEquipment(row.weaponReq).map(r => String(r.name || ""));
+  if (reqNames.some(name => name === "弓")) return "bow";
+  if (reqNames.some(name => name === "銃器")) return "gun";
+  const name = String(row.name || "");
+  if (/弓|ボウ|bow/i.test(name)) return "bow";
+  if (/銃|ガン|ライフル|キャノン|gun|rifle|cannon/i.test(name)) return "gun";
+  return "";
+}
+
+function effectiveWeaponStats(st) {
+  const weapon = selectedWeaponForCalc(st);
+  const kind = projectileWeaponKind(weapon);
+  const ammo = kind ? selectedAmmoForCalc(st) : null;
+  const weaponDamage = +weapon?.weaponDamage || 0;
+  const ammoDamage = +ammo?.weaponDamage || 0;
+  const weaponRange = +weapon?.weaponRange || 0;
+  const ammoRange = +ammo?.weaponRange || 0;
+  return {
+    weapon,
+    ammo,
+    kind,
+    usesAmmo: !!kind,
+    damage: weaponDamage + (kind ? ammoDamage : 0),
+    range: weaponRange + (kind ? ammoRange : 0),
+    weaponDamage,
+    ammoDamage: kind ? ammoDamage : 0,
+    weaponRange,
+    ammoRange: kind ? ammoRange : 0,
+    weight: +weapon?.weaponWeight || 0,
+    attackInterval: +weapon?.weaponAttackInterval || 0,
+    durability: +weapon?.weaponDurability || 0,
+    twoHanded: weapon?.weaponTwoHanded || "×"
+  };
 }
 
 function selectedWeaponRowForEdit() {
@@ -8669,7 +8723,8 @@ function weaponCalcStatusText(row) {
 function updateSelectedWeaponCalcSummary(m=null) {
   const el = byId("selectedWeaponCalcSummary");
   if (!el) return;
-  const w = selectedWeaponForCalc(state);
+  const effective = effectiveWeaponStats(state);
+  const w = effective.weapon;
   if (!w) {
     el.innerHTML = `装備登録タブの武器詳細が未設定です。武器ダメージ0 / 使用条件なしとして計算しています。`;
     return;
@@ -8677,18 +8732,24 @@ function updateSelectedWeaponCalcSummary(m=null) {
   const reqText = weaponReqRowsWithSkillSimCurrent(w.weaponReq).filter(r => +r.required)
     .map(r => `${escapeHtml(r.name)} ${fmt(r.current,1)}/${fmt(r.required,1)}`)
     .join(" / ") || "条件なし";
+  const ammoLine = effective.usesAmmo
+    ? `矢・弾: ${effective.ammo ? escapeHtml(effective.ammo.name || "名称未入力") : "未設定"} / ダメージ ${fmt(effective.ammoDamage,1)} / 射程 ${fmt(effective.ammoRange,1)}`
+    : "";
   el.innerHTML = [
     `<b>${escapeHtml((w.slot || "武器").replace(/^武器: /, ""))}: ${escapeHtml(w.name || "名称未入力")}</b>`,
-    `武器ダメージ ${fmt(+w.weaponDamage || 0,1)} / 武器重量 ${fmt(+w.weaponWeight || 0,1)} / 攻撃間隔 ${fmt(+w.weaponAttackInterval || 0,1)} / 射程 ${fmt(+w.weaponRange || 0,1)} / 耐久 ${fmt(+w.weaponDurability || 0,0)} / 両手 ${escapeHtml(w.weaponTwoHanded || "×")}`,
+    `合計ダメージ ${fmt(effective.damage,1)}（本体 ${fmt(effective.weaponDamage,1)}${effective.usesAmmo ? ` + 矢・弾 ${fmt(effective.ammoDamage,1)}` : ""}） / 武器重量 ${fmt(effective.weight,1)} / 攻撃間隔 ${fmt(effective.attackInterval,1)} / 合計射程 ${fmt(effective.range,1)} / 耐久 ${fmt(effective.durability,0)} / 両手 ${escapeHtml(effective.twoHanded)}`,
+    ammoLine,
     `使用条件: ${reqText}`
-  ].map(x => `<div>${x}</div>`).join("");
+  ].filter(Boolean).map(x => `<div>${x}</div>`).join("");
 }
 
 function syncSelectedWeaponToHiddenInputs() {
-  const w = selectedWeaponForCalc(state);
+  const effective = effectiveWeaponStats(state);
+  const w = effective.weapon;
   if (!w) return;
-  if (byId("weaponDamage")) byId("weaponDamage").value = +w.weaponDamage || 0;
-  if (byId("weaponWeight")) byId("weaponWeight").value = +w.weaponWeight || 0;
+  if (byId("weaponDamage")) byId("weaponDamage").value = effective.damage;
+  if (byId("weaponWeight")) byId("weaponWeight").value = effective.weight;
+  if (byId("weaponRange")) byId("weaponRange").value = effective.range;
   const reqs = weaponReqRowsWithSkillSimCurrent(w.weaponReq);
   if (reqs[0]) {
     if (byId("weaponSkill")) byId("weaponSkill").value = +reqs[0].current || 0;
@@ -9599,6 +9660,7 @@ function integratedOptimizerSettings() {
     buffBeamWidth: Math.max(20, parseInt(byId("optimizerBuffBeamWidth")?.value, 10) || 120),
     localPasses: Math.max(1, parseInt(byId("optimizerLocalPasses")?.value, 10) || 8),
     objective: byId("optimizerObjective")?.value || "damage",
+    mainWeaponSkill: optimizerResolvedMainWeaponSkill(byId("optimizerMainWeaponSkill")?.value || ""),
     secondaryObjective: byId("optimizerSecondaryObjective")?.value || "",
     targetValueRaw: byId("optimizerTargetValue")?.value ?? "",
     targetOverRaw: byId("optimizerTargetOver")?.value ?? "",
@@ -9647,6 +9709,7 @@ const OPTIMIZER_MINIMIZE_OBJECTIVES = Object.freeze(new Set([
 ]));
 
 function optimizerObjectiveRawValue(m, objective) {
+  if (objective === "skillPlus") return +(m.skillPlusScore || 0);
   if (objective === "attack") return m.atk;
   if (objective === "magic") return m.stats.magic;
   if (objective === "speed") return m.stats.speed;
@@ -9859,6 +9922,8 @@ function optimizerPrepareRunCaches(settings) {
   settings._evaluationCache = new Map();
   settings._compositeCandidates = null;
   settings._equipmentConflictKeyCache = new Map();
+  settings._optimizerVirtualBlankBySlot = new Map();
+  settings._mainWeaponAnchorSlot = "";
   settings.optimizerEvalCount = 0;
   settings.optimizerCacheHits = 0;
 }
@@ -9925,33 +9990,76 @@ function optimizerEquipmentConflictKeysForIndex(idx, settings) {
 }
 
 
+function optimizerVirtualBlankCandidate(slot, settings) {
+  const rows = optimizerEquipmentRows(settings);
+  if (settings) {
+    if (!settings._optimizerVirtualBlankBySlot) settings._optimizerVirtualBlankBySlot = new Map();
+    const cached = settings._optimizerVirtualBlankBySlot.get(slot);
+    if (cached) return cached;
+  }
+
+  // 最適化専用の空欄候補。state.equipment へは追加しない。
+  // 選択されても実データには存在しないため、適用時は単にそのスロットが全OFFになる。
+  const row = defaultEquipmentCandidate(slot, false);
+  row.__optimizerVirtualBlank = true;
+  rows.push(row);
+  const candidate = {row, idx: rows.length - 1};
+  if (settings) settings._optimizerVirtualBlankBySlot.set(slot, candidate);
+  return candidate;
+}
+
+function optimizerMainWeaponAnchorSlot(groups, settings) {
+  const skill = String(settings?.mainWeaponSkill || "");
+  if (!skill) return "";
+
+  const handGroups = (groups || []).filter(group =>
+    group.slot === "武器: 右手" || group.slot === "武器: 左手"
+  );
+  const ranked = handGroups
+    .map(group => ({
+      slot: group.slot,
+      count: (group.candidates || []).filter(cand => optimizerRowMatchesMainWeaponSkill(cand.row, skill)).length
+    }))
+    .filter(x => x.count > 0)
+    .sort((a, b) => b.count - a.count || (a.slot === "武器: 右手" ? -1 : 1));
+  return ranked[0]?.slot || "";
+}
+
 function optimizerEquipmentGroups(settings) {
   const rows = optimizerEquipmentRows(settings);
-  return EQUIPMENT_SLOTS.map(({slot}) => {
+  const groups = EQUIPMENT_SLOTS.map(({slot}) => {
     let candidates = rows
       .map((row, idx) => ({row, idx}))
       .filter(x => x.row.slot === slot && equipmentCandidateHasData(x.row));
 
     const fixed = candidates.filter(x => x.row.optimizerFixed && !x.row.optimizerExcluded);
     if (fixed.length) {
+      // 固定装備は外せないため、仮想空欄を追加しない。
       candidates = fixed.slice(0, 1);
     } else {
       candidates = candidates.filter(x => !x.row.optimizerExcluded);
-    }
-
-    if (!candidates.length) {
-      const blank = defaultEquipmentCandidate(slot, false);
-      if (settings && settings._equipmentRows) {
-        settings._equipmentRows.push(blank);
-        state.equipment.push(blank);
-        candidates = [{row: blank, idx: settings._equipmentRows.length - 1}];
-      } else {
-        state.equipment.push(blank);
-        candidates = [{row: state.equipment[state.equipment.length - 1], idx: state.equipment.length - 1}];
-      }
+      // 候補が存在するスロットにも必ず空欄を用意する。
+      // これにより、右手候補を武器種で除外した後でも左手武器を探索できる。
+      candidates.unshift(optimizerVirtualBlankCandidate(slot, settings));
     }
     return {slot, candidates};
   });
+
+  const anchorSlot = optimizerMainWeaponAnchorSlot(groups, settings);
+  if (settings) settings._mainWeaponAnchorSlot = anchorSlot;
+  if (!anchorSlot) return groups;
+
+  // 指定武器を最初に確定してから途中評価する。
+  // 武器未装備の途中構成が高得点という理由で、指定武器の経路が枝刈りされるのを防ぐ。
+  const priority = new Map([
+    [anchorSlot, 0],
+    [anchorSlot === "武器: 右手" ? "武器: 左手" : "武器: 右手", 1],
+    ["武器: 弾丸", 2]
+  ]);
+  return groups.slice().sort((a, b) =>
+    (priority.get(a.slot) ?? 100 + (OPTIMIZER_EQUIPMENT_SLOT_ORDER.get(a.slot) ?? 9999))
+    - (priority.get(b.slot) ?? 100 + (OPTIMIZER_EQUIPMENT_SLOT_ORDER.get(b.slot) ?? 9999))
+  );
 }
 
 function optimizerStateForSelection(equipmentIdxs, compositeIdxs, settings=null) {
@@ -10057,8 +10165,159 @@ function optimizerDedupeResultsByEquipment(results, settings=null) {
 }
 
 
+
+const OPTIMIZER_MAIN_WEAPON_SKILLS = Object.freeze([
+  "素手", "刀剣", "こんぼう", "槍", "弓", "銃器", "投げ"
+]);
+
+function optimizerWeaponSkillNames(row) {
+  if (!row) return [];
+  return normalizeWeaponReqRowsForEquipment(row.weaponReq)
+    .map(req => validSkillSimSkillName(String(req?.name || ""), ""))
+    .filter(name => OPTIMIZER_MAIN_WEAPON_SKILLS.includes(name));
+}
+
+function optimizerCurrentMainWeaponSkill() {
+  const rows = normalizeEquipmentRows(state.equipment);
+  const enabledHands = rows.filter(row =>
+    row?.enabled !== false
+    && (row?.slot === "武器: 右手" || row?.slot === "武器: 左手")
+    && weaponRowHasCalcData(row)
+  );
+  for (const row of enabledHands) {
+    const skill = optimizerWeaponSkillNames(row)[0];
+    if (skill) return skill;
+  }
+  const simulated = validSkillSimSkillName(String(state.skillSim?.weaponSkill || ""), "");
+  return OPTIMIZER_MAIN_WEAPON_SKILLS.includes(simulated) ? simulated : "";
+}
+
+function optimizerResolvedMainWeaponSkill(value) {
+  const raw = String(value || "");
+  if (raw === "current") return optimizerCurrentMainWeaponSkill();
+  return OPTIMIZER_MAIN_WEAPON_SKILLS.includes(raw) ? raw : "";
+}
+
+function optimizerRowMatchesMainWeaponSkill(row, skill) {
+  if (!skill || !row || !weaponRowHasCalcData(row)) return false;
+  return optimizerWeaponSkillNames(row).includes(skill);
+}
+
+function optimizerSelectionHasMainWeapon(equipmentIdxs, settings=null) {
+  const skill = String(settings?.mainWeaponSkill || "");
+  if (!skill) return true;
+  const rows = optimizerEquipmentRows(settings);
+  return (equipmentIdxs || []).some(idx => optimizerRowMatchesMainWeaponSkill(rows[idx], skill));
+}
+
+function optimizerAmmoKind(row) {
+  if (!row || row.slot !== "武器: 弾丸") return "";
+  const text = [
+    row.name,
+    row.tags,
+    row.note,
+    row.category,
+    row.catalogCategory,
+    row.itemType,
+    row.sourceType
+  ].filter(Boolean).join(" ");
+  if (/アロー|矢|arrow/i.test(text)) return "bow";
+  if (/バレット|銃弾|砲弾|弾丸|bullet|shell|round/i.test(text)) return "gun";
+  return "";
+}
+
+function optimizerSelectedWeaponRow(selectedIdxs, settings=null) {
+  const rows = optimizerEquipmentRows(settings);
+  const selectedRows = (selectedIdxs || []).map(idx => rows[idx]).filter(Boolean);
+  const withData = selectedRows.filter(row => row.slot !== "武器: 弾丸" && weaponRowHasCalcData(row));
+  return withData.find(row => row.slot === "武器: 右手")
+    || withData.find(row => row.slot === "武器: 左手")
+    || null;
+}
+
+/* 明示された両手武器フラグに加え、弓は両手占有として扱う。
+   銃器など他の武器種はフラグがない限り両手扱いしない。 */
+function optimizerWeaponUsesBothHands(row) {
+  if (!row || !weaponRowHasCalcData(row)) return false;
+  if (optimizerWeaponSkillNames(row).includes("弓")) return true;
+  const value = row.weaponTwoHanded ?? row.twoHanded;
+  return value === true
+    || value === 1
+    || value === "1"
+    || value === "○"
+    || String(value ?? "").trim().toLowerCase() === "true"
+    || String(value ?? "").trim().toLowerCase() === "yes";
+}
+
+function optimizerSelectedHandRow(selectedIdxs, slot, settings=null) {
+  const rows = optimizerEquipmentRows(settings);
+  return (selectedIdxs || [])
+    .map(idx => rows[idx])
+    .find(row => row?.slot === slot && equipmentCandidateHasData(row)) || null;
+}
+
+function optimizerEquipmentHandednessWouldConflict(selectedIdxs, candidateIdx, settings=null) {
+  const rows = optimizerEquipmentRows(settings);
+  const candidate = rows[candidateIdx];
+  if (!candidate || !equipmentCandidateHasData(candidate)) return false;
+  if (candidate.slot !== "武器: 右手" && candidate.slot !== "武器: 左手") return false;
+
+  const oppositeSlot = candidate.slot === "武器: 右手" ? "武器: 左手" : "武器: 右手";
+  const opposite = optimizerSelectedHandRow(selectedIdxs, oppositeSlot, settings);
+  if (!opposite) return false;
+
+  return optimizerWeaponUsesBothHands(candidate) || optimizerWeaponUsesBothHands(opposite);
+}
+
+function optimizerEquipmentCandidatesForSelection(group, selectedIdxs, settings=null) {
+  const candidates = group?.candidates || [];
+
+  if (group?.slot === "武器: 右手" || group?.slot === "武器: 左手") {
+    return candidates.filter(cand => {
+      if (optimizerEquipmentHandednessWouldConflict(selectedIdxs, cand.idx, settings)) return false;
+      const skill = String(settings?.mainWeaponSkill || "");
+      if (!skill) return true;
+
+      // 指定武器を持つアンカースロットでは、その武器種だけを候補にする。
+      // これによりビーム探索の初手から必ず実武器を装備した状態で比較できる。
+      if (group.slot === settings?._mainWeaponAnchorSlot) {
+        return optimizerRowMatchesMainWeaponSkill(cand.row, skill);
+      }
+
+      // 反対側は空欄・盾・本などを許可する。別武器種は混在させない。
+      if (!equipmentCandidateHasData(cand.row)) return true;
+      if (!weaponRowHasCalcData(cand.row)) return true;
+      return optimizerRowMatchesMainWeaponSkill(cand.row, skill);
+    });
+  }
+
+  if (group?.slot !== "武器: 弾丸") return candidates;
+
+  const weaponKind = projectileWeaponKind(optimizerSelectedWeaponRow(selectedIdxs, settings));
+  return candidates.filter(cand => {
+    // 空欄候補は常に残す。近接武器では空欄だけとなり、矢・弾を探索しない。
+    if (!equipmentCandidateHasData(cand.row)) return true;
+    if (!weaponKind) return false;
+    const ammoKind = optimizerAmmoKind(cand.row);
+    // 既存手入力など種類を判定できない弾薬は、後方互換のため飛び道具では候補に残す。
+    return !ammoKind || ammoKind === weaponKind;
+  });
+}
+
 function optimizerEquipmentGroupProduct(groups) {
-  return (groups || []).reduce((n, g) => n * Math.max(1, (g.candidates || []).length), 1);
+  const list = groups || [];
+  const ammoGroup = list.find(g => g.slot === "武器: 弾丸");
+  const ordinaryProduct = list
+    .filter(g => g.slot !== "武器: 弾丸")
+    .reduce((n, g) => n * Math.max(1, (g.candidates || []).length), 1);
+  if (!ammoGroup) return ordinaryProduct;
+
+  const blankCount = ammoGroup.candidates.filter(c => !equipmentCandidateHasData(c.row)).length;
+  const bowCount = ammoGroup.candidates.filter(c => optimizerAmmoKind(c.row) === "bow").length;
+  const gunCount = ammoGroup.candidates.filter(c => optimizerAmmoKind(c.row) === "gun").length;
+  const unknownCount = ammoGroup.candidates.filter(c => equipmentCandidateHasData(c.row) && !optimizerAmmoKind(c.row)).length;
+  const maxRelevantAmmo = Math.max(1, blankCount + unknownCount + Math.max(bowCount, gunCount));
+  return ordinaryProduct * maxRelevantAmmo;
 }
 
 function optimizerBuildEquipmentExact(inputs, settings) {
@@ -10079,8 +10338,12 @@ function optimizerBuildEquipmentExact(inputs, settings) {
     if (aborted) return;
 
     if (groupIndex >= groups.length) {
+      if (!optimizerSelectionHasMainWeapon(selected, settings)) return;
       const st = optimizerStateForSelection(selected, [], settings);
       const m = computeMetrics(st, inputs);
+      if (globalThis.MOEOptimizerSkillPlusFixV1) {
+        globalThis.MOEOptimizerSkillPlusFixV1.attachMetrics(m, selected, [], settings);
+      }
       const ev = optimizerEvaluationFromMetrics(m, settings);
       out.push({equipmentIdxs: optimizerCanonicalEquipmentIdxs(selected, settings), score: ev.score, rank: ev.rank, metrics: m});
       if (out.length > settings.exactEquipmentLimit) aborted = true;
@@ -10088,7 +10351,8 @@ function optimizerBuildEquipmentExact(inputs, settings) {
     }
 
     const group = groups[groupIndex];
-    group.candidates.forEach(cand => {
+    optimizerEquipmentCandidatesForSelection(group, selected, settings).forEach(cand => {
+      if (optimizerEquipmentHandednessWouldConflict(selected, cand.idx, settings)) return;
       const keys = optimizerEquipmentConflictKeysForIndex(cand.idx, settings);
       if (keys.some(k => selectedKeys.has(k))) {
         settings.equipmentConflictSkipped++;
@@ -10135,7 +10399,8 @@ function optimizerBuildEquipmentBeams(inputs, settings) {
   groups.forEach(group => {
     const next = [];
     beams.forEach(beam => {
-      group.candidates.forEach(cand => {
+      optimizerEquipmentCandidatesForSelection(group, beam.equipmentIdxs, settings).forEach(cand => {
+        if (optimizerEquipmentHandednessWouldConflict(beam.equipmentIdxs, cand.idx, settings)) return;
         if (optimizerEquipmentWouldConflict(beam.equipmentIdxs, cand.idx, settings)) {
           settings.equipmentConflictSkipped++;
           return;
@@ -10144,8 +10409,19 @@ function optimizerBuildEquipmentBeams(inputs, settings) {
         const equipmentIdxs = optimizerCanonicalEquipmentIdxs(beam.equipmentIdxs.concat([cand.idx]), settings);
         const st = optimizerStateForSelection(equipmentIdxs, [], settings);
         const m = computeMetrics(st, inputs);
+        if (globalThis.MOEOptimizerSkillPlusFixV1) {
+          globalThis.MOEOptimizerSkillPlusFixV1.attachMetrics(m, equipmentIdxs, [], settings);
+        }
         const ev = optimizerEvaluationFromMetrics(m, settings);
-        next.push({equipmentIdxs, score: ev.score, rank: ev.rank, metrics: m});
+        const skillPlusViolations = globalThis.MOEOptimizerSkillPlusFixV1
+          ? globalThis.MOEOptimizerSkillPlusFixV1.filterViolations(m, settings)
+          : [];
+        next.push({
+          equipmentIdxs,
+          score: skillPlusViolations.length ? OPTIMIZER_INVALID_SCORE : ev.score,
+          rank: ev.rank,
+          metrics: m
+        });
       });
     });
     const dedupedNext = optimizerDedupeResultsByEquipment(next, settings);
@@ -10153,7 +10429,7 @@ function optimizerBuildEquipmentBeams(inputs, settings) {
     beams = dedupedNext.slice(0, settings.beamWidth);
   });
 
-  return beams;
+  return beams.filter(beam => optimizerSelectionHasMainWeapon(beam.equipmentIdxs, settings));
 }
 
 function optimizerCompositeCandidates(settings) {
@@ -10181,8 +10457,19 @@ function optimizerEvaluateBuffSelection(equipmentIdxs, compositeIdxs, inputs, se
 
   const st = optimizerStateForSelection(equipmentIdxs, compositeIdxs, settings);
   const metrics = computeMetrics(st, inputs);
+  if (globalThis.MOEOptimizerSkillPlusFixV1) {
+    globalThis.MOEOptimizerSkillPlusFixV1.attachMetrics(metrics, equipmentIdxs, compositeIdxs, settings);
+  }
   const ev = optimizerEvaluationFromMetrics(metrics, settings);
-  const result = {metrics, violations: ev.violations, score: ev.score, rank: ev.rank};
+  const skillPlusViolations = globalThis.MOEOptimizerSkillPlusFixV1
+    ? globalThis.MOEOptimizerSkillPlusFixV1.filterViolations(metrics, settings)
+    : [];
+  const result = {
+    metrics,
+    violations: ev.violations.concat(skillPlusViolations),
+    score: skillPlusViolations.length ? OPTIMIZER_INVALID_SCORE : ev.score,
+    rank: ev.rank
+  };
 
   if (settings && settings._evaluationCache) {
     settings.optimizerEvalCount = (settings.optimizerEvalCount || 0) + 1;
@@ -10477,6 +10764,78 @@ function workerSupportedForThisPage() {
   return {ok:true, reason:""};
 }
 
+/* __MOE_OPTIMIZER_RESULT_APPLY_CONSISTENCY_V1__ */
+function optimizerConsistencySettingsFromPayload(payload) {
+  const source = payload || optimizerLastPayload || optimizerFallbackPayload || {};
+  const payloadState = source.state || state || {};
+  const settings = {...(source.settings || {})};
+
+  settings._equipmentRows = normalizeEquipmentRows(
+    Array.isArray(payloadState.equipment)
+      ? payloadState.equipment
+      : (state.equipment || [])
+  );
+  settings._compositeRows = normalizeCompositeRows(
+    Array.isArray(payloadState.composite)
+      ? payloadState.composite
+      : (state.composite || [])
+  );
+  settings._otherRows = Array.isArray(payloadState.other)
+    ? payloadState.other
+    : (Array.isArray(state.other) ? state.other : []);
+  settings._postRows = Array.isArray(payloadState.post)
+    ? payloadState.post
+    : (Array.isArray(state.post) ? state.post : []);
+
+  settings._evaluationCache = new Map();
+  settings._compositeCandidates = null;
+  settings._equipmentConflictKeyCache = new Map();
+  return settings;
+}
+
+function optimizerReevaluateResultsOnMain(results, payload) {
+  if (!Array.isArray(results) || !results.length || !payload) return results || [];
+
+  const settings = optimizerConsistencySettingsFromPayload(payload);
+  const inputs = {...(payload.inputs || {})};
+
+  return results.map(result => {
+    if (!result) return result;
+
+    const equipmentIdxs = optimizerCanonicalEquipmentIdxs(
+      Array.isArray(result.equipmentIdxs) ? result.equipmentIdxs : [],
+      settings
+    );
+    const compositeIdxs = Array.from(new Set(
+      Array.isArray(result.compositeIdxs) ? result.compositeIdxs : []
+    )).sort((a, b) => a - b);
+
+    const evaluated = optimizerEvaluateBuffSelection(
+      equipmentIdxs,
+      compositeIdxs,
+      inputs,
+      settings
+    );
+
+    const metrics = evaluated.metrics;
+    const capViolations = optimizerStatCapViolations(metrics, settings)
+      .concat(optimizerTargetOverViolations(metrics, settings))
+      .concat(evaluated.violations || []);
+
+    return {
+      ...result,
+      equipmentIdxs,
+      compositeIdxs,
+      metrics,
+      score: evaluated.score,
+      rank: evaluated.rank,
+      capViolations,
+      equipmentSummary: optimizerEquipmentSummaryByIdx(equipmentIdxs, metrics),
+      reevaluatedOnMain: true
+    };
+  }).sort(optimizerSortByEvaluation);
+}
+
 function runOptimizerOnMainThread(payload, reason="") {
   const status = byId("optimizerStatus");
   const progress = byId("optimizerProgress");
@@ -10496,9 +10855,12 @@ function runOptimizerOnMainThread(payload, reason="") {
       if (status) status.textContent = p.message || `探索中: ${p.current}/${p.total}`;
     });
 
-    integratedOptimizerResults = out.results || [];
     optimizerLastSummary = out.summary || null;
     optimizerLastPayload = payload || null;
+    integratedOptimizerResults = optimizerReevaluateResultsOnMain(
+      out.results || [],
+      optimizerLastPayload
+    );
     if (progress) {
       progress.max = out.summary?.evaluated || 100;
       progress.value = out.summary?.evaluated || progress.max;
@@ -10551,9 +10913,12 @@ function ensureOptimizerWorker() {
     }
 
     if (msg.type === "result") {
-      integratedOptimizerResults = msg.results || [];
       optimizerLastSummary = msg.summary || null;
       optimizerLastPayload = optimizerFallbackPayload || null;
+      integratedOptimizerResults = optimizerReevaluateResultsOnMain(
+        msg.results || [],
+        optimizerLastPayload
+      );
       if (progress) {
         progress.max = msg.summary?.evaluated || 100;
         progress.value = msg.summary?.evaluated || progress.max;
@@ -10806,14 +11171,26 @@ function applyIntegratedOptimizerResult(index) {
   const r = integratedOptimizerResults[index];
   if (!r) return;
 
-  const equipSet = new Set(r.equipmentIdxs);
-  state.equipment = normalizeEquipmentRows(state.equipment).map((row, idx) => ({
+  const payloadState = optimizerLastPayload?.state || state || {};
+  const sourceEquipment = normalizeEquipmentRows(
+    Array.isArray(payloadState.equipment)
+      ? payloadState.equipment
+      : (state.equipment || [])
+  );
+  const sourceComposite = normalizeCompositeRows(
+    Array.isArray(payloadState.composite)
+      ? payloadState.composite
+      : (state.composite || [])
+  );
+
+  const equipSet = new Set(r.equipmentIdxs || []);
+  state.equipment = sourceEquipment.map((row, idx) => ({
     ...row,
     enabled: equipSet.has(idx)
   }));
 
-  const buffSet = new Set(r.compositeIdxs);
-  state.composite = normalizeCompositeRows(state.composite).map((row, idx) => ({
+  const buffSet = new Set(r.compositeIdxs || []);
+  state.composite = sourceComposite.map((row, idx) => ({
     ...row,
     enabled: buffSet.has(idx)
   }));
@@ -11459,6 +11836,8 @@ function showcaseTextFromMetrics(m) {
   const title = state.skillSim.name || "無題構成";
   const race = RACE_LABELS[state.skillSim.race] || state.skillSim.race || "-";
   const weapon = m.selectedWeapon;
+  const effective = m.effectiveWeapon || effectiveWeaponStats(state);
+  const ammo = effective.ammo;
   const reqRows = (m.skillModInfo?.evaluated || []).map(r => `${r.name} ${fmt(r.current,1)}/${fmt(r.required,1)}`);
   const equipLines = activeEquipmentForShowcase().map(r => {
     const slot = (r.slot || "").replace(/^武器: /, "").replace(/^防具: /, "").replace(/^装飾: /, "");
@@ -11489,7 +11868,7 @@ function showcaseTextFromMetrics(m) {
     "",
     "■武器",
     weapon
-      ? `${(weapon.slot || "武器").replace(/^武器: /, "")}: ${weapon.name || "名称未入力"} / Dmg ${fmt(+weapon.weaponDamage || 0,1)} / 重量 ${fmt(+weapon.weaponWeight || 0,1)} / 発揮率 ${fmt((m.skillModInfo?.mod || 1) * 100,1)}%${reqRows.length ? ` / 条件 ${reqRows.join(" / ")}` : ""}`
+      ? `${(weapon.slot || "武器").replace(/^武器: /, "")}: ${weapon.name || "名称未入力"} / Dmg ${fmt(effective.damage,1)}${effective.usesAmmo ? `（本体 ${fmt(effective.weaponDamage,1)} + ${ammo?.name || "矢・弾未設定"} ${fmt(effective.ammoDamage,1)}）` : ""} / 射程 ${fmt(effective.range,1)} / 重量 ${fmt(effective.weight,1)} / 発揮率 ${fmt((m.skillModInfo?.mod || 1) * 100,1)}%${reqRows.length ? ` / 条件 ${reqRows.join(" / ")}` : ""}`
       : "未設定",
     "",
     "■装備",
@@ -11524,6 +11903,8 @@ function renderShowcaseTab(m=null) {
   const title = state.skillSim.name || "無題構成";
   const race = RACE_LABELS[state.skillSim.race] || state.skillSim.race || "-";
   const weapon = m.selectedWeapon;
+  const effective = m.effectiveWeapon || effectiveWeaponStats(state);
+  const ammo = effective.ammo;
   const reqRows = (m.skillModInfo?.evaluated || []).map(r => `${escapeHtml(r.name)} ${fmt(r.current,1)}/${fmt(r.required,1)}`);
   const resolvedShowcaseState = showcaseResolvedBuffState();
   const equipRows = activeEquipmentForShowcase();
@@ -11591,12 +11972,18 @@ function renderShowcaseTab(m=null) {
           <h3>武器</h3>
           ${showcaseList(weapon ? [
             `<li><b>${escapeHtml((weapon.slot || "武器").replace(/^武器: /, ""))}: ${escapeHtml(weapon.name || "名称未入力")}</b></li>`,
-            showcasePair("武器ダメージ", fmt(+weapon.weaponDamage || 0,1)),
-            showcasePair("武器重量", fmt(+weapon.weaponWeight || 0,1)),
-            showcasePair("攻撃間隔", fmt(+weapon.weaponAttackInterval || 0,1)),
-            showcasePair("射程", fmt(+weapon.weaponRange || 0,1)),
-            showcasePair("耐久", fmt(+weapon.weaponDurability || 0,0)),
-            showcasePair("両手武器", weapon.weaponTwoHanded || "×"),
+            showcasePair("合計ダメージ", fmt(effective.damage,1)),
+            showcasePair("武器本体ダメージ", fmt(effective.weaponDamage,1)),
+            ...(effective.usesAmmo ? [
+              showcasePair("矢・弾", ammo ? (ammo.name || "名称未入力") : "未設定"),
+              showcasePair("矢・弾ダメージ", fmt(effective.ammoDamage,1))
+            ] : []),
+            showcasePair("武器重量", fmt(effective.weight,1)),
+            showcasePair("攻撃間隔", fmt(effective.attackInterval,1)),
+            showcasePair("合計射程", fmt(effective.range,1)),
+            ...(effective.usesAmmo ? [showcasePair("矢・弾射程", fmt(effective.ammoRange,1))] : []),
+            showcasePair("耐久", fmt(effective.durability,0)),
+            showcasePair("両手武器", effective.twoHanded),
             showcasePair("性能発揮率", `${fmt((m.skillModInfo?.mod || 1) * 100,1)}%`),
             `<li><span>使用条件</span><br><b>${reqRows.length ? reqRows.join(" / ") : "条件なし"}</b></li>`
           ] : [])}
@@ -17474,3 +17861,555 @@ function renderAnalysisPanel() {
 })();
 
 /* __MOE_EQUIPMENT_CATALOG_CACHE_PAGINATION_V2__ */
+
+/* __MOE_OPTIMIZER_SKILLPLUS_OBJECTIVE_TOTALS_FIX_V1__ */
+(function installOptimizerSkillPlusObjectiveTotalsFixV1(global) {
+  if (global.__MOE_OPTIMIZER_SKILLPLUS_OBJECTIVE_TOTALS_FIX_V1_INSTALLED__) return;
+  global.__MOE_OPTIMIZER_SKILLPLUS_OBJECTIVE_TOTALS_FIX_V1_INSTALLED__ = true;
+
+  const norm = value => String(value || "").replace(/[　\s]+/g, "").replace(/[‐‑‒–—―ー－]/g, "-").toLowerCase().trim();
+  const num = value => Number.isFinite(parseFloat(value)) ? parseFloat(value) : 0;
+
+  function effects(value) {
+    if (!value) return [];
+    try {
+      if (typeof normalizeAdditionalEffects === "function") return normalizeAdditionalEffects(value);
+    } catch {}
+    if (Array.isArray(value)) return value;
+    try {
+      if (typeof parseAdditionalEffectsText === "function") return parseAdditionalEffectsText(String(value || ""));
+    } catch {}
+    return [];
+  }
+
+  function add(out, skill, value, mode="sum") {
+    const name = String(skill || "").trim();
+    const v = num(value);
+    if (!name || !v) return;
+    const key = Object.keys(out).find(k => norm(k) === norm(name)) || name;
+    out[key] = mode === "max" ? Math.max(num(out[key]), v) : num(out[key]) + v;
+  }
+
+  function directTotals(obj) {
+    const out = {};
+    [obj?.extraEffects, obj?.equipBuff?.extraEffects].forEach(source => {
+      effects(source).forEach(e => {
+        if (e?.key === "skillPlus") add(out, e.name, e.value);
+      });
+    });
+    return out;
+  }
+
+  function buffNames(obj) {
+    const out = [];
+    [obj?.equipBuffName, obj?.equipBuff?.name, obj?.equipBuff?.buffName, obj?.buffName, obj?.effectName]
+      .forEach(value => {
+        const s = String(value || "").trim();
+        if (s && !out.some(x => norm(x) === norm(s))) out.push(s);
+      });
+    return out;
+  }
+
+  function compatRows() {
+    const out = [];
+    [global.MOE_SKILL_BUFF_COMPATIBILITY_MANUAL,
+     global.MOE_SKILL_BUFF_COMPATIBILITY,
+     global.MOE_SKILL_BUFF_COMPATIBILITY_GENERATED]
+      .forEach(rows => { if (Array.isArray(rows)) out.push(...rows); });
+    return out;
+  }
+
+  function totalsFromObject(obj) {
+    if (!obj) return {};
+    if (obj.equipBuffEnabled === false || obj.equipBuffEnabled === 0 || obj.equipBuffEnabled === "0") return {};
+
+    const direct = directTotals(obj);
+    const names = buffNames(obj).map(norm).filter(Boolean);
+    const fallback = {};
+
+    if (names.length) {
+      compatRows().forEach(rule => {
+        const bn = norm(rule?.buffName || rule?.name || "");
+        if (!bn || !names.includes(bn)) return;
+        const skill = String(rule?.targetSkill || rule?.skill || rule?.skillName || rule?.target || "").trim();
+        const value = rule?.value ?? rule?.amount ?? rule?.skillPlus ?? rule?.plus;
+        if (!skill || !num(value)) return;
+        if (Object.keys(direct).some(k => norm(k) === norm(skill))) return;
+        add(fallback, skill, value, "max");
+      });
+    }
+
+    const out = {...direct};
+    Object.entries(fallback).forEach(([skill, value]) => add(out, skill, value));
+    return out;
+  }
+
+  function totalsForRows(rows) {
+    const out = {};
+    (rows || []).forEach(row => {
+      Object.entries(totalsFromObject(row)).forEach(([skill, value]) => add(out, skill, value));
+    });
+    return out;
+  }
+
+  function totalForSkill(totals, skill) {
+    const target = norm(skill);
+    return Object.entries(totals || {}).reduce(
+      (sum, [name, value]) => sum + (norm(name) === target ? num(value) : 0), 0
+    );
+  }
+
+  function selectedRows(equipmentIdxs, compositeIdxs, settings) {
+    const rows = [];
+    try {
+      const equipment = optimizerEquipmentRows(settings || {});
+      (equipmentIdxs || []).forEach(idx => { if (equipment[idx]) rows.push(equipment[idx]); });
+    } catch {}
+    try {
+      const composite = optimizerCompositeRows(settings || {});
+      (compositeIdxs || []).forEach(idx => { if (composite[idx]) rows.push(composite[idx]); });
+    } catch {}
+    return rows;
+  }
+
+  function totalsForSelection(equipmentIdxs, compositeIdxs, settings) {
+    return totalsForRows(selectedRows(equipmentIdxs, compositeIdxs, settings));
+  }
+
+  function attachMetrics(metrics, equipmentIdxs, compositeIdxs, settings) {
+    const totals = totalsForSelection(equipmentIdxs, compositeIdxs, settings);
+    const target = settings?.skillPlusTargetSkill || "";
+    metrics.skillPlusTotals = totals;
+    metrics.skillPlusScore = target
+      ? totalForSkill(totals, target)
+      : Object.values(totals).reduce((sum, value) => sum + num(value), 0);
+    return metrics;
+  }
+
+  function filterViolations(metrics, settings) {
+    const filters = settings?.skillPlusFilters || [];
+    const helper = global.MOESkillPlusV21;
+    if (!filters.length || !helper?.filterMatchesTotals) return [];
+    return helper.filterMatchesTotals(metrics?.skillPlusTotals || {}, filters)
+      ? []
+      : ["スキル強化値の絞り込み条件を満たしていません"];
+  }
+
+  if (global.MOESkillPlusV21) {
+    global.MOESkillPlusV21.totalsFromObject = totalsFromObject;
+    global.MOESkillPlusV21.totalsForRows = totalsForRows;
+    global.MOESkillPlusV21.totalForSkill = totalForSkill;
+    global.MOESkillPlusV21.totalsForSelection = totalsForSelection;
+  }
+
+  global.MOEOptimizerSkillPlusFixV1 = {
+    totalsFromObject, totalsForRows, totalForSkill,
+    totalsForSelection, attachMetrics, filterViolations
+  };
+})(typeof globalThis !== "undefined" ? globalThis : window);
+
+/* __MOE_OPTIMIZER_SKILLPLUS_DEBUG_MODE_V1__ */
+(function installOptimizerSkillPlusDebugModeV1(global) {
+  if (global.__MOE_OPTIMIZER_SKILLPLUS_DEBUG_MODE_V1_INSTALLED__) return;
+  global.__MOE_OPTIMIZER_SKILLPLUS_DEBUG_MODE_V1_INSTALLED__ = true;
+
+  const norm = value => String(value || "")
+    .replace(/[　\s]+/g, "")
+    .replace(/[‐‑‒–—―ー－]/g, "-")
+    .toLowerCase()
+    .trim();
+
+  const num = value => {
+    const n = parseFloat(value);
+    return Number.isFinite(n) ? n : 0;
+  };
+
+  function helper() {
+    return global.MOEOptimizerSkillPlusFixV1 || global.MOESkillPlusV21 || null;
+  }
+
+  function targetSkill() {
+    return document.getElementById("optimizerSkillPlusTargetSkill")?.value || "";
+  }
+
+  function isEnabled() {
+    return !!document.getElementById("optimizerSkillPlusDebugMode")?.checked;
+  }
+
+  function totalsFromObject(row) {
+    const h = helper();
+    if (h?.totalsFromObject) {
+      try { return h.totalsFromObject(row) || {}; } catch {}
+    }
+
+    const totals = {};
+    const effects = typeof normalizeAdditionalEffects === "function"
+      ? normalizeAdditionalEffects(row?.extraEffects || [])
+      : (Array.isArray(row?.extraEffects) ? row.extraEffects : []);
+
+    effects.forEach(effect => {
+      if (effect?.key !== "skillPlus") return;
+      const name = String(effect.name || "").trim();
+      const value = num(effect.value);
+      if (name && value) totals[name] = (totals[name] || 0) + value;
+    });
+
+    return totals;
+  }
+
+  function totalForSkill(totals, skillName) {
+    const h = helper();
+    if (h?.totalForSkill) {
+      try { return num(h.totalForSkill(totals, skillName)); } catch {}
+    }
+
+    const target = norm(skillName);
+    return Object.entries(totals || {}).reduce(
+      (sum, [name, value]) => sum + (norm(name) === target ? num(value) : 0),
+      0
+    );
+  }
+
+  function rowDebugData(row, idx) {
+    const totals = totalsFromObject(row);
+    const skill = targetSkill();
+    return {
+      idx,
+      slot: row?.slot || "",
+      name: row?.name || "",
+      enabled: !!row?.enabled,
+      fixed: !!row?.optimizerFixed,
+      excluded: !!row?.optimizerExcluded,
+      tags: row?.tags || "",
+      targetSkill: skill,
+      targetValue: skill ? totalForSkill(totals, skill) : 0,
+      totals,
+      equipBuffName: row?.equipBuffName || row?.equipBuff?.name || "",
+      conflictGroup: row?.equipBuffConflictGroup || "",
+      conflictGroups: row?.equipBuffConflictGroups || [],
+      extraEffects: row?.extraEffects || []
+    };
+  }
+
+  function selectedResult() {
+    const results = integratedOptimizerResults || [];
+    return results.find(r =>
+      r &&
+      Array.isArray(r.equipmentIdxs) &&
+      r.equipmentIdxs.length &&
+      !r.currentConfig &&
+      !r.baselineReference
+    ) || results.find(r => r && Array.isArray(r.equipmentIdxs)) || null;
+  }
+
+  function buildReport() {
+    const payload = optimizerLastPayload || {};
+    const payloadState = payload.state || state || {};
+    const settings = {...(payload.settings || {})};
+    settings._equipmentRows = normalizeEquipmentRows(
+      Array.isArray(payloadState.equipment)
+        ? payloadState.equipment
+        : (state.equipment || [])
+    );
+    settings._compositeRows = normalizeCompositeRows(
+      Array.isArray(payloadState.composite)
+        ? payloadState.composite
+        : (state.composite || [])
+    );
+
+    const rows = settings._equipmentRows;
+    const groups = typeof optimizerEquipmentGroups === "function"
+      ? optimizerEquipmentGroups(settings)
+      : [];
+    const result = selectedResult();
+    const selected = new Set(result?.equipmentIdxs || []);
+    const skill = targetSkill();
+
+    const slotReports = groups.map(group => {
+      const candidates = (group.candidates || []).map(candidate => {
+        const row = rows[candidate.idx];
+        const data = rowDebugData(row, candidate.idx);
+
+        let singleMetrics = null;
+        let singleObjective = null;
+        let singleScore = null;
+        try {
+          const st = optimizerStateForSelection([candidate.idx], [], settings);
+          singleMetrics = computeMetrics(st, payload.inputs || {});
+          if (global.MOEOptimizerSkillPlusFixV1?.attachMetrics) {
+            global.MOEOptimizerSkillPlusFixV1.attachMetrics(
+              singleMetrics,
+              [candidate.idx],
+              [],
+              settings
+            );
+          }
+          singleObjective = optimizerObjectiveRawValue(
+            singleMetrics,
+            settings.objective || "damage"
+          );
+          singleScore = optimizerMetricValue(
+            singleMetrics,
+            settings.objective || "damage"
+          );
+        } catch (error) {
+          singleMetrics = {error: error?.message || String(error)};
+        }
+
+        return {
+          ...data,
+          selected: selected.has(candidate.idx),
+          singleObjective,
+          singleScore,
+          singleSkillPlusScore: num(singleMetrics?.skillPlusScore),
+          singleSkillPlusTotals: singleMetrics?.skillPlusTotals || {},
+          singleFinalDamage: num(singleMetrics?.finalDamage),
+          singleMagic: num(singleMetrics?.stats?.magic),
+          singleAttack: num(singleMetrics?.atk),
+          metricError: singleMetrics?.error || ""
+        };
+      });
+
+      candidates.sort((a, b) => {
+        if (skill) {
+          const d = b.targetValue - a.targetValue;
+          if (d) return d;
+        }
+        return num(b.singleScore) - num(a.singleScore);
+      });
+
+      return {
+        slot: group.slot,
+        selectedCandidate: candidates.find(c => c.selected) || null,
+        candidates
+      };
+    });
+
+    return {
+      generatedAt: new Date().toISOString(),
+      objective: settings.objective || "damage",
+      secondaryObjective: settings.secondaryObjective || "",
+      targetSkill: skill,
+      skillPlusFilters: settings.skillPlusFilters || [],
+      beamWidth: settings.beamWidth,
+      accuracyPreset: settings.accuracyPreset,
+      result: result ? {
+        equipmentIdxs: result.equipmentIdxs || [],
+        compositeIdxs: result.compositeIdxs || [],
+        score: result.score,
+        rank: result.rank,
+        metrics: {
+          skillPlusScore: result.metrics?.skillPlusScore,
+          skillPlusTotals: result.metrics?.skillPlusTotals,
+          finalDamage: result.metrics?.finalDamage,
+          magic: result.metrics?.stats?.magic,
+          attack: result.metrics?.atk
+        }
+      } : null,
+      slots: slotReports
+    };
+  }
+
+  function reportText(report) {
+    const lines = [];
+    lines.push("Master of Epic 物理ダメージ計算webツール");
+    lines.push("skillPlus最適化デバッグ");
+    lines.push("=".repeat(96));
+    lines.push("");
+    lines.push(`目的: ${report.objective}`);
+    lines.push(`副目的: ${report.secondaryObjective || "なし"}`);
+    lines.push(`対象スキル: ${report.targetSkill || "未選択"}`);
+    lines.push(`精度: ${report.accuracyPreset || ""}`);
+    lines.push(`beamWidth: ${report.beamWidth ?? ""}`);
+    lines.push("");
+
+    report.slots.forEach(slot => {
+      lines.push(`[${slot.slot}]`);
+      lines.push("-".repeat(96));
+
+      slot.candidates.forEach(candidate => {
+        const mark = candidate.selected ? "★採用" : "  候補";
+        lines.push(
+          `${mark} idx=${candidate.idx} ` +
+          `${candidate.name || "(空)"} ` +
+          `対象+${candidate.targetValue} ` +
+          `単体skillPlus=${candidate.singleSkillPlusScore} ` +
+          `目的値=${candidate.singleObjective ?? ""} ` +
+          `score=${candidate.singleScore ?? ""}`
+        );
+
+        if (candidate.metricError) {
+          lines.push(`    ERROR: ${candidate.metricError}`);
+        }
+        if (Object.keys(candidate.totals || {}).length) {
+          lines.push(`    row totals: ${JSON.stringify(candidate.totals)}`);
+        }
+        if (Object.keys(candidate.singleSkillPlusTotals || {}).length) {
+          lines.push(`    metrics totals: ${JSON.stringify(candidate.singleSkillPlusTotals)}`);
+        }
+        if (candidate.conflictGroup || (candidate.conflictGroups || []).length) {
+          lines.push(
+            `    conflict: ${candidate.conflictGroup || ""} ` +
+            `${JSON.stringify(candidate.conflictGroups || [])}`
+          );
+        }
+      });
+
+      lines.push("");
+    });
+
+    return lines.join("\n");
+  }
+
+  function renderPanel() {
+    let panel = document.getElementById("optimizerSkillPlusDebugPanel");
+    if (!panel) {
+      const results = document.getElementById("optimizerResults");
+      if (!results) return;
+      panel = document.createElement("details");
+      panel.id = "optimizerSkillPlusDebugPanel";
+      panel.className = "optimizerSkillPlusDebugPanel";
+      panel.innerHTML = `
+        <summary>skillPlus最適化デバッグ</summary>
+        <div class="optimizerSkillPlusDebugActions">
+          <button type="button" id="optimizerSkillPlusDebugRefresh">再解析</button>
+          <button type="button" id="optimizerSkillPlusDebugCopy">レポートをコピー</button>
+        </div>
+        <pre id="optimizerSkillPlusDebugOutput"></pre>
+      `;
+      results.insertAdjacentElement("afterend", panel);
+    }
+
+    const output = document.getElementById("optimizerSkillPlusDebugOutput");
+    const refresh = document.getElementById("optimizerSkillPlusDebugRefresh");
+    const copy = document.getElementById("optimizerSkillPlusDebugCopy");
+
+    const report = buildReport();
+    const text = reportText(report);
+
+    if (output) output.textContent = text;
+    global.__MOE_LAST_SKILLPLUS_DEBUG_REPORT__ = report;
+    global.__MOE_LAST_SKILLPLUS_DEBUG_TEXT__ = text;
+
+    console.group("MoE skillPlus optimizer debug");
+    console.log(report);
+    console.table(
+      report.slots.flatMap(slot =>
+        slot.candidates.map(c => ({
+          slot: slot.slot,
+          selected: c.selected,
+          idx: c.idx,
+          name: c.name,
+          targetValue: c.targetValue,
+          singleSkillPlusScore: c.singleSkillPlusScore,
+          objective: c.singleObjective,
+          score: c.singleScore
+        }))
+      )
+    );
+    console.groupEnd();
+
+    if (refresh) refresh.onclick = renderPanel;
+    if (copy) copy.onclick = async () => {
+      try {
+        await navigator.clipboard.writeText(
+          global.__MOE_LAST_SKILLPLUS_DEBUG_TEXT__ || ""
+        );
+        copy.textContent = "コピー済み";
+        setTimeout(() => copy.textContent = "レポートをコピー", 1200);
+      } catch (error) {
+        alert("コピーに失敗しました: " + (error?.message || String(error)));
+      }
+    };
+  }
+
+  function installCheckbox() {
+    if (document.getElementById("optimizerSkillPlusDebugMode")) return;
+
+    const target = document.getElementById("optimizerSkillPlusTargetSkill");
+    if (!target) return;
+
+    const label = document.createElement("label");
+    label.className = "optimizerSkillPlusDebugToggle";
+    label.innerHTML = `
+      <input type="checkbox" id="optimizerSkillPlusDebugMode">
+      skillPlusデバッグ
+    `;
+    target.closest("label, .optimizerControl, .field, div")?.appendChild(label);
+
+    document.getElementById("optimizerSkillPlusDebugMode")?.addEventListener(
+      "change",
+      event => {
+        if (event.target.checked) renderPanel();
+        else document.getElementById("optimizerSkillPlusDebugPanel")?.remove();
+      }
+    );
+  }
+
+  const baseRender = renderIntegratedOptimizerResults;
+  renderIntegratedOptimizerResults = function renderIntegratedOptimizerResultsWithSkillPlusDebugV1() {
+    const result = baseRender.apply(this, arguments);
+    installCheckbox();
+    if (isEnabled()) renderPanel();
+    return result;
+  };
+
+  global.renderOptimizerSkillPlusDebugV1 = renderPanel;
+  global.buildOptimizerSkillPlusDebugReportV1 = buildReport;
+
+  const boot = () => {
+    installCheckbox();
+    if (isEnabled() && (integratedOptimizerResults || []).length) renderPanel();
+  };
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", boot, {once:true});
+  } else {
+    boot();
+  }
+})(typeof globalThis !== "undefined" ? globalThis : window);
+
+
+/* Optimizer: メイン武器種指定 UI */
+(function installOptimizerMainWeaponSkillV1(global) {
+  if (global.__MOE_OPTIMIZER_MAIN_WEAPON_SKILL_V1__) return;
+  global.__MOE_OPTIMIZER_MAIN_WEAPON_SKILL_V1__ = true;
+
+  function install() {
+    if (document.getElementById("optimizerMainWeaponSkill")) return;
+    const objective = document.getElementById("optimizerObjective");
+    if (!objective) return;
+
+    const select = document.createElement("select");
+    select.id = "optimizerMainWeaponSkill";
+    [
+      ["", "指定なし"],
+      ["current", "現在の武器種"],
+      ["素手", "素手"],
+      ["刀剣", "刀剣"],
+      ["こんぼう", "こんぼう"],
+      ["槍", "槍"],
+      ["弓", "弓"],
+      ["銃器", "銃器"],
+      ["投げ", "投げ"]
+    ].forEach(([value, label]) => {
+      const option = document.createElement("option");
+      option.value = value;
+      option.textContent = label;
+      select.appendChild(option);
+    });
+
+    const wrapper = document.createElement("label");
+    wrapper.className = objective.closest("label")?.className || "";
+    wrapper.append(document.createTextNode("メイン武器種"), document.createElement("br"), select);
+
+    const objectiveWrapper = objective.closest("label") || objective.parentElement;
+    if (objectiveWrapper?.parentElement) objectiveWrapper.insertAdjacentElement("afterend", wrapper);
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", install, {once:true});
+  } else {
+    install();
+  }
+})(typeof globalThis !== "undefined" ? globalThis : window);
