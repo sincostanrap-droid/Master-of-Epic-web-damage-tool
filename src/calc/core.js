@@ -49,9 +49,12 @@ function computeMetrics(st, inputs) {
   const stats = pctStats.stats;
 
   // 武器性能発揮率を反映した武器攻撃力を計算する。
-  const selectedWeapon = selectedWeaponForCalc(st);
-  const weaponDamage = selectedWeapon ? (+selectedWeapon.weaponDamage || 0) : (parseFloat(inputs.weaponDamage) || 0);
-  const weaponWeight = selectedWeapon ? (+selectedWeapon.weaponWeight || 0) : (parseFloat(inputs.weaponWeight) || 0);
+  const effectiveWeapon = effectiveWeaponStats(st);
+  const selectedWeapon = effectiveWeapon.weapon;
+  const selectedAmmo = effectiveWeapon.ammo;
+  const weaponDamage = selectedWeapon ? effectiveWeapon.damage : (parseFloat(inputs.weaponDamage) || 0);
+  const weaponWeight = selectedWeapon ? effectiveWeapon.weight : (parseFloat(inputs.weaponWeight) || 0);
+  if (selectedWeapon) inputs.weaponRange = effectiveWeapon.range;
   const weaponInputs = {...inputs, weaponDamage, weaponWeight};
   const skillModInfo = calcWeaponSkillMod(st, weaponInputs);
   const skillMod = skillModInfo.mod;
@@ -140,7 +143,7 @@ function computeMetrics(st, inputs) {
 
   return {
     stats, pctStats, conv, pctAtkCalc, spirit, magicCoeff, baseMagicFromSpirit, flatStatRaw, equipmentRaw, extraStats,
-    racialAtk, weaponAtk, weaponDamage, weaponWeight, selectedWeapon, skillModInfo, baseNaturalAtk, conversionAtk, baseAtk, flatAtkRaw, extraRawBeforePct, cappedAddRawBeforePct, cappedAddBeforePct, atkBeforePct, atkPctMode, atkBuffRaw, atkCap, atkBuffCapped, atk,
+    racialAtk, weaponAtk, weaponDamage, weaponWeight, selectedWeapon, selectedAmmo, effectiveWeapon, skillModInfo, baseNaturalAtk, conversionAtk, baseAtk, flatAtkRaw, extraRawBeforePct, cappedAddRawBeforePct, cappedAddBeforePct, atkBeforePct, atkPctMode, atkBuffRaw, atkCap, atkBuffCapped, atk,
     attackMultiplier, dmgMultiplier, defenseFactor, critAvg, postMultiplier, baseNoTech,
     rawDamage, finalDamage, slots, specialMultiplier,
     forcedEvasion: activeForcedEvasionFromState(st),

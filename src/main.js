@@ -13699,6 +13699,7 @@ function addIdbEquipmentCandidate() {
 
 const CATALOG_SCRIPT_URLS = [
   "src/data/generated/equipmentCatalog.generated.js",
+  "src/data/generated/ammoCatalog.generated.js",
   "src/data/generated/buffCatalog.generated.js",
   "src/data/generated/wikiEquipBuffEffects.generated.js",
   "src/data/generated/equipBuffRuleCandidates.generated.js",
@@ -13709,9 +13710,11 @@ const CATALOG_SCRIPT_URLS = [
 let catalogScriptsPromise = null;
 
 function catalogGlobalsReady() {
-  return Array.isArray(window.MOE_EQUIPMENT_CATALOG_GENERATED) ||
+  const equipmentReady = Array.isArray(window.MOE_EQUIPMENT_CATALOG_GENERATED) ||
     Array.isArray(window.MOE_EQUIPMENT_CATALOG) ||
     Array.isArray(window.MOE_EQUIPMENT_CATALOG_MANUAL);
+  const ammoReady = Array.isArray(window.MOE_AMMO_CATALOG_GENERATED);
+  return equipmentReady && ammoReady;
 }
 
 function loadCatalogScriptsOnce() {
@@ -13739,7 +13742,7 @@ function catalogArray(...names) {
 }
 
 function equipmentCatalogItems() {
-  const raw = catalogArray("MOE_EQUIPMENT_CATALOG_MANUAL", "MOE_EQUIPMENT_CATALOG", "MOE_EQUIPMENT_CATALOG_GENERATED");
+  const raw = catalogArray("MOE_EQUIPMENT_CATALOG_MANUAL", "MOE_EQUIPMENT_CATALOG", "MOE_EQUIPMENT_CATALOG_GENERATED", "MOE_AMMO_CATALOG_GENERATED");
   const seen = new Set();
   const out = [];
   raw.forEach(item => {
@@ -14688,6 +14691,11 @@ function createCatalogTab(panel) {
       <label>検索 <input id="catalogSearch" type="search" placeholder="装備名・効果・Buff名・必要スキル" autocomplete="off"></label>
       <label>カテゴリ <select id="catalogCategory"><option value="">すべて</option><option value="weapon">武器</option><option value="defense">防具/装飾</option><option value="shield">盾</option></select></label>
       <label>部位 <select id="catalogSlot"><option value="">すべて</option></select></label>
+      <div id="catalogSearchApplyActions" class="catalogSearchApplyActions catalogSearchApplyActionsTop">
+        <button type="button" id="catalogApplySearch" class="primary">検索</button>
+        <button type="button" id="catalogClearSearch">条件クリア</button>
+        <span id="catalogSearchApplyHint" class="small mutedText">条件を入力して「検索」で反映します。</span>
+      </div>
       <details class="catalogMultiStatFilters">
         <summary>追加ステータス数値フィルタ（最大4条件・すべて満たす）</summary>
         <div class="small mutedText catalogMultiStatFilterHelp">例: 攻撃力 +4以上 / 攻撃ディレイ -1以下 / 命中 +1以上。複数行を入れるとAND条件で絞り込みます。</div>
@@ -16888,6 +16896,20 @@ function renderAnalysisPanel() {
 
       actions.append(apply, clear, hint);
       toolbar.appendChild(actions);
+    }
+
+    const applyButton = document.getElementById("catalogApplySearch");
+    if (applyButton && applyButton.dataset.catalogApplyReady !== "1") {
+      applyButton.dataset.catalogApplyReady = "1";
+      applyButton.onclick = () => applySearch(true);
+    }
+    const clearButton = document.getElementById("catalogClearSearch");
+    if (clearButton && clearButton.dataset.catalogClearReady !== "1") {
+      clearButton.dataset.catalogClearReady = "1";
+      clearButton.onclick = () => {
+        clearDraftControls();
+        applySearch(true);
+      };
     }
 
     if (search.dataset.catalogApplyEnterReady !== "1") {

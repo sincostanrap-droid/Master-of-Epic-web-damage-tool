@@ -1,3 +1,12 @@
+﻿// __MOE_REVIEWED_BUFF_MAGIC_DELAY_FIX_V1__
+// Reviewed Buffの魔法ディレイ固定値反映漏れを補完。
+// タケミカヅチ -25 / リリース オブ マジック -25。
+// __MOE_REVIEWED_BUFF_ATTACK_DELAY_FLAT_FIX_V2__
+// Reviewed Buffの「攻撃ディレイ-N」を extraAttackDelay（固定値）として扱う。
+// 正式値: レイジ ドライブ -10 / トリニティ エンハンス -20 / フォース ステップ -20。
+// __MOE_REVIEWED_BUFF_ATTACK_DELAY_FLAT_FIX_V1__
+// Reviewed Buffの「攻撃ディレイ-N」を extraAttackDelay（固定値）へ統一。
+// フォース ステップはユーザー確認値 -10。
 /* __MOE_BATCH1_RUNTIME_AND_LIMIT_BREAK_V3__ */
 // __MOE_REVIEWED_BUFF_CATALOG_DATA_SPLIT_V1__
 // Master of Epic 物理ダメージ計算webツール
@@ -1188,7 +1197,7 @@ window.MOE_REVIEWED_BUFF_CATALOG_MANUAL = [
   description: "攻撃力上昇量を手入力。アタックディレイ-15は固定。",
   evaluate() {
     return {
-      attackDelayPct: -15,
+      extraAttackDelay: -15,
       note: "134件レビュー済みBuffマスター / 手入力必須 / 攻撃力上昇量を手入力。アタックディレイ-15は固定。"
     };
   }
@@ -1428,7 +1437,7 @@ window.MOE_REVIEWED_BUFF_CATALOG_MANUAL = [
   description: "攻撃ディレイ-25。",
   evaluate() {
     return {
-      attackDelayPct: -25,
+      extraAttackDelay: -25,
       note: "134件レビュー済みBuffマスター / 固定値 / 攻撃ディレイ-25"
     };
   }
@@ -1443,6 +1452,7 @@ window.MOE_REVIEWED_BUFF_CATALOG_MANUAL = [
   evaluate() {
     return {
       magicPct: 10,
+      extraMagicDelay: -25,
       note: "134件レビュー済みBuffマスター / 固定値・固定割合 / 魔法ディレイ-25 / 魔力+10%"
     };
   }
@@ -1493,7 +1503,7 @@ window.MOE_REVIEWED_BUFF_CATALOG_MANUAL = [
       extraHit: value,
       extraAvoid: value,
       extraAC: value,
-      attackDelayPct: -13,
+      extraAttackDelay: -13,
       note: `134件レビュー済みBuffマスター / 自然調和${skill} / 攻撃力・命中・回避・防御+${value} / 攻撃ディレイ-13`
     };
   }
@@ -1550,7 +1560,7 @@ window.MOE_REVIEWED_BUFF_CATALOG_MANUAL = [
   evaluate() {
     return {
       extraAvoid: 20,
-      attackDelayPct: -5,
+      extraAttackDelay: -5,
       note: "134件レビュー済みBuffマスター / 固定値 / 回避+20 / 攻撃ディレイ-5"
     };
   }
@@ -1722,7 +1732,7 @@ window.MOE_REVIEWED_BUFF_CATALOG_MANUAL = [
   evaluate() {
     return {
       dmgPct: 20,
-      attackDelayPct: -10,
+      extraAttackDelay: -10,
       extraAvoidPct: -50,
       note: "134件レビュー済みBuffマスター / 固定値・固定割合 / 与ダメージ+20% / 攻撃ディレイ-10 / 回避-50%"
     };
@@ -1751,7 +1761,7 @@ window.MOE_REVIEWED_BUFF_CATALOG_MANUAL = [
   description: "攻撃ディレイ-25。",
   evaluate() {
     return {
-      attackDelayPct: -25,
+      extraAttackDelay: -25,
       note: "134件レビュー済みBuffマスター / 固定値 / 攻撃ディレイ-25"
     };
   }
@@ -1779,7 +1789,8 @@ window.MOE_REVIEWED_BUFF_CATALOG_MANUAL = [
   description: "攻撃ディレイ-25 / 魔法ディレイ-25 / 移動速度+25 / 回避+25。",
   evaluate() {
     return {
-      attackDelayPct: -25,
+      extraAttackDelay: -25,
+      extraMagicDelay: -25,
       flatSpeed: 25,
       extraAvoid: 25,
       note: "134件レビュー済みBuffマスター / 固定値 / 攻撃ディレイ-25 / 魔法ディレイ-25 / 移動速度+25 / 回避+25"
@@ -1870,7 +1881,7 @@ window.MOE_REVIEWED_BUFF_CATALOG_MANUAL = [
   evaluate() {
     return {
       dmgPct: 10,
-      attackDelayPct: -20,
+      extraAttackDelay: -20,
       note: "134件レビュー済みBuffマスター / 固定値・固定割合 / 与ダメージ+10% / 攻撃ディレイ-20"
     };
   }
@@ -1978,7 +1989,7 @@ window.MOE_REVIEWED_BUFF_CATALOG_MANUAL = [
   evaluate() {
     return {
       attackPct: 20,
-      attackDelayPct: -20,
+      extraAttackDelay: -20,
       note: "134件レビュー済みBuffマスター / 固定割合・固定値 / 攻撃力+20% / 攻撃ディレイ-20"
     };
   }
