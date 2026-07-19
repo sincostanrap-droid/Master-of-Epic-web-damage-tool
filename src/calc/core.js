@@ -58,7 +58,22 @@ function computeMetrics(st, inputs) {
   const weaponInputs = {...inputs, weaponDamage, weaponWeight};
   const skillModInfo = calcWeaponSkillMod(st, weaponInputs);
   const skillMod = skillModInfo.mod;
-  const ac = parseFloat(inputs.targetAC) || 0;
+  const baseTargetAC = parseFloat(inputs.targetAC) || 0;
+  const baseTargetEvasion = parseFloat(inputs.targetEvasion) || 0;
+  const npcAcDelta = (() => {
+    try { return +(globalThis.MOE_NPC_EFFECT_SLOTS?.getAcDelta?.() || 0); }
+    catch { return 0; }
+  })();
+  const npcEvasionDelta = (() => {
+    try { return +(globalThis.MOE_NPC_EFFECT_SLOTS?.getEvasionDelta?.() || 0); }
+    catch { return 0; }
+  })();
+  const npcDamageTakenMultiplier = (() => {
+    try { return +(globalThis.MOE_NPC_EFFECT_SLOTS?.getDamageTakenMultiplier?.() || 1); }
+    catch { return 1; }
+  })();
+  const ac = Math.max(0, baseTargetAC + npcAcDelta);
+  const effectiveTargetEvasion = Math.max(0, baseTargetEvasion + npcEvasionDelta);
 
   const racialAtk = stats.str * raceCoeff;
   const weaponAtk = ((stats.str + 300) / 350) * weaponDamage * skillMod;
@@ -134,7 +149,31 @@ function computeMetrics(st, inputs) {
     critAvg = 1 + rate * ((parseFloat(inputs.critMultiplier) || 1.5) - 1);
   }
 
-  const postMultiplier = (st.post || []).filter(r => r.enabled && !r.excluded).reduce((p, r) => p * (+r.value || 1), 1);
+  const basePostMultiplier = (st.post || []).filter(r => r.enabled && !r.excluded).reduce((p, r) => p * (+r.value || 1), 1);
+  // NPCの被ダメージ倍率は、既存の外枠補正と同じ計算位置で乗算する。
+  const postMultiplier = basePostMultiplier * npcDamageTakenMultiplier;
+
+  // 命中の基礎値は、現在攻撃に使っている武器種に対応する武器スキル値そのもの。
+  // 戦闘技術や他スキル、種族補正は加算しない。
+  const mainWeaponSkillNames = new Set(["素手", "刀剣", "こんぼう", "槍", "弓", "銃器", "投げ"]);
+  const equippedWeaponSkill = (() => {
+    if (selectedWeapon && typeof normalizeWeaponReqRowsForEquipment === "function") {
+      const req = normalizeWeaponReqRowsForEquipment(selectedWeapon.weaponReq)
+        .map(row => typeof validSkillSimSkillName === "function"
+          ? validSkillSimSkillName(String(row?.name || ""), "")
+          : String(row?.name || ""))
+        .find(name => mainWeaponSkillNames.has(name));
+      if (req) return req;
+    }
+    const fallback = String(globalThis.state?.skillSim?.weaponSkill || "");
+    return mainWeaponSkillNames.has(fallback) ? fallback : "";
+  })();
+  const weaponSkillHit = equippedWeaponSkill && typeof skillSimValue === "function"
+    ? skillSimValue(equippedWeaponSkill)
+    : 0;
+  const playerHit = totalStatValue(weaponSkillHit, extraStats.extraHit, extraStats.extraHitPct);
+  const rawHitRatePct = ((playerHit + 55) / (effectiveTargetEvasion + 40)) * 52;
+  const hitRatePct = Math.max(0, Math.min(100, rawHitRatePct));
   const baseNoTech = atk * 0.8;
   const rawDamage = baseNoTech * attackMultiplier * dmgMultiplier * specialMultiplier * defenseFactor * critAvg * postMultiplier;
   const finalCap = parseFloat(inputs.finalCap) || 0;
@@ -144,8 +183,10 @@ function computeMetrics(st, inputs) {
   return {
     stats, pctStats, conv, pctAtkCalc, spirit, magicCoeff, baseMagicFromSpirit, flatStatRaw, equipmentRaw, extraStats,
     racialAtk, weaponAtk, weaponDamage, weaponWeight, selectedWeapon, selectedAmmo, effectiveWeapon, skillModInfo, baseNaturalAtk, conversionAtk, baseAtk, flatAtkRaw, extraRawBeforePct, cappedAddRawBeforePct, cappedAddBeforePct, atkBeforePct, atkPctMode, atkBuffRaw, atkCap, atkBuffCapped, atk,
-    attackMultiplier, dmgMultiplier, defenseFactor, critAvg, postMultiplier, baseNoTech,
+    attackMultiplier, dmgMultiplier, defenseFactor, critAvg, basePostMultiplier, npcDamageTakenMultiplier, postMultiplier, baseNoTech,
     rawDamage, finalDamage, slots, specialMultiplier,
+    baseTargetAC, npcAcDelta, effectiveTargetAC: ac,
+    equippedWeaponSkill, weaponSkillHit, playerHit, baseTargetEvasion, npcEvasionDelta, effectiveTargetEvasion, rawHitRatePct, hitRatePct,
     forcedEvasion: activeForcedEvasionFromState(st),
     targetRace
   };

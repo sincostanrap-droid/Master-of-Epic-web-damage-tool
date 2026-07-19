@@ -12,8 +12,8 @@
   onclick属性から呼ばれる関数があるため、現時点では module ではなく通常scriptとして読み込みます。
 */
 
-const APP_VERSION = "v1.23.73";
-const APP_VERSION_NOTE = "最適化のメイン武器種指定・仮想空欄・武器探索順を修正";
+const APP_VERSION = "v1.23.78";
+const APP_VERSION_NOTE = "装備中の武器種スキルを命中率へ反映";
 
 /* 種族係数。攻撃力係数と魔力係数は別管理。 */
 const RACE_COEFFS = {
@@ -7440,6 +7440,7 @@ function ensureTargetRaceSelector() {
   let select = byId("targetRace");
   if (select) return select;
   const targetAC = byId("targetAC");
+  const targetEvasion = byId("targetEvasion");
   if (!targetAC) return null;
 
   select = document.createElement("select");
@@ -7454,9 +7455,10 @@ function ensureTargetRaceSelector() {
   label.append("対象種族 ");
   label.appendChild(select);
 
-  const host = targetAC.closest("label,.inputPair,.formRow,.controlRow");
+  const anchor = targetEvasion || targetAC;
+  const host = anchor.closest("label,.inputPair,.formRow,.controlRow");
   if (host) host.insertAdjacentElement("afterend", label);
-  else targetAC.insertAdjacentElement("afterend", label);
+  else anchor.insertAdjacentElement("afterend", label);
   return select;
 }
 
@@ -7478,7 +7480,7 @@ function effectiveAvoidValue(d, m) {
 function collectInputs() {
   const ids = [
     "raceSelect","raceCoeff","str","spirit","magic","weaponSkill","requiredSkill","weaponReqMode","weaponDamage","weaponWeight",
-    "speed","drunk","targetAC","targetRace","attackType","heavyFormula","heavyManualMultiplier","techMultiplier",
+    "speed","drunk","targetAC","targetEvasion","targetRace","attackType","heavyFormula","heavyManualMultiplier","techMultiplier",
     "allowCrit","critRate","critMultiplier","atkCap","atkPctMode","finalCap"
   ];
   const inputs = {};
@@ -11102,7 +11104,7 @@ function damageAuditHtml(m, inputs) {
     `×攻撃/テク ${fmt(m.attackMultiplier, 4)}`,
     `×与ダメ ${fmt(m.dmgMultiplier, 3)}`,
     `×特攻 ${fmt(m.specialMultiplier, 3)}`,
-    `×防御 ${fmt(m.defenseFactor, 6)}`,
+    `×防御 ${fmt(m.defenseFactor, 6)} (AC ${fmt(m.effectiveTargetAC ?? inputs.targetAC ?? 0)})`,
     `×クリ ${fmt(m.critAvg, 3)}`,
     `×外枠 ${fmt(m.postMultiplier, 3)}`
   ].join(" ");
@@ -15076,6 +15078,20 @@ function updatePredictedAtkUI(m) {
  * 入力イベントのたびに呼ばれ、computeMetrics()→各UI更新→localStorage保存まで行う。
  */
 
+function updateHitRateSummary(m) {
+  const rateEl = byId("hitRateSummary");
+  const detailEl = byId("hitRateBreakdown");
+  if (!rateEl || !detailEl || !m) return;
+  rateEl.textContent = `${m.hitRatePct.toFixed(1)}%`;
+  const deltaText = m.npcEvasionDelta
+    ? ` / NPC効果 ${m.npcEvasionDelta >= 0 ? "+" : ""}${m.npcEvasionDelta.toFixed(1)}`
+    : "";
+  const skillText = m.equippedWeaponSkill
+    ? `${m.equippedWeaponSkill} ${m.weaponSkillHit.toFixed(1)} / `
+    : "";
+  detailEl.textContent = `${skillText}命中 ${m.playerHit.toFixed(2)} / 対象回避 ${m.baseTargetEvasion.toFixed(1)}${deltaText} / 実効回避 ${m.effectiveTargetEvasion.toFixed(1)}`;
+}
+
 function updateTotalStatsSummary(m=null) {
   const el = byId("totalStatsSummary");
   if (!el) return;
@@ -15116,6 +15132,7 @@ function calc() {
   updateSlotUI(m);
   updateEquipmentSummary(m);
   updateTotalStatsSummary(m);
+  updateHitRateSummary(m);
   updateWeaponReqAutoCurrentDisplays();
   updateSelectedWeaponCalcSummary(m);
   updateWeaponSkillModHint(m);
@@ -15164,6 +15181,7 @@ function calc() {
     lines.push(`<p>攻撃力: <b>${m.atk.toFixed(3)}</b> = 基礎攻撃力 ${m.baseNaturalAtk.toFixed(3)} + 変換上限外 ${m.conversionAtk.toFixed(3)} + min(上限対象 raw ${m.atkBuffRaw.toFixed(3)}, 上限 ${m.atkCap.toFixed(3)})</p>`);
   }
   if (atkPctLine) lines.push(atkPctLine);
+  lines.push(`<p>命中率: <b>${m.hitRatePct.toFixed(1)}%</b> = (命中 ${m.playerHit.toFixed(3)} + 55) ÷ (実効回避 ${m.effectiveTargetEvasion.toFixed(3)} + 40) × 52${m.rawHitRatePct > 100 ? "（100%で上限）" : ""}${m.equippedWeaponSkill ? ` / 武器スキル: ${escapeHtml(m.equippedWeaponSkill)} ${m.weaponSkillHit.toFixed(3)}` : ""}</p>`);
   lines.push(`<p>基礎: 攻撃力×0.8 = <b>${m.baseNoTech.toFixed(3)}</b></p>`);
   lines.push(`<p>攻撃/テク倍率: <b>${m.attackMultiplier.toFixed(4)}</b> / 与ダメ倍率: <b>${m.dmgMultiplier.toFixed(3)}</b> / 特攻倍率: <b>${m.specialMultiplier.toFixed(3)}</b> / 防御係数: <b>${m.defenseFactor.toFixed(6)}</b> / クリ平均: <b>${m.critAvg.toFixed(3)}</b> / 外枠: <b>${m.postMultiplier.toFixed(3)}</b></p>`);
   lines.push(`<p>計算式: 攻撃力×0.8×攻撃/テク倍率×与ダメ倍率×特攻倍率×防御係数×クリ平均×外枠</p>`);
@@ -15536,7 +15554,9 @@ function setHeavyManualMultiplier(value) {
 }
 /* 指定攻撃力でのAC防御係数を計算する。実測逆算で使用。 */
 function defenseFactorForAtk(atk, inputs, m) {
-  const ac = parseFloat(inputs.targetAC) || 0;
+  const baseAc = parseFloat(inputs.targetAC) || 0;
+  const npcAcDelta = +(window.MOE_NPC_EFFECT_SLOTS?.getAcDelta?.() || 0);
+  const ac = Math.max(0, baseAc + npcAcDelta);
   if (ac <= 0) return 1;
   const atkDefInput = atk * m.dmgMultiplier * m.specialMultiplier;
   return 1 - Math.pow(ac / (atkDefInput + ac), 1.244);
@@ -18435,3 +18455,289 @@ function renderAnalysisPanel() {
     install();
   }
 })(typeof globalThis !== "undefined" ? globalThis : window);
+
+/* __MOE_NPC_EFFECT_SLOTS_V1__
+ * NPCに付与されるBuff / Debuff / DoT / 状態異常を区別せず、共通8枠で管理する基盤。
+ * この版では計算式には反映せず、選択状態と8枠制限だけを提供する。
+ */
+(function installNpcEffectSlotsV1(global) {
+  "use strict";
+  if (global.__MOE_NPC_EFFECT_SLOTS_V1_INSTALLED__) return;
+  global.__MOE_NPC_EFFECT_SLOTS_V1_INSTALLED__ = true;
+
+  const STORAGE_KEY = "moeNpcEffectsV1";
+  const MAX_SLOTS = 8;
+  const CATEGORIES = [
+    ["buff", "Buff"],
+    ["debuff", "Debuff"],
+    ["dot", "DoT"],
+    ["status", "状態異常"],
+    ["control", "行動制限"],
+    ["other", "その他"]
+  ];
+
+  let effects = [];
+
+  function esc(value) {
+    return String(value ?? "").replace(/[&<>"']/g, ch => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;",
+      '"': "&quot;", "'": "&#39;"
+    }[ch]));
+  }
+
+  function normalizeEffect(raw, index) {
+    const category = CATEGORIES.some(([key]) => key === raw?.category)
+      ? raw.category : "debuff";
+    return {
+      id: String(raw?.id || ("npc-effect-" + Date.now() + "-" + index)),
+      name: String(raw?.name || "").trim(),
+      category,
+      slotCost: 1,
+      calcType: ["none", "acFlat", "evasionFlat", "damageTakenPct", "critTakenPct", "resistFlat"].includes(raw?.calcType)
+        ? raw.calcType : "none",
+      value: Number.isFinite(+raw?.value) ? +raw.value : 0,
+      note: String(raw?.note || "").trim()
+    };
+  }
+
+  function load() {
+    try {
+      const raw = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+      effects = (Array.isArray(raw) ? raw : [])
+        .map(normalizeEffect)
+        .filter(item => item.name)
+        .slice(0, MAX_SLOTS);
+    } catch {
+      effects = [];
+    }
+  }
+
+  function save() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(effects));
+    } catch {}
+  }
+
+  function usedSlots() {
+    return effects.reduce((sum, item) => sum + (+item.slotCost || 1), 0);
+  }
+
+  function categoryLabel(key) {
+    return CATEGORIES.find(([value]) => value === key)?.[1] || "その他";
+  }
+
+  function hostElement() {
+    return document.getElementById("npcEffectSlotsPanel");
+  }
+
+  function bindPanel(panel) {
+    if (!panel || panel.dataset.npcEffectBound === "1") return;
+    panel.dataset.npcEffectBound = "1";
+
+    panel.querySelector("#npcEffectAddButton")?.addEventListener("click", addFromInputs);
+    panel.querySelector("#npcEffectNameInput")?.addEventListener("keydown", ev => {
+      if (ev.key === "Enter") {
+        ev.preventDefault();
+        addFromInputs();
+      }
+    });
+  }
+
+  function ensurePanel() {
+    const panel = hostElement();
+    if (!panel) {
+      console.warn("NPC効果パネルがindex.htmlに見つかりません。");
+      return null;
+    }
+    bindPanel(panel);
+    return panel;
+  }
+
+  function addFromInputs() {
+    const nameEl = document.getElementById("npcEffectNameInput");
+    const categoryEl = document.getElementById("npcEffectCategoryInput");
+    const calcTypeEl = document.getElementById("npcEffectCalcTypeInput");
+    const valueEl = document.getElementById("npcEffectValueInput");
+    const noteEl = document.getElementById("npcEffectNoteInput");
+    const name = String(nameEl?.value || "").trim();
+
+    if (!name) {
+      nameEl?.focus();
+      return;
+    }
+    if (usedSlots() >= MAX_SLOTS) {
+      render();
+      return;
+    }
+
+    effects.push(normalizeEffect({
+      id: "npc-effect-" + Date.now() + "-" + Math.random().toString(36).slice(2, 8),
+      name,
+      category: categoryEl?.value || "debuff",
+      calcType: calcTypeEl?.value || "none",
+      value: Number(valueEl?.value || 0),
+      note: noteEl?.value || ""
+    }, effects.length));
+
+    if (nameEl) nameEl.value = "";
+    if (valueEl) valueEl.value = "0";
+    if (noteEl) noteEl.value = "";
+    save();
+    render();
+    if (typeof global.calc === "function") global.calc();
+    nameEl?.focus();
+  }
+
+  function removeEffect(id) {
+    effects = effects.filter(item => item.id !== id);
+    save();
+    render();
+    if (typeof global.calc === "function") global.calc();
+  }
+
+  function clearEffects() {
+    effects = [];
+    save();
+    render();
+    if (typeof global.calc === "function") global.calc();
+  }
+
+  function sumByCalcType(calcType) {
+    return effects.filter(item => item.calcType === calcType).reduce((sum, item) => sum + (+item.value || 0), 0);
+  }
+
+  function acDelta() { return sumByCalcType("acFlat"); }
+  function evasionDelta() { return sumByCalcType("evasionFlat"); }
+  function damageTakenMultiplier() {
+    return effects
+      .filter(item => item.calcType === "damageTakenPct")
+      .reduce((multiplier, item) => multiplier * Math.max(0, 1 + (+item.value || 0) / 100), 1);
+  }
+  function critTakenPct() { return sumByCalcType("critTakenPct"); }
+  function resistDelta() { return sumByCalcType("resistFlat"); }
+
+  function calcTypeLabel(calcType) {
+    return ({
+      none: "枠のみ",
+      acFlat: "対象AC増減",
+      evasionFlat: "対象回避増減",
+      damageTakenPct: "被ダメージ倍率%",
+      critTakenPct: "被クリティカル率%",
+      resistFlat: "対象抵抗増減（保持のみ）"
+    })[calcType] || "枠のみ";
+  }
+
+  function calcEffectLabel(item) {
+    const value = +item.value || 0;
+    if (item.calcType === "none") return "枠のみ";
+    if (item.calcType === "damageTakenPct" || item.calcType === "critTakenPct") {
+      return `${calcTypeLabel(item.calcType)} ${value >= 0 ? "+" : ""}${value}%`;
+    }
+    return `${calcTypeLabel(item.calcType)} ${value >= 0 ? "+" : ""}${value}`;
+  }
+
+  function render() {
+    const panel = ensurePanel();
+    if (!panel) return;
+    const used = usedSlots();
+    const badge = panel.querySelector("#npcEffectSlotBadge");
+    const list = panel.querySelector("#npcEffectList");
+    const limit = panel.querySelector("#npcEffectLimitMessage");
+    const addButton = panel.querySelector("#npcEffectAddButton");
+
+    if (badge) {
+      badge.textContent = `${used} / ${MAX_SLOTS}枠`;
+      badge.classList.toggle("isFull", used >= MAX_SLOTS);
+    }
+    if (limit) limit.hidden = used < MAX_SLOTS;
+    if (addButton) addButton.disabled = used >= MAX_SLOTS;
+
+    if (!list) return;
+
+    if (!effects.length) {
+      list.innerHTML = `<div class="npcEffectEmpty">NPC効果はまだ登録されていません。</div>`;
+      return;
+    }
+
+    list.innerHTML = `
+      <table class="compactTable npcEffectTable">
+        <thead>
+          <tr>
+            <th class="npcEffectNoCol">No.</th>
+            <th>種類</th>
+            <th>名称</th>
+            <th>計算効果</th>
+            <th>値</th>
+            <th>メモ / ソース</th>
+            <th>削除</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${effects.map((item, index) => {
+            const hasValue = item.calcType !== "none";
+            const isPct = item.calcType === "damageTakenPct" || item.calcType === "critTakenPct";
+            const value = +item.value || 0;
+            return `
+              <tr data-npc-effect-id="${esc(item.id)}">
+                <td class="npcEffectNoCol">${index + 1}</td>
+                <td>${esc(categoryLabel(item.category))}</td>
+                <td>${esc(item.name)}</td>
+                <td>${esc(calcTypeLabel(item.calcType))}</td>
+                <td>${hasValue ? esc(`${value >= 0 ? "+" : ""}${value}${isPct ? "%" : ""}`) : "-"}</td>
+                <td>${esc(item.note || "")}</td>
+                <td>
+                  <button type="button"
+                          data-remove-npc-effect="${esc(item.id)}">削除</button>
+                </td>
+              </tr>
+            `;
+          }).join("")}
+        </tbody>
+      </table>
+      <div class="npcEffectActions">
+        <button type="button" id="npcEffectClearButton">すべて解除</button>
+      </div>
+    `;
+    list.querySelectorAll("[data-remove-npc-effect]").forEach(button => {
+      button.addEventListener("click", () => removeEffect(button.dataset.removeNpcEffect));
+    });
+    list.querySelector("#npcEffectClearButton")?.addEventListener("click", clearEffects);
+  }
+
+  global.MOE_NPC_EFFECT_SLOTS = Object.freeze({
+    maxSlots: MAX_SLOTS,
+    getEffects: () => effects.map(item => ({...item})),
+    getUsedSlots: usedSlots,
+    getAcDelta: acDelta,
+    getEvasionDelta: evasionDelta,
+    getDamageTakenMultiplier: damageTakenMultiplier,
+    getCritTakenPct: critTakenPct,
+    getResistDelta: resistDelta,
+    add(effect) {
+      if (usedSlots() >= MAX_SLOTS) return false;
+      const normalized = normalizeEffect(effect, effects.length);
+      if (!normalized.name) return false;
+      effects.push(normalized);
+      save();
+      render();
+      if (typeof global.calc === "function") global.calc();
+      return true;
+    },
+    remove: removeEffect,
+    clear: clearEffects,
+    render
+  });
+
+  function boot() {
+    load();
+    ensurePanel();
+    render();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", boot, {once: true});
+  } else {
+    boot();
+  }
+})(window);
+/* __MOE_NPC_EFFECT_AC_V1__ */
