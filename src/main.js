@@ -12,8 +12,8 @@
   onclick属性から呼ばれる関数があるため、現時点では module ではなく通常scriptとして読み込みます。
 */
 
-const APP_VERSION = "v1.23.78";
-const APP_VERSION_NOTE = "装備中の武器種スキルを命中率へ反映";
+const APP_VERSION = "v1.23.80";
+const APP_VERSION_NOTE = "Buff登録の効果プレビューに追加ステータスを反映";
 
 /* 種族係数。攻撃力係数と魔力係数は別管理。 */
 const RACE_COEFFS = {
@@ -1268,7 +1268,12 @@ function makeExtraStatsEditor(row, title, mode="base", onUpdate=null) {
     : "Buff ON時に計算へ反映される追加ステータスです。HP/MP/ST/最大重量/命中/回避/AC/耐性/ディレイ/軽減/クリ率/生産・生活系などを直接入力できます。";
   wrap.appendChild(help);
 
-  const activeDefs = extraFieldDefsFor(mode).filter(def => extraStatHasValue(row, def, mode));
+  const activeDefs = extraFieldDefsFor(mode).filter(def => {
+    // Buff登録の主要割合3項目は「基本効果・競合」に常設しているため、
+    // 入力済み追加ステータス側へ同じ入力欄を重複表示しない。
+    if (mode === "buff" && COMPACT_COMPOSITE_PRIMARY_EXTRA_PROPS?.has(def.prop)) return false;
+    return extraStatHasValue(row, def, mode);
+  });
 
   if (!activeDefs.length) {
     const empty = document.createElement("div");
@@ -6815,7 +6820,7 @@ function compositeEffectText(r) {
     parts.push(`${target}特攻×${r.special}`);
   }
   if (hasForcedEvasionValue(r.forcedEvasion)) parts.push(`回避${Number(r.forcedEvasion)}固定`);
-  const extra = extraStatsEffectText(r, false);
+  const extra = extraStatsEffectText(r, "buff");
   if (extra) parts.push(extra);
   const displayOnly = additionalEffectsSummary(r, "display");
   if (displayOnly.length) parts.push(...displayOnly);
@@ -8316,6 +8321,9 @@ const COMPACT_COMPOSITE_PRIMARY_FIELDS = [
   ["attackPct", "攻撃力%", "1"],
   ["magicPct", "魔力%", "1"],
   ["speedPct", "速度%", "1"],
+  ["extraHitPct", "命中%", "0.1"],
+  ["extraACPct", "AC%", "0.1"],
+  ["extraAvoidPct", "回避%", "0.1"],
   ["flatAttack", "攻撃力+", "0.1"],
   ["flatMagic", "魔力+", "0.1"],
   ["flatSpeed", "速度+", "0.1"],
@@ -8324,6 +8332,12 @@ const COMPACT_COMPOSITE_PRIMARY_FIELDS = [
   ["dmgPct", "与ダメ%", "1"],
   ["special", "特攻倍率", "0.01"]
 ];
+
+const COMPACT_COMPOSITE_PRIMARY_EXTRA_PROPS = new Set([
+  "extraHitPct",
+  "extraACPct",
+  "extraAvoidPct"
+]);
 
 function installCompactCompositeRowStyles() {
   if (byId("compactCompositeRowStyle")) return;
