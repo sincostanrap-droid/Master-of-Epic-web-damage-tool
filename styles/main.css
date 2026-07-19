@@ -5064,3 +5064,74 @@ button[onclick*="applySkillSimToCalc"],
     flex:1 1 100%;
   }
 }
+
+/* __MOE_NPC_EFFECT_UI_UNIFIED_V1__ */
+.npcEffectInputRow {
+  display: grid;
+  grid-template-columns:
+    minmax(150px, 1.2fr)
+    minmax(100px, 0.65fr)
+    minmax(120px, 0.8fr)
+    minmax(80px, 0.45fr)
+    minmax(190px, 1.5fr)
+    auto;
+  gap: 8px;
+  align-items: end;
+  margin-bottom: 12px;
+}
+
+.npcEffectInputRow label {
+  display: grid;
+  gap: 4px;
+}
+
+.npcEffectInputRow input,
+.npcEffectInputRow select {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.npcEffectTable {
+  width: 100%;
+}
+
+.npcEffectNoCol {
+  width: 3.5em;
+  text-align: center;
+}
+
+.npcEffectActions {
+  margin-top: 8px;
+}
+
+.npcEffectEmpty {
+  padding: 8px 0;
+}
+
+@media (max-width: 1050px) {
+  .npcEffectInputRow {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .npcEffectNoteField {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 620px) {
+  .npcEffectInputRow {
+    grid-template-columns: 1fr;
+  }
+
+  .npcEffectNoteField {
+    grid-column: auto;
+  }
+
+  .npcEffectTable {
+    min-width: 720px;
+  }
+
+  #npcEffectList {
+    overflow-x: auto;
+  }
+}

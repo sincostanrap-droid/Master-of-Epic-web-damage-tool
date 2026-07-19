@@ -143,6 +143,7 @@ MoE固有の主な仮定:
       </div>
       <label>攻撃/テク倍率<input id="techMultiplier" type="number" step="0.0001" value="1.0000"></label>
       <label>対象AC<input id="targetAC" type="number" step="0.1" value="0"></label>
+      <label>対象回避<input id="targetEvasion" type="number" step="0.1" value="0"></label>
 
       <div id="critFields">
         <label>クリティカル計算<input id="allowCrit" type="checkbox"></label>
@@ -216,6 +217,12 @@ MoE固有の主な仮定:
     <div class="summaryPanel metricCard metricTotalStats">
       <div class="metricLabel">総合ステータス</div>
       <div id="totalStatsSummary" class="summaryTotalStats small">-</div>
+    </div>
+
+    <div class="summaryPanel metricCard metricHitRate">
+      <div class="metricLabel">命中率</div>
+      <div class="bigNum" id="hitRateSummary">-</div>
+      <div id="hitRateBreakdown" class="small">-</div>
     </div>
 
     <div class="summaryPanel slotPanel metricCard metricSlot">
@@ -980,6 +987,55 @@ MoE固有の主な仮定:
     <tbody></tbody>
   </table>
   <button onclick="addOtherRow()">その他バフ行を追加</button>
+</section>
+
+
+<section id="npcEffectSlotsPanel" class="card wide" data-tab-target="buffs">
+  <h2>NPC効果（Buff・Debuff共通 <span id="npcEffectSlotBadge">0 / 8枠</span>）</h2>
+  <p class="small">
+    NPCに付与されるBuff・Debuff・DoT・状態異常・行動制限を、共通の8枠として管理します。
+    「対象AC増減」「対象回避増減」は各対象値へ加算されます。低下は負の値で入力してください。
+    「被ダメージ倍率%」は既存の外枠補正と同じ位置で乗算されます。
+  </p>
+
+  <div class="npcEffectInputRow">
+    <label>名称
+      <input id="npcEffectNameInput" type="text" maxlength="80" placeholder="例: アーマー ブレイク">
+    </label>
+    <label>種類
+      <select id="npcEffectCategoryInput">
+        <option value="buff">Buff</option>
+        <option value="debuff" selected>Debuff</option>
+        <option value="dot">DoT</option>
+        <option value="status">状態異常</option>
+        <option value="control">行動制限</option>
+        <option value="other">その他</option>
+      </select>
+    </label>
+    <label>計算効果
+      <select id="npcEffectCalcTypeInput">
+        <option value="none">枠のみ</option>
+        <option value="acFlat">対象AC増減</option>
+        <option value="evasionFlat">対象回避増減</option>
+        <option value="damageTakenPct">被ダメージ倍率%</option>
+        <option value="critTakenPct">被クリティカル率%</option>
+        <option value="resistFlat">対象抵抗増減（保持のみ）</option>
+      </select>
+    </label>
+    <label class="npcEffectValueField">値
+      <input id="npcEffectValueInput" type="number" step="0.1" value="0" placeholder="-30">
+    </label>
+    <label class="npcEffectNoteField">メモ / ソース
+      <input id="npcEffectNoteInput" type="text" maxlength="160" placeholder="効果量・競合・検証メモなど">
+    </label>
+    <button type="button" id="npcEffectAddButton">NPC効果行を追加</button>
+  </div>
+
+  <p id="npcEffectLimitMessage" class="small" hidden>NPC効果はBuff込みで最大8枠です。</p>
+
+  <div id="npcEffectList">
+    <div class="npcEffectEmpty small">NPC効果はまだ登録されていません。</div>
+  </div>
 </section>
 
 
