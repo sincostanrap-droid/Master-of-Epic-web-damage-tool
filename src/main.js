@@ -1,4 +1,4 @@
-/* ============================================================
+﻿/* ============================================================
  * main.js organization note
  * This file is intentionally kept as a single module.
  * Refactoring phase 1: comments/organization only.
@@ -12,8 +12,8 @@
   onclick属性から呼ばれる関数があるため、現時点では module ではなく通常scriptとして読み込みます。
 */
 
-const APP_VERSION = "v1.23.80";
-const APP_VERSION_NOTE = "Buff登録の効果プレビューに追加ステータスを反映";
+const APP_VERSION = "v1.23.86";
+const APP_VERSION_NOTE = "起動時IIFEのDOM処理を各タブ初回表示まで遅延";
 
 /* 種族係数。攻撃力係数と魔力係数は別管理。 */
 const RACE_COEFFS = {
@@ -10997,6 +10997,13 @@ function optimizerPayloadForCurrentState() {
 }
 
 function runIntegratedOptimizer() {
+  if (!optimizerUiInitialized || typeof runOptimizerCore !== "function") {
+    initializeOptimizerUiOnce()
+      .then(() => runIntegratedOptimizer())
+      .catch(() => {});
+    return;
+  }
+
   const status = byId("optimizerStatus");
   const resultEl = byId("optimizerResults");
   const progress = byId("optimizerProgress");
@@ -11672,6 +11679,9 @@ function activateMainTab(id) {
     panel.hidden = panel.dataset.tabPanel !== valid;
   });
   localStorage.setItem("moeDamageSimActiveTab", valid);
+  document.dispatchEvent(new CustomEvent("moe:main-tab-activated", {
+    detail: {id: valid}
+  }));
   if (valid === "catalog") renderCatalogTab();
 }
 
@@ -14807,8 +14817,12 @@ function renderCatalogTab() {
   if (!panel.dataset.catalogReady) {
     panel.dataset.catalogReady = "1";
     createCatalogTab(panel);
-    loadCatalogScriptsOnce().then(() => setupCatalogFilterOptions(true));
+    loadCatalogScriptsOnce().then(() => {
+      document.dispatchEvent(new CustomEvent("moe:catalog-ui-ready"));
+      setupCatalogFilterOptions(true);
+    });
   } else {
+    document.dispatchEvent(new CustomEvent("moe:catalog-ui-ready"));
     setupCatalogFilterOptions(false);
   }
 }
@@ -14847,7 +14861,6 @@ function renderAll() {
   renderTagLinkSummary();
   renderShowcaseTab();
   renderAttackDpsTab();
-  renderCatalogTab();
 }
 
 /* 種族プルダウンから攻撃力係数hidden値を同期する。 */
@@ -15724,16 +15737,77 @@ function ensureOptimizerObjectiveOptions() {
   });
 }
 
+let optimizerUiInitialized = false;
+let optimizerCoreLoadPromise = null;
+
+function ensureOptimizerCoreLoaded() {
+  if (typeof runOptimizerCore === "function") return Promise.resolve();
+  if (optimizerCoreLoadPromise) return optimizerCoreLoadPromise;
+
+  optimizerCoreLoadPromise = new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = "./src/optimizer/core.js?v=1.22.4";
+    script.dataset.optimizerCore = "1";
+    script.onload = () => {
+      if (typeof runOptimizerCore === "function") resolve();
+      else reject(new Error("Optimizerコアを初期化できませんでした。"));
+    };
+    script.onerror = () => reject(new Error("Optimizerコアの読み込みに失敗しました。"));
+    document.head.appendChild(script);
+  });
+  return optimizerCoreLoadPromise;
+}
+
+function bindCalcRefreshInput(el) {
+  if (!el || el.dataset.moeCalcRefreshBound === "1") return;
+  el.dataset.moeCalcRefreshBound = "1";
+  el.addEventListener("input", calc);
+  el.addEventListener("change", calc);
+}
+
+function initializeOptimizerUiOnce() {
+  if (optimizerUiInitialized) return ensureOptimizerCoreLoaded();
+  optimizerUiInitialized = true;
+
+  const root = document.querySelector(".optimizerDetails");
+  ensureOptimizerObjectiveOptions();
+  root?.querySelectorAll("input,select").forEach(bindCalcRefreshInput);
+  globalThis.__MOE_INITIALIZE_OPTIMIZER_SKILL_PLUS_V21__?.(root);
+  globalThis.__MOE_INITIALIZE_OPTIMIZER_MAIN_WEAPON_V1__?.();
+
+  return ensureOptimizerCoreLoaded().catch(error => {
+    optimizerUiInitialized = false;
+    optimizerCoreLoadPromise = null;
+    const status = byId("optimizerStatus");
+    if (status) status.textContent = error.message;
+    throw error;
+  });
+}
+
+function setupOptimizerLazyInitialization() {
+  const details = document.querySelector(".optimizerDetails");
+  if (!details || details.dataset.optimizerLazyBound === "1") return;
+  details.dataset.optimizerLazyBound = "1";
+
+  function initializeOnFirstOpen() {
+    if (!details.open) return;
+    details.removeEventListener("toggle", initializeOnFirstOpen);
+    initializeOptimizerUiOnce().catch(() => {});
+  }
+
+  details.addEventListener("toggle", initializeOnFirstOpen);
+  if (details.open) initializeOnFirstOpen();
+}
+
 function initializeBrowserApp() {
   loadIdbWorkerEndpoint();
 
   setupTabLayout();
   setupEquipmentFilterControls();
-  ensureOptimizerObjectiveOptions();
+  setupOptimizerLazyInitialization();
 
   document.querySelectorAll("input,select").forEach(el => {
-    el.addEventListener("input", calc);
-    el.addEventListener("change", calc);
+    if (!el.closest(".optimizerDetails")) bindCalcRefreshInput(el);
   });
 
   renderAll();
@@ -15913,6 +15987,7 @@ function renderAnalysisPanel() {
   let debounceTimer = 0;
   let lastArgs = [];
   let renderingNow = false;
+  let catalogPerfBooted = false;
 
   function byIdV23(id) {
     return typeof document !== "undefined" ? document.getElementById(id) : null;
@@ -16106,19 +16181,28 @@ function renderAnalysisPanel() {
   }
 
   function bootCatalogPerf() {
+    if (catalogPerfBooted) return true;
+    // 依存順: SkillPlus拡張 → 検索キャッシュ描画 → 性能ラッパー。
+    if (global.__MOE_INITIALIZE_SKILL_PLUS_CATALOG_V21__?.() === false) return false;
+    if (global.__MOE_INITIALIZE_CATALOG_SEARCH_CACHE_V1__?.() === false) return false;
+    catalogPerfBooted = true;
     wrapRenderCatalogResults();
     wrapCatalogStatNumericValue();
     wrapSkillPlusTotals();
     ensureCatalogLimitOptions();
     installCatalogInputDebounceHints();
     nextFrame(ensureLoadMoreButton);
+    return true;
   }
 
   if (typeof document !== "undefined") {
-    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", bootCatalogPerf);
-    else bootCatalogPerf();
-    setTimeout(bootCatalogPerf, 300);
-    setTimeout(bootCatalogPerf, 1000);
+    function bootCatalogPerfWhenReady() {
+      if (bootCatalogPerf()) {
+        document.removeEventListener("moe:catalog-ui-ready", bootCatalogPerfWhenReady);
+      }
+    }
+
+    document.addEventListener("moe:catalog-ui-ready", bootCatalogPerfWhenReady);
   } else {
     wrapCatalogStatNumericValue();
     wrapSkillPlusTotals();
@@ -16361,13 +16445,13 @@ function renderAnalysisPanel() {
   // Worker側ではここまで。以下はブラウザUIだけ。
   if (typeof document === "undefined") return;
 
-  function spFillSelects() {
+  function spFillSelects(root=document) {
     const selectors = [
       "[data-skill-plus-filter-select]",
       "[data-skill-plus-objective-select]"
     ];
     selectors.forEach(sel => {
-      document.querySelectorAll(sel).forEach(select => {
+      root.querySelectorAll(sel).forEach(select => {
         const current = select.value;
         const emptyLabel = select.dataset.emptyLabel || "指定なし";
         select.innerHTML = spSelectOptions({allowEmpty:true, emptyLabel});
@@ -16412,7 +16496,8 @@ function renderAnalysisPanel() {
     if (typeof baseSetup === "function") {
       global.setupCatalogFilterOptions = function setupCatalogFilterOptionsSkillPlusV21() {
         const out = baseSetup.apply(this, arguments);
-        spFillSelects();
+        const catalogRoot = document.querySelector('[data-tab-panel="catalog"]') || document;
+        spFillSelects(catalogRoot);
         return out;
       };
     }
@@ -16456,8 +16541,8 @@ function renderAnalysisPanel() {
     };
   }
 
-  function spInstallEvents() {
-    document.querySelectorAll("[data-skill-plus-filter-select], [data-skill-plus-filter-input]").forEach(el => {
+  function spInstallEvents(root=document) {
+    root.querySelectorAll("[data-skill-plus-filter-select], [data-skill-plus-filter-input]").forEach(el => {
       if (el.dataset.skillPlusV21Ready) return;
       el.dataset.skillPlusV21Ready = "1";
       el.addEventListener("input", () => {
@@ -16471,14 +16556,26 @@ function renderAnalysisPanel() {
 
   function spBoot() {
     spInstallCatalogWrappers();
-    spInstallWorkerBridge();
-    spFillSelects();
-    spInstallEvents();
+    const catalogRoot = document.querySelector('[data-tab-panel="catalog"]') || document;
+    spFillSelects(catalogRoot);
+    spInstallEvents(catalogRoot);
   }
 
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", spBoot);
-  else spBoot();
-  setTimeout(spBoot, 500);
+  global.__MOE_INITIALIZE_OPTIMIZER_SKILL_PLUS_V21__ = root => {
+    spInstallWorkerBridge();
+    if (root) {
+      spFillSelects(root);
+      spInstallEvents(root);
+    }
+  };
+
+  let spCatalogUiInitialized = false;
+  global.__MOE_INITIALIZE_SKILL_PLUS_CATALOG_V21__ = () => {
+    if (spCatalogUiInitialized) return true;
+    spCatalogUiInitialized = true;
+    spBoot();
+    return true;
+  };
 })(typeof globalThis !== "undefined" ? globalThis : window);
 
 /* v21.2: showcase skillPlus total summary
@@ -16664,6 +16761,8 @@ function renderAnalysisPanel() {
   }
 
   function installHooks() {
+    if (installHooks.installed) return;
+    installHooks.installed = true;
     wrapRenderFunction("renderShowcase");
     wrapRenderFunction("updateShowcase");
     wrapRenderFunction("renderAll");
@@ -16681,13 +16780,18 @@ function renderAnalysisPanel() {
     }
 
     scheduleShowcaseSkillPlusTotalsUpdate();
-    setTimeout(scheduleShowcaseSkillPlusTotalsUpdate, 250);
-    setTimeout(scheduleShowcaseSkillPlusTotalsUpdate, 1000);
   }
 
   if (typeof document !== "undefined") {
-    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", installHooks, {once: true});
-    else installHooks();
+    function initializeShowcaseOnFirstDisplay(event) {
+      if (event.detail?.id !== "showcase") return;
+      installHooks();
+      document.removeEventListener("moe:main-tab-activated", initializeShowcaseOnFirstDisplay);
+    }
+    document.addEventListener("moe:main-tab-activated", initializeShowcaseOnFirstDisplay);
+    if (localStorage.getItem("moeDamageSimActiveTab") === "showcase") {
+      queueMicrotask(() => initializeShowcaseOnFirstDisplay({detail:{id:"showcase"}}));
+    }
   }
 })(typeof globalThis !== "undefined" ? globalThis : window);
 
@@ -16982,30 +17086,28 @@ function renderAnalysisPanel() {
   }
 
   function installRenderOverride() {
-    global.renderCatalogResults = renderPage;
+    // v23の性能ラッパー適用後に、再試行bootが素の描画関数へ戻すのを防ぐ。
+    if (!global.renderCatalogResults?.__catalogPerfV23Wrapped) {
+      global.renderCatalogResults = renderPage;
+    }
     global.applyCatalogSearch = applySearch;
     global.renderCatalogCachedPage = renderPage;
   }
 
   function boot() {
     installRenderOverride();
-    if (!ensureControls()) return;
+    if (!ensureControls()) return false;
     if (!cache.ready) applySearch(false);
+    return true;
   }
 
   if (typeof document !== "undefined") {
-    if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", boot);
-    } else {
-      boot();
-    }
-
-    const observer = new MutationObserver(() => {
-      if (document.getElementById("catalogSearch")) boot();
-    });
-    observer.observe(document.documentElement, {childList:true, subtree:true});
-
-    [250, 700, 1300, 2500].forEach(ms => setTimeout(boot, ms));
+    let catalogSearchCacheInitialized = false;
+    global.__MOE_INITIALIZE_CATALOG_SEARCH_CACHE_V1__ = () => {
+      if (catalogSearchCacheInitialized) return true;
+      catalogSearchCacheInitialized = boot();
+      return catalogSearchCacheInitialized;
+    };
   } else {
     installRenderOverride();
   }
@@ -18064,368 +18166,6 @@ function renderAnalysisPanel() {
   };
 })(typeof globalThis !== "undefined" ? globalThis : window);
 
-/* __MOE_OPTIMIZER_SKILLPLUS_DEBUG_MODE_V1__ */
-(function installOptimizerSkillPlusDebugModeV1(global) {
-  if (global.__MOE_OPTIMIZER_SKILLPLUS_DEBUG_MODE_V1_INSTALLED__) return;
-  global.__MOE_OPTIMIZER_SKILLPLUS_DEBUG_MODE_V1_INSTALLED__ = true;
-
-  const norm = value => String(value || "")
-    .replace(/[　\s]+/g, "")
-    .replace(/[‐‑‒–—―ー－]/g, "-")
-    .toLowerCase()
-    .trim();
-
-  const num = value => {
-    const n = parseFloat(value);
-    return Number.isFinite(n) ? n : 0;
-  };
-
-  function helper() {
-    return global.MOEOptimizerSkillPlusFixV1 || global.MOESkillPlusV21 || null;
-  }
-
-  function targetSkill() {
-    return document.getElementById("optimizerSkillPlusTargetSkill")?.value || "";
-  }
-
-  function isEnabled() {
-    return !!document.getElementById("optimizerSkillPlusDebugMode")?.checked;
-  }
-
-  function totalsFromObject(row) {
-    const h = helper();
-    if (h?.totalsFromObject) {
-      try { return h.totalsFromObject(row) || {}; } catch {}
-    }
-
-    const totals = {};
-    const effects = typeof normalizeAdditionalEffects === "function"
-      ? normalizeAdditionalEffects(row?.extraEffects || [])
-      : (Array.isArray(row?.extraEffects) ? row.extraEffects : []);
-
-    effects.forEach(effect => {
-      if (effect?.key !== "skillPlus") return;
-      const name = String(effect.name || "").trim();
-      const value = num(effect.value);
-      if (name && value) totals[name] = (totals[name] || 0) + value;
-    });
-
-    return totals;
-  }
-
-  function totalForSkill(totals, skillName) {
-    const h = helper();
-    if (h?.totalForSkill) {
-      try { return num(h.totalForSkill(totals, skillName)); } catch {}
-    }
-
-    const target = norm(skillName);
-    return Object.entries(totals || {}).reduce(
-      (sum, [name, value]) => sum + (norm(name) === target ? num(value) : 0),
-      0
-    );
-  }
-
-  function rowDebugData(row, idx) {
-    const totals = totalsFromObject(row);
-    const skill = targetSkill();
-    return {
-      idx,
-      slot: row?.slot || "",
-      name: row?.name || "",
-      enabled: !!row?.enabled,
-      fixed: !!row?.optimizerFixed,
-      excluded: !!row?.optimizerExcluded,
-      tags: row?.tags || "",
-      targetSkill: skill,
-      targetValue: skill ? totalForSkill(totals, skill) : 0,
-      totals,
-      equipBuffName: row?.equipBuffName || row?.equipBuff?.name || "",
-      conflictGroup: row?.equipBuffConflictGroup || "",
-      conflictGroups: row?.equipBuffConflictGroups || [],
-      extraEffects: row?.extraEffects || []
-    };
-  }
-
-  function selectedResult() {
-    const results = integratedOptimizerResults || [];
-    return results.find(r =>
-      r &&
-      Array.isArray(r.equipmentIdxs) &&
-      r.equipmentIdxs.length &&
-      !r.currentConfig &&
-      !r.baselineReference
-    ) || results.find(r => r && Array.isArray(r.equipmentIdxs)) || null;
-  }
-
-  function buildReport() {
-    const payload = optimizerLastPayload || {};
-    const payloadState = payload.state || state || {};
-    const settings = {...(payload.settings || {})};
-    settings._equipmentRows = normalizeEquipmentRows(
-      Array.isArray(payloadState.equipment)
-        ? payloadState.equipment
-        : (state.equipment || [])
-    );
-    settings._compositeRows = normalizeCompositeRows(
-      Array.isArray(payloadState.composite)
-        ? payloadState.composite
-        : (state.composite || [])
-    );
-
-    const rows = settings._equipmentRows;
-    const groups = typeof optimizerEquipmentGroups === "function"
-      ? optimizerEquipmentGroups(settings)
-      : [];
-    const result = selectedResult();
-    const selected = new Set(result?.equipmentIdxs || []);
-    const skill = targetSkill();
-
-    const slotReports = groups.map(group => {
-      const candidates = (group.candidates || []).map(candidate => {
-        const row = rows[candidate.idx];
-        const data = rowDebugData(row, candidate.idx);
-
-        let singleMetrics = null;
-        let singleObjective = null;
-        let singleScore = null;
-        try {
-          const st = optimizerStateForSelection([candidate.idx], [], settings);
-          singleMetrics = computeMetrics(st, payload.inputs || {});
-          if (global.MOEOptimizerSkillPlusFixV1?.attachMetrics) {
-            global.MOEOptimizerSkillPlusFixV1.attachMetrics(
-              singleMetrics,
-              [candidate.idx],
-              [],
-              settings
-            );
-          }
-          singleObjective = optimizerObjectiveRawValue(
-            singleMetrics,
-            settings.objective || "damage"
-          );
-          singleScore = optimizerMetricValue(
-            singleMetrics,
-            settings.objective || "damage"
-          );
-        } catch (error) {
-          singleMetrics = {error: error?.message || String(error)};
-        }
-
-        return {
-          ...data,
-          selected: selected.has(candidate.idx),
-          singleObjective,
-          singleScore,
-          singleSkillPlusScore: num(singleMetrics?.skillPlusScore),
-          singleSkillPlusTotals: singleMetrics?.skillPlusTotals || {},
-          singleFinalDamage: num(singleMetrics?.finalDamage),
-          singleMagic: num(singleMetrics?.stats?.magic),
-          singleAttack: num(singleMetrics?.atk),
-          metricError: singleMetrics?.error || ""
-        };
-      });
-
-      candidates.sort((a, b) => {
-        if (skill) {
-          const d = b.targetValue - a.targetValue;
-          if (d) return d;
-        }
-        return num(b.singleScore) - num(a.singleScore);
-      });
-
-      return {
-        slot: group.slot,
-        selectedCandidate: candidates.find(c => c.selected) || null,
-        candidates
-      };
-    });
-
-    return {
-      generatedAt: new Date().toISOString(),
-      objective: settings.objective || "damage",
-      secondaryObjective: settings.secondaryObjective || "",
-      targetSkill: skill,
-      skillPlusFilters: settings.skillPlusFilters || [],
-      beamWidth: settings.beamWidth,
-      accuracyPreset: settings.accuracyPreset,
-      result: result ? {
-        equipmentIdxs: result.equipmentIdxs || [],
-        compositeIdxs: result.compositeIdxs || [],
-        score: result.score,
-        rank: result.rank,
-        metrics: {
-          skillPlusScore: result.metrics?.skillPlusScore,
-          skillPlusTotals: result.metrics?.skillPlusTotals,
-          finalDamage: result.metrics?.finalDamage,
-          magic: result.metrics?.stats?.magic,
-          attack: result.metrics?.atk
-        }
-      } : null,
-      slots: slotReports
-    };
-  }
-
-  function reportText(report) {
-    const lines = [];
-    lines.push("Master of Epic 物理ダメージ計算webツール");
-    lines.push("skillPlus最適化デバッグ");
-    lines.push("=".repeat(96));
-    lines.push("");
-    lines.push(`目的: ${report.objective}`);
-    lines.push(`副目的: ${report.secondaryObjective || "なし"}`);
-    lines.push(`対象スキル: ${report.targetSkill || "未選択"}`);
-    lines.push(`精度: ${report.accuracyPreset || ""}`);
-    lines.push(`beamWidth: ${report.beamWidth ?? ""}`);
-    lines.push("");
-
-    report.slots.forEach(slot => {
-      lines.push(`[${slot.slot}]`);
-      lines.push("-".repeat(96));
-
-      slot.candidates.forEach(candidate => {
-        const mark = candidate.selected ? "★採用" : "  候補";
-        lines.push(
-          `${mark} idx=${candidate.idx} ` +
-          `${candidate.name || "(空)"} ` +
-          `対象+${candidate.targetValue} ` +
-          `単体skillPlus=${candidate.singleSkillPlusScore} ` +
-          `目的値=${candidate.singleObjective ?? ""} ` +
-          `score=${candidate.singleScore ?? ""}`
-        );
-
-        if (candidate.metricError) {
-          lines.push(`    ERROR: ${candidate.metricError}`);
-        }
-        if (Object.keys(candidate.totals || {}).length) {
-          lines.push(`    row totals: ${JSON.stringify(candidate.totals)}`);
-        }
-        if (Object.keys(candidate.singleSkillPlusTotals || {}).length) {
-          lines.push(`    metrics totals: ${JSON.stringify(candidate.singleSkillPlusTotals)}`);
-        }
-        if (candidate.conflictGroup || (candidate.conflictGroups || []).length) {
-          lines.push(
-            `    conflict: ${candidate.conflictGroup || ""} ` +
-            `${JSON.stringify(candidate.conflictGroups || [])}`
-          );
-        }
-      });
-
-      lines.push("");
-    });
-
-    return lines.join("\n");
-  }
-
-  function renderPanel() {
-    let panel = document.getElementById("optimizerSkillPlusDebugPanel");
-    if (!panel) {
-      const results = document.getElementById("optimizerResults");
-      if (!results) return;
-      panel = document.createElement("details");
-      panel.id = "optimizerSkillPlusDebugPanel";
-      panel.className = "optimizerSkillPlusDebugPanel";
-      panel.innerHTML = `
-        <summary>skillPlus最適化デバッグ</summary>
-        <div class="optimizerSkillPlusDebugActions">
-          <button type="button" id="optimizerSkillPlusDebugRefresh">再解析</button>
-          <button type="button" id="optimizerSkillPlusDebugCopy">レポートをコピー</button>
-        </div>
-        <pre id="optimizerSkillPlusDebugOutput"></pre>
-      `;
-      results.insertAdjacentElement("afterend", panel);
-    }
-
-    const output = document.getElementById("optimizerSkillPlusDebugOutput");
-    const refresh = document.getElementById("optimizerSkillPlusDebugRefresh");
-    const copy = document.getElementById("optimizerSkillPlusDebugCopy");
-
-    const report = buildReport();
-    const text = reportText(report);
-
-    if (output) output.textContent = text;
-    global.__MOE_LAST_SKILLPLUS_DEBUG_REPORT__ = report;
-    global.__MOE_LAST_SKILLPLUS_DEBUG_TEXT__ = text;
-
-    console.group("MoE skillPlus optimizer debug");
-    console.log(report);
-    console.table(
-      report.slots.flatMap(slot =>
-        slot.candidates.map(c => ({
-          slot: slot.slot,
-          selected: c.selected,
-          idx: c.idx,
-          name: c.name,
-          targetValue: c.targetValue,
-          singleSkillPlusScore: c.singleSkillPlusScore,
-          objective: c.singleObjective,
-          score: c.singleScore
-        }))
-      )
-    );
-    console.groupEnd();
-
-    if (refresh) refresh.onclick = renderPanel;
-    if (copy) copy.onclick = async () => {
-      try {
-        await navigator.clipboard.writeText(
-          global.__MOE_LAST_SKILLPLUS_DEBUG_TEXT__ || ""
-        );
-        copy.textContent = "コピー済み";
-        setTimeout(() => copy.textContent = "レポートをコピー", 1200);
-      } catch (error) {
-        alert("コピーに失敗しました: " + (error?.message || String(error)));
-      }
-    };
-  }
-
-  function installCheckbox() {
-    if (document.getElementById("optimizerSkillPlusDebugMode")) return;
-
-    const target = document.getElementById("optimizerSkillPlusTargetSkill");
-    if (!target) return;
-
-    const label = document.createElement("label");
-    label.className = "optimizerSkillPlusDebugToggle";
-    label.innerHTML = `
-      <input type="checkbox" id="optimizerSkillPlusDebugMode">
-      skillPlusデバッグ
-    `;
-    target.closest("label, .optimizerControl, .field, div")?.appendChild(label);
-
-    document.getElementById("optimizerSkillPlusDebugMode")?.addEventListener(
-      "change",
-      event => {
-        if (event.target.checked) renderPanel();
-        else document.getElementById("optimizerSkillPlusDebugPanel")?.remove();
-      }
-    );
-  }
-
-  const baseRender = renderIntegratedOptimizerResults;
-  renderIntegratedOptimizerResults = function renderIntegratedOptimizerResultsWithSkillPlusDebugV1() {
-    const result = baseRender.apply(this, arguments);
-    installCheckbox();
-    if (isEnabled()) renderPanel();
-    return result;
-  };
-
-  global.renderOptimizerSkillPlusDebugV1 = renderPanel;
-  global.buildOptimizerSkillPlusDebugReportV1 = buildReport;
-
-  const boot = () => {
-    installCheckbox();
-    if (isEnabled() && (integratedOptimizerResults || []).length) renderPanel();
-  };
-
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", boot, {once:true});
-  } else {
-    boot();
-  }
-})(typeof globalThis !== "undefined" ? globalThis : window);
-
-
 /* Optimizer: メイン武器種指定 UI */
 (function installOptimizerMainWeaponSkillV1(global) {
   if (global.__MOE_OPTIMIZER_MAIN_WEAPON_SKILL_V1__) return;
@@ -18463,10 +18203,8 @@ function renderAnalysisPanel() {
     if (objectiveWrapper?.parentElement) objectiveWrapper.insertAdjacentElement("afterend", wrapper);
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", install, {once:true});
-  } else {
-    install();
+  if (typeof document !== "undefined") {
+    global.__MOE_INITIALIZE_OPTIMIZER_MAIN_WEAPON_V1__ = install;
   }
 })(typeof globalThis !== "undefined" ? globalThis : window);
 
@@ -18491,6 +18229,7 @@ function renderAnalysisPanel() {
   ];
 
   let effects = [];
+  let panelInitialized = false;
 
   function esc(value) {
     return String(value ?? "").replace(/[&<>"']/g, ch => ({
@@ -18651,6 +18390,7 @@ function renderAnalysisPanel() {
   }
 
   function render() {
+    if (!panelInitialized) return;
     const panel = ensurePanel();
     if (!panel) return;
     const used = usedSlots();
@@ -18739,19 +18479,29 @@ function renderAnalysisPanel() {
     },
     remove: removeEffect,
     clear: clearEffects,
-    render
+    render: initializePanel
   });
 
-  function boot() {
-    load();
+  function initializePanel() {
+    if (panelInitialized) return;
+    panelInitialized = true;
     ensurePanel();
     render();
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", boot, {once: true});
-  } else {
-    boot();
+  // 計算用データは従来どおり直ちに復元する。DOM探索・イベント登録・表描画だけを、
+  // NPC UI が存在する Buff登録タブを初めて開くまで遅延する。
+  load();
+  function initializePanelOnBuffTab(event) {
+    if (event.detail?.id !== "buffs") return;
+    initializePanel();
+    document.removeEventListener("moe:main-tab-activated", initializePanelOnBuffTab);
+  }
+  document.addEventListener("moe:main-tab-activated", initializePanelOnBuffTab);
+
+  if (localStorage.getItem("moeDamageSimActiveTab") === "buffs") {
+    initializePanel();
+    document.removeEventListener("moe:main-tab-activated", initializePanelOnBuffTab);
   }
 })(window);
 /* __MOE_NPC_EFFECT_AC_V1__ */
