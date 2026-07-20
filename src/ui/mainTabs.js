@@ -10,6 +10,7 @@ const MAIN_TABS = [
   {id:"skill", label:"スキルシミュレータ", hint:"スキル合計850、残りポイント、種族別の簡易ステータスを確認します。計算タブへは常時自動反映します。"},
   {id:"equipment", label:"装備登録", hint:"武器・防具・装飾候補、装備Buff、AC/HP/命中などの追加ステータスを部位ごとのカテゴリで登録します。候補追加はここで行います。"},
   {id:"catalog", label:"装備カタログ α", hint:"Git上の生成カタログから装備を検索し、必要なものだけ装備登録へ追加します。カタログ上にあるだけでは計算対象になりません。"},
+  {id:"combatLog", label:"戦闘ログ解析 α", hint:"MoEの戦闘ログをブラウザ内だけで解析し、与ダメージ、クリティカル、ミス、DPMを集計します。"},
   {id:"buffs", label:"Buff登録", hint:"装備以外のBuff、外枠補正、その他バフを登録します。"},
   {id:"groups", label:"競合グループ", hint:"同一グループで重複しないBuffを確認します。"},
   {id:"showcase", label:"見せびらかし", hint:"現在構成のダメージ、ステータス、装備、Buffを一覧表示します。"},
@@ -31,6 +32,7 @@ function activateMainTab(id) {
     detail: {id: valid}
   }));
   if (valid === "catalog") renderCatalogTab();
+  if (valid === "combatLog") renderCombatLogTab();
 }
 
 function setupTabLayout() {

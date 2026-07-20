@@ -128,6 +128,39 @@
     overflow-x: auto;
     max-width: 100%;
   }
+  .combatLogSummaryGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr));
+    gap: 12px;
+    align-items: start;
+    margin-top: 10px;
+  }
+  .combatLogSummaryBlock {
+    min-width: 0;
+    padding: 8px 10px;
+    border-left: 3px solid #ddd;
+    background: #fcfcfc;
+  }
+  .combatLogSummaryBlock h3 {
+    margin: 0 0 4px;
+    font-size: 15px;
+  }
+  .combatLogSummaryHeadline {
+    margin-bottom: 5px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  .combatLogTextStats {
+    font-size: 13px;
+    line-height: 1.45;
+  }
+  .combatLogTextStats > div {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+  #combatLogEncounter {
+    width: min(100%, 620px);
+  }
   .compactControls {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));

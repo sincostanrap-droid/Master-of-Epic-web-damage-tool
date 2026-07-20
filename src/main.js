@@ -12,8 +12,8 @@
   onclick属性から呼ばれる関数があるため、現時点では module ではなく通常scriptとして読み込みます。
 */
 
-const APP_VERSION = "v1.23.86";
-const APP_VERSION_NOTE = "起動時IIFEのDOM処理を各タブ初回表示まで遅延";
+const APP_VERSION = "v1.24.0";
+const APP_VERSION_NOTE = "戦闘ログ解析を追加・タブ初回表示まで遅延初期化";
 
 /* 種族係数。攻撃力係数と魔力係数は別管理。 */
 const RACE_COEFFS = {
