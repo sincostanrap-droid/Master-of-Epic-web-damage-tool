@@ -2432,6 +2432,55 @@ Object.assign(window.MOE_BUFF_RULES_MANUAL, {
   }
 });
 
+// __MOE_EQUIPMENT_BUFF_ESTIMATE_CONFLICT_SPLIT_BULK19_V1__
+// 単独の概算値として安定しているものと、複数情報が衝突するものを分離する。
+(() => {
+  const confirmEstimate = (id, effect, memo) => {
+    const rule = window.MOE_BUFF_RULES_MANUAL[`technic-${id}`];
+    rule.verified = true;
+    rule.reviewStatus = "display-only";
+    rule.customEffects = [{ name: effect, value: 0 }];
+    rule.memo = memo || "Wiki/Scrapboxの概算値を概算表記のまま反映。現行計算対象外のため表示のみ。";
+  };
+
+  confirmEstimate(3564, "HP/MP自然回復 約15/分・ST自然回復 約10/分");
+  confirmEstimate(8997, "召喚魔法ディレイ 約-20%");
+  confirmEstimate(8202, "銃器ディレイ 約-10%・専用技「タンク キャノン」使用可能");
+  confirmEstimate(
+    9593,
+    "スキル上昇率 約10%・ミスリル強化ゲージ滑り約-1・盗み補正上昇",
+    "Wikiの概算値を保持。スキル上昇・生産・盗み補正のため表示のみ。"
+  );
+
+  {
+    const rule = window.MOE_BUFF_RULES_MANUAL["technic-7824"];
+    rule.customEffects = [
+      { name: "シャウトディレイ-20%", value: 0 },
+      { name: "シャウト効果範囲+2", value: 0 },
+      { name: "シャウト詠唱短縮量未検証", value: 0 }
+    ];
+    rule.memo = "ディレイ-20%と範囲+2のみ確認。詠唱短縮量が未確定のため未検証を維持。";
+  }
+
+  {
+    const rule = window.MOE_BUFF_RULES_MANUAL["technic-9221"];
+    rule.customEffects = [
+      { name: "HP12回復・周期14秒または15秒", value: 0 },
+      { name: "ST12回復・周期14秒または15秒", value: 0 }
+    ];
+    rule.memo = "回復量12は一致するが周期が14秒/15秒で衝突するため未検証を維持。";
+  }
+
+  {
+    const rule = window.MOE_BUFF_RULES_MANUAL["technic-7634"];
+    rule.customEffects = [
+      { name: "物理ダメージ100%反射", value: 0 },
+      { name: "発動率：Wiki約10% / 実測55回÷292被弾≒18.8%", value: 0 }
+    ];
+    rule.memo = "反射率100%は一致。発動率の記録が約10%と約18.8%で衝突するため未検証。";
+  }
+})();
+
 // __MOE_EQUIPMENT_BUFF_RESISTANCE_PARTIAL_BULK18_V1__
 // 「固定値」と「割合値」が明示的に併記されたものは別効果として反映する。
 // 一部だけ確定した複合効果は、未確定部分を残して未検証を維持する。

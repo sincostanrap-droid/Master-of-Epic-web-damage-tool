@@ -30,7 +30,7 @@ assert.equal(rules["technic-9152"].misc.targetMultiplier, 1.2);
 
 for (const id of [
   "technic-6479", "technic-7326", "technic-12145", "technic-7737",
-  "technic-8301", "technic-6200", "technic-3564",
+  "technic-8301", "technic-6200",
   "technic-9221", "technic-6393", "technic-10567", "technic-6080",
   "technic-977", "technic-14078", "technic-7634", "technic-8759"
 ]) {

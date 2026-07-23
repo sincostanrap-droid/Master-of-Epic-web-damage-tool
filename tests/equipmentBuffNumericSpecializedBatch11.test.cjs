@@ -25,14 +25,6 @@ for (const [id, speed] of implementedSpeed) {
   assert.equal(rules[id].stats.speed, speed, `${id} normal movement speed`);
 }
 
-const unverified = [
-  "technic-8997", "technic-8202"
-];
-for (const id of unverified) {
-  assert.equal(rules[id].reviewStatus, "unverified", `${id} unverified`);
-  assert.equal(rules[id].verified, false, `${id} verified flag`);
-}
-
 const displayExamples = [
   "technic-8305", "technic-13284", "technic-10469",
   "technic-10677", "technic-6896", "technic-11213",
