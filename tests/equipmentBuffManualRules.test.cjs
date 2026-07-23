@@ -253,4 +253,29 @@ for (const id of displayClassificationBatch9) {
   assert.ok(rules[id].customEffects.length > 0, `${id} batch9 display effect`);
 }
 
+const noNumericDisplayBatch10 = [
+  "technic-3268", "technic-7750", "technic-2439", "technic-4559",
+  "technic-9674", "technic-7755", "technic-8199", "technic-5967",
+  "technic-1327", "technic-4022", "technic-3875", "technic-7880",
+  "technic-2996", "technic-7304", "technic-9892", "technic-7649",
+  "technic-3551", "technic-3867", "technic-8774", "technic-5976"
+];
+for (const id of noNumericDisplayBatch10) {
+  assert.equal(rules[id].reviewStatus, "display-only", `${id} batch10 display classification`);
+  assert.ok(rules[id].customEffects.length > 0, `${id} batch10 display effect`);
+}
+
+const noNumericUnverifiedBatch10 = [
+  "technic-11379", "technic-3275", "technic-1579", "technic-1577",
+  "technic-6368", "technic-8998", "technic-3274", "technic-7941",
+  "technic-8999", "technic-6086", "technic-5837", "technic-8996",
+  "technic-12458", "technic-12777", "technic-7873", "technic-7569",
+  "technic-11483", "technic-8819", "technic-14258"
+];
+for (const id of noNumericUnverifiedBatch10) {
+  assert.equal(rules[id].reviewStatus, "unverified", `${id} batch10 unverified classification`);
+  assert.equal(rules[id].verified, false, `${id} batch10 verified flag`);
+  assert.ok(rules[id].customEffects.length > 0, `${id} batch10 unverified display effect`);
+}
+
 console.log("equipmentBuffManualRules tests: OK");
