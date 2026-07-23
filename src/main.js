@@ -704,8 +704,20 @@ function quickEffectAppliedMessage(context, scope, key, value, targetName="") {
   return `${where}へ反映: ${target}${def.label} ${v}${def.unit || ""}`;
 }
 
+function additionalEffectIdentity(effect) {
+  const e = effect || {};
+  return [
+    String(e.key || "custom").trim(),
+    String(e.name || "").trim(),
+    Number(e.value || 0),
+    String(e.unit || "").trim(),
+    String(e.scope || "display").trim()
+  ].join("\u001f");
+}
+
 function normalizeAdditionalEffects(effects) {
   if (!Array.isArray(effects)) return [];
+  const seen = new Set();
   return effects.map(e => ({
     key: e?.key || "custom",
     name: String(e?.name || ""),
@@ -713,7 +725,13 @@ function normalizeAdditionalEffects(effects) {
     unit: e?.unit || quickEffectDef(e?.key || "custom").unit || "",
     scope: e?.scope || "display",
     note: e?.note || ""
-  })).filter(e => e.name || e.value || e.key !== "custom");
+  })).filter(e => e.name || e.value || e.key !== "custom")
+    .filter(e => {
+      const identity = additionalEffectIdentity(e);
+      if (seen.has(identity)) return false;
+      seen.add(identity);
+      return true;
+    });
 }
 
 function additionalEffectLabel(effect) {
@@ -789,7 +807,18 @@ function parseAdditionalEffectsText(text) {
 
 function pushDisplayEffect(row, key, value, name="", unit="", scope="display", note="") {
   row.extraEffects = normalizeAdditionalEffects(row.extraEffects);
-  row.extraEffects.push({key, name, value:+value || 0, unit: unit || quickEffectDef(key).unit || "", scope, note});
+  const effect = {
+    key,
+    name,
+    value:+value || 0,
+    unit: unit || quickEffectDef(key).unit || "",
+    scope,
+    note
+  };
+  const identity = additionalEffectIdentity(effect);
+  if (row.extraEffects.some(existing => additionalEffectIdentity(existing) === identity)) return false;
+  row.extraEffects.push(effect);
+  return true;
 }
 
 function quickEffectTargetName(def, targetValue) {
@@ -6413,7 +6442,10 @@ function resolveEquipmentBuffRow(row) {
     name: resolved.equipBuffName
   };
   const candidate = findEquipBuffRuleCandidate(buff);
-  if (candidate) applyEquipBuffRuleCandidateToEquipment(resolved, candidate);
+  if (candidate) {
+    clearEquipmentBuffPercentPrefixArtifacts(resolved, candidate);
+    applyEquipBuffRuleCandidateToEquipment(resolved, candidate);
+  }
   applySkillBuffCompatibilityToEquipment(resolved, buff);
   applyDamageBuffCompatibilityToEquipment(resolved, buff);
   Object.assign(resolved, equipmentBuffRecoveryValues(resolved), equipmentBuffDamageCompatibilityValues(resolved));
@@ -13286,6 +13318,59 @@ function setIfNumeric(row, prop, value, overwrite=false) {
   return true;
 }
 
+/* 旧Wiki抽出器は「回避+20%」等を割合20と固定値2の両方に誤認していた。
+ * generatedを直接書き換えず、抽出ヒントと数値がその誤認形に完全一致する場合だけ
+ * 固定値側を無効化する。manualルールは確定値として対象外にする。 */
+function equipmentBuffPercentPrefixArtifactFields(rule) {
+  const fields = new Set();
+  if (!rule || String(rule.source || "").toLowerCase().startsWith("manual")) return fields;
+  const hint = String(rule.parsedStatsHint || "");
+  const stats = rule.stats || {};
+  const pairs = [
+    ["攻撃力", "attackPct", "attack", "equipBuffFlatAttack"],
+    ["魔力", "magicPct", "magic", "equipBuffFlatMagic"],
+    ["速度", "speedPct", "speed", "equipBuffFlatSpeed"],
+    ["AC", "extraACPct", "extraAC", "equipBuffExtraAC"],
+    ["HP", "extraHPPct", "extraHP", "equipBuffExtraHP"],
+    ["MP", "extraMPPct", "extraMP", "equipBuffExtraMP"],
+    ["ST", "extraSTPct", "extraST", "equipBuffExtraST"],
+    ["最大重量", "extraMaxWeightPct", "extraMaxWeight", "equipBuffExtraMaxWeight"],
+    ["命中", "extraHitPct", "extraHit", "equipBuffExtraHit"],
+    ["回避", "extraAvoidPct", "extraAvoid", "equipBuffExtraAvoid"],
+    ["攻撃ディレイ", "extraAttackDelayPct", "extraAttackDelay", "equipBuffExtraAttackDelay"],
+    ["魔法ディレイ", "extraMagicDelayPct", "extraMagicDelay", "equipBuffExtraMagicDelay"]
+  ];
+  const escapeRe = value => String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  pairs.forEach(([label, pctKey, flatKey, equipProp]) => {
+    const pct = Number(stats[pctKey]);
+    const flat = Number(stats[flatKey]);
+    if (!Number.isFinite(pct) || !Number.isFinite(flat) || pct === flat) return;
+    const pctText = String(pct);
+    const flatText = String(flat);
+    if (!pctText.startsWith(flatText)) return;
+    const pctHint = new RegExp(`(?:^|\\s/\\s)${escapeRe(label)}%:${escapeRe(pctText)}%(?=\\s/\\s|$)`);
+    const flatHint = new RegExp(`(?:^|\\s/\\s)${escapeRe(label)}:${escapeRe(flatText)}(?=\\s/\\s|$)`);
+    if (pctHint.test(hint) && flatHint.test(hint)) fields.add(`${flatKey}\u001f${equipProp}`);
+  });
+  return fields;
+}
+
+function equipmentBuffStatsWithoutPercentPrefixArtifacts(rule, stats) {
+  const out = {...(stats || {})};
+  equipmentBuffPercentPrefixArtifactFields(rule).forEach(field => {
+    delete out[field.split("\u001f")[0]];
+  });
+  return out;
+}
+
+function clearEquipmentBuffPercentPrefixArtifacts(row, rule) {
+  equipmentBuffPercentPrefixArtifactFields(rule).forEach(field => {
+    const [flatKey, equipProp] = field.split("\u001f");
+    if (Number(row?.[equipProp]) === Number(rule?.stats?.[flatKey])) row[equipProp] = 0;
+  });
+  return row;
+}
+
 function appendUniqueText(base, add) {
   const a = String(add || "").trim();
   if (!a) return base || "";
@@ -13313,7 +13398,10 @@ function applyEquipBuffRuleCandidateToEquipment(row, rule, opts={}) {
 
   // 説明文に単位付きで明記された自然回復も、カタログ追加時は入力値として保存する。
   // 手動・生成済み stats の確定値を優先する。
-  const stats = {...equipmentBuffSafeTagHintStats(rule), ...(rule.stats || {})};
+  const stats = equipmentBuffStatsWithoutPercentPrefixArtifacts(
+    rule,
+    {...equipmentBuffSafeTagHintStats(rule), ...(rule.stats || {})}
+  );
   const statMap = {
     attack:"equipBuffFlatAttack", attackPct:"equipBuffAttackPct", magic:"equipBuffFlatMagic", magicPct:"equipBuffMagicPct", speed:"equipBuffFlatSpeed", speedPct:"equipBuffSpeedPct",
     dmgPct:"equipBuffDmgPct",

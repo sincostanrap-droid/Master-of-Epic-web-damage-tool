@@ -8,6 +8,7 @@ const manualPath = path.join(root, "src/data/manual/buffRules.manual.js");
 const generatedPath = path.join(root, "src/data/generated/equipBuffRuleCandidates.generated.js");
 const skillCompatibilityPath = path.join(root, "src/data/generated/skillBuffCompatibility.generated.js");
 const damageCompatibilityPath = path.join(root, "src/data/generated/damageBuffCompatibility.generated.js");
+const wikiEffectsPath = path.join(root, "src/data/generated/wikiEquipBuffEffects.generated.js");
 const mainPath = path.join(root, "src/main.js");
 
 function loadWindowFiles(files) {
@@ -67,6 +68,56 @@ function runtimeSafeHintResolver(mainSource) {
   return candidate => context.__resolveEquipmentBuffSafeHints(candidate);
 }
 
+function runtimePercentPrefixArtifactResolver(mainSource) {
+  const start = mainSource.indexOf("function equipmentBuffPercentPrefixArtifactFields(");
+  const end = mainSource.indexOf("function applyEquipBuffRuleCandidateToEquipment(", start);
+  if (start < 0 || end < 0) return () => new Set();
+  const context = {};
+  vm.createContext(context);
+  vm.runInContext(
+    `${mainSource.slice(start, end)}
+     globalThis.__resolveEquipmentBuffPercentPrefixArtifacts = equipmentBuffPercentPrefixArtifactFields;`,
+    context
+  );
+  return candidate => context.__resolveEquipmentBuffPercentPrefixArtifacts(candidate);
+}
+
+function wikiPercentPrefixArtifactCount(rows) {
+  const pairs = [
+    ["attackPct", "attackFlat"], ["magicPct", "magicFlat"], ["speedPct", "speedFlat"],
+    ["extraACPct", "flatAC"], ["extraHPPct", "flatHP"], ["extraMPPct", "flatMP"],
+    ["extraSTPct", "flatST"], ["extraHitPct", "hitFlat"], ["extraAvoidPct", "avoidFlat"],
+    ["maxWeightPct", "flatMaxWeight"], ["attackDelayPct", "attackDelayFlat"],
+    ["magicDelayPct", "magicDelayFlat"]
+  ];
+  let affectedRows = 0;
+  let affectedFields = 0;
+  for (const row of rows) {
+    let rowFields = 0;
+    for (const [pctKey, flatKey] of pairs) {
+      const pctEffects = (row.parsedStats || []).filter(effect => effect.key === pctKey);
+      const flatEffects = (row.parsedStats || []).filter(effect => effect.key === flatKey);
+      for (const pct of pctEffects) {
+        for (const flat of flatEffects) {
+          const pctRaw = String(pct.raw || "");
+          const flatRaw = String(flat.raw || "");
+          if (
+            pctRaw.endsWith("%")
+            && pctRaw.slice(0, -1).startsWith(flatRaw)
+            && Number(pct.value) !== Number(flat.value)
+            && String(Number(pct.value)).startsWith(String(Number(flat.value)))
+          ) rowFields += 1;
+        }
+      }
+    }
+    if (rowFields) {
+      affectedRows += 1;
+      affectedFields += rowFields;
+    }
+  }
+  return { rows: affectedRows, fields: affectedFields };
+}
+
 function runAudit() {
   const mainSource = fs.readFileSync(mainPath, "utf8");
   const manualSource = fs.readFileSync(manualPath, "utf8");
@@ -74,13 +125,16 @@ function runAudit() {
     generatedPath,
     skillCompatibilityPath,
     damageCompatibilityPath,
+    wikiEffectsPath,
     manualPath
   ]);
   const manual = window.MOE_BUFF_RULES_MANUAL || {};
   const generated = window.MOE_EQUIP_BUFF_RULE_CANDIDATES_GENERATED || [];
   const skillCompatibility = window.MOE_SKILL_BUFF_COMPATIBILITY_GENERATED || [];
   const damageCompatibility = window.MOE_DAMAGE_BUFF_COMPATIBILITY_GENERATED || [];
+  const wikiEffects = window.MOE_WIKI_EQUIP_BUFF_EFFECTS_GENERATED || [];
   const resolveSafeHints = runtimeSafeHintResolver(mainSource);
+  const resolvePercentPrefixArtifacts = runtimePercentPrefixArtifactResolver(mainSource);
   const skillCoveredNames = new Set(skillCompatibility
     .filter(rule => Number(rule?.value) !== 0 && !rule?.valueUncertain)
     .map(rule => normalizedBuffName(rule?.buffName || rule?.name))
@@ -193,6 +247,10 @@ function runAudit() {
   const remainingWithNumericSource = remaining.filter(rule =>
     /\d/.test([rule.rawInfo, rule.parsedStatsHint, rule.scrapboxRawLines].filter(Boolean).join(" "))
   ).length;
+  const percentPrefixArtifactRules = generated.filter(rule => resolvePercentPrefixArtifacts(rule).size > 0);
+  const percentPrefixArtifactFields = percentPrefixArtifactRules
+    .reduce((sum, rule) => sum + resolvePercentPrefixArtifacts(rule).size, 0);
+  const wikiPercentPrefixArtifacts = wikiPercentPrefixArtifactCount(wikiEffects);
 
   return {
     ok: errors.length === 0,
@@ -203,6 +261,13 @@ function runAudit() {
       remainingWithoutNormalizedEffect: remaining.length,
       remainingWithNumericSource,
       remainingWithoutNumericSource: remaining.length - remainingWithNumericSource,
+      percentPrefixArtifacts: {
+        sourceRows: wikiPercentPrefixArtifacts.rows,
+        sourceFields: wikiPercentPrefixArtifacts.fields,
+        runtimeCandidates: percentPrefixArtifactRules.length,
+        runtimeFields: percentPrefixArtifactFields,
+        runtimeSuppressed: percentPrefixArtifactFields
+      },
       runtimeCoverage: coverage,
       reviewStatus: statusCounts
     },
@@ -227,6 +292,7 @@ if (process.argv.includes("--json")) {
   console.log(`equipment buff manual audit: ${result.ok ? "OK" : "FAILED"}`);
   console.log(`generated=${counts.generatedRules} manual=${counts.manualRules} runtimeStats=${counts.runtimeStatKeys}`);
   console.log(`remaining=${counts.remainingWithoutNormalizedEffect} numericSource=${counts.remainingWithNumericSource} noNumericSource=${counts.remainingWithoutNumericSource}`);
+  console.log(`percentPrefixArtifacts=${JSON.stringify(counts.percentPrefixArtifacts)}`);
   console.log(`runtimeCoverage=${JSON.stringify(counts.runtimeCoverage)}`);
   console.log(`reviewStatus=${JSON.stringify(counts.reviewStatus)}`);
   result.warnings.forEach(message => console.warn(`WARN: ${message}`));
