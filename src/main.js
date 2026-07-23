@@ -9318,9 +9318,8 @@ function makeEquipmentBuffDetailRow(row, includeSlot, statusButton) {
 
 /* 装備1行分の入力欄を作る。装備は常に使用扱いで、0なら効果なし。 */
 function equipmentUseCell(row, idx) {
-  const cb = makeCell("input", {type:"checkbox", checked: row.enabled !== false});
+  const cb = makeCell("input", {type:"checkbox", checked: row.enabled !== false, class:"equipmentUseCheckbox"});
   cb.onchange = () => {
-    state.equipment = normalizeEquipmentRows(state.equipment);
     const target = state.equipment[idx];
     if (!target) return;
 
@@ -9336,7 +9335,7 @@ function equipmentUseCell(row, idx) {
       target.enabled = false;
     }
 
-    renderEquipmentTable();
+    refreshEquipmentUsageAfterToggle();
     calc();
   };
   const td = makeCell("td", {class:"checkCell"});
@@ -9456,6 +9455,7 @@ function makeEquipmentInputRow(row, includeSlot=true, idx=0) {
   const frag = document.createDocumentFragment();
   const tr = document.createElement("tr");
   tr.className = "equipmentMainRow";
+  tr.dataset.equipmentIndex = String(idx);
   if (row.enabled === false) tr.classList.add("equipmentOffRow");
   if (row.optimizerFixed) tr.classList.add("equipmentOptimizerFixedRow");
   if (row.optimizerExcluded) tr.classList.add("equipmentOptimizerExcludedRow");
@@ -9528,6 +9528,29 @@ function equipmentFilterState() {
     slot: byId("equipmentFilterSlot")?.value || "all",
     status: byId("equipmentFilterStatus")?.value || "all"
   };
+}
+
+function syncEquipmentUsageControls() {
+  document.querySelectorAll(".equipmentMainRow[data-equipment-index]").forEach(tr => {
+    const idx = Number(tr.dataset.equipmentIndex);
+    const row = state.equipment[idx];
+    if (!row) return;
+    const enabled = row.enabled !== false;
+    const checkbox = tr.querySelector(".equipmentUseCheckbox");
+    if (checkbox) checkbox.checked = enabled;
+    tr.classList.toggle("equipmentOffRow", !enabled);
+    tr.querySelector(".equipInlineBuffSummaryText")
+      ?.classList.toggle("equipmentOffSummary", !enabled);
+  });
+}
+
+function refreshEquipmentUsageAfterToggle() {
+  const status = equipmentFilterState().status;
+  if (status === "enabled" || status === "disabled") {
+    renderEquipmentTable();
+    return;
+  }
+  syncEquipmentUsageControls();
 }
 
 function populateEquipmentFilterSlotOptions() {
