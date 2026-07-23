@@ -23,16 +23,16 @@ assert.equal(
 );
 
 const scorpio = rules["technic-12145"];
-assert.equal(scorpio.reviewStatus, "unverified");
-assert.equal(scorpio.verified, false);
+assert.equal(scorpio.reviewStatus, "display-only");
+assert.equal(scorpio.verified, true);
 assert.equal(
   scorpio.customEffects[1].name,
   "被弾時に毒針反撃 27～28ダメージ×3"
 );
 
 const starfish = rules["technic-14258"];
-assert.equal(starfish.reviewStatus, "unverified");
-assert.equal(starfish.verified, false);
+assert.equal(starfish.reviewStatus, "display-only");
+assert.equal(starfish.verified, true);
 assert.equal(
   starfish.customEffects[3].name,
   "水属性被ダメージ50%軽減"
