@@ -2514,6 +2514,57 @@ Object.assign(window.MOE_BUFF_RULES_MANUAL, {
   }
 })();
 
+// __MOE_EQUIPMENT_BUFF_FINAL_UNVERIFIED_BULK23_V1__
+// Wiki原文とScrapbox照合データを最終再確認しても計算に必要な数値根拠が
+// 得られなかったもの。効果自体は表示し、推測値は計算へ入れない。
+(() => {
+  const finalize = (id, effects, memo) => {
+    const rule = window.MOE_BUFF_RULES_MANUAL[`technic-${id}`];
+    rule.verified = false;
+    rule.reviewStatus = "unverified";
+    rule.reviewComplete = true;
+    rule.customEffects = (Array.isArray(effects) ? effects : [effects])
+      .map(name => ({ name, value: 0 }));
+    rule.memo = memo;
+  };
+
+  finalize(
+    11841,
+    "悪魔系への与ダメージ上昇（倍率不明）",
+    "Wikiで悪魔特攻を確認。Scrapboxには倍率の実測値がなく、特攻倍率は最終未検証。"
+  );
+  finalize(
+    14386,
+    ["攻撃力・命中・防御上昇（各上昇量不明）", "移動可能な行動不能状態を解除・無効化"],
+    "Wikiで効果範囲を確認。Scrapboxには各ステータスの数値根拠がなく、計算値は最終未検証。"
+  );
+  finalize(
+    8193,
+    ["攻撃力上昇（上昇量不明）", "移動速度1.05倍", "四足歩行モーション"],
+    "移動速度1.05倍は確認済みでstats.speedPct=5として反映。攻撃力上昇量のみ最終未検証。"
+  );
+  finalize(
+    9009,
+    "攻撃力上昇（上昇量不明）",
+    "WikiとScrapboxで攻撃力上昇を確認したが、Buff分の数値根拠がなく最終未検証。装備本体の攻撃力+1とは分離する。"
+  );
+  finalize(
+    13910,
+    "命中上昇（上昇量不明）",
+    "Wikiで命中上昇を確認したが、Scrapboxの数値は装備本体の命中+5のみでBuff分は最終未検証。"
+  );
+  finalize(
+    8998,
+    "悪魔系への与ダメージ上昇（倍率不明）",
+    "Wikiで悪魔特攻を確認。Scrapboxに倍率の数値根拠がなく、特攻倍率は最終未検証。"
+  );
+  finalize(
+    8996,
+    "ドラゴン系への与ダメージ上昇（倍率不明）",
+    "Wikiでドラゴン特攻を確認。Scrapboxに倍率の数値根拠がなく、特攻倍率は最終未検証。"
+  );
+})();
+
 // __MOE_EQUIPMENT_BUFF_OUT_OF_SCOPE_DISPLAY_BULK21_V1__
 // 効果量に未確定要素があっても、現行の物理ダメージ計算へ直接使わない
 // 回復・防御・移動・生産・魔法系効果は、不明点を明記して表示用へ分類する。
@@ -2730,6 +2781,6 @@ Object.assign(window.MOE_BUFF_RULES_MANUAL, {
       { name: "攻撃力上昇量未検証", value: 0 },
       { name: "四足歩行モーション", value: 0 }
     ];
-    rule.memo = "移動速度1.05倍のみ+5%として反映。攻撃力上昇量が不明なため未検証を維持。";
+    rule.memo = "移動速度1.05倍のみ+5%として反映。攻撃力上昇量は数値根拠がなく最終未検証。";
   }
 })();

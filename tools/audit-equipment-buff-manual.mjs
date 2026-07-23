@@ -320,6 +320,12 @@ function runAudit() {
   if (semanticDisplayDuplicates.remaining) {
     errors.push(`semantic display duplicates remain after runtime deduplication: ${semanticDisplayDuplicates.remaining}`);
   }
+  const unverifiedRules = Object.values(manual)
+    .filter(rule => rule?.reviewStatus === "unverified");
+  const unverifiedReview = {
+    finalized: unverifiedRules.filter(rule => rule?.reviewComplete === true).length,
+    pending: unverifiedRules.filter(rule => rule?.reviewComplete !== true).length
+  };
 
   return {
     ok: errors.length === 0,
@@ -339,7 +345,8 @@ function runAudit() {
       },
       semanticDisplayDuplicates,
       runtimeCoverage: coverage,
-      reviewStatus: statusCounts
+      reviewStatus: statusCounts,
+      unverifiedReview
     },
     remainingCandidates: process.argv.includes("--details")
       ? remaining.map(rule => ({
@@ -366,6 +373,7 @@ if (process.argv.includes("--json")) {
   console.log(`semanticDisplayDuplicates=${JSON.stringify(counts.semanticDisplayDuplicates)}`);
   console.log(`runtimeCoverage=${JSON.stringify(counts.runtimeCoverage)}`);
   console.log(`reviewStatus=${JSON.stringify(counts.reviewStatus)}`);
+  console.log(`unverifiedReview=${JSON.stringify(counts.unverifiedReview)}`);
   result.warnings.forEach(message => console.warn(`WARN: ${message}`));
   result.errors.forEach(message => console.error(`ERROR: ${message}`));
 }
