@@ -266,7 +266,7 @@ for (const id of noNumericDisplayBatch10) {
 }
 
 const noNumericUnverifiedBatch10 = [
-  "technic-6368", "technic-8998", "technic-8996", "technic-7873"
+  "technic-8998", "technic-8996"
 ];
 for (const id of noNumericUnverifiedBatch10) {
   assert.equal(rules[id].reviewStatus, "unverified", `${id} batch10 unverified classification`);

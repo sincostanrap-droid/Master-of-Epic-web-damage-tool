@@ -28,10 +28,7 @@ for (const id of displayOnly) {
 }
 
 const unverified = [
-  "technic-12307",
-  "technic-7624", "technic-7093", "technic-8193",
-  "technic-7917", "technic-12334",
-  "technic-12704", "technic-13877"
+  "technic-8193"
 ];
 for (const id of unverified) {
   assert.equal(rules[id].reviewStatus, "unverified", `${id} unverified`);

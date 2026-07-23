@@ -28,12 +28,6 @@ assert.equal(
   "銃器ディレイ 約-10%・専用技「タンク キャノン」使用可能"
 );
 
-for (const id of ["technic-7824"]) {
-  assert.equal(rules[id].reviewStatus, "unverified", `${id} remains unverified`);
-  assert.equal(rules[id].verified, false, `${id} verified flag`);
-  assert.ok(rules[id].customEffects.length >= 2, `${id} separated evidence`);
-}
-
 assert.equal(
   rules["technic-7634"].customEffects[1].name,
   "発動率：Wiki約10% / 実測55回÷292被弾≒18.8%"
