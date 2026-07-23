@@ -12902,15 +12902,50 @@ function equipBuffRuleKeyCandidates(buff, item=null) {
   return keys;
 }
 
+let equipBuffRuleLookupItems = null;
+let equipBuffRuleLookupIndex = null;
+
+function equipBuffRuleCandidateIndex(rules) {
+  if (equipBuffRuleLookupItems === rules && equipBuffRuleLookupIndex) {
+    return equipBuffRuleLookupIndex;
+  }
+
+  const byKey = new Map();
+  const order = new Map();
+  const add = (key, rule) => {
+    const normalized = catalogNorm(key);
+    if (normalized && !byKey.has(normalized)) byKey.set(normalized, rule);
+  };
+  rules.forEach((rule, position) => {
+    order.set(rule, position);
+    add(rule?.catalogId, rule);
+    add(rule?.id, rule);
+    add(rule?.officialTechnicId, rule);
+    if (rule?.officialTechnicId) add(`technic-${rule.officialTechnicId}`, rule);
+    add(rule?.name, rule);
+    add(rule?.wikiName, rule);
+  });
+  equipBuffRuleLookupItems = rules;
+  equipBuffRuleLookupIndex = {byKey, order};
+  return equipBuffRuleLookupIndex;
+}
+
 function findEquipBuffRuleCandidate(buff, item=null) {
   const keys = equipBuffRuleKeyCandidates(buff, item).map(k => catalogNorm(k));
   if (!keys.length) return null;
   const rules = equipBuffRuleCandidateItems();
-  const exact = rules.find(r => keys.includes(catalogNorm(r.catalogId || r.id || "")) || keys.includes(catalogNorm(r.officialTechnicId || "")) || keys.includes(catalogNorm(r.name || "")) || (r.officialTechnicId && keys.includes(catalogNorm(`technic-${r.officialTechnicId}`))));
+  const index = equipBuffRuleCandidateIndex(rules);
+  let exact = null;
+  for (const key of keys) {
+    const candidate = index.byKey.get(key);
+    if (candidate && (!exact || index.order.get(candidate) < index.order.get(exact))) {
+      exact = candidate;
+    }
+  }
   if (exact) return exact;
   const bname = catalogNorm(buff?.name || item?.equipBuff?.name || "");
   if (!bname) return null;
-  return rules.find(r => catalogNorm(r.name || r.wikiName || "") === bname) || null;
+  return index.byKey.get(bname) || null;
 }
 
 /* 生成候補には、数値が stats へ正規化されず説明の抽出ヒントだけに残るものがある。
@@ -13087,7 +13122,22 @@ function equipmentBuffDamageCompatibilityDisplayEffects(row) {
 }
 
 
+let skillBuffCompatibilityItemsCache = null;
+let skillBuffCompatibilitySourceRefs = null;
+
 function skillBuffCompatibilityItems() {
+  const sourceRefs = [
+    window.MOE_SKILL_BUFF_COMPATIBILITY_MANUAL,
+    window.MOE_SKILL_BUFF_COMPATIBILITY,
+    window.MOE_SKILL_BUFF_COMPATIBILITY_GENERATED
+  ];
+  if (
+    skillBuffCompatibilityItemsCache
+    && skillBuffCompatibilitySourceRefs
+    && sourceRefs.every((source, index) => source === skillBuffCompatibilitySourceRefs[index])
+  ) {
+    return skillBuffCompatibilityItemsCache;
+  }
   const raw = catalogArray("MOE_SKILL_BUFF_COMPATIBILITY_MANUAL", "MOE_SKILL_BUFF_COMPATIBILITY", "MOE_SKILL_BUFF_COMPATIBILITY_GENERATED");
   const seen = new Set();
   const out = [];
@@ -13098,7 +13148,9 @@ function skillBuffCompatibilityItems() {
     seen.add(key);
     out.push(item);
   });
-  return out;
+  skillBuffCompatibilitySourceRefs = sourceRefs;
+  skillBuffCompatibilityItemsCache = out;
+  return skillBuffCompatibilityItemsCache;
 }
 
 function skillBuffCompatibilityRulesForBuff(buff, item=null) {
@@ -13176,7 +13228,22 @@ function applySkillBuffCompatibilityToEquipment(row, buff, item=null) {
 }
 
 
+let damageBuffCompatibilityItemsCache = null;
+let damageBuffCompatibilitySourceRefs = null;
+
 function damageBuffCompatibilityItems() {
+  const sourceRefs = [
+    window.MOE_DAMAGE_BUFF_COMPATIBILITY_MANUAL,
+    window.MOE_DAMAGE_BUFF_COMPATIBILITY,
+    window.MOE_DAMAGE_BUFF_COMPATIBILITY_GENERATED
+  ];
+  if (
+    damageBuffCompatibilityItemsCache
+    && damageBuffCompatibilitySourceRefs
+    && sourceRefs.every((source, index) => source === damageBuffCompatibilitySourceRefs[index])
+  ) {
+    return damageBuffCompatibilityItemsCache;
+  }
   const raw = catalogArray("MOE_DAMAGE_BUFF_COMPATIBILITY_MANUAL", "MOE_DAMAGE_BUFF_COMPATIBILITY", "MOE_DAMAGE_BUFF_COMPATIBILITY_GENERATED");
   const seen = new Set();
   const out = [];
@@ -13187,7 +13254,9 @@ function damageBuffCompatibilityItems() {
     seen.add(key);
     out.push(item);
   });
-  return out;
+  damageBuffCompatibilitySourceRefs = sourceRefs;
+  damageBuffCompatibilityItemsCache = out;
+  return damageBuffCompatibilityItemsCache;
 }
 
 function damageBuffCompatibilityRulesForBuff(buff, item=null) {

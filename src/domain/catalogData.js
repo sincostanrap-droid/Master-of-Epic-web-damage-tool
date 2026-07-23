@@ -92,9 +92,26 @@ function buffCatalogItems() {
   return out;
 }
 
+let equipBuffRuleCandidateItemsCache = null;
+let equipBuffRuleCandidateSourceRefs = null;
+
 function equipBuffRuleCandidateItems() {
   // __MOE_MANUAL_BUFF_RULES_PRIORITY_FIX_V1__
   // verified/manual rules must override generated candidates with the same key.
+  const sourceRefs = [
+    window.MOE_BUFF_RULES_MANUAL,
+    window.MOE_EQUIP_BUFF_RULE_CANDIDATES_MANUAL,
+    window.MOE_EQUIP_BUFF_RULE_CANDIDATES,
+    window.MOE_EQUIP_BUFF_RULE_CANDIDATES_GENERATED
+  ];
+  if (
+    equipBuffRuleCandidateItemsCache
+    && equipBuffRuleCandidateSourceRefs
+    && sourceRefs.every((source, index) => source === equipBuffRuleCandidateSourceRefs[index])
+  ) {
+    return equipBuffRuleCandidateItemsCache;
+  }
+
   const generated = catalogArray(
     "MOE_EQUIP_BUFF_RULE_CANDIDATES_MANUAL",
     "MOE_EQUIP_BUFF_RULE_CANDIDATES",
@@ -126,5 +143,7 @@ function equipBuffRuleCandidateItems() {
     out.push(item);
   });
 
-  return out;
+  equipBuffRuleCandidateSourceRefs = sourceRefs;
+  equipBuffRuleCandidateItemsCache = out;
+  return equipBuffRuleCandidateItemsCache;
 }
