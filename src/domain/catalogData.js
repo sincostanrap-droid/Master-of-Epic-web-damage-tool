@@ -9,6 +9,13 @@ const CATALOG_SCRIPT_URLS = [
   "src/data/manual/buffRules.manual.js"
 ];
 let catalogScriptsPromise = null;
+let equipmentBuffRuntimeScriptsPromise = null;
+
+const EQUIPMENT_BUFF_RUNTIME_SCRIPT_URLS = [
+  "src/data/generated/equipBuffRuleCandidates.generated.js",
+  "src/data/generated/skillBuffCompatibility.generated.js",
+  "src/data/generated/damageBuffCompatibility.generated.js"
+];
 
 function catalogGlobalsReady() {
   const equipmentReady = Array.isArray(window.MOE_EQUIPMENT_CATALOG_GENERATED) ||
@@ -31,6 +38,21 @@ function loadCatalogScriptsOnce() {
     document.head.appendChild(script);
   }))).then(() => true).catch(() => false);
   return catalogScriptsPromise;
+}
+
+function loadEquipmentBuffRuntimeScriptsOnce() {
+  if (equipmentBuffRuntimeScriptsPromise) return equipmentBuffRuntimeScriptsPromise;
+  equipmentBuffRuntimeScriptsPromise = Promise.all(EQUIPMENT_BUFF_RUNTIME_SCRIPT_URLS.map(src => new Promise(resolve => {
+    if (document.querySelector(`script[data-catalog-src="${src}"]`)) return resolve();
+    const script = document.createElement("script");
+    script.src = src;
+    script.async = false;
+    script.dataset.catalogSrc = src;
+    script.onload = () => resolve();
+    script.onerror = () => resolve();
+    document.head.appendChild(script);
+  }))).then(() => true).catch(() => false);
+  return equipmentBuffRuntimeScriptsPromise;
 }
 
 function catalogArray(...names) {

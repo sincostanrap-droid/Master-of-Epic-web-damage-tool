@@ -5,7 +5,7 @@
   これにより、探索中もタブ切り替えや進捗表示が止まりにくくなります。
 */
 
-importScripts("../main.js", "../calc/core.js", "./core.js");
+importScripts("../domain/attackDpsState.js", "../main.js", "../calc/core.js", "./core.js");
 
 self.onmessage = event => {
   const msg = event.data || {};

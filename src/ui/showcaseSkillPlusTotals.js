@@ -129,11 +129,29 @@
     return panel;
   }
 
-  function stripSkillPlusLine(text) {
-    return String(text || "")
-      .replace(/^スキル強化合計:\s*.*(?:\r?\n){1,2}/, "")
-      .replace(/^スキル強化合計:\s*.*/, "");
-  }
+  // 複数の見せびらかし集計が同じコピー欄を更新しても、
+  // 既存の集計行を必ず一括で除去してから再構成する。
+  const copyHeaders = global.MOEShowcaseCopyHeaders || (global.MOEShowcaseCopyHeaders = (() => {
+    const values = new Map();
+    const order = ["skill", "element", "recovery"];
+    const strip = text => String(text || "").replace(/^(?:スキル強化合計|属性強化合計|自然回復・継続増減合計):[^\r\n]*(?:\r?\n)*/gm, "");
+    const render = () => {
+      const textarea = document.getElementById("showcaseText");
+      if (!textarea) return;
+      const headers = order.map(key => values.get(key)).filter(Boolean);
+      const base = strip(textarea.value || "");
+      textarea.value = headers.length ? `${headers.join("\n")}\n${base}` : base;
+    };
+    return {
+      set(key, text) {
+        if (text) values.set(key, text);
+        else values.delete(key);
+        render();
+      },
+      strip,
+      render
+    };
+  })());
 
   function updateShowcaseSkillPlusTotals() {
     if (typeof document === "undefined") return;
@@ -151,11 +169,7 @@
     }
 
     // コピー用のプレーンテキストにも合計を入れる。
-    const textarea = document.getElementById("showcaseText");
-    if (textarea) {
-      const base = stripSkillPlusLine(textarea.value || "");
-      textarea.value = body ? `スキル強化合計: ${body}\n${base}` : base;
-    }
+    copyHeaders.set("skill", body ? `スキル強化合計: ${body}` : "");
   }
 
   let scheduled = false;
