@@ -2431,3 +2431,41 @@ Object.assign(window.MOE_BUFF_RULES_MANUAL, {
     memo: "HP・ST・MP自然回復 各112/分。移動行動不可。プライベート テント由来。"
   }
 });
+
+// __MOE_EQUIPMENT_BUFF_PARTIAL_VERIFICATION_BULK16_V1__
+// 互換関係または周期回復の実測値から確定できる部分だけを反映する。
+// 不明な複合効果は未検証のまま残す。
+(() => {
+  {
+    const rule = window.MOE_BUFF_RULES_MANUAL["technic-9881"];
+    rule.verified = true;
+    rule.reviewStatus = "display-only";
+    rule.customEffects = [
+      { name: "落下ダメージ軽減", value: 15, unit: "%" },
+      { name: "落下速度軽減", value: 60, unit: "%" },
+      { name: "待機・移動モーション変化", value: 0 }
+    ];
+    rule.memo = "Scrapboxで風の加護互換を確認し、風の加護の確定値（15%/60%）を適用。";
+  }
+
+  {
+    const rule = window.MOE_BUFF_RULES_MANUAL["technic-11484"];
+    rule.verified = true;
+    rule.reviewStatus = "implemented";
+    rule.stats = { stRegenPerMinute: 54 };
+    rule.conflictGroup = "technic-11484";
+    rule.stackRule = "same-technic";
+    rule.customEffects = [{ name: "30秒でST27回復", value: 0 }];
+    rule.memo = "Scrapbox実測値の30秒27回復を1分あたり54へ換算。";
+  }
+
+  {
+    const rule = window.MOE_BUFF_RULES_MANUAL["technic-8193"];
+    rule.stats = { speedPct: 5 };
+    rule.customEffects = [
+      { name: "攻撃力上昇量未検証", value: 0 },
+      { name: "四足歩行モーション", value: 0 }
+    ];
+    rule.memo = "移動速度1.05倍のみ+5%として反映。攻撃力上昇量が不明なため未検証を維持。";
+  }
+})();
