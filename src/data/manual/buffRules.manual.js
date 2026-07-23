@@ -14,6 +14,88 @@
 // };
 window.MOE_BUFF_RULES_MANUAL = window.MOE_BUFF_RULES_MANUAL || {};
 
+// __MOE_EQUIPMENT_BUFF_FINAL_REVIEW_BULK14_V1__
+// 残件を全件分類する。複数IDをまとめたWiki行は sourceCatalogOnly として
+// 個別テクニックIDへ誤適用せず、元のカタログ行だけを表示対象にする。
+(() => {
+  const batch = {};
+  const add = (id, name, effect, status = "display-only", extra = {}) => {
+    const catalogId = String(id).startsWith("technic-") ? String(id) : `technic-${id}`;
+    const numericId = /^technic-\d+$/.test(catalogId)
+      ? Number(catalogId.slice("technic-".length))
+      : null;
+    batch[catalogId] = {
+      name,
+      officialTechnicId: numericId,
+      sourceCatalogOnly: numericId == null,
+      verified: status !== "unverified",
+      applyDefault: true,
+      reviewStatus: status,
+      customEffects: [{ name: effect, value: 0 }],
+      memo: status === "unverified"
+        ? "効果量・適用範囲が未確定のため計算未反映。"
+        : "現行の物理ダメージ計算対象外のため表示のみ。",
+      ...extra
+    };
+  };
+
+  [
+    ["technic-1334 / 1327", "歩きモーション変化", "歩行モーションが銃器エイム ファイアーのしゃがみ姿勢へ変化"],
+    [5235, "オーラ", "紫色のオーラエフェクト"],
+    [11533, "熊猫 ( くまねこ ) 流の極意", "キック/戦闘技術効果 スキル+10相当"],
+    [8500, "酒豪の力", "酩酊技の効果上昇"],
+    [12287, "神便鬼毒酒", "酩酊テクニック効果 スキル+20相当"],
+    ["technic-3477 / 3756", "天使のサンダル", "落下ダメージ20%軽減・弓攻撃間隔短縮"],
+    [12775, "ドライバー", "専用技「ドライバーショット」使用可能"],
+    [9511, "鳥になりたい", "専用技「ファルコン グライディング」使用可能"],
+    [9456, "仲良しフレンズ", "パペットの小芝居モーション"],
+    [9520, "にゃん娘アタック", "通常攻撃モーション変化"],
+    [4663, "ハート エフェクト", "ハートエフェクト"],
+    [3879, "ハーモニカ エフェクト", "音符エフェクト"],
+    [10587, "パイオニア", "生産アクションゲージ速度-7"],
+    [6670, "ハイハイモーション", "待機/移動モーションが四つん這いへ変化"],
+    [8895, "白衣の天使", "アイテムディレイ短縮・包帯回復量上昇・専用技2種使用可能"],
+    [12596, "破邪の力", "病気/呪い解除・専用技「ドッジ マント」使用可能"],
+    ["technic-1335 / 1327", "走りモーション変化", "走行モーションがツイスター ランへ変化"],
+    [8070, "ハッピー ハロウィン", "現在所持重量を軽減"],
+    [9875, "薔薇のコンダクター", "音楽ディレイ約-15%・専用技「薔薇のアンサンブル」使用可能"],
+    [7632, "熊猫 ( パンダ ) の癒し", "「熊猫（くまねこ）の癒し」と同義"],
+    [9936, "秘めたる願い", "ペット取得経験値1.1倍・スキル上昇率/詠唱妨害耐性上昇"],
+    ["technic-1327 / 1334 / 1335 / 3113 / 3461 / 3657 / 4042 / 5166", "モーション変化", "通常攻撃/歩行/走行/水泳モーション変化"],
+    [2575, "妖精の加護", "現在所持重量0.8倍"]
+  ].forEach(args => add(...args));
+
+  [
+    ["technic-7535 / 7534 / 7537 / 7536", "玄武の加護 青龍の加護 白虎の加護 朱雀の加護", "対応属性魔法を一定確率で反射（確率未検証）"],
+    [11841, "黄昏の聖槍", "悪魔特攻倍率未検証"],
+    [12386, "ハーベスター", "収穫命中上昇量未検証"],
+    [7949, "這いずる", "ノックバック無効範囲未検証・モーション変化"],
+    [14158, "悪の参謀", "魔法与ダメージ上昇率未検証"],
+    [14301, "毒リンゴ", "地属性効果上昇率/毒追撃効果未検証"],
+    [14311, "シルフの加護", "破壊魔法/風属性効果/魔法ディレイの数値未検証"],
+    [14387, "精霊石の力", "魔力・火水風地無属性効果の上昇量未検証"],
+    [14386, "聖なる防護", "攻撃力/命中/防御上昇量未検証・一部行動不能を解除"]
+  ].forEach(args => add(...args, "unverified"));
+
+  {
+    const rule = {
+      name: "聖なる水",
+      officialTechnicId: 8138,
+      verified: true,
+      applyDefault: true,
+      reviewStatus: "implemented",
+      misc: { targetRace: "undead", targetMultiplier: 1.1 },
+      conflictGroup: "special:latest",
+      stackRule: "latest",
+      customEffects: [{ name: "物理攻撃はアンデッドへ1.1倍（魔法は+10%・DoT/必中対象外）", value: 0 }],
+      memo: "物理ダメージ計算ではアンデッド特攻1.1倍として反映。"
+    };
+    batch["technic-8138"] = rule;
+  }
+
+  Object.assign(window.MOE_BUFF_RULES_MANUAL, batch);
+})();
+
 // __MOE_EQUIPMENT_BUFF_UTILITY_AND_TRIGGER_BULK13_V1__
 // 現行の物理ダメージ計算へ直接反映できない確定効果は表示用、
 // 効果量・発動率に未確定要素が残るものは未検証として整理する。

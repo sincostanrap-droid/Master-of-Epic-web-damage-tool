@@ -200,7 +200,12 @@ function runAudit() {
   for (const [id, rule] of Object.entries(manual)) {
     const label = `${id} ${rule?.name || ""}`.trim();
     const expectedId = Number(String(id).replace(/^technic-/, ""));
-    if (!Number.isFinite(expectedId) || Number(rule?.officialTechnicId) !== expectedId) {
+    const sourceCatalogOnly = rule?.sourceCatalogOnly === true;
+    if (
+      sourceCatalogOnly
+        ? !/^technic-\d+(?:\s*\/\s*\d+)+$/.test(id) || rule?.officialTechnicId != null
+        : !Number.isFinite(expectedId) || Number(rule?.officialTechnicId) !== expectedId
+    ) {
       errors.push(`${label}: object key and officialTechnicId do not match`);
     }
 
