@@ -2432,6 +2432,45 @@ Object.assign(window.MOE_BUFF_RULES_MANUAL, {
   }
 });
 
+// __MOE_EQUIPMENT_BUFF_RESISTANCE_PARTIAL_BULK18_V1__
+// 「固定値」と「割合値」が明示的に併記されたものは別効果として反映する。
+// 一部だけ確定した複合効果は、未確定部分を残して未検証を維持する。
+(() => {
+  {
+    const rule = window.MOE_BUFF_RULES_MANUAL["technic-10381"];
+    rule.verified = true;
+    rule.reviewStatus = "implemented";
+    rule.stats = {
+      extraWaterRes: 20,
+      extraWaterResPct: 25
+    };
+    rule.conflictGroup = "technic-10381";
+    rule.stackRule = "same-technic";
+    rule.customEffects = [{ name: "専用技「氷結の息吹」使用可能", value: 0 }];
+    rule.memo = "Wiki本文の「耐水+20、耐水+25%上昇」は固定値と割合値の併記として両方を反映。";
+  }
+
+  {
+    const rule = window.MOE_BUFF_RULES_MANUAL["technic-12145"];
+    rule.customEffects = [
+      { name: "ST自然回復量未検証", value: 0 },
+      { name: "被弾時に毒針反撃 27～28ダメージ×3", value: 0 }
+    ];
+    rule.memo = "毒針反撃値のみ確認済み。ST自然回復量が不明なため未検証を維持。";
+  }
+
+  {
+    const rule = window.MOE_BUFF_RULES_MANUAL["technic-14258"];
+    rule.customEffects = [
+      { name: "HP自然回復量未検証", value: 0 },
+      { name: "水中呼吸可能", value: 0 },
+      { name: "水属性効果上昇量未検証", value: 0 },
+      { name: "水属性被ダメージ50%軽減", value: 0 }
+    ];
+    rule.memo = "水中呼吸と水属性被ダメージ半減のみ確認済み。自然回復・属性効果上昇量は未検証。";
+  }
+})();
+
 // __MOE_EQUIPMENT_BUFF_MEASURED_ESTIMATES_BULK17_V1__
 // 複数回の実測またはWiki検証値として範囲・概算値が安定している効果を、
 // 概算表記を維持したまま表示用の確認済み情報へ移す。

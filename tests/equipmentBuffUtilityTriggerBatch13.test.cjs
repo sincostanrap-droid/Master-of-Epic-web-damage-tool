@@ -32,7 +32,7 @@ const unverified = [
   "technic-7624", "technic-7093", "technic-8193", "technic-9593",
   "technic-7754", "technic-7917", "technic-12334",
   "technic-8313", "technic-9719", "technic-3034", "technic-7720",
-  "technic-10381", "technic-12704", "technic-13877", "technic-14090"
+  "technic-12704", "technic-13877", "technic-14090"
 ];
 for (const id of unverified) {
   assert.equal(rules[id].reviewStatus, "unverified", `${id} unverified`);
@@ -46,7 +46,7 @@ assert.equal(
 assert.equal(rules["technic-13093"].customEffects[0].name, "魔法反射率20%");
 assert.equal(
   rules["technic-10381"].customEffects[0].name,
-  "耐水+20または+25%（表記差の確認が必要）"
+  "専用技「氷結の息吹」使用可能"
 );
 
 console.log("equipmentBuffUtilityTriggerBatch13 tests: OK");
