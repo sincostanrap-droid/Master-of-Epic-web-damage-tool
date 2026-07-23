@@ -2432,6 +2432,31 @@ Object.assign(window.MOE_BUFF_RULES_MANUAL, {
   }
 });
 
+// __MOE_EQUIPMENT_BUFF_MEASURED_ESTIMATES_BULK17_V1__
+// 複数回の実測またはWiki検証値として範囲・概算値が安定している効果を、
+// 概算表記を維持したまま表示用の確認済み情報へ移す。
+(() => {
+  const confirmEstimate = (id, effect, memo) => {
+    const rule = window.MOE_BUFF_RULES_MANUAL[`technic-${id}`];
+    rule.verified = true;
+    rule.reviewStatus = "display-only";
+    rule.customEffects = [{ name: effect, value: 0 }];
+    rule.memo = memo || "Wiki/Scrapboxの実測値を概算表記のまま反映。現行計算対象外のため表示のみ。";
+  };
+
+  confirmEstimate(5164, "キックダメージ約3～7%上昇・ジャンプ力上昇");
+  confirmEstimate(5572, "牙ダメージ約1.05倍・月光エフェクト");
+  confirmEstimate(6856, "音楽ディレイ約-15%・専用技「C.D.T」使用可能");
+  confirmEstimate(8139, "被弾時約5%でHP150回復");
+  confirmEstimate(8444, "被弾時約20%で固定40魔法ダメージ");
+  confirmEstimate(8132, "被弾時約20%で4秒間クリティカル100%・物理完全回避");
+  confirmEstimate(9712, "物理被弾時約10%で対象を10秒捕縛（ダメージ解除）");
+  confirmEstimate(8771, "被弾時約3～5%で5分間の完全復活効果を付与");
+  confirmEstimate(8451, "被弾時約10%で20秒間攻撃力+10%");
+  confirmEstimate(3103, "消費MP約4%軽減・HP自然回復停止");
+  confirmEstimate(3151, "消費MP約4%軽減");
+})();
+
 // __MOE_EQUIPMENT_BUFF_PARTIAL_VERIFICATION_BULK16_V1__
 // 互換関係または周期回復の実測値から確定できる部分だけを反映する。
 // 不明な複合効果は未検証のまま残す。
