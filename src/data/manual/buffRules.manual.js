@@ -65,6 +65,1265 @@ Object.assign(window.MOE_BUFF_RULES_MANUAL, {
   }
 });
 
+// __MOE_EQUIPMENT_BUFF_DIRECT_EFFECTS_BULK8_V1__
+// 既存の生成値・スキル併用表・ダメージ併用表・説明文の安全な自動抽出で
+// カバーされない項目だけを対象にする。条件付き効果や未対応の計算種別は表示のみに留める。
+(() => {
+  const allRes = value => ({
+    extraFireRes: value, extraWaterRes: value, extraEarthRes: value,
+    extraWindRes: value, extraNeutralRes: value
+  });
+  const allResPct = value => ({
+    extraFireResPct: value, extraWaterResPct: value, extraEarthResPct: value,
+    extraWindResPct: value, extraNeutralResPct: value
+  });
+  const implemented = (id, name, stats, options={}) => ({
+    name, officialTechnicId: id, verified: true, applyDefault: true,
+    reviewStatus: "implemented",
+    conflictGroup: options.conflictGroup || `technic-${id}`,
+    stackRule: options.stackRule || "same-technic",
+    stats, ...(options.extra || {}), memo: options.memo || name
+  });
+  const displayOnly = (id, name, effects, memo) => ({
+    name, officialTechnicId: id, verified: true, applyDefault: true,
+    reviewStatus: "display-only",
+    conflictGroup: `technic-${id}`, stackRule: "same-technic",
+    customEffects: effects, memo
+  });
+  const special = (id, name, targetRace, targetMultiplier, memo) => ({
+    name, officialTechnicId: id, verified: true, applyDefault: true,
+    reviewStatus: "implemented",
+    conflictGroup: "special:latest", stackRule: "latest",
+    misc: { targetRace, targetMultiplier }, memo
+  });
+
+  Object.assign(window.MOE_BUFF_RULES_MANUAL, {
+    "technic-3358": implemented(3358, "愛らしい瞳",
+      { extraDamageReducePct: 3, ...allRes(3) },
+      { conflictGroup: "damage-cut:physical", stackRule: "score", memo: "物理ダメージ3%軽減、全抵抗+3。" }),
+    "technic-4041": implemented(4041, "安全第一", { extraDamageReducePct: 5 }, {
+      conflictGroup: "damage-cut:physical", stackRule: "score",
+      extra: { customEffects: [{ name: "頭上からの落下物無効", value: 0 }] },
+      memo: "物理ダメージ5%軽減。頭上からの落下物無効は表示のみ。"
+    }),
+    "technic-6383": implemented(6383, "インプレグナブル ガード", { extraDamageReducePct: 15 },
+      { conflictGroup: "damage-cut:physical", stackRule: "score", memo: "物理ダメージ15%軽減。" }),
+    "technic-10113": implemented(10113, "円月輪", { extraDamageReducePct: 10 }, {
+      conflictGroup: "damage-cut:physical", stackRule: "score",
+      extra: { customEffects: [{ name: "物理ダメージ常時反射", value: 10, unit: "%" }, { name: "専用技", value: 0, unit: "（斬り斬り舞）" }] },
+      memo: "物理ダメージ10%軽減。10%常時反射と専用技は表示のみ。"
+    }),
+    "technic-5165": implemented(5165, "エンシェント オーラ", allResPct(5), { memo: "全抵抗+5%。" }),
+    "technic-8504": implemented(8504, "美味しくなりました", { magic: 5 }, {
+      extra: { customEffects: [{ name: "MP消費", value: 5, unit: "%" }] },
+      memo: "魔力+5。MP消費+5%は表示のみ。"
+    }),
+    "technic-11267": implemented(11267, "桜花の加護", { attack: 5, ...allRes(15) }, { memo: "攻撃力+5、全抵抗+15。" }),
+    "technic-7078": implemented(7078, "オートガード", { extraDamageReducePct: 15 },
+      { conflictGroup: "damage-cut:physical", stackRule: "score", memo: "物理ダメージ15%軽減。" }),
+    "technic-12494": implemented(12494, "オーロラの加護", { extraDamageReducePct: 15 }, {
+      conflictGroup: "damage-cut:physical", stackRule: "score",
+      extra: { customEffects: [{ name: "無属性魔法ダメージ軽減", value: 15, unit: "%" }] },
+      memo: "物理ダメージ15%軽減。無属性魔法軽減は表示のみ。"
+    }),
+    "technic-6314": implemented(6314, "火炎", { extraFireRes: 10, extraWaterRes: 10 }, { memo: "耐火・耐水属性+10。" }),
+    "technic-4836": implemented(4836, "結界陣", { extraDamageReducePct: 5 },
+      { conflictGroup: "damage-cut:physical", stackRule: "score", memo: "物理ダメージ5%軽減。" }),
+    "technic-6262": implemented(6262, "幻影盾", { extraDamageReducePct: 5 },
+      { conflictGroup: "damage-cut:physical", stackRule: "score", memo: "物理ダメージ5%軽減。" }),
+    "technic-7538": implemented(7538, "攻防一体", { extraDamageReducePct: 20 }, {
+      conflictGroup: "damage-cut:physical", stackRule: "score",
+      extra: { customEffects: [{ name: "移動速度低下", value: 0, unit: "（数値未検証）" }, { name: "待機・移動モーション変化", value: 0 }] },
+      memo: "物理ダメージ20%軽減。移動速度低下量は未検証。"
+    }),
+    "technic-9567": implemented(9567, "氷の輝き", { extraFireResPct: 25 }, { memo: "耐火属性+25%。" }),
+    "technic-3371": implemented(3371, "呪文抵抗UP", allRes(5), { memo: "全抵抗+5。" }),
+    "technic-3276": implemented(3276, "滋養強壮", allResPct(10), { memo: "全抵抗+10%。" }),
+    "technic-10384": implemented(10384, "神秘のベール", { extraDamageReducePct: 15 },
+      { conflictGroup: "damage-cut:physical", stackRule: "score", memo: "物理ダメージ15%軽減。" }),
+    "technic-2917": implemented(2917, "ダメージ軽減", { extraDamageReducePct: 10 },
+      { conflictGroup: "damage-cut:physical", stackRule: "score", memo: "物理ダメージ10%軽減。" }),
+    "technic-12446": implemented(12446, "超合金ボディ", { extraACPct: 10 }, {
+      extra: { customEffects: [{ name: "10未満ダメージ無効", value: 0 }, { name: "専用技", value: 0, unit: "（ギガンテック モード）" }] },
+      memo: "防御力+10%。10未満のダメージ無効と専用技は表示のみ。"
+    }),
+    "technic-5879": implemented(5879, "抵抗アップの秘石", { ...allRes(5), ...allResPct(5) }, { memo: "全抵抗の基本値+5、合計値+5%。" }),
+    "technic-9839": implemented(9839, "ノア フロート", { extraAvoidPct: 3 }, {
+      extra: { customEffects: [{ name: "落下速度低下", value: 0, unit: "（数値未検証）" }] },
+      memo: "回避+3%。落下速度低下量は未検証。"
+    }),
+    "technic-3583": implemented(3583, "マナの加護", { extraDamageReducePct: 3 },
+      { conflictGroup: "damage-cut:physical", stackRule: "score", memo: "物理ダメージ3%軽減。" }),
+    "technic-6081": implemented(6081, "守りの鎖", { extraDamageReducePct: 10 },
+      { conflictGroup: "damage-cut:physical", stackRule: "score", memo: "物理ダメージ10%軽減。" }),
+    "technic-8764": implemented(8764, "満天の星", { magic: 5 }, {
+      extra: { customEffects: [{ name: "砂嵐による視界不良無効", value: 0 }] },
+      memo: "魔力+5。砂嵐無効は表示のみ。"
+    }),
+    "technic-11157": implemented(11157, "もこもこガード", { extraDamageReducePct: 15 }, {
+      conflictGroup: "damage-cut:physical", stackRule: "score",
+      extra: { customEffects: [{ name: "魔法ダメージ軽減", value: 15, unit: "%" }] },
+      memo: "物理ダメージ15%軽減。魔法ダメージ15%軽減は表示のみ。"
+    }),
+    "technic-7829": implemented(7829, "モスキート ボディ", { extraACPct: -67 }, {
+      extra: { customEffects: [{ name: "キャラクターサイズ", value: 33, unit: "%" }] },
+      memo: "防御力を通常の33%へ低下（-67%）。キャラクターサイズ33%は表示のみ。"
+    }),
+    "technic-7478": implemented(7478, "マジックイヤリング", { magicPct: 2 }, { memo: "魔力+2%。" }),
+    "technic-8005": implemented(8005, "古き漆黒の粘体", { extraDamageReducePct: 5 }, {
+      conflictGroup: "damage-cut:physical", stackRule: "score",
+      extra: { customEffects: [{ name: "物理ダメージ常時反射", value: 5, unit: "%" }] },
+      memo: "物理ダメージ5%軽減。5%常時反射は表示のみ。"
+    }),
+    "technic-11169": implemented(11169, "蛇帯", { extraDamageReducePct: 15 }, {
+      conflictGroup: "damage-cut:physical", stackRule: "score",
+      extra: { customEffects: [{ name: "専用技", value: 0, unit: "（蛇帯乱舞）" }] },
+      memo: "物理ダメージ15%軽減。専用技は表示のみ。"
+    }),
+
+    "technic-10688": special(10688, "巨人殺し", "giant", 1.2, "巨人系への物理・魔法ダメージとペット回復量1.2倍。計算は物理特攻に反映。"),
+    "technic-9261": special(9261, "神撃の一振り", "chaos", 1.2, "カオス系への物理・魔法ダメージとペット回復量1.2倍。計算は物理特攻に反映。"),
+    "technic-10530": special(10530, "ヘルズ スレイヤー", "chaos", 1.2, "カオス系への物理・魔法ダメージとペット回復量1.2倍。計算は物理特攻に反映。"),
+    "technic-10396": special(10396, "竜爪撃", "dragon", 1.2, "ドラゴン系への物理・魔法ダメージとペット回復量1.2倍。計算は物理特攻に反映。キック威力上昇量は未検証。"),
+    "technic-12612": special(12612, "憧憬一途 (リアリス・フレーゼ)", "bull", 1.5, "猛牛系へのダメージ1.5倍。ペット成長率1.1倍は計算対象外。"),
+
+    "technic-7726": displayOnly(7726, "アイギスの盾", [
+      { name: "物理ダメージ完全反射発動率", value: 10, unit: "%（約）" },
+      { name: "魔法反射発動率", value: 10, unit: "%（約）" },
+      { name: "専用技", value: 0, unit: "（メドゥーサ ガード）" }
+    ], "確率反射と専用技は現行の物理ダメージ予想値に直接加算しない。"),
+    "technic-8135": displayOnly(8135, "アドベンチャー ソウル", [
+      { name: "落下ダメージ軽減", value: 25, unit: "%" },
+      { name: "盗み技ディレイ", value: -10, unit: "%" },
+      { name: "採掘命中率上昇", value: 0, unit: "（数値未検証）" }
+    ], "落下・盗み・採掘用のため表示のみ。"),
+    "technic-12618": displayOnly(12618, "月下狼哮 (ウールヴヘジン)", [
+      { name: "夜間のみ 攻撃・命中・回避・防御", value: 20, unit: "" },
+      { name: "一部状態異常無効", value: 0 }
+    ], "夜間条件を現行入力で判定できないため表示のみ。"),
+    "technic-2402": displayOnly(2402, "風の加護", [
+      { name: "落下ダメージ軽減", value: 15, unit: "%" },
+      { name: "落下速度軽減", value: 60, unit: "%" }
+    ], "落下関連効果のため表示のみ。"),
+    "technic-6406": displayOnly(6406, "空中散歩", [
+      { name: "落下ダメージ軽減", value: 15, unit: "%" },
+      { name: "落下速度軽減", value: 0, unit: "（数値未検証）" },
+      { name: "待機・移動モーション変化", value: 0 }
+    ], "落下関連効果のため表示のみ。"),
+    "technic-13351": displayOnly(13351, "三巳一体", [
+      { name: "噛みつき追加攻撃発動率", value: 100, unit: "%" },
+      { name: "巻きつき追加攻撃発動率", value: 50, unit: "%" },
+      { name: "毒ブレス追加攻撃発動率", value: 50, unit: "%" }
+    ], "連鎖する追加攻撃は現行の単発物理ダメージ計算へ混在させず表示のみ。"),
+    "technic-11149": displayOnly(11149, "ステータス上昇(WarAge)", [
+      { name: "WarAge物理ダメージ軽減", value: 25, unit: "%" },
+      { name: "WarAge魔法ダメージ軽減", value: 25, unit: "%" }
+    ], "試験用かつ変更履歴を含むWarAge限定効果のため表示のみ。"),
+    "technic-10566": displayOnly(10566, "七つ道具", [
+      { name: "落下ダメージ軽減", value: 15, unit: "%" },
+      { name: "落下速度", value: -15, unit: "%" },
+      { name: "アイテム使用ディレイ・速度", value: -15, unit: "%" },
+      { name: "盗み成功率・スキル効果上昇", value: 0, unit: "（数値未検証）" }
+    ], "非戦闘計算項目のため表示のみ。"),
+    "technic-11461": displayOnly(11461, "上森人 (ハイエルフ)", [
+      { name: "弓技ディレイ", value: -15, unit: "%" },
+      { name: "ジャンプ力", value: 1.45, unit: "倍" },
+      { name: "落下ダメージ軽減", value: 25, unit: "%" }
+    ], "弓技ディレイと移動関連効果は現行予想値に直接加算せず表示のみ。"),
+    "technic-11029": displayOnly(11029, "魔力障壁", [
+      { name: "魔法ダメージ軽減", value: 25, unit: "%" }
+    ], "魔法ダメージ専用軽減は現行の物理ダメージ計算対象外。"),
+    "technic-9564": displayOnly(9564, "闇を統べる者", [
+      { name: "夜間のみ 攻撃・回避", value: 10, unit: "%" },
+      { name: "移動時の足音消去", value: 0 }
+    ], "夜間・ペット同伴条件を現行入力で判定できないため表示のみ。"),
+    "technic-6480": displayOnly(6480, "UFO", [
+      { name: "落下ダメージ軽減", value: 15, unit: "%" },
+      { name: "落下速度軽減", value: 0, unit: "（数値未検証）" },
+      { name: "待機・移動モーション変化", value: 0 }
+    ], "落下関連効果のため表示のみ。"),
+    "technic-7479": displayOnly(7479, "ランダム リフレクト", [
+      { name: "物理ダメージ完全反射発動率", value: 10, unit: "%" },
+      { name: "反射量", value: 100, unit: "%" }
+    ], "確率反射のため現行の物理ダメージ予想値には直接加算しない。"),
+    "technic-8648": displayOnly(8648, "魔眼の力", [
+      { name: "不可視看破", value: 0 },
+      { name: "被弾時 魔眼の呪い", value: 0, unit: "（発動率未検証）" },
+      { name: "攻撃・防御低下", value: 20, unit: "%（未検証）" }
+    ], "説明に未確認表現を含むため数値計算せず表示のみ。"),
+    "technic-1628": displayOnly(1628, "物理反射 Lv1", [
+      { name: "物理ダメージ常時反射", value: 5, unit: "%（程度）" }
+    ], "反射のみでダメージ軽減はないため表示のみ。"),
+    "technic-10689": displayOnly(10689, "ペインブラック", [
+      { name: "物理ダメージ常時反射", value: 15, unit: "%" }
+    ], "反射のみでダメージ軽減はないため表示のみ。"),
+    "technic-11584": displayOnly(11584, "ヘルメスの加護", [
+      { name: "回避から移動速度への変換率", value: 5, unit: "%" }
+    ], "回避→移動速度変換は現行計算に未対応のため表示のみ。"),
+    "technic-8573": displayOnly(8573, "魔王の家来 Lv99", [
+      { name: "表示ダメージ倍率", value: 10000, unit: "倍（表示のみ）" }
+    ], "実ダメージは変化せず表示だけを変更する。"),
+    "technic-8574": displayOnly(8574, "魔王の家来 Lv999", [
+      { name: "表示ダメージ倍率", value: 100000000, unit: "倍（表示のみ）" }
+    ], "実ダメージは変化せず表示だけを変更する。"),
+    "technic-8575": displayOnly(8575, "魔王の家来 Lv9999", [
+      { name: "表示ダメージ倍率", value: 1000000000000, unit: "倍（表示のみ）" }
+    ], "実ダメージは変化せず表示だけを変更する。"),
+    "technic-9145": displayOnly(9145, "天使の加護", [
+      { name: "被弾時HP20回復 発動率", value: 50, unit: "%" },
+      { name: "HP回復", value: 20 }
+    ], "被弾時の確率回復は現行物理ダメージ予想値に直接加算しない。"),
+    "technic-8590": displayOnly(8590, "爆発体質", [
+      { name: "被弾時固定100ダメージ 発動率", value: 5, unit: "%（約）" },
+      { name: "反撃固定ダメージ", value: 100 }
+    ], "被弾時確率反撃のため表示のみ。"),
+    "technic-13688": displayOnly(13688, "クラゲエフェクト", [
+      { name: "水属性ダメージ軽減", value: 25, unit: "%" }
+    ], "水属性ダメージ専用軽減は現行の物理ダメージ計算対象外。"),
+    "technic-8308": displayOnly(8308, "魔神の加護", [
+      { name: "ハンド ガード発動率", value: 25, unit: "%（未検証）" },
+      { name: "発動中の物理ダメージ軽減", value: 50, unit: "%" }
+    ], "発動率が未検証の確率軽減のため表示のみ。")
+  });
+})();
+
+// __MOE_EQUIPMENT_BUFF_NON_REDUNDANT_BULK7_REMAINDER_V1__
+// 併用表・説明文自然回復補完で既に反映される項目は重ねてmanual登録せず、
+// 既存経路に無い効果だけを残す。
+Object.assign(window.MOE_BUFF_RULES_MANUAL, {
+  "technic-11462": {
+    name: "鉱人道士 (ドワーフシャーマン)", officialTechnicId: 11462,
+    verified: true, applyDefault: true, reviewStatus: "display-only",
+    conflictGroup: "technic-11462", stackRule: "same-technic",
+    skillEffects: [{ name: "破壊魔法", value: 10 }],
+    customEffects: [{ name: "酩酊技ディレイ短縮", value: 0, unit: "（数値未検証）" }],
+    memo: "破壊魔法スキル効果+10。酩酊技ディレイ短縮量は未検証。"
+  },
+  "technic-11216": {
+    name: "トゲトゲ パワー", officialTechnicId: 11216,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-11216", stackRule: "same-technic",
+    stats: { attack: 5 },
+    customEffects: [{ name: "専用技", value: 0, unit: "（トゲトゲ チャージ）" }],
+    memo: "攻撃力+5。専用技は表示のみ。WarAgeでは効果なし。"
+  }
+});
+
+// __MOE_EQUIPMENT_BUFF_NO_EFFECT_AUDIT_MOVEMENT_BATCH6_V1__
+// 通常速度、割合速度、魔力→速度変換を計算へ接続する。
+// 水中速度と強制自動前進は通常移動速度へ混ぜず、表示用効果として保持する。
+Object.assign(window.MOE_BUFF_RULES_MANUAL, {
+  "technic-10676": {
+    name: "ウォーター バルーン", officialTechnicId: 10676,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-10676", stackRule: "same-technic",
+    stats: { speed: 15 },
+    customEffects: [
+      { name: "回転移動モーション", value: 0 },
+      { name: "物理ダメージ軽減", value: 0, unit: "（数値未検証）" },
+      { name: "浮上速度増加", value: 0, unit: "（数値未検証）" }
+    ],
+    memo: "移動速度+15。物理軽減・浮上速度・モーションは数値未確定または物理計算対象外のため表示のみ。"
+  },
+  "technic-9273": {
+    name: "オクト ブースター", officialTechnicId: 9273,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-9273", stackRule: "same-technic",
+    stats: { speed: 8, extraAvoidPct: 15 },
+    memo: "移動速度+8、回避+15%。WarAgeでは効果なし。"
+  },
+  "technic-10374": {
+    name: "機械翅", officialTechnicId: 10374,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-10374", stackRule: "same-technic",
+    stats: { speedPct: 5, extraAvoidPct: 5 },
+    memo: "移動速度・回避+5%。WarAgeでは効果なし。"
+  },
+  "technic-10051": {
+    name: "傀儡子", officialTechnicId: 10051,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-10051", stackRule: "same-technic",
+    stats: { speed: 5, extraAttackDelay: -5 },
+    customEffects: [{ name: "消費ST", value: 10, unit: "%増加" }],
+    memo: "移動速度+5、攻撃ディレイ-5。消費ST約10%増加は最大STへ誤加算せず表示のみ。WarAgeでは効果なし。"
+  },
+  "technic-13677": {
+    name: "ファルコンの加護", officialTechnicId: 13677,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-13677", stackRule: "same-technic",
+    stats: { speed: 10, stRegenPerMinute: 41.25 },
+    customEffects: [{ name: "待機モーション変化", value: 0 }],
+    memo: "移動速度+10、ST自然回復41.25/分。待機モーション変化は表示のみ。WarAgeでは効果なし。"
+  },
+  "technic-13920": {
+    name: "暗影の暗殺術", officialTechnicId: 13920,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "critical:verified", stackRule: "score",
+    stats: { attackPct: 5, speedPct: 10, extraCritRatePct: 20 },
+    memo: "攻撃力+5%、移動速度+10%、クリティカル率+20%。WarAgeでは効果なし。"
+  },
+  "technic-13963": {
+    name: "怪盗の極意", officialTechnicId: 13963,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-13963", stackRule: "same-technic",
+    stats: { speedPct: 5 },
+    skillEffects: [{ name: "盗み", value: 20 }, { name: "物まね", value: 20 }],
+    memo: "移動速度+5%、盗み・物まねスキル効果+20。WarAgeでは効果なし。"
+  },
+  "technic-13997": {
+    name: "インフィニット エンハンス", officialTechnicId: 13997,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-13997", stackRule: "same-technic",
+    stats: { attackPct: 5, magicPct: 5, extraACPct: 5, speedPct: 5, extraMaxWeightPct: 5 },
+    memo: "攻撃力・魔力・防御力・移動速度・最大所持重量+5%。WarAgeでは効果なし。"
+  },
+  "technic-14152": {
+    name: "山の妖精", officialTechnicId: 14152,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-14152", stackRule: "same-technic",
+    stats: { speedPct: 10 },
+    skillEffects: [{ name: "ダンス", value: 20 }],
+    customEffects: [{ name: "水中移動速度", value: 10, unit: "%" }],
+    memo: "移動速度+10%、ダンススキル効果+20。水中移動速度+10%は通常速度へ重ねず表示のみ。WarAgeでは効果なし。"
+  },
+  "technic-14257": {
+    name: "メガパワー", officialTechnicId: 14257,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-14257", stackRule: "same-technic",
+    stats: { attackPct: 5, extraHitPct: 5, extraAvoidPct: 5, extraACPct: 5, speedPct: 5 },
+    customEffects: [{ name: "落下速度軽減", value: 0, unit: "（数値未検証）" }],
+    memo: "攻撃力・命中・回避・防御力・移動速度+5%。落下速度軽減量は未検証のため表示のみ。WarAgeでは効果なし。"
+  },
+  "technic-14306": {
+    name: "フェアリー ブースト", officialTechnicId: 14306,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "movement-assist-exclusive", stackRule: "score",
+    stats: { speedPct: 10 },
+    customEffects: [{ name: "所持重量軽減", value: 0, unit: "（数値未検証）" }],
+    memo: "移動速度+10%。所持重量軽減量は未検証。移動アシスト機能・ロードランナーと併用不可。"
+  },
+  "technic-14343": {
+    name: "タクティカルギア", officialTechnicId: 14343,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-14343", stackRule: "same-technic",
+    stats: { extraACPct: 10, extraAvoidPct: 10, speedPct: 10 },
+    skillEffects: [{ name: "戦闘技術", value: 20 }],
+    memo: "防御力・回避・移動速度+10%、戦闘技術スキル効果+20。WarAgeでは効果なし。"
+  },
+  "technic-14392": {
+    name: "ロードランナー", officialTechnicId: 14392,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "movement-assist-exclusive", stackRule: "score",
+    stats: { extraAvoidPct: 15, speedPct: 15 },
+    customEffects: [{ name: "移動モーション変化", value: 0 }],
+    memo: "回避・移動速度+15%。モーション変化は表示のみ。フェアリー ブースト・移動アシスト機能と併用不可。"
+  },
+  "technic-13876": {
+    name: "異形の力", officialTechnicId: 13876,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-13876", stackRule: "same-technic",
+    stats: { attackPct: 3 },
+    conversions: { magicToSpeedPct: 5 },
+    skillEffects: [{ name: "暗黒命令", value: 10 }],
+    memo: "攻撃力+3%、魔力の5%を移動速度へ加算、暗黒命令スキル効果+10。WarAgeでは効果なし。"
+  },
+  "technic-14299": {
+    name: "魔法の靴", officialTechnicId: 14299,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-14299", stackRule: "same-technic",
+    stats: { stRegenPerMinute: 41.25 },
+    conversions: { magicToSpeedPct: 10 },
+    memo: "魔力の10%を移動速度へ加算、ST自然回復41.25/分。WarAgeでは効果なし。"
+  },
+  "technic-14347": {
+    name: "スピードスター", officialTechnicId: 14347,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-14347", stackRule: "same-technic",
+    stats: { stRegenPerMinute: 41.25, mpRegenPerMinute: 41.25 },
+    conversions: { magicToSpeedPct: 10 },
+    memo: "魔力の10%を移動速度へ加算、ST・MP自然回復各41.25/分。WarAgeでは効果なし。"
+  },
+  "technic-8261": {
+    name: "滑走", officialTechnicId: 8261,
+    verified: true, applyDefault: true, reviewStatus: "display-only",
+    conflictGroup: "forced-movement", stackRule: "score",
+    misc: { forcedSpeed: 65 },
+    customEffects: [
+      { name: "強制自動前進", value: 65, unit: "+" },
+      { name: "ジャンプ不可", value: 0 },
+      { name: "テクニック使用不可", value: 0 }
+    ],
+    memo: "強制移動速度65。通常移動速度の加算値ではないため表示のみ。"
+  },
+  "technic-9453": {
+    name: "魚ぉぉおおぉぉぉ！", officialTechnicId: 9453,
+    verified: true, applyDefault: true, reviewStatus: "display-only",
+    conflictGroup: "technic-9453", stackRule: "same-technic",
+    customEffects: [{ name: "水中移動速度", value: 20, unit: "+" }, { name: "モーション変化", value: 0 }],
+    memo: "水中移動速度+20。地上の通常移動速度へ加算しないため表示のみ。WarAgeでは効果なし。"
+  },
+  "technic-8640": {
+    name: "ウー！マンボウ！", officialTechnicId: 8640,
+    verified: true, applyDefault: true, reviewStatus: "display-only",
+    conflictGroup: "technic-8640", stackRule: "same-technic",
+    customEffects: [
+      { name: "水中移動速度", value: 30, unit: "+" },
+      { name: "水中呼吸", value: 0 },
+      { name: "待機・移動モーション変化", value: 0 }
+    ],
+    memo: "水中移動速度+30・水中呼吸・モーション変化。通常移動速度へ加算しないため表示のみ。"
+  },
+  "technic-13191": {
+    name: "海竜の力", officialTechnicId: 13191,
+    verified: true, applyDefault: true, reviewStatus: "display-only",
+    conflictGroup: "technic-13191", stackRule: "same-technic",
+    skillEffects: [{ name: "水泳", value: 10 }],
+    customEffects: [
+      { name: "水中移動速度", value: 30, unit: "+" },
+      { name: "水中呼吸", value: 0 },
+      { name: "専用技", value: 0, unit: "（タイダルブレス）" }
+    ],
+    memo: "水中移動速度+30、水泳スキル効果+10、水中呼吸、専用技。通常移動速度へ加算せず表示のみ。"
+  }
+});
+
+// __MOE_EQUIPMENT_BUFF_NO_EFFECT_AUDIT_MOVEMENT_BATCH5_V1__
+// 通常移動速度・移動速度割合と、同じ説明文で確定している基礎ステータスを
+// 計算へ接続する。水中速度、落下、反射、モーション、専用技は表示用に分離する。
+Object.assign(window.MOE_BUFF_RULES_MANUAL, {
+  "technic-8754": {
+    name: "回転木馬", officialTechnicId: 8754,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-8754", stackRule: "same-technic",
+    stats: { speed: 15 },
+    customEffects: [{ name: "移動モーション変化", value: 0 }, { name: "テクニック使用不可", value: 0 }],
+    memo: "移動速度+15。モーション変化・テクニック使用不可は表示のみ。"
+  },
+  "technic-8892": {
+    name: "お注射タイム", officialTechnicId: 8892,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-8892", stackRule: "same-technic",
+    stats: { speed: 15 },
+    customEffects: [{ name: "騎乗モーション変化", value: 0 }],
+    memo: "移動速度+15。騎乗モーション変化は表示のみ。WarAgeでは効果なし。"
+  },
+  "technic-7539": {
+    name: "ラートの効果", officialTechnicId: 7539,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-7539", stackRule: "same-technic",
+    stats: { speed: 10 },
+    customEffects: [{ name: "待機・移動モーション変化", value: 0 }, { name: "テクニック使用不可", value: 0 }],
+    memo: "移動速度+10。モーション変化・テクニック使用不可は表示のみ。WarAgeでは効果なし。"
+  },
+  "technic-11082": {
+    name: "ライダー ソウル", officialTechnicId: 11082,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-11082", stackRule: "same-technic",
+    stats: { speedPct: 8 },
+    memo: "移動速度+8%。WarAgeでは効果なし。"
+  },
+  "technic-6263": {
+    name: "ライド オン グリモア", officialTechnicId: 6263,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-6263", stackRule: "same-technic",
+    stats: { speed: 10 },
+    customEffects: [{ name: "浮遊移動モーション", value: 0 }, { name: "テクニック使用不可", value: 0 }],
+    memo: "移動速度+10。浮遊モーション・テクニック使用不可は表示のみ。WarAgeでは効果なし。"
+  },
+  "technic-8064": {
+    name: "ライド バイク", officialTechnicId: 8064,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-8064", stackRule: "same-technic",
+    stats: { speed: 20 },
+    customEffects: [
+      { name: "待機・移動フォーム変化", value: 0 },
+      { name: "通常時テクニック使用不可", value: 0 },
+      { name: "専用技マナ バースト時移動速度", value: 50, unit: "+" }
+    ],
+    memo: "通常時の移動速度+20。専用技時+50、フォーム変化、テクニック制限は表示のみ。WarAgeでは効果なし。"
+  },
+  "technic-7386": {
+    name: "ラピッドスワロー", officialTechnicId: 7386,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-7386", stackRule: "same-technic",
+    stats: { speed: 20 },
+    customEffects: [{ name: "テクニック使用不可", value: 0 }],
+    memo: "復刻後の現行値を採用して移動速度+20。旧値は+15。テクニック使用不可は表示のみ。WarAgeでは効果なし。"
+  },
+  "technic-7156": {
+    name: "陸上最速の脚", officialTechnicId: 7156,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-7156", stackRule: "same-technic",
+    stats: { speed: 10 },
+    memo: "移動速度+10。"
+  },
+  "technic-12381": {
+    name: "ロードレーサー", officialTechnicId: 12381,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-12381", stackRule: "same-technic",
+    stats: { speed: 15 },
+    customEffects: [{ name: "待機・移動モーション変化", value: 0 }],
+    memo: "移動速度+15。モーション変化は表示のみ。WarAgeでは効果なし。"
+  },
+  "technic-13401": {
+    name: "オーリ・オール", officialTechnicId: 13401,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-13401", stackRule: "same-technic",
+    stats: { speed: 20 },
+    customEffects: [
+      { name: "物理ダメージ50%反射確率", value: 25, unit: "%" },
+      { name: "落下速度低下", value: 30, unit: "%" },
+      { name: "移動モーション変化", value: 0 }
+    ],
+    memo: "移動速度+20。25%確率で物理ダメージ50%反射、落下速度30%低下、モーション変化は表示のみ。"
+  },
+  "technic-13684": {
+    name: "椅子レース", officialTechnicId: 13684,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-13684", stackRule: "same-technic",
+    stats: { speed: 10 },
+    customEffects: [{ name: "待機・移動モーション変化", value: 0 }],
+    memo: "移動速度+10。モーション変化は表示のみ。WarAgeでは効果なし。"
+  },
+  "technic-13789": {
+    name: "南瓜戦車", officialTechnicId: 13789,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-13789", stackRule: "same-technic",
+    stats: { speed: 20 },
+    customEffects: [
+      { name: "モーション変化", value: 0 },
+      { name: "専用技", value: 0, unit: "（パンプキン キャノン）" }
+    ],
+    memo: "移動速度+20。モーション変化・専用技は表示のみ。WarAgeでは効果なし。"
+  },
+  "technic-13720": {
+    name: "散歩拒否", officialTechnicId: 13720,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-13720", stackRule: "same-technic",
+    stats: { speedPct: -50 },
+    skillEffects: [{ name: "調教", value: 20 }],
+    customEffects: [{ name: "待機・移動モーション変化", value: 0 }],
+    memo: "移動速度-50%（固定値-50ではない）、調教スキル効果+20。モーション変化は表示のみ。WarAgeでは効果なし。"
+  },
+  "technic-13869": {
+    name: "重力操作", officialTechnicId: 13869,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-13869", stackRule: "same-technic",
+    stats: { speed: 10 },
+    misc: { jumpMultiplier: 1.71 },
+    customEffects: [
+      { name: "現在所持重量", value: -20, unit: "%" },
+      { name: "落下速度軽減", value: 25, unit: "%" },
+      { name: "落下ダメージ軽減", value: 25, unit: "%" },
+      { name: "専用技", value: 0, unit: "（ジェット スラスター）" }
+    ],
+    memo: "移動速度+10。ジャンプ力1.71倍、重量・落下系、専用技は表示のみ。WarAgeでは効果なし。"
+  },
+  "technic-13878": {
+    name: "フード デリバリー", officialTechnicId: 13878,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-13878", stackRule: "same-technic",
+    stats: { speed: 20 },
+    customEffects: [{ name: "モーション変化", value: 0 }],
+    memo: "移動速度+20。モーション変化は表示のみ。WarAgeでは効果なし。"
+  },
+  "technic-13909": {
+    name: "シュッシュポッポ", officialTechnicId: 13909,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-13909", stackRule: "same-technic",
+    stats: { speedPct: 20, extraMaxWeightPct: 20 },
+    customEffects: [{ name: "待機・移動モーション変化", value: 0 }],
+    memo: "移動速度+20%、最大所持重量+20%。モーション変化は表示のみ。WarAgeでは効果なし。"
+  },
+  "technic-14004": {
+    name: "近未来二輪", officialTechnicId: 14004,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-14004", stackRule: "same-technic",
+    stats: { speedPct: 20 },
+    customEffects: [
+      { name: "通常時テクニック使用不可", value: 0 },
+      { name: "専用技", value: 0, unit: "（N-ブースト）" }
+    ],
+    memo: "移動速度+20%。テクニック制限・専用技は表示のみ。WarAgeでは効果なし。"
+  },
+  "technic-14073": {
+    name: "ゆめくじらいどおん", officialTechnicId: 14073,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-14073", stackRule: "same-technic",
+    stats: { speed: 20 },
+    customEffects: [
+      { name: "水中移動速度", value: 50, unit: "+" },
+      { name: "水面浮上", value: 0 },
+      { name: "待機・移動モーション変化", value: 0 }
+    ],
+    memo: "地上移動速度+20。水中移動速度+50・水面浮上・モーション変化は表示のみ。WarAgeでは効果なし。"
+  },
+  "technic-14083": {
+    name: "ウマの加護", officialTechnicId: 14083,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-14083", stackRule: "same-technic",
+    stats: { speed: 5 },
+    customEffects: [{ name: "キック攻撃補正", value: 5, unit: "+" }],
+    memo: "移動速度+5。キック攻撃補正+5は通常攻撃力へ加算せず表示のみ。WarAgeでは効果なし。"
+  },
+  "technic-14253": {
+    name: "乗馬", officialTechnicId: 14253,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-14253", stackRule: "same-technic",
+    stats: { speedPct: 20 },
+    customEffects: [{ name: "待機・移動モーション変化", value: 0 }],
+    memo: "移動速度+20%。モーション変化は表示のみ。WarAgeでは効果なし。"
+  }
+});
+
+// __MOE_EQUIPMENT_BUFF_NO_EFFECT_AUDIT_MOVEMENT_BATCH4_V1__
+// 通常移動速度と単位が確定した自然回復だけを計算へ接続する。
+// 落下系、モーション、専用技、テクニック制限は表示用効果として保持する。
+Object.assign(window.MOE_BUFF_RULES_MANUAL, {
+  "technic-9468": {
+    name: "なりきりチャーリー", officialTechnicId: 9468,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-9468", stackRule: "same-technic",
+    stats: { speed: 15 },
+    customEffects: [
+      { name: "待機・移動モーション変化", value: 0 },
+      { name: "専用技", value: 0, unit: "（チャーリー フェスティバル）" }
+    ],
+    memo: "移動速度+15。モーション変化・専用技は表示のみ。WarAgeでは効果なし。"
+  },
+  "technic-5839": {
+    name: "忍者走り", officialTechnicId: 5839,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-5839", stackRule: "same-technic",
+    stats: { speed: 5 },
+    misc: { jumpMultiplier: 1.71 },
+    customEffects: [{ name: "走行モーション変化", value: 0 }],
+    memo: "移動速度+5。ジャンプ力1.71倍・走行モーション変化は表示のみ。WarAgeではモーション以外効果なし。"
+  },
+  "technic-6199": {
+    name: "寝袋効果", officialTechnicId: 6199,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-6199", stackRule: "same-technic",
+    stats: { speed: -50, hpRegenPerMinute: 113 },
+    memo: "移動速度-50、HP自然回復約113/分。"
+  },
+  "technic-12270": {
+    name: "ノア ポッド", officialTechnicId: 12270,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-12270", stackRule: "same-technic",
+    stats: { speed: 20 },
+    customEffects: [
+      { name: "落下速度軽減", value: 38, unit: "%" },
+      { name: "専用技以外テクニック使用不可", value: 0 },
+      { name: "専用技", value: 0, unit: "（マナ キャノン）" }
+    ],
+    memo: "移動速度+20。落下速度38%軽減・テクニック制限・専用技は表示のみ。WarAgeでは効果なし。"
+  },
+  "technic-12701": {
+    name: "蜂の羽ばたき", officialTechnicId: 12701,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-12701", stackRule: "same-technic",
+    stats: { speed: 10 },
+    customEffects: [
+      { name: "移動モーション変化", value: 0 },
+      { name: "落下速度軽減", value: 60, unit: "%" }
+    ],
+    memo: "移動速度+10。落下速度60%軽減・モーション変化は表示のみ。WarAgeでは効果なし。"
+  },
+  "technic-9935": {
+    name: "バナナでプカプカ", officialTechnicId: 9935,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-9935", stackRule: "same-technic",
+    stats: { speed: 15 },
+    customEffects: [{ name: "移動モーション変化", value: 0 }, { name: "テクニック使用不可", value: 0 }],
+    memo: "移動速度+15。モーション変化・テクニック使用不可は表示のみ。WarAgeでは効果なし。"
+  },
+  "technic-10470": {
+    name: "埴輪ポーズ", officialTechnicId: 10470,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-10470", stackRule: "same-technic",
+    stats: { speed: 10 },
+    customEffects: [{ name: "モーション変化", value: 0 }],
+    memo: "移動速度+10。モーション変化は表示のみ。WarAgeでは効果なし。"
+  },
+  "technic-7815": {
+    name: "ビートル GO!", officialTechnicId: 7815,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-7815", stackRule: "same-technic",
+    stats: { speed: 15 },
+    customEffects: [{ name: "待機・移動モーション変化", value: 0 }, { name: "テクニック使用不可", value: 0 }],
+    memo: "移動速度+15。モーション変化・テクニック使用不可は表示のみ。WarAgeでは効果なし。"
+  },
+  "technic-5896": {
+    name: "浮遊モード", officialTechnicId: 5896,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-5896", stackRule: "same-technic",
+    stats: { speed: 10 },
+    customEffects: [{ name: "浮遊モーション変化", value: 0 }, { name: "テクニック使用不可", value: 0 }],
+    memo: "移動速度+10。浮遊モーション・テクニック使用不可は表示のみ。WarAgeでは効果なし。"
+  },
+  "technic-12385": {
+    name: "ブルーム ブースター", officialTechnicId: 12385,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-12385", stackRule: "same-technic",
+    stats: { speed: 20 },
+    customEffects: [{ name: "移動エフェクト", value: 0 }],
+    memo: "移動速度+20。移動エフェクトは表示のみ。WarAgeでは効果なし。"
+  },
+  "technic-10155": {
+    name: "ブル ライディング", officialTechnicId: 10155,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-10155", stackRule: "same-technic",
+    stats: { speed: 15 },
+    customEffects: [{ name: "騎乗モーション変化", value: 0 }],
+    memo: "移動速度+15。騎乗モーション変化は表示のみ。WarAgeでは効果なし。"
+  },
+  "technic-8516": {
+    name: "浮遊水晶", officialTechnicId: 8516,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-8516", stackRule: "same-technic",
+    stats: { speed: 15 },
+    customEffects: [{ name: "待機・移動モーション変化", value: 0 }],
+    memo: "移動速度+15。モーション変化は表示のみ。WarAgeでは効果なし。"
+  },
+  "technic-12561": {
+    name: "ヘリ脱出！", officialTechnicId: 12561,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-12561", stackRule: "same-technic",
+    stats: { speed: 20 },
+    customEffects: [
+      { name: "待機・移動モーション変化", value: 0 },
+      { name: "落下速度軽減", value: 0, unit: "（数値未検証）" },
+      { name: "テクニック使用不可", value: 0 }
+    ],
+    memo: "移動速度+20。モーション変化・落下速度軽減・テクニック使用不可は表示のみ。WarAgeでは効果なし。"
+  },
+  "technic-9477": {
+    name: "ボール キャリア", officialTechnicId: 9477,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-9477", stackRule: "same-technic",
+    stats: { speed: 10 },
+    customEffects: [
+      { name: "移動モーション変化", value: 0 },
+      { name: "専用技", value: 0, unit: "（ラグビー ダッシュ）" }
+    ],
+    memo: "移動速度+10。モーション変化・専用技は表示のみ。WarAgeでは効果なし。"
+  },
+  "technic-12715": {
+    name: "魔法の馬車", officialTechnicId: 12715,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-12715", stackRule: "same-technic",
+    stats: { speed: 20 },
+    customEffects: [{ name: "待機・移動モーション変化", value: 0 }, { name: "テクニック使用不可", value: 0 }],
+    memo: "移動速度+20。モーション変化・テクニック使用不可は表示のみ。WarAgeでは効果なし。"
+  },
+  "technic-8698": {
+    name: "魔法の羽ペン", officialTechnicId: 8698,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-8698", stackRule: "same-technic",
+    stats: { speed: 15 },
+    customEffects: [{ name: "羽根エフェクト", value: 0 }, { name: "テクニック使用不可", value: 0 }],
+    memo: "移動速度+15。羽根エフェクト・テクニック使用不可は表示のみ。WarAgeでは効果なし。"
+  },
+  "technic-5883": {
+    name: "魔法のブラシ", officialTechnicId: 5883,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-5883", stackRule: "same-technic",
+    stats: { speed: 10 },
+    customEffects: [
+      { name: "浮遊移動モーション", value: 0 },
+      { name: "泡エフェクト", value: 0 },
+      { name: "テクニック使用不可", value: 0 }
+    ],
+    memo: "移動速度+10。浮遊モーション・泡エフェクト・テクニック使用不可は表示のみ。WarAgeでは効果なし。"
+  },
+  "technic-5582": {
+    name: "魔法の箒", officialTechnicId: 5582,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-5582", stackRule: "same-technic",
+    stats: { speed: 10 },
+    customEffects: [
+      { name: "浮遊移動モーション", value: 0 },
+      { name: "発光エフェクト", value: 0 },
+      { name: "テクニック使用不可", value: 0 }
+    ],
+    memo: "移動速度+10。浮遊モーション・発光エフェクト・テクニック使用不可は表示のみ。WarAgeでは効果なし。"
+  },
+  "technic-12703": {
+    name: "山犬の加護", officialTechnicId: 12703,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-12703", stackRule: "same-technic",
+    stats: { speed: 10 },
+    misc: { jumpMultiplier: 1.21 },
+    customEffects: [{ name: "落下ダメージ軽減", value: 0, unit: "（数値未検証）" }],
+    memo: "移動速度+10。ジャンプ力1.21倍・落下ダメージ軽減は表示のみ。WarAgeでは効果なし。"
+  },
+  "technic-9968": {
+    name: "四輪駆動", officialTechnicId: 9968,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-9968", stackRule: "same-technic",
+    stats: { speed: 15 },
+    memo: "移動速度+15。WarAgeでは効果なし。"
+  }
+});
+
+// __MOE_EQUIPMENT_BUFF_NO_EFFECT_AUDIT_MOVEMENT_BATCH3_V1__
+// 通常移動速度の明記値だけを計算へ接続し、武器種固有補正、落下速度、
+// モーション、専用技、テクニック制限は表示用効果として分離する。
+Object.assign(window.MOE_BUFF_RULES_MANUAL, {
+  "technic-7731": {
+    name: "人馬一体", officialTechnicId: 7731,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-7731", stackRule: "same-technic",
+    stats: { speed: 5 },
+    customEffects: [
+      { name: "キック攻撃力", value: 10, unit: "+" },
+      { name: "弓技ディレイ", value: -10, unit: "%" }
+    ],
+    memo: "移動速度+5。キック攻撃力+10・弓技ディレイ-10%は通常攻撃力/共通ディレイへ加算せず表示のみ。"
+  },
+  "technic-10882": {
+    name: "スカイ ドライビング", officialTechnicId: 10882,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-10882", stackRule: "same-technic",
+    stats: { speed: 20 },
+    customEffects: [
+      { name: "攻撃不可", value: 0 },
+      { name: "落下速度軽減", value: 0, unit: "（数値未検証）" }
+    ],
+    memo: "移動速度+20。攻撃不可・落下速度軽減は表示のみ。WarAgeでは効果なし。"
+  },
+  "technic-6591": {
+    name: "スケーティング", officialTechnicId: 6591,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-6591", stackRule: "same-technic",
+    stats: { speed: 10 },
+    customEffects: [{ name: "移動モーション変化", value: 0 }],
+    memo: "移動速度+10。移動モーション変化は表示のみ。WarAgeでは効果なし。"
+  },
+  "technic-11525": {
+    name: "スター ロード", officialTechnicId: 11525,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-11525", stackRule: "same-technic",
+    stats: { speed: 10 },
+    customEffects: [{ name: "移動軌跡エフェクト", value: 0 }],
+    memo: "移動速度+10。移動軌跡エフェクトは表示のみ。WarAgeでは効果なし。"
+  },
+  "technic-6780": {
+    name: "スノーボード", officialTechnicId: 6780,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-6780", stackRule: "same-technic",
+    stats: { speed: 10 },
+    customEffects: [{ name: "待機・移動モーション変化", value: 0 }],
+    memo: "移動速度+10。モーション変化は表示のみ。WarAgeでは効果なし。"
+  },
+  "technic-9566": {
+    name: "スノー ロード", officialTechnicId: 9566,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-9566", stackRule: "same-technic",
+    stats: { speed: 10 },
+    customEffects: [{ name: "雪の結晶軌跡", value: 0 }],
+    memo: "移動速度+10。雪の結晶の移動軌跡は表示のみ。"
+  },
+  "technic-12135": {
+    name: "宣伝車", officialTechnicId: 12135,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-12135", stackRule: "same-technic",
+    stats: { speed: 15 },
+    customEffects: [{ name: "待機・移動モーション変化", value: 0 }],
+    memo: "移動速度+15。モーション変化等は表示のみ。WarAgeでは効果なし。"
+  },
+  "technic-5649": {
+    name: "空飛ぶ雲", officialTechnicId: 5649,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-5649", stackRule: "same-technic",
+    stats: { speed: 10 },
+    customEffects: [{ name: "浮遊移動モーション", value: 0 }, { name: "テクニック使用不可", value: 0 }],
+    memo: "移動速度+10。浮遊モーション・テクニック使用不可は表示のみ。WarAgeでは効果なし。"
+  },
+  "technic-8642": {
+    name: "空飛ぶ絨毯", officialTechnicId: 8642,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-8642", stackRule: "same-technic",
+    stats: { speed: 15 },
+    customEffects: [{ name: "待機・移動モーション変化", value: 0 }, { name: "テクニック使用不可", value: 0 }],
+    memo: "移動速度+15。モーション変化・テクニック使用不可は表示のみ。WarAgeでは効果なし。"
+  },
+  "technic-7227": {
+    name: "空を自由に飛びたいな", officialTechnicId: 7227,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-7227", stackRule: "same-technic",
+    stats: { speed: 10 },
+    customEffects: [
+      { name: "待機・移動モーション変化", value: 0 },
+      { name: "落下速度", value: -70, unit: "%" }
+    ],
+    memo: "移動速度+10。落下速度-70%・モーション変化・落下系競合は表示のみ。WarAgeでは効果なし。"
+  },
+  "technic-7753": {
+    name: "体重移動", officialTechnicId: 7753,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-7753", stackRule: "same-technic",
+    stats: { speed: 10 },
+    memo: "移動速度+10。WarAgeでは効果なし。"
+  },
+  "technic-7157": {
+    name: "竹馬の友", officialTechnicId: 7157,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-7157", stackRule: "same-technic",
+    stats: { speed: 10 },
+    customEffects: [{ name: "移動モーション変化", value: 0 }],
+    memo: "移動速度+10。移動モーション変化は表示のみ。WarAgeでは効果なし。"
+  },
+  "technic-8761": {
+    name: "ツーリング", officialTechnicId: 8761,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-8761", stackRule: "same-technic",
+    stats: { speed: 20 },
+    customEffects: [{ name: "モーション変化", value: 0 }],
+    memo: "移動速度+20。モーション変化は表示のみ。WarAgeでは効果なし。"
+  },
+  "technic-6478": {
+    name: "電車でゴー！", officialTechnicId: 6478,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-6478", stackRule: "same-technic",
+    stats: { speed: 15 },
+    customEffects: [{ name: "変身状態", value: 0 }, { name: "テクニック使用不可", value: 0 }],
+    memo: "移動速度+15。変身状態・テクニック使用不可は表示のみ。WarAgeでは効果なし。"
+  },
+  "technic-6781": {
+    name: "ドッグファイト", officialTechnicId: 6781,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-6781", stackRule: "same-technic",
+    stats: { speed: 15 },
+    customEffects: [{ name: "テクニック使用不可", value: 0 }],
+    memo: "移動速度+15。テクニック使用不可は表示のみ。WarAgeでは効果なし。"
+  },
+  "technic-7470": {
+    name: "ドライビング", officialTechnicId: 7470,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-7470", stackRule: "same-technic",
+    stats: { speed: 15 },
+    customEffects: [
+      { name: "待機・移動モーション変化", value: 0 },
+      { name: "通常時テクニック使用不可", value: 0 },
+      { name: "専用技フル スロットル時移動速度", value: 35, unit: "+" }
+    ],
+    memo: "通常時の移動速度+15。専用技時+35、モーション変化、テクニック制限は表示のみ。WarAgeでは移動速度上昇なし。"
+  },
+  "technic-11759": {
+    name: "トランスフォーム・タイタン！", officialTechnicId: 11759,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-11759", stackRule: "same-technic",
+    stats: { speed: 20 },
+    customEffects: [{ name: "専用技", value: 0, unit: "（フル スロットル）" }],
+    memo: "移動速度+20。専用技は表示のみ。"
+  },
+  "technic-8252": {
+    name: "トロリーバッグ", officialTechnicId: 8252,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-8252", stackRule: "same-technic",
+    stats: { speed: 15 },
+    customEffects: [{ name: "待機モーション変化", value: 0 }],
+    memo: "移動速度+15。待機モーション変化は表示のみ。WarAgeでは効果なし。"
+  },
+  "technic-7804": {
+    name: "☆彡", officialTechnicId: 7804,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-7804", stackRule: "same-technic",
+    stats: { speed: 15 },
+    customEffects: [
+      { name: "待機・移動モーション変化", value: 0 },
+      { name: "テクニック使用不可", value: 0 },
+      { name: "ライト効果", value: 0 }
+    ],
+    memo: "移動速度+15。モーション変化・テクニック使用不可・ライト効果は表示のみ。WarAgeでは効果なし。"
+  },
+  "technic-11162": {
+    name: "肉球スタンプ", officialTechnicId: 11162,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-11162", stackRule: "same-technic",
+    stats: { speed: 10 },
+    customEffects: [
+      { name: "落下ダメージ軽減", value: 25, unit: "%" },
+      { name: "肉球の移動軌跡", value: 0 }
+    ],
+    memo: "移動速度+10。落下ダメージ25%軽減・肉球の移動軌跡は表示のみ。WarAgeでは効果なし。"
+  }
+});
+
+// __MOE_EQUIPMENT_BUFF_NO_EFFECT_AUDIT_MOVEMENT_BATCH2_V1__
+// 説明文に通常移動速度の固定値が明記された候補をmanualへ昇格する。
+// モーション、専用技、テクニック制限、水泳速度、落下速度などは表示用に分離する。
+Object.assign(window.MOE_BUFF_RULES_MANUAL, {
+  "technic-5812": {
+    name: "アドベント エンジェル", officialTechnicId: 5812,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-5812", stackRule: "same-technic",
+    stats: { speed: 2 },
+    customEffects: [{ name: "浮遊移動モーション", value: 0 }, { name: "ライト効果", value: 0 }],
+    memo: "移動速度+2。浮遊モーション・ライト効果は表示のみ。"
+  },
+  "technic-7246": {
+    name: "安全運転", officialTechnicId: 7246,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-7246", stackRule: "same-technic",
+    stats: { speed: 15 },
+    customEffects: [{ name: "低空飛行モーション", value: 0 }],
+    memo: "移動速度+15。低空飛行モーションは表示のみ。"
+  },
+  "technic-7801": {
+    name: "韋駄天", officialTechnicId: 7801,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-7801", stackRule: "same-technic",
+    stats: { speed: 10 },
+    customEffects: [{ name: "移動モーション変化", value: 0 }],
+    memo: "移動速度+10。移動モーション変化は表示のみ。WarAgeでは効果なし。"
+  },
+  "technic-7879": {
+    name: "一輪車", officialTechnicId: 7879,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-7879", stackRule: "same-technic",
+    stats: { speed: 15 },
+    customEffects: [{ name: "待機・移動モーション変化", value: 0 }, { name: "テクニック使用不可", value: 0 }],
+    memo: "移動速度+15。モーション変化・テクニック使用不可は表示のみ。WarAgeでは移動速度上昇なし。"
+  },
+  "technic-10247": {
+    name: "一輪バイク", officialTechnicId: 10247,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-10247", stackRule: "same-technic",
+    stats: { speed: 20 },
+    customEffects: [{ name: "モーション変化", value: 0 }],
+    memo: "移動速度+20。モーション変化は表示のみ。WarAgeでは効果なし。"
+  },
+  "technic-10371": {
+    name: "エクストリーム ボード", officialTechnicId: 10371,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-10371", stackRule: "same-technic",
+    stats: { speed: 10 },
+    customEffects: [
+      { name: "待機・移動モーション変化", value: 0 },
+      { name: "専用技", value: 0, unit: "（グラウンド トリック）" }
+    ],
+    memo: "移動速度+10。モーション変化・専用技は表示のみ。WarAgeでは効果なし。"
+  },
+  "technic-7746": {
+    name: "大型二種", officialTechnicId: 7746,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-7746", stackRule: "same-technic",
+    stats: { speed: 15 },
+    customEffects: [{ name: "待機・移動モーション変化", value: 0 }],
+    memo: "移動速度+15。モーション変化等は表示のみ。WarAgeでは移動速度上昇なし。"
+  },
+  "technic-12198": {
+    name: "大型二輪", officialTechnicId: 12198,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-12198", stackRule: "same-technic",
+    stats: { speed: 20 },
+    customEffects: [
+      { name: "テクニック使用不可", value: 0 },
+      { name: "専用技", value: 0, unit: "（ジェット ブースター）" }
+    ],
+    memo: "移動速度+20。テクニック制限・専用技は表示のみ。WarAgeでは効果なし。"
+  },
+  "technic-12000": {
+    name: "オート モービル", officialTechnicId: 12000,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-12000", stackRule: "same-technic",
+    stats: { speed: 20 },
+    customEffects: [{ name: "待機・移動モーション変化", value: 0 }],
+    memo: "移動速度+20。モーション変化は表示のみ。WarAgeでは効果なし。"
+  },
+  "technic-5988": {
+    name: "おしおき三輪車", officialTechnicId: 5988,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-5988", stackRule: "same-technic",
+    stats: { speed: 10 },
+    customEffects: [{ name: "旋回・移動モーション変化", value: 0 }, { name: "テクニック使用不可", value: 0 }],
+    memo: "移動速度+10。モーション変化・テクニック使用不可は表示のみ。WarAgeでは効果なし。"
+  },
+  "technic-11377": {
+    name: "蛙の加護", officialTechnicId: 11377,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-11377", stackRule: "same-technic",
+    stats: { speed: 10 },
+    misc: { jumpMultiplier: 1.45 },
+    memo: "移動速度+10。ジャンプ力1.45倍は表示のみ。WarAgeでは効果なし。"
+  },
+  "technic-10640": {
+    name: "クリスタル シェルター", officialTechnicId: 10640,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-10640", stackRule: "same-technic",
+    stats: { speed: 15 },
+    customEffects: [
+      { name: "待機・移動モーション変化", value: 0 },
+      { name: "MP自然回復", value: 0, unit: "（数値未検証）" }
+    ],
+    memo: "移動速度+15。MP自然回復量は数値不明のため表示のみ。WarAgeでは効果なし。"
+  },
+  "technic-10933": {
+    name: "ゴーゴーゴースト", officialTechnicId: 10933,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-10933", stackRule: "same-technic",
+    stats: { speed: 15 },
+    customEffects: [
+      { name: "所持重量", value: 80, unit: "%" },
+      { name: "落下速度低下", value: 0, unit: "（数値未検証）" },
+      { name: "テクニック使用不可", value: 0 }
+    ],
+    memo: "移動速度+15。所持重量80%・落下速度低下・テクニック制限は表示のみ。WarAgeでは効果なし。"
+  },
+  "technic-10045": {
+    name: "サイドカー", officialTechnicId: 10045,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-10045", stackRule: "same-technic",
+    stats: { speed: 15 },
+    customEffects: [{ name: "待機・移動モーション変化", value: 0 }],
+    memo: "移動速度+15。モーション変化は表示のみ。WarAgeでは効果なし。"
+  },
+  "technic-10533": {
+    name: "仕込み靴", officialTechnicId: 10533,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-10533", stackRule: "same-technic",
+    stats: { speed: 10 },
+    customEffects: [
+      { name: "足音消去", value: 0 },
+      { name: "専用技", value: 0, unit: "（ジェット スラスター）" }
+    ],
+    memo: "移動速度+10。足音消去・専用技は表示のみ。WarAgeでは効果なし。"
+  },
+  "technic-11577": {
+    name: "姿勢制御", officialTechnicId: 11577,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-11577", stackRule: "same-technic",
+    stats: { speedPct: 8 },
+    customEffects: [{ name: "落下速度低下", value: 0, unit: "（数値未検証）" }],
+    memo: "移動速度+8%。落下速度低下量は数値不明のため表示のみ。WarAgeでは効果なし。"
+  },
+  "technic-12523": {
+    name: "シャーク・ザ・ライド", officialTechnicId: 12523,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-12523", stackRule: "same-technic",
+    stats: { speed: 15 },
+    skillEffects: [{ name: "水泳", value: 10 }],
+    customEffects: [
+      { name: "水中移動速度", value: 65, unit: "+" },
+      { name: "呼吸ゲージ回復", value: 0 }
+    ],
+    memo: "移動速度+15、水泳スキル効果+10。水中移動速度+65・呼吸ゲージ回復は表示のみ。WarAgeでは効果なし。"
+  },
+  "technic-5694": {
+    name: "重力制御", officialTechnicId: 5694,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-5694", stackRule: "same-technic",
+    stats: { speed: 10 },
+    customEffects: [
+      { name: "所持重量軽減", value: 10, unit: "%" },
+      { name: "待機・移動モーション変化", value: 0 },
+      { name: "テクニック使用不可", value: 0 }
+    ],
+    memo: "移動速度+10。所持重量軽減・モーション変化・テクニック制限は表示のみ。"
+  },
+  "technic-8120": {
+    name: "神速の勾玉", officialTechnicId: 8120,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-8120", stackRule: "same-technic",
+    stats: { speed: 10 },
+    customEffects: [{ name: "移動モーション変化", value: 0 }],
+    memo: "移動速度+10。移動モーション変化は表示のみ。WarAgeでは効果なし。"
+  }
+});
+
+// __MOE_EQUIPMENT_BUFF_NO_EFFECT_AUDIT_BATCH1_V1__
+// 生成候補では「効果なし」になる装備Buffのうち、説明内の数値と効果範囲が
+// 明確なものだけを手動ルールへ昇格する。水中速度・落下軽減・アイテム使用
+// ディレイは現行の物理計算へ接続せず、表示用効果として保持する。
+Object.assign(window.MOE_BUFF_RULES_MANUAL, {
+  "technic-10510": {
+    name: "アニマル コミュニケーション", officialTechnicId: 10510,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-10510", stackRule: "same-technic",
+    stats: { speed: 5 },
+    customEffects: [{ name: "ペット取得経験値", value: 1.1, unit: "倍" }],
+    memo: "移動速度+5。ペット取得経験値1.1倍は表示のみ。WarAgeでは効果なし。"
+  },
+  "technic-10829": {
+    name: "駆け抜ける悪夢", officialTechnicId: 10829,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-10829", stackRule: "same-technic",
+    stats: { speed: 5 },
+    memo: "移動速度+5。WarAgeでは効果なし。"
+  },
+  "technic-9277": {
+    name: "がたん ごとん がたん ごとん", officialTechnicId: 9277,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-9277", stackRule: "same-technic",
+    stats: { speed: 10 },
+    memo: "移動速度+10。WarAgeでは効果なし。"
+  },
+  "technic-9602": {
+    name: "雷様", officialTechnicId: 9602,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-9602", stackRule: "same-technic",
+    stats: { speed: 10 },
+    customEffects: [
+      { name: "待機・移動モーション変化", value: 0 },
+      { name: "テクニック使用不可", value: 0 }
+    ],
+    memo: "移動速度+10。モーション変化・テクニック使用不可は表示のみ。WarAgeでは効果なし。"
+  },
+  "technic-11528": {
+    name: "キックスケーター", officialTechnicId: 11528,
+    verified: true, applyDefault: true, reviewStatus: "implemented",
+    conflictGroup: "technic-11528", stackRule: "same-technic",
+    stats: { speed: 20 },
+    customEffects: [{ name: "待機・移動モーション変化", value: 0 }],
+    memo: "移動速度+20。モーション変化は表示のみ。WarAgeでは効果なし。"
+  },
+  "technic-9961": {
+    name: "魚群", officialTechnicId: 9961,
+    verified: true, applyDefault: true, reviewStatus: "display-only",
+    conflictGroup: "technic-9961", stackRule: "same-technic",
+    customEffects: [
+      { name: "水中移動速度", value: 20, unit: "+" },
+      { name: "水中呼吸", value: 0 }
+    ],
+    memo: "水中移動速度+20・水中呼吸。通常移動速度へ誤加算しないため表示のみ。WarAgeでは効果なし。"
+  },
+  "technic-8063": {
+    name: "風に揺られて", officialTechnicId: 8063,
+    verified: true, applyDefault: true, reviewStatus: "display-only",
+    conflictGroup: "fall-damage-reduction", stackRule: "score",
+    customEffects: [
+      { name: "落下ダメージ軽減", value: 15, unit: "%" },
+      { name: "落下速度軽減", value: 0, unit: "（数値未検証）" },
+      { name: "待機モーション変化", value: 0 }
+    ],
+    memo: "落下ダメージ15%軽減。落下速度の数値は未検証。物理ダメージ計算へは接続せず表示のみ。"
+  },
+  "technic-2440": {
+    name: "アイテム使用ディレイ短縮 Lv1", officialTechnicId: 2440,
+    verified: true, applyDefault: true, reviewStatus: "display-only",
+    conflictGroup: "item-use-delay", stackRule: "latest",
+    customEffects: [{ name: "アイテム使用ディレイ", value: -2, unit: "%" }],
+    memo: "アイテム使用ディレイ・使用速度-2%。物理攻撃ディレイとは別のため表示のみ。"
+  },
+  "technic-2441": {
+    name: "アイテム使用ディレイ短縮 Lv2", officialTechnicId: 2441,
+    verified: true, applyDefault: true, reviewStatus: "display-only",
+    conflictGroup: "item-use-delay", stackRule: "latest",
+    customEffects: [{ name: "アイテム使用ディレイ", value: -4, unit: "%" }],
+    memo: "アイテム使用ディレイ・使用速度-4%。物理攻撃ディレイとは別のため表示のみ。"
+  },
+  "technic-2442": {
+    name: "アイテム使用ディレイ短縮 Lv3", officialTechnicId: 2442,
+    verified: true, applyDefault: true, reviewStatus: "display-only",
+    conflictGroup: "item-use-delay", stackRule: "latest",
+    customEffects: [{ name: "アイテム使用ディレイ", value: -6, unit: "%" }],
+    memo: "アイテム使用ディレイ・使用速度-6%。物理攻撃ディレイとは別のため表示のみ。"
+  }
+});
+
 // __MOE_THREE_VERIFIED_EQUIPMENT_BUFFS_V1__
 
 window.MOE_BUFF_RULES_MANUAL["technic-10685"] = {
