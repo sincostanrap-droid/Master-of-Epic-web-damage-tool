@@ -53,6 +53,213 @@ function catalogHasBuff(item) {
   return !!(item?.equipBuff?.name || (Array.isArray(item?.buffRefs) && item.buffRefs.length));
 }
 
+const CATALOG_BUFF_EFFECT_FILTER_TYPES = [
+  ["基本ステータス", [
+    ["stat:attack", "攻撃力"], ["stat:attackPct", "攻撃力%"],
+    ["stat:magic", "魔力"], ["stat:magicPct", "魔力%"],
+    ["stat:speed", "移動速度"], ["stat:speedPct", "移動速度%"],
+    ["stat:dmgPct", "物理与ダメージ%"],
+    ["stat:extraHit", "命中"], ["stat:extraHitPct", "命中%"],
+    ["stat:extraAvoid", "回避"], ["stat:extraAvoidPct", "回避%"],
+    ["stat:extraAC", "防御力"], ["stat:extraACPct", "防御力%"],
+    ["stat:extraHP", "最大HP"], ["stat:extraHPPct", "最大HP%"],
+    ["stat:extraMP", "最大MP"], ["stat:extraMPPct", "最大MP%"],
+    ["stat:extraST", "最大ST"], ["stat:extraSTPct", "最大ST%"],
+    ["stat:extraMaxWeight", "最大重量"], ["stat:extraMaxWeightPct", "最大重量%"]
+  ]],
+  ["戦闘・回復", [
+    ["stat:extraAttackDelay", "攻撃ディレイ"], ["stat:extraAttackDelayPct", "攻撃ディレイ%"],
+    ["stat:extraMagicDelay", "魔法ディレイ"], ["stat:extraMagicDelayPct", "魔法ディレイ%"],
+    ["stat:extraCritRatePct", "クリティカル率%"],
+    ["stat:extraDamageReducePct", "被ダメージ軽減%"],
+    ["stat:hpRegenPerMinute", "HP自然回復/分"],
+    ["stat:stRegenPerMinute", "ST自然回復/分"],
+    ["stat:mpRegenPerMinute", "MP自然回復/分"],
+    ["stat:extraFangAttack", "牙攻撃補正"]
+  ]],
+  ["属性耐性", [
+    ["stat:extraFireRes", "耐火属性"], ["stat:extraFireResPct", "耐火属性%"],
+    ["stat:extraWaterRes", "耐水属性"], ["stat:extraWaterResPct", "耐水属性%"],
+    ["stat:extraEarthRes", "耐地属性"], ["stat:extraEarthResPct", "耐地属性%"],
+    ["stat:extraWindRes", "耐風属性"], ["stat:extraWindResPct", "耐風属性%"],
+    ["stat:extraNeutralRes", "耐無属性"], ["stat:extraNeutralResPct", "耐無属性%"]
+  ]],
+  ["変換・特殊効果", [
+    ["conversion:magicToAttackPct", "魔力→攻撃力"],
+    ["conversion:magicToSpeedPct", "魔力→移動速度"],
+    ["conversion:speedToAttackPct", "移動速度→攻撃力"],
+    ["skillPlus", "スキル強化"],
+    ["specialTarget", "種族特攻"],
+    ["effectText", "効果名・説明文"]
+  ]]
+];
+
+function catalogBuffEffectFilterOptions() {
+  const head = `<option value="">指定なし</option>`;
+  return head + CATALOG_BUFF_EFFECT_FILTER_TYPES.map(([group, entries]) =>
+    `<optgroup label="${escapeAttr(group)}">${entries.map(([value, label]) =>
+      `<option value="${escapeAttr(value)}">${escapeHtml(label)}</option>`
+    ).join("")}</optgroup>`
+  ).join("");
+}
+
+function catalogBuffEffectTypeLabel(type) {
+  for (const [, entries] of CATALOG_BUFF_EFFECT_FILTER_TYPES) {
+    const found = entries.find(([value]) => value === type);
+    if (found) return found[1];
+  }
+  return type;
+}
+
+function catalogBuffForItem(item) {
+  if (item?.equipBuff?.name) return item.equipBuff;
+  if (!Array.isArray(item?.buffRefs) || typeof catalogFindBuffById !== "function") return null;
+  return item.buffRefs.map(catalogFindBuffById).find(Boolean) || null;
+}
+
+const catalogBuffEffectEntryCache = new WeakMap();
+
+function catalogBuffEffectEntries(item) {
+  if (!item || typeof item !== "object") return [];
+  if (catalogBuffEffectEntryCache.has(item)) return catalogBuffEffectEntryCache.get(item);
+
+  const buff = catalogBuffForItem(item);
+  if (!buff) {
+    catalogBuffEffectEntryCache.set(item, []);
+    return [];
+  }
+
+  const entries = [];
+  const seen = new Set();
+  const add = (type, target, value, label) => {
+    const numeric = Number(value);
+    const entry = {
+      type: String(type || ""),
+      target: String(target || "").trim(),
+      value: Number.isFinite(numeric) ? numeric : NaN,
+      label: String(label || target || type || "").trim()
+    };
+    const key = `${entry.type}\u001f${catalogNorm(entry.target)}\u001f${Number.isFinite(entry.value) ? entry.value : ""}\u001f${catalogNorm(entry.label)}`;
+    if (!entry.type || seen.has(key)) return;
+    seen.add(key);
+    entries.push(entry);
+  };
+
+  const candidate = typeof findEquipBuffRuleCandidate === "function"
+    ? findEquipBuffRuleCandidate(buff, item)
+    : null;
+  Object.entries(candidate?.stats || {}).forEach(([key, value]) => {
+    const numeric = Number(value);
+    if (Number.isFinite(numeric) && numeric !== 0) {
+      add(`stat:${key}`, "", numeric, catalogBuffEffectTypeLabel(`stat:${key}`));
+    }
+  });
+  Object.entries(candidate?.conversions || {}).forEach(([key, value]) => {
+    const numeric = Number(value);
+    if (Number.isFinite(numeric) && numeric !== 0) {
+      add(`conversion:${key}`, "", numeric, catalogBuffEffectTypeLabel(`conversion:${key}`));
+    }
+  });
+  (candidate?.skillEffects || []).forEach(effect => {
+    const name = effect?.name || effect?.target || "";
+    if (name) add("skillPlus", name, effect?.value, `${name}スキル強化`);
+  });
+  (candidate?.customEffects || []).forEach(effect => {
+    const name = effect?.name || effect?.target || "";
+    if (name) add("effectText", name, effect?.value, name);
+  });
+
+  const misc = candidate?.misc || {};
+  const targetRace = misc.targetRace || misc.target || candidate?.targetRace || "";
+  const targetMultiplier = Number(misc.targetMultiplier ?? candidate?.targetMultiplier);
+  if (targetRace) {
+    const targetLabel = typeof targetRaceLabel === "function" ? targetRaceLabel(targetRace) : targetRace;
+    add("specialTarget", targetLabel, targetMultiplier, `${targetLabel}特攻`);
+  }
+
+  const skillTotals = globalThis.MOESkillPlusV21?.totalsFromObject?.(item) || {};
+  Object.entries(skillTotals).forEach(([name, value]) => {
+    if (name && Number(value)) add("skillPlus", name, value, `${name}スキル強化`);
+  });
+
+  if (typeof damageBuffCompatibilityRulesForBuff === "function") {
+    damageBuffCompatibilityRulesForBuff(buff, item).forEach(rule => {
+      const value = Number(rule?.value);
+      if (!Number.isFinite(value) || value === 0 || rule?.valueUncertain) return;
+      const kind = String(rule?.autoApplyKind || "");
+      const type = {
+        equipBuffDmgPct: "stat:dmgPct",
+        equipBuffExtraCritRatePct: "stat:extraCritRatePct",
+        equipBuffConvMagicRate: "conversion:magicToAttackPct",
+        equipBuffConvSpeedRate: "conversion:speedToAttackPct"
+      }[kind] || "effectText";
+      add(type, "", value, rule.effectLabel || rule.sectionName || rule.buffName || "");
+    });
+  }
+
+  const sourceText = [
+    buff.name, buff.info, buff.note,
+    candidate?.name, candidate?.memo, candidate?.rawInfo, candidate?.parsedStatsHint,
+    ...entries.map(entry => `${entry.label} ${entry.target}`)
+  ].filter(Boolean).join(" / ");
+  if (sourceText) add("effectText", sourceText, NaN, sourceText);
+
+  catalogBuffEffectEntryCache.set(item, entries);
+  return entries;
+}
+
+function catalogNormalizeBuffEffectFilters(filter) {
+  const out = [];
+  const push = row => {
+    const effect = String(row?.effect || row?.type || "").trim();
+    if (!effect) return;
+    out.push({
+      effect,
+      target: String(row?.target || "").trim(),
+      op: String(row?.op || "exists"),
+      valueRaw: String(row?.valueRaw ?? "")
+    });
+  };
+  (filter?.buffEffectFilters || []).forEach(push);
+  return out;
+}
+
+function catalogBuffEffectFilterMatches(item, filter) {
+  const type = String(filter?.effect || "");
+  const target = catalogNorm(filter?.target || "");
+  const entries = catalogBuffEffectEntries(item).filter(entry => entry.type === type);
+  if (type === "effectText") {
+    return !!target && entries.some(entry => catalogNorm(`${entry.target} ${entry.label}`).includes(target));
+  }
+
+  const candidates = target
+    ? entries.filter(entry => catalogNorm(`${entry.target} ${entry.label}`).includes(target))
+    : entries;
+  if (!candidates.length) return false;
+  if (filter?.op === "exists" || filter?.valueRaw === "") return true;
+  return candidates.some(entry =>
+    catalogStatNumericFilterMatches(entry.value, filter.op, filter.valueRaw)
+  );
+}
+
+function catalogBuffEffectFilterDescription(filter) {
+  const label = catalogBuffEffectTypeLabel(filter?.effect || "");
+  const target = String(filter?.target || "").trim();
+  if (filter?.effect === "effectText") return target ? `Buff効果「${target}」` : "";
+  const prefix = [label, target].filter(Boolean).join("：");
+  if (!prefix) return "";
+  if (filter?.op === "exists" || filter?.valueRaw === "") return `${prefix}あり`;
+  const opLabel = {gte:"以上", lte:"以下", gt:"超", lt:"未満", eq:"="}[filter.op] || "";
+  return `${prefix} ${filter.valueRaw}${opLabel}`;
+}
+
+function catalogBuffEffectFiltersDescription(filter) {
+  return catalogNormalizeBuffEffectFilters(filter)
+    .map(catalogBuffEffectFilterDescription)
+    .filter(Boolean)
+    .join(" / ");
+}
+
 function catalogResetPage() {
   catalogPageIndex = 0;
 }
@@ -152,8 +359,9 @@ function catalogNormalizeStatFilters(filter) {
 
 function catalogStatFiltersDescription(filter) {
   const filters = catalogNormalizeStatFilters(filter);
-  if (!filters.length) return "";
-  return filters.map(catalogStatFilterDescription).filter(Boolean).join(" / ");
+  const statText = filters.map(catalogStatFilterDescription).filter(Boolean).join(" / ");
+  const buffText = catalogBuffEffectFiltersDescription(filter);
+  return [statText, buffText].filter(Boolean).join(" / ");
 }
 
 function catalogItemMatches(item, filter) {
@@ -169,6 +377,10 @@ function catalogItemMatches(item, filter) {
   for (const statFilter of statFilters) {
     const statValue = catalogStatNumericValue(item, statFilter.stat);
     if (!catalogStatNumericFilterMatches(statValue, statFilter.statOp, statFilter.statValueRaw)) return false;
+  }
+
+  for (const buffFilter of catalogNormalizeBuffEffectFilters(filter)) {
+    if (!catalogBuffEffectFilterMatches(item, buffFilter)) return false;
   }
 
   return true;

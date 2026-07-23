@@ -4,7 +4,7 @@
  * - 「検索」またはEnterで条件を適用
  * - 適用済み検索結果をキャッシュ
  * - ページ送りはcache.sliceのみ
- * - 既存のSkill+フィルタ拡張をそのまま利用
+ * - 追加ステータスと装備Buff効果の複数条件をそのまま利用
  */
 (function installEquipmentCatalogApplySearchCacheV1(global) {
   if (!global || global.__MOE_EQUIPMENT_CATALOG_APPLY_SEARCH_CACHE_V1__) return;
@@ -198,12 +198,17 @@
       if (op) op.value = "any";
       if (value) value.value = "";
 
-      const skill = document.getElementById(`catalogSkillPlusSkill${i}`);
-      const skillOp = document.getElementById(`catalogSkillPlusOp${i}`);
-      const skillValue = document.getElementById(`catalogSkillPlusValue${i}`);
-      if (skill) skill.value = "";
-      if (skillOp) skillOp.value = "gte";
-      if (skillValue) skillValue.value = "";
+      const effect = document.getElementById(`catalogBuffEffect${i}`);
+      const target = document.getElementById(`catalogBuffEffectTarget${i}`);
+      const effectOp = document.getElementById(`catalogBuffEffectOp${i}`);
+      const effectValue = document.getElementById(`catalogBuffEffectValue${i}`);
+      if (effect) effect.value = "";
+      if (target) target.value = "";
+      if (effectOp) effectOp.value = "exists";
+      if (effectValue) effectValue.value = "";
+      if (typeof global.updateCatalogBuffEffectFilterRow === "function") {
+        global.updateCatalogBuffEffectFilterRow(i);
+      }
     }
   }
 
@@ -277,8 +282,8 @@
       "#catalogLimit",
       "[data-catalog-stat-filter-input]",
       "[data-catalog-stat-filter-select]",
-      "[data-skill-plus-filter-input]",
-      "[data-skill-plus-filter-select]"
+      "[data-catalog-buff-effect-input]",
+      "[data-catalog-buff-effect-select]"
     ].join(",");
 
     document.querySelectorAll(draftSelector).forEach(el => {

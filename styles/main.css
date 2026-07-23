@@ -4466,8 +4466,8 @@ button[onclick*="applySkillSimToCalc"],
   }
 }
 
-/* v21: skillPlus catalog/optimizer filters */
-.catalogSkillPlusFilters,
+/* 装備Buff効果フィルタ / v21 optimizer skillPlus filters */
+.catalogBuffEffectFilters,
 .optimizerSkillPlusFilters {
   grid-column: 1 / -1;
   border: 1px solid var(--border, rgba(127, 127, 127, .28));
@@ -4475,39 +4475,79 @@ button[onclick*="applySkillSimToCalc"],
   padding: .55rem .7rem;
   background: color-mix(in srgb, currentColor 2%, transparent);
 }
-.catalogSkillPlusFilters > summary,
+.catalogBuffEffectFilters > summary,
 .optimizerSkillPlusFilters > summary {
   cursor: pointer;
   font-weight: 800;
 }
-.catalogSkillPlusFilterHelp,
+.catalogBuffEffectFilterHelp,
 .optimizerSkillPlusHelp {
   margin: .45rem 0 .6rem;
 }
-.catalogSkillPlusFilterRows,
+.catalogBuffEffectFilterRows,
 .optimizerSkillPlusFilterRows {
   display: grid;
   gap: .55rem;
 }
-.catalogSkillPlusFilterRow,
+.catalogBuffEffectFilterRow {
+  display: grid;
+  grid-template-columns: minmax(13rem, 1.45fr) minmax(10rem, 1fr) minmax(7rem, .7fr) minmax(7rem, .7fr);
+  gap: .55rem;
+  align-items: end;
+  padding: .65rem;
+  border: 1px solid color-mix(in srgb, var(--border, currentColor) 70%, transparent);
+  border-radius: 10px;
+  background: color-mix(in srgb, currentColor 2.5%, transparent);
+}
 .optimizerSkillPlusFilterRow {
   display: grid;
   grid-template-columns: minmax(12rem, 1.5fr) minmax(7rem, .75fr) minmax(7rem, .75fr);
   gap: .55rem;
   align-items: end;
 }
-.catalogSkillPlusFilterRow select,
-.catalogSkillPlusFilterRow input,
+.catalogBuffEffectFilterRow label {
+  display: grid;
+  gap: .25rem;
+  min-width: 0;
+  font-size: .82rem;
+  font-weight: 700;
+}
+.catalogBuffEffectFilterRow select,
+.catalogBuffEffectFilterRow input,
 .optimizerSkillPlusFilterRow select,
 .optimizerSkillPlusFilterRow input,
 .optimizerSkillPlusTargetRow select {
   width: 100%;
   box-sizing: border-box;
 }
+@media (max-width: 980px) {
+  .catalogBuffEffectFilterRow {
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+  }
+}
 @media (max-width: 720px) {
-  .catalogSkillPlusFilterRow,
   .optimizerSkillPlusFilterRow {
     grid-template-columns: 1fr;
+  }
+  .catalogBuffEffectFilters {
+    padding: .5rem;
+  }
+  .catalogBuffEffectFilterRow {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: .5rem;
+    padding: .6rem;
+  }
+  .catalogBuffEffectKind,
+  .catalogBuffEffectTarget {
+    grid-column: 1 / -1;
+  }
+}
+@media (max-width: 420px) {
+  .catalogBuffEffectFilterRow {
+    grid-template-columns: 1fr;
+  }
+  .catalogBuffEffectFilterRow > label {
+    grid-column: 1;
   }
 }
 

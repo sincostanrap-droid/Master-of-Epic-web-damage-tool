@@ -1,10 +1,17 @@
 function catalogFilterState() {
   const statFilters = [];
+  const buffEffectFilters = [];
   for (let i = 1; i <= 4; i++) {
     const stat = byId(`catalogStat${i}`)?.value || "";
     const statOp = byId(`catalogStatOp${i}`)?.value || "any";
     const statValueRaw = byId(`catalogStatValue${i}`)?.value || "";
     if (stat) statFilters.push({stat, statOp, statValueRaw});
+
+    const effect = byId(`catalogBuffEffect${i}`)?.value || "";
+    const target = byId(`catalogBuffEffectTarget${i}`)?.value || "";
+    const op = byId(`catalogBuffEffectOp${i}`)?.value || "exists";
+    const valueRaw = byId(`catalogBuffEffectValue${i}`)?.value || "";
+    if (effect) buffEffectFilters.push({effect, target, op, valueRaw});
   }
 
   // v17単一フィルタUIが残っている環境でも一応読めるようにする。
@@ -25,6 +32,7 @@ function catalogFilterState() {
     category: byId("catalogCategory")?.value || "",
     slot: byId("catalogSlot")?.value || "",
     statFilters,
+    buffEffectFilters,
     // 旧コード・デバッグ用に1条件目も残す。
     stat: firstStat?.stat || "",
     statOp: firstStat?.statOp || "any",
@@ -61,17 +69,19 @@ function createCatalogTab(panel) {
             </div>`).join("")}
         </div>
       </details>
-      <details class="catalogSkillPlusFilters">
-        <summary>スキル強化フィルタ（最大4条件・すべて満たす）</summary>
-        <div class="small mutedText catalogSkillPlusFilterHelp">例: 戦闘技術 +20以上 / 物まね +20以上。ステータスや成功率には加算せず、装備Buffの〇スキル強化だけを条件にします。</div>
-        <div class="catalogSkillPlusFilterRows">
+      <details class="catalogBuffEffectFilters">
+        <summary>装備Buff効果フィルタ（最大4条件・すべて満たす）</summary>
+        <div class="small mutedText catalogBuffEffectFilterHelp">攻撃力%、ディレイ、自然回復、変換、種族特攻、スキル強化、説明文をまとめて検索できます。例: 攻撃力% 5以上 / スキル強化：戦闘技術 20以上。</div>
+        <div class="catalogBuffEffectFilterRows">
           ${[1,2,3,4].map(i => `
-            <div class="catalogSkillPlusFilterRow">
-              <label>スキル${i} <select id="catalogSkillPlusSkill${i}" data-skill-plus-filter-select><option value="">指定なし</option></select></label>
-              <label>条件 <select id="catalogSkillPlusOp${i}" data-skill-plus-filter-input><option value="gte">以上</option><option value="lte">以下</option><option value="gt">超</option><option value="lt">未満</option><option value="eq">等しい</option><option value="exists">有無のみ</option></select></label>
-              <label>値 <input id="catalogSkillPlusValue${i}" data-skill-plus-filter-input type="number" step="0.1" placeholder="例: 20"></label>
+            <div class="catalogBuffEffectFilterRow" data-catalog-buff-effect-row="${i}">
+              <label class="catalogBuffEffectKind">効果${i} <select id="catalogBuffEffect${i}" data-catalog-buff-effect-select><option value="">指定なし</option></select></label>
+              <label class="catalogBuffEffectTarget" data-buff-effect-target-wrap>対象・名称 <input id="catalogBuffEffectTarget${i}" data-catalog-buff-effect-input list="catalogBuffEffectTargetSuggestions" placeholder="例: 戦闘技術 / 悪魔"></label>
+              <label class="catalogBuffEffectOp" data-buff-effect-op-wrap>条件 <select id="catalogBuffEffectOp${i}" data-catalog-buff-effect-input><option value="exists">有無のみ</option><option value="gte">以上</option><option value="lte">以下</option><option value="gt">超</option><option value="lt">未満</option><option value="eq">等しい</option></select></label>
+              <label class="catalogBuffEffectValue" data-buff-effect-value-wrap>値 <input id="catalogBuffEffectValue${i}" data-catalog-buff-effect-input type="number" step="0.1" placeholder="例: 5 / 20"></label>
             </div>`).join("")}
         </div>
+        <datalist id="catalogBuffEffectTargetSuggestions"></datalist>
       </details>
       <label>装備Buff <select id="catalogBuffMode"><option value="">すべて</option><option value="with">あり</option><option value="without">なし</option></select></label>
       <label>ソート <select id="catalogSort">
@@ -96,7 +106,7 @@ function createCatalogTab(panel) {
     </details>
   `;
 
-  ["catalogSearch", "catalogCategory", "catalogSlot", "catalogStat1", "catalogStatOp1", "catalogStatValue1", "catalogStat2", "catalogStatOp2", "catalogStatValue2", "catalogStat3", "catalogStatOp3", "catalogStatValue3", "catalogStat4", "catalogStatOp4", "catalogStatValue4", "catalogBuffMode", "catalogSort", "catalogSortDir", "catalogLimit"].forEach(id => {
+  ["catalogSearch", "catalogCategory", "catalogSlot", "catalogStat1", "catalogStatOp1", "catalogStatValue1", "catalogStat2", "catalogStatOp2", "catalogStatValue2", "catalogStat3", "catalogStatOp3", "catalogStatValue3", "catalogStat4", "catalogStatOp4", "catalogStatValue4", "catalogBuffEffect1", "catalogBuffEffectTarget1", "catalogBuffEffectOp1", "catalogBuffEffectValue1", "catalogBuffEffect2", "catalogBuffEffectTarget2", "catalogBuffEffectOp2", "catalogBuffEffectValue2", "catalogBuffEffect3", "catalogBuffEffectTarget3", "catalogBuffEffectOp3", "catalogBuffEffectValue3", "catalogBuffEffect4", "catalogBuffEffectTarget4", "catalogBuffEffectOp4", "catalogBuffEffectValue4", "catalogBuffMode", "catalogSort", "catalogSortDir", "catalogLimit"].forEach(id => {
     const el = byId(id);
     if (el) {
       const handler = () => { catalogResetPage(); renderCatalogResults(); };
@@ -104,12 +114,63 @@ function createCatalogTab(panel) {
       el.onchange = handler;
     }
   });
+  document.querySelectorAll("[data-catalog-buff-effect-row]").forEach(row => {
+    const index = row.dataset.catalogBuffEffectRow;
+    const update = () => updateCatalogBuffEffectFilterRow(index);
+    byId(`catalogBuffEffect${index}`)?.addEventListener("change", update);
+    byId(`catalogBuffEffectOp${index}`)?.addEventListener("change", update);
+    update();
+  });
   const reload = byId("catalogReloadBtn");
   if (reload) reload.onclick = () => {
     catalogScriptsPromise = null;
     catalogResetPage();
     loadCatalogScriptsOnce().then(() => setupCatalogFilterOptions(true));
   };
+}
+
+function updateCatalogBuffEffectFilterRow(index) {
+  const row = document.querySelector(`[data-catalog-buff-effect-row="${CSS.escape(String(index))}"]`);
+  if (!row) return;
+  const type = byId(`catalogBuffEffect${index}`)?.value || "";
+  const op = byId(`catalogBuffEffectOp${index}`)?.value || "exists";
+  const targetWrap = row.querySelector("[data-buff-effect-target-wrap]");
+  const opWrap = row.querySelector("[data-buff-effect-op-wrap]");
+  const valueWrap = row.querySelector("[data-buff-effect-value-wrap]");
+  const targetInput = byId(`catalogBuffEffectTarget${index}`);
+  const needsTarget = type === "skillPlus" || type === "specialTarget" || type === "effectText";
+  const textMode = type === "effectText";
+  if (targetWrap) targetWrap.hidden = !needsTarget;
+  if (opWrap) opWrap.hidden = textMode || !type;
+  if (valueWrap) valueWrap.hidden = textMode || !type || op === "exists";
+  if (targetInput) {
+    targetInput.placeholder = type === "effectText"
+      ? "例: モーション変化 / 追撃"
+      : (type === "specialTarget" ? "例: 悪魔 / ドラゴン" : "例: 戦闘技術 / 牙");
+  }
+}
+
+function setupCatalogBuffEffectFilterOptions(force=false) {
+  document.querySelectorAll("[data-catalog-buff-effect-select]").forEach(select => {
+    if (!force && select.dataset.ready === "1") return;
+    const current = select.value;
+    select.innerHTML = catalogBuffEffectFilterOptions();
+    select.value = current;
+    select.dataset.ready = "1";
+  });
+
+  const suggestions = byId("catalogBuffEffectTargetSuggestions");
+  if (suggestions && (force || suggestions.dataset.ready !== "1")) {
+    const skills = globalThis.MOESkillPlusV21?.allSkillNames?.() || [];
+    const targets = ["ドラゴン", "カオス", "アンデッド", "巨人", "ゴブリン", "悪魔", "猛牛", "鳥"];
+    suggestions.innerHTML = Array.from(new Set([...skills, ...targets]))
+      .map(value => `<option value="${escapeAttr(value)}"></option>`)
+      .join("");
+    suggestions.dataset.ready = "1";
+  }
+  document.querySelectorAll("[data-catalog-buff-effect-row]").forEach(row =>
+    updateCatalogBuffEffectFilterRow(row.dataset.catalogBuffEffectRow)
+  );
 }
 
 function setupCatalogFilterOptions(force=false) {
@@ -134,6 +195,7 @@ function setupCatalogFilterOptions(force=false) {
       statSelect.dataset.ready = "1";
     }
   });
+  setupCatalogBuffEffectFilterOptions(force);
 
   renderCatalogResults();
 }

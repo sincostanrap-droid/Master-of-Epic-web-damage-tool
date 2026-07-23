@@ -14844,7 +14844,7 @@ if (typeof document !== "undefined") {
 
   function installCatalogInputDebounceHints() {
     if (typeof document === "undefined") return;
-    document.querySelectorAll("#catalogSearch, #catalogCategory, #catalogSlot, [id^='catalogStat'], [id^='catalogSkillPlus'], #catalogBuffMode, #catalogSort, #catalogSortDir, #catalogLimit").forEach(el => {
+    document.querySelectorAll("#catalogSearch, #catalogCategory, #catalogSlot, [id^='catalogStat'], [id^='catalogBuffEffect'], #catalogBuffMode, #catalogSort, #catalogSortDir, #catalogLimit").forEach(el => {
       if (el.dataset.catalogPerfV23Ready) return;
       el.dataset.catalogPerfV23Ready = "1";
       // 既存イベントが即時renderを呼ぶ環境でも、最終状態をもう一度debounce描画して整える。
@@ -14861,7 +14861,7 @@ if (typeof document !== "undefined") {
 
   function bootCatalogPerf() {
     if (catalogPerfBooted) return true;
-    // 依存順: SkillPlus拡張 → 検索キャッシュ描画 → 性能ラッパー。
+    // 依存順: SkillPlus効果抽出API → 検索キャッシュ描画 → 性能ラッパー。
     if (global.__MOE_INITIALIZE_SKILL_PLUS_CATALOG_V21__?.() === false) return false;
     if (global.__MOE_INITIALIZE_CATALOG_SEARCH_CACHE_V1__?.() === false) return false;
     catalogPerfBooted = true;
@@ -15139,49 +15139,6 @@ if (typeof document !== "undefined") {
     });
   }
 
-  function spInstallCatalogWrappers() {
-    if (global.__MOE_SKILL_PLUS_V21_CATALOG_WRAPPED__) return;
-    global.__MOE_SKILL_PLUS_V21_CATALOG_WRAPPED__ = true;
-
-    const baseState = global.catalogFilterState;
-    if (typeof baseState === "function") {
-      global.catalogFilterState = function catalogFilterStateSkillPlusV21() {
-        const filter = baseState.apply(this, arguments) || {};
-        filter.skillPlusFilters = spReadFilterRows("catalogSkillPlus", 4);
-        return filter;
-      };
-    }
-
-    const baseMatches = global.catalogItemMatches;
-    if (typeof baseMatches === "function") {
-      global.catalogItemMatches = function catalogItemMatchesSkillPlusV21(item, filter) {
-        if (!baseMatches.call(this, item, filter)) return false;
-        const filters = filter?.skillPlusFilters || spReadFilterRows("catalogSkillPlus", 4);
-        if (!filters.length) return true;
-        return spFilterMatchesTotals(spTotalsFromObject(item), filters);
-      };
-    }
-
-    const baseDesc = global.catalogStatFiltersDescription;
-    if (typeof baseDesc === "function") {
-      global.catalogStatFiltersDescription = function catalogStatFiltersDescriptionSkillPlusV21(filter) {
-        const main = baseDesc.call(this, filter) || "";
-        const skill = spFilterDescription(filter?.skillPlusFilters || []);
-        return [main, skill].filter(Boolean).join(" / ");
-      };
-    }
-
-    const baseSetup = global.setupCatalogFilterOptions;
-    if (typeof baseSetup === "function") {
-      global.setupCatalogFilterOptions = function setupCatalogFilterOptionsSkillPlusV21() {
-        const out = baseSetup.apply(this, arguments);
-        const catalogRoot = document.querySelector('[data-tab-panel="catalog"]') || document;
-        spFillSelects(catalogRoot);
-        return out;
-      };
-    }
-  }
-
   function spOptimizerSettingsFromUI() {
     const targetSkill = document.getElementById("optimizerSkillPlusTargetSkill")?.value || "";
     const filters = spReadFilterRows("optimizerSkillPlusFilter", 4);
@@ -15236,10 +15193,8 @@ if (typeof document !== "undefined") {
   }
 
   function spBoot() {
-    spInstallCatalogWrappers();
-    const catalogRoot = document.querySelector('[data-tab-panel="catalog"]') || document;
-    spFillSelects(catalogRoot);
-    spInstallEvents(catalogRoot);
+    // カタログのスキル強化検索は汎用の装備Buff効果フィルターへ統合済み。
+    // SkillPlus APIはフィルターの効果抽出とOptimizerで引き続き利用する。
   }
 
   global.__MOE_INITIALIZE_OPTIMIZER_SKILL_PLUS_V21__ = root => {
