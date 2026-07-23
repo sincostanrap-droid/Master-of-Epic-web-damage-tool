@@ -226,4 +226,31 @@ assert.equal(rules["technic-7829"].stats.extraACPct, -67, "mosquito body AC perc
 assert.equal(rules["technic-12612"].misc.targetRace, "bull", "realise phrase target race");
 assert.equal(rules["technic-12612"].misc.targetMultiplier, 1.5, "realise phrase multiplier");
 
+const displayClassificationBatch9 = [
+  "technic-8251", "technic-6382", "technic-13392", "technic-8687",
+  "technic-6486", "technic-10201", "technic-6177", "technic-4344",
+  "technic-10213", "technic-6288", "technic-5471", "technic-4234",
+  "technic-9879", "technic-3376", "technic-6305", "technic-4812",
+  "technic-5150", "technic-10881", "technic-8639", "technic-5176",
+  "technic-10212", "technic-7625", "technic-4806", "technic-6396",
+  "technic-4672", "technic-6603", "technic-2993", "technic-10471",
+  "technic-11826", "technic-12147", "technic-7529", "technic-8901",
+  "technic-9722", "technic-3473", "technic-4952", "technic-4673",
+  "technic-2178", "technic-5968", "technic-12006", "technic-10427",
+  "technic-10197", "technic-9703", "technic-7751", "technic-10531",
+  "technic-2510", "technic-9144", "technic-5687", "technic-9210",
+  "technic-7223", "technic-9322", "technic-11953", "technic-4825",
+  "technic-9269", "technic-6470", "technic-8770", "technic-12708",
+  "technic-4635", "technic-12656", "technic-11767", "technic-11529",
+  "technic-5856", "technic-8973", "technic-7946", "technic-10385",
+  "technic-8846", "technic-11264", "technic-8115", "technic-3273",
+  "technic-6377", "technic-9701", "technic-5827", "technic-9258",
+  "technic-1573", "technic-11952", "technic-4582", "technic-13508",
+  "technic-13795", "technic-13964", "technic-14092"
+];
+for (const id of displayClassificationBatch9) {
+  assert.equal(rules[id].reviewStatus, "display-only", `${id} batch9 classification`);
+  assert.ok(rules[id].customEffects.length > 0, `${id} batch9 display effect`);
+}
+
 console.log("equipmentBuffManualRules tests: OK");
