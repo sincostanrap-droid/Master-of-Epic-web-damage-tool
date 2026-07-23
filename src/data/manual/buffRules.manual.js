@@ -14,6 +14,108 @@
 // };
 window.MOE_BUFF_RULES_MANUAL = window.MOE_BUFF_RULES_MANUAL || {};
 
+// __MOE_EQUIPMENT_BUFF_COMBAT_EFFECTS_BULK12_V1__
+// 自然回復は単位換算できる確定値だけ計算へ反映する。
+// 反射・追撃・被弾時発動は現行DPSモデルの対象外なので、確定値も表示用に保持する。
+(() => {
+  const batch = {};
+  const ensure = (id, name, status) => {
+    const key = `technic-${id}`;
+    batch[key] ||= {
+      name,
+      officialTechnicId: id,
+      verified: status !== "unverified",
+      applyDefault: true,
+      reviewStatus: status,
+      customEffects: [],
+      memo: ""
+    };
+    return batch[key];
+  };
+  const display = (id, name, effect, status="display-only") => {
+    const rule = ensure(id, name, status);
+    rule.customEffects.push({ name: effect, value: 0 });
+    rule.memo = status === "unverified"
+      ? "情報源間の差または概算表記があるため計算未反映。"
+      : "発動条件付き効果または現行DPSモデル対象外のため表示のみ。";
+  };
+  const recovery = (id, name, stats, other="") => {
+    const rule = ensure(id, name, "implemented");
+    rule.stats = stats;
+    rule.conflictGroup = `technic-${id}`;
+    rule.stackRule = "same-technic";
+    if (other) rule.customEffects.push({ name: other, value: 0 });
+    rule.memo = "周期回復を1分あたりへ換算して反映。";
+  };
+
+  recovery(7257, "大地の恵み", { hpRegenPerMinute: 36.52 });
+  recovery(7300, "童子の加護", { stRegenPerMinute: 36.52 });
+  recovery(7748, "花の恵み", { mpRegenPerMinute: 36.52 }, "花びら追加取得（未検証）");
+  recovery(12217, "海月の加護", { mpRegenPerMinute: 60 }, "10秒ごとに新しいデバフを1つ解除");
+  recovery(7942, "植物の加護", { hpRegenPerMinute: 36.52 }, "耐火属性低下量未検証");
+
+  [
+    [6479, "お布団の魔力", "HP/MP自然回復量（未検証）・移動不可"],
+    [7326, "木の心", "HP自然回復量（未検証）・専用技以外使用不可"],
+    [12145, "蠍座", "ST自然回復量（未検証）・毒針反撃27～28×3"],
+    [7737, "シザー チェアー", "ST自然回復量（未検証）"],
+    [8139, "守護天使の加護", "被弾時HP150回復・発動率約5%"],
+    [8301, "すこしでもいやせたらいいな♪", "自然回復量（未検証）"],
+    [6200, "太陽神の加護", "日中のみ自然回復量上昇（数値未検証）"],
+    [3564, "和御魂の加護", "1分あたりHP/MP約15・ST約10回復"],
+    [9221, "フェアリー ヒール", "HP/ST周期回復（12/14秒または12/15秒）"],
+    [6393, "魔王の風格", "MP自然回復量（未検証）・行動制限"],
+    [10567, "まるふわ", "HP/ST/MP自然回復量（未検証）"]
+  ].forEach(args => display(...args, "unverified"));
+
+  [
+    [2573, "物理反射 Lv2", "物理ダメージ10%反射・発動率100%"],
+    [6080, "攻めの鎖", "近接/遠距離物理ダメージ反射率未検証"],
+    [977, "直接ダメージ反射 Lv1", "物理ダメージ軽減/反射率未検証"],
+    [14078, "カーバンクルの光", "ランダム魔法反射率未検証・友好度変化"]
+  ].forEach(args => display(...args, args[2].includes("未検証") ? "unverified" : "display-only"));
+  display(7634, "ソーンカウンター", "完全反射発動率 約10%～18%", "unverified");
+
+  [
+    [11266, "桜花の力", "通常攻撃時「桜花閃」追撃・攻撃力/刀剣依存"],
+    [9791, "紫電", "通常攻撃時 神秘依存追撃 約50ダメージ"],
+    [7831, "スケールトン", "通常攻撃時 攻撃力依存追撃"],
+    [9531, "毒蠍の尾", "通常攻撃時 毒追撃"],
+    [9323, "氷炎の使い手", "通常攻撃時 火属性DoT追撃 約40～50"],
+    [10254, "氷晶", "通常攻撃時 水属性追撃 約18～20"],
+    [8778, "飛竜の追撃", "通常攻撃時 与ダメージ依存3HIT魔法追撃"],
+    [9840, "副腕", "通常攻撃時 攻撃力依存追撃"],
+    [13579, "ドリュッケン", "通常攻撃時 範囲物理追撃"],
+    [13786, "オートマチック レーザー", "通常攻撃時 レーザー追撃・MP10消費"],
+    [14254, "雷弩", "通常攻撃時 雷属性追撃"]
+  ].forEach(args => display(...args));
+
+  [
+    [8759, "鎌鼬の加護", "被弾時 最大HP10%ダメージ（上限40）の反撃・発動率未検証"],
+    [8132, "九字護身法", "被弾時発動 約20%（要検証）・4秒間クリティカル100%/物理完全回避"],
+    [9712, "正義執行", "被弾時 約10%で10秒捕縛"],
+    [9383, "ビースト サポート", "被弾時50%で30魔法ダメージ・AC10%低下"],
+    [8771, "不死鳥の加護", "被弾時 約3～5%で完全復活効果を付与"],
+    [8451, "武神の加護", "被弾時 約10%で20秒間攻撃力+10%"],
+    [9166, "夢へのいざない", "被弾時30%で20魔法ダメージ・ST20回復・睡眠"]
+  ].forEach(args => display(...args, "unverified"));
+
+  display(8842, "防毒効果", "3秒間隔で新しい毒DoTを1つ解除");
+  display(11964, "お金の力", "追加効果発動ごとに100G消費");
+  display(12620, "炎化創火 (ベリタス・バーン)", "火属性効果 約+10%・火属性被効果 約-10%", "unverified");
+
+  {
+    const rule = ensure(9152, "聖天使の力", "implemented");
+    rule.misc = { targetRace: "undead", targetMultiplier: 1.2 };
+    rule.conflictGroup = "special:latest";
+    rule.stackRule = "latest";
+    rule.customEffects.push({ name: "アンデッド対象の魔法ダメージ/回復量も1.2倍", value: 0 });
+    rule.memo = "アンデッド特攻1.2倍。特攻系は最新1件のみ。";
+  }
+
+  Object.assign(window.MOE_BUFF_RULES_MANUAL, batch);
+})();
+
 // __MOE_EQUIPMENT_BUFF_NUMERIC_SPECIALIZED_BULK11_V1__
 // 数値が明記されている残件のうち、通常移動速度は計算へ反映し、
 // 水泳・詠唱・技能別ディレイ・射程・消費量・ペット経験値など
