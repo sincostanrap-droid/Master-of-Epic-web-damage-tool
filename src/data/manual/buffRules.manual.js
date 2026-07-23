@@ -2432,6 +2432,39 @@ Object.assign(window.MOE_BUFF_RULES_MANUAL, {
   }
 });
 
+// __MOE_EQUIPMENT_BUFF_QUALITATIVE_DISPLAY_BULK20_V1__
+// 発動率・効果量が不明でも、効果条件と挙動が確認できており、
+// 現行計算モデルの対象外であるものは不明点を明記して表示用へ分類する。
+(() => {
+  const display = (id, effect) => {
+    const key = String(id).startsWith("technic-") ? String(id) : `technic-${id}`;
+    const rule = window.MOE_BUFF_RULES_MANUAL[key];
+    rule.verified = true;
+    rule.reviewStatus = "display-only";
+    rule.customEffects = [{ name: effect, value: 0 }];
+    rule.memo = "挙動を確認済み。発動率または効果量は不明のため、その旨を表示して計算には使用しない。";
+  };
+
+  display(
+    "technic-7535 / 7534 / 7537 / 7536",
+    "玄武=水・青龍=風・白虎=地・朱雀=火属性魔法を一定確率で反射（発動率不明）"
+  );
+  display(7949, "ノックバック無効・待機/移動モーション変化");
+  display(8195, "被弾時に一定確率で黒服を召喚（発動率/召喚性能不明）");
+  display(8699, "被弾時に一定確率で対象のMPを吸収（発動率/吸収量不明）");
+  display(9719, "被弾時に低確率で死亡時復活効果を付与（発動率不明）");
+  display(4364, "満腹度減少を軽減（軽減量/併用関係不明）");
+  display(8768, "移動モーション変化・落下速度軽減（軽減量不明）");
+  display(14078, "ランダムな魔法反射・友好度変化（反射率不明）");
+  display(8759, "被弾時に最大HP10%ダメージ、上限40の反撃（発動率不明）");
+  display(3275, "移動詠唱速度上昇・詠唱妨害耐性低下（変化量不明）");
+  display(8999, "被弾時に一定確率で物理攻撃を回避（発動率不明）");
+  display(6080, "近接/遠距離物理ダメージ反射（反射率不明）");
+  display(977, "物理ダメージ軽減・反射（軽減率/反射率不明）");
+  display(1577, "常時フレイム ブレイド・HP継続減少（減少量不明）");
+  display(1579, "常時ライトニング ブレイド・HP継続減少（減少量不明）");
+})();
+
 // __MOE_EQUIPMENT_BUFF_ESTIMATE_CONFLICT_SPLIT_BULK19_V1__
 // 単独の概算値として安定しているものと、複数情報が衝突するものを分離する。
 (() => {

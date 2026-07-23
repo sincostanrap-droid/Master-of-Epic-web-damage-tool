@@ -23,7 +23,7 @@ for (const id of [
 }
 
 for (const id of [
-  "technic-11841", "technic-12386", "technic-7949", "technic-14158",
+  "technic-11841", "technic-12386", "technic-14158",
   "technic-14301", "technic-14311", "technic-14387", "technic-14386"
 ]) {
   assert.equal(rules[id].reviewStatus, "unverified", `${id} unverified`);
