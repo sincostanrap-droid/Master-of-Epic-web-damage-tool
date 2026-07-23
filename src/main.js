@@ -529,10 +529,12 @@ function extraStatsHasEffect(row, mode="base") {
   return extraFieldDefsFor(mode).some(d => +(row?.[extraPropFor(d, mode)] || 0));
 }
 
-function extraStatsEffectText(row, mode="base") {
+function extraStatsEffectText(row, mode="base", options={}) {
   mode = normalizeExtraMode(mode);
   const parts = [];
+  const omitProps = new Set(Array.isArray(options?.omitProps) ? options.omitProps : []);
   extraFieldDefsFor(mode).forEach(d => {
+    if (omitProps.has(d.prop)) return;
     const v = +(row?.[extraPropFor(d, mode)] || 0);
     if (v) parts.push(`${d.label}${v > 0 ? "+" : ""}${v}`);
   });
@@ -6531,6 +6533,33 @@ function equipmentBuffDisplayName(r) {
   return r.equipBuffName || (r.name ? `${r.name} 装備Buff` : "装備Buff");
 }
 
+function equipmentBuffSemanticEffectKey(label) {
+  let text = String(label || "")
+    .normalize("NFKC")
+    .replace(/[⇒➡➜]/g, "→")
+    .replace(/->/g, "→")
+    .replace(/\s+/g, "");
+  text = text.replace(/((?:魔力|速度|移動速度|酩酊度)→(?:攻撃力|移動速度))変換/g, "$1");
+
+  const regen = text.match(/^(HP|ST|MP)自然回復(?:\/分)?([+-]?\d+(?:\.\d+)?)(?:\/分)?$/);
+  if (regen) return `regen:${regen[1]}:${Number(regen[2])}`;
+
+  const conversion = text.match(/^((?:魔力|速度|移動速度|酩酊度)→(?:攻撃力|移動速度))([+-]?\d+(?:\.\d+)?)%$/);
+  if (conversion) return `conversion:${conversion[1]}:${Number(conversion[2])}`;
+
+  return `text:${text.toLowerCase()}`;
+}
+
+function deduplicateEquipmentBuffEffectLabels(labels) {
+  const seen = new Set();
+  return (Array.isArray(labels) ? labels : []).filter(label => {
+    const key = equipmentBuffSemanticEffectKey(label);
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
 /* 公式説明に含まれる見た目・モーション系の状態を表示だけに反映する。
  * ダメージ・ディレイ・最適化の入力値は一切変えない。 */
 function equipmentBuffPresentationEffects(r) {
@@ -6784,12 +6813,17 @@ function equipmentBuffEffectText(r) {
   addRecovery("HP変化", recovery.equipBuffHpChangePerSecond, "/秒");
   addRecovery("ST変化", recovery.equipBuffStChangePerSecond, "/秒");
   addRecovery("MP変化", recovery.equipBuffMpChangePerSecond, "/秒");
-  const extra = extraStatsEffectText(r, "equipBuff");
+  const extra = extraStatsEffectText(r, "equipBuff", {
+    omitProps: [
+      "hpRegenPerMinute", "stRegenPerMinute", "mpRegenPerMinute",
+      "hpChangePerSecond", "stChangePerSecond", "mpChangePerSecond"
+    ]
+  });
   if (extra) parts.push(extra);
   const displayOnly = additionalEffectsSummary(r, "display");
   if (displayOnly.length) parts.push(...displayOnly);
   equipmentBuffPresentationEffects(r).forEach(effect => parts.push(additionalEffectLabel(effect)));
-  return parts.join(" / ") || "効果なし";
+  return deduplicateEquipmentBuffEffectLabels(parts).join(" / ") || "効果なし";
 }
 
 function equipmentBuffResolvedPreview(row) {
@@ -6942,7 +6976,7 @@ function compositeEffectText(r) {
   if (extra) parts.push(extra);
   const displayOnly = additionalEffectsSummary(r, "display");
   if (displayOnly.length) parts.push(...displayOnly);
-  return parts.join(" / ") || "効果なし";
+  return deduplicateEquipmentBuffEffectLabels(parts).join(" / ") || "効果なし";
 }
 /**
  * 装備以外Buffを計算用の既存カテゴリへ展開する。

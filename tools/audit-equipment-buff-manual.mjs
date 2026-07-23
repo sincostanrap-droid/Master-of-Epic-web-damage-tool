@@ -82,6 +82,54 @@ function runtimePercentPrefixArtifactResolver(mainSource) {
   return candidate => context.__resolveEquipmentBuffPercentPrefixArtifacts(candidate);
 }
 
+function runtimeSemanticDisplayDeduplicator(mainSource) {
+  const start = mainSource.indexOf("function equipmentBuffSemanticEffectKey(");
+  const end = mainSource.indexOf("/* 公式説明に含まれる見た目・モーション系", start);
+  if (start < 0 || end < 0) return labels => labels;
+  const context = {};
+  vm.createContext(context);
+  vm.runInContext(
+    `${mainSource.slice(start, end)}
+     globalThis.__deduplicateEquipmentBuffEffectLabels = deduplicateEquipmentBuffEffectLabels;`,
+    context
+  );
+  return labels => Array.from(context.__deduplicateEquipmentBuffEffectLabels(labels));
+}
+
+function semanticDisplayDuplicateAudit(rules, deduplicate) {
+  let candidates = 0;
+  let fields = 0;
+  let remaining = 0;
+  for (const rule of rules) {
+    const labels = [];
+    const conversions = rule.conversions || {};
+    if (Number(conversions.magicToAttackPct)) labels.push(`魔力→攻撃力 ${Number(conversions.magicToAttackPct)}%`);
+    if (Number(conversions.magicToSpeedPct)) labels.push(`魔力→移動速度 ${Number(conversions.magicToSpeedPct)}%`);
+    if (Number(conversions.speedToAttackPct)) labels.push(`速度→攻撃力 ${Number(conversions.speedToAttackPct)}%`);
+    const stats = rule.stats || {};
+    [["HP", "hpRegenPerMinute"], ["ST", "stRegenPerMinute"], ["MP", "mpRegenPerMinute"]]
+      .forEach(([resource, key]) => {
+        const value = Number(stats[key]);
+        if (!value) return;
+        labels.push(`${resource}自然回復 ${value > 0 ? "+" : ""}${value}/分`);
+        labels.push(`${resource}自然回復/分${value > 0 ? "+" : ""}${value}`);
+      });
+    for (const effect of rule.customEffects || []) {
+      const name = String(effect?.name || "").trim();
+      const value = Number(effect?.value || 0);
+      labels.push(`${name}${value ? ` ${value > 0 ? "+" : ""}${value}${effect?.unit || ""}` : ""}`);
+    }
+    const deduped = deduplicate(labels);
+    const duplicates = labels.length - deduped.length;
+    if (duplicates > 0) {
+      candidates += 1;
+      fields += duplicates;
+    }
+    remaining += deduped.length - deduplicate(deduped).length;
+  }
+  return { candidates, fields, runtimeSuppressed: fields, remaining };
+}
+
 function wikiPercentPrefixArtifactCount(rows) {
   const pairs = [
     ["attackPct", "attackFlat"], ["magicPct", "magicFlat"], ["speedPct", "speedFlat"],
@@ -135,6 +183,7 @@ function runAudit() {
   const wikiEffects = window.MOE_WIKI_EQUIP_BUFF_EFFECTS_GENERATED || [];
   const resolveSafeHints = runtimeSafeHintResolver(mainSource);
   const resolvePercentPrefixArtifacts = runtimePercentPrefixArtifactResolver(mainSource);
+  const deduplicateSemanticDisplay = runtimeSemanticDisplayDeduplicator(mainSource);
   const skillCoveredNames = new Set(skillCompatibility
     .filter(rule => Number(rule?.value) !== 0 && !rule?.valueUncertain)
     .map(rule => normalizedBuffName(rule?.buffName || rule?.name))
@@ -251,6 +300,21 @@ function runAudit() {
   const percentPrefixArtifactFields = percentPrefixArtifactRules
     .reduce((sum, rule) => sum + resolvePercentPrefixArtifacts(rule).size, 0);
   const wikiPercentPrefixArtifacts = wikiPercentPrefixArtifactCount(wikiEffects);
+  const effectiveRules = [];
+  const effectiveRuleKeys = new Set();
+  [
+    ...Object.entries(manual).map(([catalogId, rule]) => ({ catalogId, ...rule, source: rule.source || "manual" })),
+    ...generated
+  ].forEach(rule => {
+    const key = rule.catalogId || rule.id || rule.officialTechnicId || rule.name;
+    if (!key || effectiveRuleKeys.has(key)) return;
+    effectiveRuleKeys.add(key);
+    effectiveRules.push(rule);
+  });
+  const semanticDisplayDuplicates = semanticDisplayDuplicateAudit(effectiveRules, deduplicateSemanticDisplay);
+  if (semanticDisplayDuplicates.remaining) {
+    errors.push(`semantic display duplicates remain after runtime deduplication: ${semanticDisplayDuplicates.remaining}`);
+  }
 
   return {
     ok: errors.length === 0,
@@ -268,6 +332,7 @@ function runAudit() {
         runtimeFields: percentPrefixArtifactFields,
         runtimeSuppressed: percentPrefixArtifactFields
       },
+      semanticDisplayDuplicates,
       runtimeCoverage: coverage,
       reviewStatus: statusCounts
     },
@@ -293,6 +358,7 @@ if (process.argv.includes("--json")) {
   console.log(`generated=${counts.generatedRules} manual=${counts.manualRules} runtimeStats=${counts.runtimeStatKeys}`);
   console.log(`remaining=${counts.remainingWithoutNormalizedEffect} numericSource=${counts.remainingWithNumericSource} noNumericSource=${counts.remainingWithoutNumericSource}`);
   console.log(`percentPrefixArtifacts=${JSON.stringify(counts.percentPrefixArtifacts)}`);
+  console.log(`semanticDisplayDuplicates=${JSON.stringify(counts.semanticDisplayDuplicates)}`);
   console.log(`runtimeCoverage=${JSON.stringify(counts.runtimeCoverage)}`);
   console.log(`reviewStatus=${JSON.stringify(counts.reviewStatus)}`);
   result.warnings.forEach(message => console.warn(`WARN: ${message}`));
