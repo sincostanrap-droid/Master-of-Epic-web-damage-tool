@@ -26,8 +26,8 @@ for (const [id, speed] of implementedSpeed) {
 }
 
 const unverified = [
-  "technic-3038", "technic-8997", "technic-8202",
-  "technic-3103", "technic-3151", "technic-6664"
+  "technic-8997", "technic-8202", "technic-3103",
+  "technic-3151"
 ];
 for (const id of unverified) {
   assert.equal(rules[id].reviewStatus, "unverified", `${id} unverified`);

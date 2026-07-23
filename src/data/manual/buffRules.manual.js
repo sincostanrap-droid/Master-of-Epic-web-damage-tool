@@ -14,6 +14,87 @@
 // };
 window.MOE_BUFF_RULES_MANUAL = window.MOE_BUFF_RULES_MANUAL || {};
 
+// __MOE_EQUIPMENT_BUFF_UNVERIFIED_REVIEW_BULK15_V1__
+// 収録済みWiki本文とScrapbox検証記録の双方、または数値付き検証記録で
+// 効果内容を確定できるものを「表示のみ」へ昇格する。
+(() => {
+  const pending = window.MOE_BUFF_RULE_REVIEW_PROMOTIONS_PENDING = [];
+  const promote = (id, effect, memo) => {
+    pending.push({ id, effect, memo });
+  };
+
+  promote(
+    12597,
+    "鍛冶/木工/装飾細工/裁縫：成功マス-24・グレードマス+18",
+    "Wiki本文の数値とScrapboxの裁縫グレード+18記録を照合。生産ゲージ効果のため表示のみ。"
+  );
+  promote(
+    9383,
+    "被弾時50%で30魔法ダメージ・5秒間AC10%低下",
+    "Scrapboxの数値付き検証記録を反映。被弾時発動のため表示のみ。"
+  );
+  promote(
+    9166,
+    "被弾時30%で20魔法ダメージ・ST20回復・睡眠",
+    "複数のScrapbox検証記録で発動率30%と固定値を確認。被弾時発動のため表示のみ。"
+  );
+  promote(
+    6664,
+    "消費MP0.95倍（5%軽減）",
+    "Scrapboxの0.95倍表記を反映。消費MPは現行の物理ダメージ計算対象外。"
+  );
+  promote(
+    3274,
+    "常時フレイム ブレイド相当（威力は神秘魔法依存）",
+    "Wiki本文でフレイム ブレイドと同一効果を確認。エンチャント追撃は現行計算対象外。"
+  );
+  promote(
+    9594,
+    "通常攻撃時にAC/耐性無視の5～10ダメージ×8回追撃",
+    "Wiki本文とScrapbox記録の追撃値を反映。追撃は現行計算対象外。"
+  );
+  promote(
+    5855,
+    "通常攻撃時に炎追撃（対象レベルにより約2～9ダメージ）",
+    "Wiki本文の対象レベル別検証値を反映。追撃は現行計算対象外。"
+  );
+  promote(
+    13483,
+    "通常攻撃命中時に直線範囲の必中物理追撃",
+    "Wiki本文と装備説明の発動条件を照合。範囲追撃は現行計算対象外。"
+  );
+  promote(
+    12621,
+    "通常攻撃命中時、MP50以上なら破壊魔法/魔力依存の火魔法追撃",
+    "Wiki本文とScrapboxの消費MP50・対象別ダメージ記録を照合。追撃は現行計算対象外。"
+  );
+  promote(
+    12132,
+    "通常攻撃命中時に棍棒依存の範囲魔法追撃",
+    "Wiki本文の発動条件と棍棒100時の検証値を確認。範囲追撃は現行計算対象外。"
+  );
+  promote(
+    8446,
+    "採掘命中上昇・採掘時に低確率で鉱石の破片を追加取得",
+    "Wiki本文に追加取得対象と個数の実例があるため効果内容を確定。採掘効果のため表示のみ。"
+  );
+  promote(
+    9886,
+    "約10秒間隔で古いデバフ/DoTを1つ解除",
+    "Wiki本文に解除順・対象・周期の検証記録があるため反映。状態異常解除のため表示のみ。"
+  );
+  promote(
+    12620,
+    "火属性効果 約+10%・火属性被効果 約-10%",
+    "Wiki検証値と生成データの属性効果10%を照合。物理ダメージ計算へ直接適用しないため表示のみ。"
+  );
+  promote(
+    3038,
+    "銃器アタック/銃器技ディレイ 約-3%",
+    "Wiki本文とScrapboxの銃器短縮-3記録を照合。技能別ディレイのため表示のみ。"
+  );
+})();
+
 // __MOE_EQUIPMENT_BUFF_FINAL_REVIEW_BULK14_V1__
 // 残件を全件分類する。複数IDをまとめたWiki行は sourceCatalogOnly として
 // 個別テクニックIDへ誤適用せず、元のカタログ行だけを表示対象にする。
@@ -547,6 +628,20 @@ Object.assign(window.MOE_BUFF_RULES_MANUAL, {
   }
 });
 
+// bulk15 は既存の手動ルール定義を読み終えた後に適用する。
+(() => {
+  const pending = window.MOE_BUFF_RULE_REVIEW_PROMOTIONS_PENDING || [];
+  pending.forEach(({ id, effect, memo }) => {
+    const rule = window.MOE_BUFF_RULES_MANUAL[`technic-${id}`];
+    if (!rule) return;
+    rule.verified = true;
+    rule.reviewStatus = "display-only";
+    rule.customEffects = [{ name: effect, value: 0 }];
+    rule.memo = memo || "効果内容を確認済み。現行の物理ダメージ計算対象外のため表示のみ。";
+  });
+  delete window.MOE_BUFF_RULE_REVIEW_PROMOTIONS_PENDING;
+})();
+
 // 数値根拠が無い残件を、効果の存在まで確定できる表示専用と、
 // 計算へ入れる数値が未検証のものに一括分類する。
 // 装備本体の追加ステータスは含めず、Buff固有の効果だけを表示する。
@@ -613,6 +708,13 @@ Object.assign(window.MOE_BUFF_RULES_MANUAL, {
     customEffects: [{ name: `${unknown}（未検証）`, value: 0 }],
     memo: `${unknown}の数値根拠が無いため計算未反映。`
   };
+});
+
+Object.assign(window.MOE_BUFF_RULES_MANUAL["technic-3274"], {
+  verified: true,
+  reviewStatus: "display-only",
+  customEffects: [{ name: "常時フレイム ブレイド相当（威力は神秘魔法依存）", value: 0 }],
+  memo: "Wiki本文でフレイム ブレイドと同一効果を確認。エンチャント追撃は現行計算対象外。"
 });
 
 // __MOE_EQUIPMENT_BUFF_DISPLAY_CLASSIFICATION_BULK9_V1__
