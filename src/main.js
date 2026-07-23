@@ -119,7 +119,13 @@ const BUFF_PCT_EXTRA_STAT_DEFS = [
 
 const BUFF_ONLY_EXTRA_STAT_DEFS = [
   {prop:"extraDamageReducePct", equipProp:"equipBuffExtraDamageReducePct", label:"被ダメ軽減%", step:"0.1"},
-  {prop:"extraCritRatePct", equipProp:"equipBuffExtraCritRatePct", label:"クリ率%", step:"0.1"}
+  {prop:"extraCritRatePct", equipProp:"equipBuffExtraCritRatePct", label:"クリ率%", step:"0.1"},
+  {prop:"hpRegenPerMinute", equipProp:"equipBuffHpRegenPerMinute", label:"HP自然回復/分", step:"0.01"},
+  {prop:"stRegenPerMinute", equipProp:"equipBuffStRegenPerMinute", label:"ST自然回復/分", step:"0.01"},
+  {prop:"mpRegenPerMinute", equipProp:"equipBuffMpRegenPerMinute", label:"MP自然回復/分", step:"0.01"},
+  {prop:"hpChangePerSecond", equipProp:"equipBuffHpChangePerSecond", label:"HP増減/秒", step:"0.01"},
+  {prop:"stChangePerSecond", equipProp:"equipBuffStChangePerSecond", label:"ST増減/秒", step:"0.01"},
+  {prop:"mpChangePerSecond", equipProp:"equipBuffMpChangePerSecond", label:"MP増減/秒", step:"0.01"}
 ];
 
 const UTILITY_EXTRA_STAT_DEFS = [
@@ -6393,15 +6399,40 @@ function renderEmptyRow(tbody, colSpan, message) {
   tbody.appendChild(tr);
 }
 
+// 保存値・手動ルール・候補データ・互換表を同じ経路で解決する。
+// 表示/計算用のコピーだけを変更し、保存済み行やカタログを直接変更しない。
+function resolveEquipmentBuffRow(row) {
+  const resolved = {
+    ...(row || {}),
+    extraEffects: normalizeAdditionalEffects(row?.extraEffects || []).map(effect => ({...effect}))
+  };
+  if (resolved.equipBuffEnabled === false || resolved.equipBuffEnabled === 0 || resolved.equipBuffEnabled === "0") return resolved;
+  const buff = {
+    catalogId: resolved.equipBuffCatalogId,
+    officialTechnicId: resolved.equipBuffTechnicId,
+    name: resolved.equipBuffName
+  };
+  const candidate = findEquipBuffRuleCandidate(buff);
+  if (candidate) applyEquipBuffRuleCandidateToEquipment(resolved, candidate);
+  applySkillBuffCompatibilityToEquipment(resolved, buff);
+  applyDamageBuffCompatibilityToEquipment(resolved, buff);
+  Object.assign(resolved, equipmentBuffRecoveryValues(resolved), equipmentBuffDamageCompatibilityValues(resolved));
+  return restoreEquipmentBuffCompatibilityGroups(resolved);
+}
 
 function equipmentBuffHasEffect(r) {
+  r = resolveEquipmentBuffRow(r);
+  const recovery = equipmentBuffRecoveryValues(r);
   return !!(
     +r.equipBuffAttackPct || +r.equipBuffMagicPct || +r.equipBuffSpeedPct ||
     +r.equipBuffFlatAttack || +r.equipBuffFlatMagic || +r.equipBuffFlatSpeed ||
     +r.equipBuffConvMagicRate || +r.equipBuffConvMagicSpeedRate || +r.equipBuffConvSpeedRate || +r.equipBuffDmgPct ||
     (+r.equipBuffSpecial && +r.equipBuffSpecial !== 1) ||
+    +recovery.equipBuffHpRegenPerMinute || +recovery.equipBuffStRegenPerMinute || +recovery.equipBuffMpRegenPerMinute ||
+    +recovery.equipBuffHpChangePerSecond || +recovery.equipBuffStChangePerSecond || +recovery.equipBuffMpChangePerSecond ||
     extraStatsHasEffect(r, "equipBuff") ||
-    additionalEffectsSummary(r, "display").length
+    additionalEffectsSummary(r, "display").length ||
+    equipmentBuffPresentationEffects(r).length
   );
 }
 
@@ -6413,9 +6444,23 @@ function equipmentBuffHasEffect(r) {
  */
 function equipmentBuffNeedsEffectWarning(row) {
   if (!row) return false;
+  const resolved = resolveEquipmentBuffRow(row);
   const hasBuffName = String(row.equipBuffName || "").trim().length > 0;
   const buffOn = row.equipBuffEnabled !== false && row.equipBuffEnabled !== 0 && row.equipBuffEnabled !== "0";
-  if (!hasBuffName || !buffOn || equipmentBuffHasEffect(row)) return false;
+  const compatibleValues = equipmentBuffDamageCompatibilityValues(row);
+  const hasCompatibleValue = Object.values(compatibleValues).some(value => Number(value) !== 0);
+  const hasCompatibleDisplayValue = equipmentBuffDamageCompatibilityDisplayEffects(row).length > 0;
+  const hasSkillCompatibilityValue = skillBuffCompatibilityRulesForEquipmentBuff(row)
+    .some(rule => String(rule?.skillName || "").trim() && Number(rule?.value) !== 0 && !rule?.valueUncertain);
+  const candidate = findEquipBuffRuleCandidate({
+    catalogId: row?.equipBuffCatalogId,
+    officialTechnicId: row?.equipBuffTechnicId,
+    name: row?.equipBuffName
+  });
+  const hasCandidateValue = Object.values(candidate?.stats || {}).some(value => Number(value) !== 0)
+    || (candidate?.skillEffects || []).some(effect => Number(effect?.value) !== 0)
+    || (candidate?.customEffects || []).some(effect => Number(effect?.value) !== 0);
+  if (!hasBuffName || !buffOn || equipmentBuffHasEffect(resolved) || hasCompatibleValue || hasCompatibleDisplayValue || hasSkillCompatibilityValue || hasCandidateValue) return false;
 
   // カタログ由来を優先して検出。ただしメタデータ名は履歴で揺れるので少し広めに見る。
   const sourceText = [
@@ -6454,6 +6499,30 @@ function equipmentBuffDisplayName(r) {
   return r.equipBuffName || (r.name ? `${r.name} 装備Buff` : "装備Buff");
 }
 
+/* 公式説明に含まれる見た目・モーション系の状態を表示だけに反映する。
+ * ダメージ・ディレイ・最適化の入力値は一切変えない。 */
+function equipmentBuffPresentationEffects(r) {
+  const text = [r?.equipBuffWikiText, r?.equipBuffScrapboxText, r?.equipBuffNote]
+    .filter(Boolean)
+    .join("\n");
+  if (!text) return [];
+
+  const existingNames = new Set(normalizeAdditionalEffects(r?.extraEffects)
+    .filter(e => e && e.key === "custom")
+    .map(e => String(e.name || "").trim()));
+  const out = [];
+  const add = name => {
+    if (!existingNames.has(name) && !out.some(e => e.name === name)) {
+      out.push({key:"custom", name, value:0, unit:"", scope:"display", source:"catalog-presentation"});
+    }
+  };
+  if (/変身(?:できる|する|可能)|の姿に変身/.test(text)) add("変身状態");
+  if (/モーション(?:が|を)?変化|モーション変化/.test(text) && !Array.from(existingNames).some(name => name.includes("モーション"))) {
+    add("モーション変化");
+  }
+  return out;
+}
+
 function normalizeEquipmentBuffConflictGroupsInput(value) {
   if (Array.isArray(value)) return Array.from(new Set(value.map(v => String(v || "").trim()).filter(Boolean)));
   return splitTags(String(value || ""));
@@ -6480,9 +6549,23 @@ function equipmentBuffCompatNorm(name) {
 
 function equipmentBuffCompatibilityCandidateNames(row, item=null) {
   const names = [];
+  // カタログ側の表記ゆれを、確認済みの同一Buff名だけに限定して吸収する。
+  // 括弧を一律に除去すると「左」など別効果の名称まで一致し得るため、ここは明示別名のみ。
+  const verifiedAliases = {
+    "鉱人道士 (ドワーフシャーマン)": "鉱人道士",
+    // 3色はいずれも説明文に「魔力の30%を攻撃力へ加算」とあり、
+    // 併用2の変換グループ F へ同じ値で掲載されている。
+    "マナ フォース(紅)": "マナ フォース(蒼)",
+    "マナ フォース(翠)": "マナ フォース(蒼)",
+    "マナ フォース（紅）": "マナ フォース(蒼)",
+    "マナ フォース（蒼）": "マナ フォース(蒼)",
+    "マナ フォース（翠）": "マナ フォース(蒼)"
+  };
   const add = v => {
     const s = String(v || "").trim();
     if (s && !names.includes(s)) names.push(s);
+    const alias = verifiedAliases[s];
+    if (alias && !names.includes(alias)) names.push(alias);
   };
   add(row?.equipBuffName);
   add(item?.equipBuff?.name);
@@ -6618,7 +6701,9 @@ function equipmentBuffStackKey(r) {
 
 function resolveEquipmentBuffRowsForSameTechnic(rows) {
   const eligible = normalizeEquipmentRows(rows)
-    .filter(r => r.enabled !== false && r.equipBuffEnabled && equipmentBuffHasEffect(r));
+    .filter(r => r.enabled !== false && r.equipBuffEnabled)
+    .map(resolveEquipmentBuffRow)
+    .filter(equipmentBuffHasEffect);
 
   const latestOrderByKey = new Map();
   eligible.forEach((r, order) => {
@@ -6643,6 +6728,7 @@ function equipmentBuffCompositeTags(r) {
 }
 
 function equipmentBuffEffectText(r) {
+  r = resolveEquipmentBuffRow(r);
   const parts = [];
   if (+r.equipBuffAttackPct) parts.push(`攻撃力+${r.equipBuffAttackPct}%`);
   if (+r.equipBuffMagicPct) parts.push(`魔力+${r.equipBuffMagicPct}%`);
@@ -6655,15 +6741,51 @@ function equipmentBuffEffectText(r) {
   if (+r.equipBuffConvSpeedRate) parts.push(`速度→攻撃力 ${r.equipBuffConvSpeedRate}%`);
   if (+r.equipBuffDmgPct) parts.push(`与ダメ+${r.equipBuffDmgPct}%`);
   if (+r.equipBuffSpecial && +r.equipBuffSpecial !== 1) parts.push(`特攻×${r.equipBuffSpecial}`);
+  const recovery = equipmentBuffRecoveryValues(r);
+  const addRecovery = (label, value, unit) => {
+    const n = Number(value);
+    if (Number.isFinite(n) && n !== 0) parts.push(`${label} ${n > 0 ? "+" : ""}${fmt(n, 3)}${unit}`);
+  };
+  addRecovery("HP自然回復", recovery.equipBuffHpRegenPerMinute, "/分");
+  addRecovery("ST自然回復", recovery.equipBuffStRegenPerMinute, "/分");
+  addRecovery("MP自然回復", recovery.equipBuffMpRegenPerMinute, "/分");
+  addRecovery("HP変化", recovery.equipBuffHpChangePerSecond, "/秒");
+  addRecovery("ST変化", recovery.equipBuffStChangePerSecond, "/秒");
+  addRecovery("MP変化", recovery.equipBuffMpChangePerSecond, "/秒");
   const extra = extraStatsEffectText(r, "equipBuff");
   if (extra) parts.push(extra);
   const displayOnly = additionalEffectsSummary(r, "display");
   if (displayOnly.length) parts.push(...displayOnly);
+  equipmentBuffPresentationEffects(r).forEach(effect => parts.push(additionalEffectLabel(effect)));
   return parts.join(" / ") || "効果なし";
 }
 
+function equipmentBuffResolvedPreview(row) {
+  const resolved = resolveEquipmentBuffRow(row);
+  const buff = {
+    catalogId: resolved.equipBuffCatalogId,
+    officialTechnicId: resolved.equipBuffTechnicId,
+    name: resolved.equipBuffName
+  };
+  const candidate = findEquipBuffRuleCandidate(buff);
+  const sourceLines = [
+    candidate?.parsedStatsHint,
+    candidate?.scrapboxRawLines,
+    candidate?.rawInfo,
+    resolved.equipBuffSourceText,
+    resolved.equipBuffScrapboxText,
+    resolved.equipBuffWikiText
+  ].filter(Boolean).map(v => String(v).trim()).filter(Boolean);
+  return {
+    resolved,
+    candidate,
+    effectText: equipmentBuffEffectText(resolved),
+    sourceText: Array.from(new Set(sourceLines)).join("\n")
+  };
+}
+
 function equipmentBuffToCompositeRow(r) {
-  r = restoreEquipmentBuffCompatibilityGroups({...(r || {})});
+  r = resolveEquipmentBuffRow(r);
   const row = {
     enabled: !!r.equipBuffEnabled,
     slot: r.equipBuffSlot !== false,
@@ -6685,7 +6807,7 @@ function equipmentBuffToCompositeRow(r) {
     forcedEvasion: hasForcedEvasionValue(r.equipBuffForcedEvasion)
       ? Number(r.equipBuffForcedEvasion)
       : null,
-    extraEffects: normalizeAdditionalEffects(r.extraEffects),
+    extraEffects: normalizeAdditionalEffects(r.extraEffects).concat(equipmentBuffPresentationEffects(r)),
     stackRule: r.equipBuffStackRule || "same-technic",
     note: [r.equipBuffNote || `装備由来: ${r.name || r.slot || "装備"}`, r.equipBuffRuleConfidence ? `候補精度: ${r.equipBuffRuleConfidence}` : ""].filter(Boolean).join(" / ")
   };
@@ -8830,7 +8952,7 @@ function equipBuffNumberInput(row, key, label, step="1") {
   return wrap;
 }
 
-function makeEquipmentBuffSourcePanel(row) {
+function makeEquipmentBuffSourcePanel(row, preview=equipmentBuffResolvedPreview(row)) {
   const box = document.createElement("details");
   box.className = "equipBuffSourcePanel equipBuffWide";
   if (row.equipBuffWikiText || row.equipBuffScrapboxText || row.equipBuffSourceText) box.open = false;
@@ -8862,7 +8984,26 @@ function makeEquipmentBuffSourcePanel(row) {
   makeBlock("Wiki原文", row.equipBuffWikiText, "equipBuffWikiText");
   makeBlock("Scrapbox根拠行", row.equipBuffScrapboxText, "equipBuffScrapboxText");
   makeBlock("抽出ヒント/メモ", row.equipBuffSourceText, "equipBuffSourceText");
+
+  if (preview.sourceText) {
+    const generated = document.createElement("div");
+    generated.className = "small muted equipBuffResolvedSource";
+    generated.textContent = `自動候補の根拠（読み取り専用）\n${preview.sourceText}`;
+    box.appendChild(generated);
+  }
   return box;
+}
+
+function makeEquipmentBuffResolvedPreview(row) {
+  const preview = equipmentBuffResolvedPreview(row);
+  const box = document.createElement("div");
+  box.className = "small equipBuffResolvedPreview";
+  const candidateText = preview.candidate
+    ? `候補: ${preview.candidate.name || preview.candidate.catalogId || "名称未設定"}${preview.candidate.confidence ? ` / 精度: ${preview.candidate.confidence}` : ""}`
+    : "候補: 未照合（手入力値のみ）";
+  const reflectionText = row?.equipBuffEnabled ? "計算に反映中" : "Buff OFFのため計算には未反映";
+  box.textContent = `自動解決済み（${reflectionText}）: ${preview.effectText}\n${candidateText}`;
+  return { box, preview };
 }
 
 function makeEquipmentBuffEditor(row, statusButton) {
@@ -8886,6 +9027,9 @@ function makeEquipmentBuffEditor(row, statusButton) {
   buffTitle.className = "extraStatsTitle";
   buffTitle.textContent = "装備Buff";
   buffSection.appendChild(buffTitle);
+
+  const resolvedPreview = makeEquipmentBuffResolvedPreview(row);
+  buffSection.appendChild(resolvedPreview.box);
 
   
   if (equipmentBuffNeedsEffectWarning(row)) {
@@ -8953,7 +9097,7 @@ function makeEquipmentBuffEditor(row, statusButton) {
   nameMemoRow.appendChild(nameLabel);
   nameMemoRow.appendChild(noteLabel);
   buffDetails.appendChild(nameMemoRow);
-  buffDetails.appendChild(makeEquipmentBuffSourcePanel(row));
+  buffDetails.appendChild(makeEquipmentBuffSourcePanel(row, resolvedPreview.preview));
 
   const buffGrid = document.createElement("div");
   buffGrid.className = "equipBuffDirectGrid";
@@ -8974,7 +9118,7 @@ function makeEquipmentBuffEditor(row, statusButton) {
 
   const help = document.createElement("div");
   help.className = "small";
-  help.textContent = "%欄は10%なら10。装備本体は装備ON時、装備BuffはBuff ONかつ効果ありの場合だけ計算へ反映します。";
+  help.textContent = "%欄は10%なら10。数値入力欄は手動上書き用で、空欄/0でも上の自動解決済み効果は保存値を書き換えず計算へ反映します。";
   buffDetails.appendChild(help);
   buffSection.appendChild(buffDetails);
 
@@ -12703,6 +12847,179 @@ function findEquipBuffRuleCandidate(buff, item=null) {
   return rules.find(r => catalogNorm(r.name || r.wikiName || "") === bname) || null;
 }
 
+/* 生成候補には、数値が stats へ正規化されず説明の抽出ヒントだけに残るものがある。
+ * 自然回復の「#HP/ST/MP自然回復増加バフ 数値/m」だけは単位まで明示されているため、
+ * 既存の確定値を上書きしない補完値として扱う。?・約? など数値不明の記述は一致しない。 */
+function equipmentBuffRecoveryHintValues(candidate) {
+  const out = {};
+  const text = [candidate?.parsedStatsHint, candidate?.scrapboxRawLines, candidate?.rawInfo]
+    .filter(Boolean).join(" / ");
+  const fieldByResource = {
+    HP: "hpRegenPerMinute",
+    ST: "stRegenPerMinute",
+    MP: "mpRegenPerMinute"
+  };
+  const re = /#(HP|ST|MP)自然回復(?:増加)?バフ\s*([+-]?\d+(?:\.\d+)?)\s*\/(?:m|min|60s)/g;
+  for (const match of text.matchAll(re)) {
+    const field = fieldByResource[match[1]];
+    const value = Number(match[2]);
+    if (field && Number.isFinite(value) && out[field] == null) out[field] = value;
+  }
+
+  // タグ化されていない公式説明でも、資源・単位・回復量が揃う定型表現だけを補完する。
+  // 数値が読める「約42回復？」も暫定値として採用し、数値が無い * / ？ は一致しない。
+  const raw = String(candidate?.rawInfo || "");
+  const set = (resource, rawValue) => {
+    const field = fieldByResource[resource];
+    const value = Number(rawValue);
+    if (field && Number.isFinite(value) && out[field] == null) out[field] = value;
+  };
+  // 「#HP自然回復増加バフ #MP自然回復増加バフ 112/m」のように、
+  // 複数タグに一つの共通値が付く記法を扱う。
+  const sharedTagRe = /(?:#(?:HP|ST|MP)自然回復(?:増加)?バフ\s*){2,}([+-]?\d+(?:\.\d+)?)\s*\/(?:m|min|60s)/g;
+  for (const match of text.matchAll(sharedTagRe)) {
+    const resources = Array.from(match[0].matchAll(/#(HP|ST|MP)自然回復(?:増加)?バフ/g), m => m[1]);
+    resources.forEach(resource => set(resource, match[1]));
+  }
+  const listRe = /1分間(?:で|に)(HP|ST|MP)(?:\/(HP|ST|MP))?(?:\/(HP|ST|MP))?(?:が|は)?(?:それぞれ)?(?:約)?([+-]?\d+(?:\.\d+)?)回復/g;
+  for (const match of raw.matchAll(listRe)) {
+    [match[1], match[2], match[3]].filter(Boolean).forEach(resource => set(resource, match[4]));
+  }
+  const singleRe = /1分間(?:で|に)(HP|ST|MP)(?:が|は)?(?:約)?([+-]?\d+(?:\.\d+)?)回復/g;
+  for (const match of raw.matchAll(singleRe)) set(match[1], match[2]);
+  const naturalRe = /(HP|ST|MP)(?:の)?自然回復量(?:が|は)?(?:約)?([+-]?\d+(?:\.\d+)?)(?:増加|回復)/g;
+  for (const match of raw.matchAll(naturalRe)) set(match[1], match[2]);
+  const naturalUnitRe = /(HP|ST|MP)(?:の)?自然回復量(?:が|は)?\s*([+-]?\d+(?:\.\d+)?)\s*\/(?:m|min)/g;
+  for (const match of raw.matchAll(naturalUnitRe)) set(match[1], match[2]);
+  const decreaseRe = /(HP|ST|MP)(?:の)?自然回復量(?:が|は)?(?:約)?([+-]?\d+(?:\.\d+)?)減少/g;
+  for (const match of raw.matchAll(decreaseRe)) set(match[1], -Math.abs(Number(match[2])));
+  const minuteDecreaseRe = /1分間(?:で|に)(HP|ST|MP)(?:が|は)?(?:約)?([+-]?\d+(?:\.\d+)?)減少/g;
+  for (const match of raw.matchAll(minuteDecreaseRe)) set(match[1], -Math.abs(Number(match[2])));
+  const compactPerMinuteRe = /(HP|ST|MP)\s*([+-]?\d+(?:\.\d+)?)(?=\s*(?:\/|／|回復))/g;
+  for (const match of raw.matchAll(compactPerMinuteRe)) set(match[1], match[2]);
+  return out;
+}
+
+/* Scrapboxの「#効果名 数値」タグから、条件なしで意味が一意な基礎ステータスだけを補完する。
+ * 競合・確率・時間限定・倍率・スキル効果はここでは扱わない。値を推測せず、
+ * `+3%` 等の明示値だけを既存の手動/生成statsの不足分として利用する。 */
+function equipmentBuffSafeTagHintStats(candidate) {
+  const out = {...equipmentBuffRecoveryHintValues(candidate)};
+  const escapeRe = value => String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const equipmentNames = Array.isArray(candidate?.equipmentNames)
+    ? candidate.equipmentNames.map(name => String(name || "").trim()).filter(Boolean)
+    : [];
+  // parsedStatsHintには参照ページのタグも混ざる。候補の装備名が付いた行だけに絞り、
+  // 「参照先の別装備の効果」を拾わないようにする。
+  const text = String(candidate?.parsedStatsHint || "")
+    .split(/\s*\/\s*/)
+    .filter(part => equipmentNames.some(name => new RegExp(`\\[${escapeRe(name)}\\]`).test(part)))
+    .join(" / ");
+  const directTags = [
+    ["攻撃力増加バフ", "attackPct", "attack"], ["魔力増加バフ", "magicPct", "magic"], ["移動速度増加バフ", "speedPct", "speed"],
+    ["命中増加バフ", "extraHitPct", "extraHit"], ["回避増加バフ", "extraAvoidPct", "extraAvoid"], ["防御増加バフ", "extraACPct", "extraAC"],
+    ["HP増加バフ", "extraHPPct", "extraHP"], ["MP増加バフ", "extraMPPct", "extraMP"], ["ST増加バフ", "extraSTPct", "extraST"],
+    ["最大重量増加バフ", "extraMaxWeightPct", "extraMaxWeight"]
+  ];
+  const set = (key, raw) => {
+    const value = Number(raw);
+    if (Number.isFinite(value) && value !== 0 && out[key] == null) out[key] = value;
+  };
+  directTags.forEach(([tag, pctKey, flatKey]) => {
+    const pctRe = new RegExp(`#${escapeRe(tag)}\\s*([+-]?\\d+(?:\\.\\d+)?)\\s*%(?=\\s*(?:$|/|#))`, "g");
+    const flatRe = new RegExp(`#${escapeRe(tag)}\\s*([+-]?\\d+(?:\\.\\d+)?)(?!\\s*%)(?=\\s*(?:$|/|#))`, "g");
+    for (const match of text.matchAll(pctRe)) set(pctKey, match[1]);
+    for (const match of text.matchAll(flatRe)) set(flatKey, match[1]);
+  });
+  const resistanceKeys = ["Fire", "Water", "Earth", "Wind", "Neutral"];
+  const addResistance = (tag, keyPrefix) => {
+    const re = new RegExp(`#${escapeRe(tag)}\\s*([+-]?\\d+(?:\\.\\d+)?)\\s*(%)?(?=\\s*(?:$|/|#))`, "g");
+    for (const match of text.matchAll(re)) {
+      const key = `${keyPrefix}${match[2] ? "Pct" : ""}`;
+      set(key, match[1]);
+    }
+  };
+  addResistance("全抵抗増加バフ", "extraAllRes");
+  [["火抵抗増加バフ", "Fire"], ["水抵抗増加バフ", "Water"], ["地抵抗増加バフ", "Earth"], ["風抵抗増加バフ", "Wind"], ["無抵抗増加バフ", "Neutral"]]
+    .forEach(([tag, element]) => addResistance(tag, `extra${element}Res`));
+  if (out.extraAllRes != null || out.extraAllResPct != null) {
+    resistanceKeys.forEach(element => {
+      if (out.extraAllRes != null && out[`extra${element}Res`] == null) out[`extra${element}Res`] = out.extraAllRes;
+      if (out.extraAllResPct != null && out[`extra${element}ResPct`] == null) out[`extra${element}ResPct`] = out.extraAllResPct;
+    });
+    delete out.extraAllRes;
+    delete out.extraAllResPct;
+  }
+  return out;
+}
+
+/* 旧保存データには、自然回復用の数値フィールド追加前に取り込まれた装備がある。
+ * 数値が確定している回復系だけを読み出し時に補完し、他の候補効果は触らない。 */
+function equipmentBuffRecoveryValues(row) {
+  const out = {};
+  const fields = [
+    ["hpRegenPerMinute", "equipBuffHpRegenPerMinute"], ["stRegenPerMinute", "equipBuffStRegenPerMinute"], ["mpRegenPerMinute", "equipBuffMpRegenPerMinute"],
+    ["hpChangePerSecond", "equipBuffHpChangePerSecond"], ["stChangePerSecond", "equipBuffStChangePerSecond"], ["mpChangePerSecond", "equipBuffMpChangePerSecond"]
+  ];
+  const candidate = findEquipBuffRuleCandidate({
+    catalogId: row?.equipBuffCatalogId,
+    officialTechnicId: row?.equipBuffTechnicId,
+    name: row?.equipBuffName
+  });
+  const stats = candidate?.stats || {};
+  const hintedStats = equipmentBuffSafeTagHintStats(candidate);
+  fields.forEach(([statKey, equipKey]) => {
+    const saved = Number(row?.[equipKey]);
+    const fallback = Number(stats[statKey]);
+    const hinted = Number(hintedStats[statKey]);
+    out[equipKey] = Number.isFinite(saved) && saved !== 0
+      ? saved
+      : (Number.isFinite(fallback) ? fallback : (Number.isFinite(hinted) ? hinted : 0));
+  });
+  return out;
+}
+
+/* 既存構成は、カタログ登録時にだけ投入される併用表の確定値を持たないことがある。
+ * safeForValueAutoApply の明示値だけを読み出し時に補完する。手入力済みの値は優先する。 */
+function equipmentBuffDamageCompatibilityValues(row) {
+  const out = {};
+  const propByKind = {
+    equipBuffDmgPct: "equipBuffDmgPct",
+    equipBuffExtraCritRatePct: "equipBuffExtraCritRatePct",
+    equipBuffConvMagicRate: "equipBuffConvMagicRate",
+    equipBuffConvSpeedRate: "equipBuffConvSpeedRate"
+  };
+  const rules = damageBuffCompatibilityRulesForEquipmentBuff(row);
+  rules.forEach(rule => {
+    if (!rule?.safeForValueAutoApply || rule.valueUncertain) return;
+    const prop = propByKind[String(rule.autoApplyKind || "")];
+    const value = Number(rule.value);
+    if (!prop || !Number.isFinite(value) || value === 0) return;
+    const saved = Number(row?.[prop]);
+    if (!(Number.isFinite(saved) && saved !== 0) && out[prop] == null) out[prop] = value;
+  });
+  return out;
+}
+
+/* 属性強化は現行方針どおり計算へ入れず、既存構成の表示合計だけを補完する。 */
+function equipmentBuffDamageCompatibilityDisplayEffects(row) {
+  const out = [];
+  const existing = normalizeAdditionalEffects(row?.extraEffects || []);
+  const hasElement = (name, value) => existing.some(effect =>
+    effect?.key === "elementDamagePct" && String(effect.name || "").trim() === name && Number(effect.value) === value
+  );
+  damageBuffCompatibilityRulesForEquipmentBuff(row).forEach(rule => {
+    if (!rule?.safeForValueAutoApply || rule.valueUncertain || rule.autoApplyKind !== "displayElement") return;
+    const name = String(rule.element || rule.effectLabel || "").trim();
+    const value = Number(rule.value);
+    if (!name || !Number.isFinite(value) || value === 0 || hasElement(name, value)) return;
+    if (!out.some(effect => effect.name === name && effect.value === value)) {
+      out.push({key:"elementDamagePct", name, value, unit:"%", scope:"display", source:"compatibility-backfill"});
+    }
+  });
+  return out;
+}
+
 
 function skillBuffCompatibilityItems() {
   const raw = catalogArray("MOE_SKILL_BUFF_COMPATIBILITY_MANUAL", "MOE_SKILL_BUFF_COMPATIBILITY", "MOE_SKILL_BUFF_COMPATIBILITY_GENERATED");
@@ -12994,7 +13311,9 @@ function applyEquipBuffRuleCandidateToEquipment(row, rule, opts={}) {
   row.equipBuffRuleConfidence = row.equipBuffRuleConfidence || rule.confidence || (rule.verified ? "verified" : "candidate");
   row.equipBuffRuleSource = row.equipBuffRuleSource || rule.source || "tsv-candidate";
 
-  const stats = rule.stats || {};
+  // 説明文に単位付きで明記された自然回復も、カタログ追加時は入力値として保存する。
+  // 手動・生成済み stats の確定値を優先する。
+  const stats = {...equipmentBuffSafeTagHintStats(rule), ...(rule.stats || {})};
   const statMap = {
     attack:"equipBuffFlatAttack", attackPct:"equipBuffAttackPct", magic:"equipBuffFlatMagic", magicPct:"equipBuffMagicPct", speed:"equipBuffFlatSpeed", speedPct:"equipBuffSpeedPct",
     dmgPct:"equipBuffDmgPct",
@@ -13003,6 +13322,8 @@ function applyEquipBuffRuleCandidateToEquipment(row, rule, opts={}) {
     extraAttackDelay:"equipBuffExtraAttackDelay", extraAttackDelayPct:"equipBuffExtraAttackDelayPct", extraMagicDelay:"equipBuffExtraMagicDelay", extraMagicDelayPct:"equipBuffExtraMagicDelayPct",
     extraFireRes:"equipBuffExtraFireRes", extraFireResPct:"equipBuffExtraFireResPct", extraWaterRes:"equipBuffExtraWaterRes", extraWaterResPct:"equipBuffExtraWaterResPct", extraEarthRes:"equipBuffExtraEarthRes", extraEarthResPct:"equipBuffExtraEarthResPct", extraWindRes:"equipBuffExtraWindRes", extraWindResPct:"equipBuffExtraWindResPct", extraNeutralRes:"equipBuffExtraNeutralRes", extraNeutralResPct:"equipBuffExtraNeutralResPct",
     extraDamageReducePct:"equipBuffExtraDamageReducePct", extraCritRatePct:"equipBuffExtraCritRatePct",
+    hpRegenPerMinute:"equipBuffHpRegenPerMinute", stRegenPerMinute:"equipBuffStRegenPerMinute", mpRegenPerMinute:"equipBuffMpRegenPerMinute",
+    hpChangePerSecond:"equipBuffHpChangePerSecond", stChangePerSecond:"equipBuffStChangePerSecond", mpChangePerSecond:"equipBuffMpChangePerSecond",
     extraBreath:"equipBuffExtraBreath", extraHearing:"equipBuffExtraHearing", extraSeeing:"equipBuffExtraSeeing", extraSmelling:"equipBuffExtraSmelling", extraFullness:"equipBuffExtraFullness", extraThirst:"equipBuffExtraThirst", extraSteal:"equipBuffExtraSteal", extraLockpickingFail:"equipBuffExtraLockpickingFail", extraFangAttack:"equipBuffExtraFangAttack",
     extraFishingGaugeLength:"equipBuffExtraFishingGaugeLength", extraFishingHitZone:"equipBuffExtraFishingHitZone",
     extraSmithingGradeZone:"equipBuffExtraSmithingGradeZone", extraSmithingGaugeSlip:"equipBuffExtraSmithingGaugeSlip", extraSmithingHitZone:"equipBuffExtraSmithingHitZone",
@@ -14048,6 +14369,19 @@ function setupOptimizerLazyInitialization() {
   if (details.open) initializeOnFirstOpen();
 }
 
+function initializeEquipmentBuffRuntimeData() {
+  const hasEquipBuff = (state.equipment || []).some(row =>
+    row && row.equipBuffEnabled !== false && row.equipBuffEnabled !== 0 && row.equipBuffEnabled !== "0" &&
+    (row.equipBuffName || row.equipBuffCatalogId || row.equipBuffTechnicId)
+  );
+  if (!hasEquipBuff || typeof loadEquipmentBuffRuntimeScriptsOnce !== "function") return;
+  loadEquipmentBuffRuntimeScriptsOnce().then(() => {
+    renderAll();
+    calc();
+    document.dispatchEvent(new CustomEvent("moe:equip-buff-runtime-ready"));
+  }).catch(() => {});
+}
+
 function initializeBrowserApp() {
   loadIdbWorkerEndpoint();
 
@@ -14087,7 +14421,9 @@ function initializeBrowserApp() {
   renderRaceTable();
   renderValueTable();
   renderTagLinkSummary();
-  loadConfigFromShareHash();
+  Promise.resolve(loadConfigFromShareHash()).finally(() => {
+    initializeEquipmentBuffRuntimeData();
+  });
 }
 
 if (typeof document !== "undefined") {
