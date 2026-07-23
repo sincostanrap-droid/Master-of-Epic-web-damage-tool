@@ -82,8 +82,18 @@ assert.match(
 );
 
 const catalogTabSource = fs.readFileSync(path.join(root, "src/ui/catalogTab.js"), "utf8");
+const mainTabsSource = fs.readFileSync(path.join(root, "src/ui/mainTabs.js"), "utf8");
+const mainSource = fs.readFileSync(path.join(root, "src/main.js"), "utf8");
+const indexSource = fs.readFileSync(path.join(root, "index.html"), "utf8");
+const stylesSource = fs.readFileSync(path.join(root, "styles/main.css"), "utf8");
 assert.match(catalogTabSource, /装備Buff効果フィルタ/);
 assert.doesNotMatch(catalogTabSource, /スキル強化フィルタ/);
 assert.doesNotMatch(catalogTabSource, /catalogSkillPlus/);
+assert.match(mainTabsSource, /label:"装備カタログ"/);
+assert.doesNotMatch(mainTabsSource, /装備カタログ α/);
+assert.match(mainSource, /const APP_VERSION = "v1\.24\.1"/);
+assert.doesNotMatch(indexSource, /\?v=1\.24\.0/);
+assert.match(stylesSource, /@media \(max-width: 980px\)[\s\S]*?\.catalogBuffEffectFilterRow[\s\S]*?grid-template-columns:[^;]*1\.35fr[^;]*1fr/);
+assert.match(stylesSource, /@media \(max-width: 420px\)[\s\S]*?\.catalogBuffEffectFilterRow[\s\S]*?grid-template-columns: 1fr/);
 
 console.log("catalogBuffEffectFilter tests: OK");
