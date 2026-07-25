@@ -14,7 +14,7 @@
     if (parserLoadPromise) return parserLoadPromise;
     parserLoadPromise = new Promise((resolve, reject) => {
       const script = document.createElement("script");
-      script.src = "./src/domain/combatLogParser.js?v=1.24.1";
+      script.src = "./src/domain/combatLogParser.js?v=1.24.2";
       script.dataset.combatLogParser = "1";
       script.onload = () => global.MoeCombatLogParser
         ? resolve(global.MoeCombatLogParser)

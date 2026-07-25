@@ -12,8 +12,8 @@
   onclick属性から呼ばれる関数があるため、現時点では module ではなく通常scriptとして読み込みます。
 */
 
-const APP_VERSION = "v1.24.1";
-const APP_VERSION_NOTE = "装備カタログ正式版・装備Buff効果フィルタ対応";
+const APP_VERSION = "v1.24.2";
+const APP_VERSION_NOTE = "最適化のBuff固定状態を修正";
 
 /* 種族係数。攻撃力係数と魔力係数は別管理。 */
 const RACE_COEFFS = {
@@ -10710,11 +10710,18 @@ function optimizerCompositeCandidates(settings) {
   const candidates = rows
     .map((row, idx) => ({row, idx}))
     .filter(x => compositeHasEffect(x.row))
+    // 行単位で固定されたOFF状態は、最適化でもOFFのまま候補から外す。
+    .filter(x => !(x.row.fixed && !x.row.enabled))
     .filter(x => settings.includeDisabledBuffs || x.row.enabled);
   if (settings) settings._compositeCandidates = candidates;
   return candidates;
 }
 
+function optimizerFixedCompositeCandidates(settings, candidates=optimizerCompositeCandidates(settings)) {
+  return candidates.filter(x =>
+    x.row.enabled && (x.row.fixed || settings.fixCurrentBuffs)
+  );
+}
 
 function optimizerScoreTolerance(score) {
   return Math.max(0.000001, Math.abs(+score || 0) * 0.000000001);
@@ -10818,7 +10825,7 @@ function optimizerCompleteGreedySelection(equipmentIdxs, inputs, settings, initi
 }
 
 function optimizerSelectExternalBuffsGreedy(equipmentIdxs, inputs, settings) {
-  const fixed = settings.fixCurrentBuffs ? optimizerCompositeCandidates(settings).filter(x => x.row.enabled) : [];
+  const fixed = optimizerFixedCompositeCandidates(settings);
   const fixedSelected = fixed.map(x => x.idx);
   const fixedSet = new Set(fixedSelected);
 
@@ -10828,7 +10835,7 @@ function optimizerSelectExternalBuffsGreedy(equipmentIdxs, inputs, settings) {
 
 function optimizerSelectExternalBuffsLocal(equipmentIdxs, inputs, settings) {
   const candidates = optimizerCompositeCandidates(settings);
-  const fixed = settings.fixCurrentBuffs ? candidates.filter(x => x.row.enabled) : [];
+  const fixed = optimizerFixedCompositeCandidates(settings, candidates);
   const fixedSet = new Set(fixed.map(x => x.idx));
 
   let current = optimizerSelectExternalBuffsGreedy(equipmentIdxs, inputs, settings);
@@ -10892,7 +10899,7 @@ function optimizerSelectExternalBuffsLocal(equipmentIdxs, inputs, settings) {
 
 function optimizerSelectExternalBuffsBeam(equipmentIdxs, inputs, settings) {
   const candidates = optimizerCompositeCandidates(settings);
-  const fixed = settings.fixCurrentBuffs ? candidates.filter(x => x.row.enabled) : [];
+  const fixed = optimizerFixedCompositeCandidates(settings, candidates);
   const fixedSelected = fixed.map(x => x.idx);
   const fixedSet = new Set(fixedSelected);
 
@@ -11160,7 +11167,7 @@ function ensureOptimizerWorker() {
   }
 
   try {
-    optimizerWorker = new Worker("./src/optimizer/optimizer.worker.js");
+    optimizerWorker = new Worker(`./src/optimizer/optimizer.worker.js?v=${encodeURIComponent(APP_VERSION)}`);
   } catch (e) {
     optimizerWorker = null;
     const status = byId("optimizerStatus");

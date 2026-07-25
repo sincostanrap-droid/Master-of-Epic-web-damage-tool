@@ -91,8 +91,8 @@ assert.doesNotMatch(catalogTabSource, /スキル強化フィルタ/);
 assert.doesNotMatch(catalogTabSource, /catalogSkillPlus/);
 assert.match(mainTabsSource, /label:"装備カタログ"/);
 assert.doesNotMatch(mainTabsSource, /装備カタログ α/);
-assert.match(mainSource, /const APP_VERSION = "v1\.24\.1"/);
-assert.doesNotMatch(indexSource, /\?v=1\.24\.0/);
+assert.match(mainSource, /const APP_VERSION = "v1\.24\.2"/);
+assert.doesNotMatch(indexSource, /\?v=1\.24\.[01]/);
 assert.match(stylesSource, /@media \(max-width: 980px\)[\s\S]*?\.catalogBuffEffectFilterRow[\s\S]*?grid-template-columns:[^;]*1\.35fr[^;]*1fr/);
 assert.match(stylesSource, /@media \(max-width: 420px\)[\s\S]*?\.catalogBuffEffectFilterRow[\s\S]*?grid-template-columns: 1fr/);
 
