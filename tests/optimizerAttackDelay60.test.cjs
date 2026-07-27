@@ -14,6 +14,8 @@ assert.match(mainSource, /requireAttackDelay60:\s*!!byId\("optimizerRequireAttac
 assert.match(mainSource, /value <= -60 \+ eps/);
 assert.match(mainSource, /value <= -60 \+ 0\.000001\s*\? \[1, 0\]\s*: \[0, -Math\.abs\(value \+ 60\)\]/);
 assert.match(mainSource, /optimizerFinalConstraintViolations\(metrics, settings\)/);
+assert.match(mainSource, /return Math\.min\(60, -\(\+m\?\.extraStats\?\.extraAttackDelay \|\| 0\)\)/);
+assert.match(mainSource, /rank\.push\(-optimizerAttackDelay60Excess\(m\)\)/);
 assert.equal(
   (coreSource.match(/optimizerFinalConstraintViolations\([^)]*, settings\)/g) || []).length,
   3,
@@ -64,5 +66,34 @@ assert.deepEqual(
   )),
   []
 );
+
+const metricStart = mainSource.indexOf("function optimizerMetricValue(m, objective)");
+const metricEnd = mainSource.indexOf("function optimizerObjectiveLabel", metricStart);
+assert.ok(metricStart >= 0 && metricEnd > metricStart, "attack-delay capped metric helper block");
+const metricContext = {
+  optimizerObjectiveRawValue: m => +(m?.extraStats?.extraAttackDelay || 0),
+  optimizerObjectiveIsMinimize: () => true
+};
+vm.createContext(metricContext);
+vm.runInContext(mainSource.slice(metricStart, metricEnd), metricContext);
+
+assert.equal(metricContext.optimizerMetricValueForSettings(
+  {extraStats:{extraAttackDelay:-59}},
+  "extraAttackDelay",
+  {requireAttackDelay60:true}
+), 59);
+assert.equal(metricContext.optimizerMetricValueForSettings(
+  {extraStats:{extraAttackDelay:-60}},
+  "extraAttackDelay",
+  {requireAttackDelay60:true}
+), 60);
+assert.equal(metricContext.optimizerMetricValueForSettings(
+  {extraStats:{extraAttackDelay:-80}},
+  "extraAttackDelay",
+  {requireAttackDelay60:true}
+), 60);
+assert.equal(metricContext.optimizerAttackDelay60Excess(
+  {extraStats:{extraAttackDelay:-62}}
+), 2);
 
 console.log("optimizer attack-delay -60 tests: OK");

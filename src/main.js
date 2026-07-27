@@ -12,8 +12,8 @@
   onclick属性から呼ばれる関数があるため、現時点では module ではなく通常scriptとして読み込みます。
 */
 
-const APP_VERSION = "v1.24.3";
-const APP_VERSION_NOTE = "最適化に攻撃ディレイ-60確保条件を追加";
+const APP_VERSION = "v1.24.4";
+const APP_VERSION_NOTE = "攻撃ディレイ-60確保後の過剰評価を修正";
 
 /* 種族係数。攻撃力係数と魔力係数は別管理。 */
 const RACE_COEFFS = {
@@ -10000,6 +10000,19 @@ function optimizerMetricValue(m, objective) {
   return optimizerObjectiveIsMinimize(objective) ? -raw : raw;
 }
 
+function optimizerMetricValueForSettings(m, objective, settings) {
+  if (settings?.requireAttackDelay60 && objective === "extraAttackDelay") {
+    // -60へ到達した後は、それ以上積んでも最適化上の得点を増やさない。
+    return Math.min(60, -(+m?.extraStats?.extraAttackDelay || 0));
+  }
+  return optimizerMetricValue(m, objective);
+}
+
+function optimizerAttackDelay60Excess(m) {
+  const value = +(m?.extraStats?.extraAttackDelay || 0);
+  return Math.max(0, -value - 60);
+}
+
 function optimizerObjectiveLabel(objective) {
   const base = ({
     damage:"ダメージ",
@@ -10129,7 +10142,7 @@ function optimizerObjectiveList(settings) {
 
 function optimizerTargetRankForPrimary(m, settings) {
   const t = optimizerPrimaryTargetSettings(settings);
-  if (!t) return [optimizerMetricValue(m, settings?.objective || "damage")];
+  if (!t) return [optimizerMetricValueForSettings(m, settings?.objective || "damage", settings)];
 
   const value = optimizerObjectiveRawValue(m, t.objective);
   if (optimizerObjectiveIsMinimize(t.objective)) {
@@ -10159,10 +10172,11 @@ function optimizerEvaluationFromMetrics(m, settings) {
     : [];
   if (optimizerPrimaryTargetSettings(settings)) {
     rank = rank.concat(optimizerTargetRankForPrimary(m, settings));
-    objectives.slice(1).forEach(obj => rank.push(optimizerMetricValue(m, obj)));
+    objectives.slice(1).forEach(obj => rank.push(optimizerMetricValueForSettings(m, obj, settings)));
   } else {
-    rank = rank.concat(objectives.map(obj => optimizerMetricValue(m, obj)));
+    rank = rank.concat(objectives.map(obj => optimizerMetricValueForSettings(m, obj, settings)));
   }
+  if (settings?.requireAttackDelay60) rank.push(-optimizerAttackDelay60Excess(m));
   return {score: rank[0] ?? 0, rank, violations: []};
 }
 
