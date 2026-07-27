@@ -6,10 +6,10 @@
 */
 
 importScripts(
-  "../domain/attackDpsState.js?v=1.24.2",
-  "../main.js?v=1.24.2",
-  "../calc/core.js?v=1.24.2",
-  "./core.js?v=1.24.2"
+  "../domain/attackDpsState.js?v=1.24.3",
+  "../main.js?v=1.24.3",
+  "../calc/core.js?v=1.24.3",
+  "./core.js?v=1.24.3"
 );
 
 self.onmessage = event => {

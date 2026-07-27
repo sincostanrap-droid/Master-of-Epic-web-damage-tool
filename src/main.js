@@ -12,8 +12,8 @@
   onclick属性から呼ばれる関数があるため、現時点では module ではなく通常scriptとして読み込みます。
 */
 
-const APP_VERSION = "v1.24.2";
-const APP_VERSION_NOTE = "最適化のBuff固定状態を修正";
+const APP_VERSION = "v1.24.3";
+const APP_VERSION_NOTE = "最適化に攻撃ディレイ-60確保条件を追加";
 
 /* 種族係数。攻撃力係数と魔力係数は別管理。 */
 const RACE_COEFFS = {
@@ -9936,6 +9936,7 @@ function integratedOptimizerSettings() {
     secondaryObjective: byId("optimizerSecondaryObjective")?.value || "",
     targetValueRaw: byId("optimizerTargetValue")?.value ?? "",
     targetOverRaw: byId("optimizerTargetOver")?.value ?? "",
+    requireAttackDelay60: !!byId("optimizerRequireAttackDelay60")?.checked,
     includeDisabledBuffs: byId("optimizerIncludeDisabledBuffs") ? !!byId("optimizerIncludeDisabledBuffs").checked : true,
     fixCurrentBuffs: !!byId("optimizerFixCurrentBuffs")?.checked,
     forceOtherBuffs: byId("optimizerForceOtherBuffs") ? !!byId("optimizerForceOtherBuffs").checked : true,
@@ -10038,9 +10039,13 @@ function optimizerPrimaryTargetSettings(settings) {
 
 function optimizerPrimaryTargetDescription(settings) {
   const t = optimizerPrimaryTargetSettings(settings);
-  if (!t) return "";
-  const over = t.over === null ? "" : ` / 超過許容 +${fmt(t.over, 1)}`;
-  return `${optimizerObjectiveLabel(t.objective)} 目標 ${fmt(t.target, 1)}${over}`;
+  const descriptions = [];
+  if (t) {
+    const over = t.over === null ? "" : ` / 超過許容 +${fmt(t.over, 1)}`;
+    descriptions.push(`${optimizerObjectiveLabel(t.objective)} 目標 ${fmt(t.target, 1)}${over}`);
+  }
+  if (settings?.requireAttackDelay60) descriptions.push("攻撃ディレイ -60以下");
+  return descriptions.join(" / ");
 }
 
 function optimizerEffectiveTotal(base, flat, pctValue) {
@@ -10098,6 +10103,21 @@ function optimizerTargetOverViolations(m, settings) {
     : [];
 }
 
+function optimizerRequiredConditionViolations(m, settings) {
+  if (!settings?.requireAttackDelay60) return [];
+  const value = +(m?.extraStats?.extraAttackDelay || 0);
+  const eps = 0.000001;
+  return value <= -60 + eps
+    ? []
+    : [`攻撃ディレイ ${fmt(value, 2)}（-60以下が必要）`];
+}
+
+function optimizerFinalConstraintViolations(m, settings) {
+  return optimizerStatCapViolations(m, settings)
+    .concat(optimizerTargetOverViolations(m, settings))
+    .concat(optimizerRequiredConditionViolations(m, settings));
+}
+
 function optimizerObjectiveList(settings) {
   const list = [];
   const primary = settings?.objective || "damage";
@@ -10129,12 +10149,19 @@ function optimizerEvaluationFromMetrics(m, settings) {
   if (violations.length) return {score: OPTIMIZER_INVALID_SCORE, rank: [OPTIMIZER_INVALID_SCORE], violations};
 
   const objectives = optimizerObjectiveList(settings);
-  let rank = [];
+  let rank = settings?.requireAttackDelay60
+    ? (() => {
+        const value = +(m?.extraStats?.extraAttackDelay || 0);
+        return value <= -60 + 0.000001
+          ? [1, 0]
+          : [0, -Math.abs(value + 60)];
+      })()
+    : [];
   if (optimizerPrimaryTargetSettings(settings)) {
     rank = rank.concat(optimizerTargetRankForPrimary(m, settings));
     objectives.slice(1).forEach(obj => rank.push(optimizerMetricValue(m, obj)));
   } else {
-    rank = objectives.map(obj => optimizerMetricValue(m, obj));
+    rank = rank.concat(objectives.map(obj => optimizerMetricValue(m, obj)));
   }
   return {score: rank[0] ?? 0, rank, violations: []};
 }
@@ -10247,7 +10274,8 @@ function optimizerSelectionCacheKey(equipmentIdxs, compositeIdxs, settings) {
     settings?.objective || "damage",
     settings?.secondaryObjective || "",
     settings?.targetValueRaw ?? "",
-    settings?.targetOverRaw ?? ""
+    settings?.targetOverRaw ?? "",
+    settings?.requireAttackDelay60 ? "delay60" : ""
   ].join("|");
 }
 
@@ -11097,8 +11125,7 @@ function optimizerReevaluateResultsOnMain(results, payload) {
     );
 
     const metrics = evaluated.metrics;
-    const capViolations = optimizerStatCapViolations(metrics, settings)
-      .concat(optimizerTargetOverViolations(metrics, settings))
+    const capViolations = optimizerFinalConstraintViolations(metrics, settings)
       .concat(evaluated.violations || []);
 
     return {

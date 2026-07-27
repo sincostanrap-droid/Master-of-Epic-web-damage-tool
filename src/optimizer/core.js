@@ -77,7 +77,7 @@ function optimizerBuildCurrentConfigResult(inputs, settings) {
   const ev = optimizerEvaluateBuffSelection(equipmentIdxs, compositeIdxs, inputs, settings);
   const metrics = ev.metrics;
   const reasons = [];
-  const capViolations = optimizerStatCapViolations(metrics, settings).concat(optimizerTargetOverViolations(metrics, settings));
+  const capViolations = optimizerFinalConstraintViolations(metrics, settings);
 
   if (metrics.slots.total > settings.maxSlots) {
     reasons.push(`バフ枠超過 ${metrics.slots.total}/${settings.maxSlots}`);
@@ -128,7 +128,7 @@ function optimizerBuildCurrentEquipmentBuffOptimizedResult(inputs, settings) {
 
   const buff = optimizerSelectExternalBuffs(equipmentIdxs, inputs, settings);
   const metrics = buff.metrics;
-  const capViolations = optimizerStatCapViolations(metrics, settings).concat(optimizerTargetOverViolations(metrics, settings));
+  const capViolations = optimizerFinalConstraintViolations(metrics, settings);
   const equipmentConflicts = optimizerEquipmentConflictNames(equipmentIdxs);
   const reasons = [];
 
@@ -370,7 +370,7 @@ function runOptimizerCore(payload, onProgress=null) {
       rank: buff.rank,
       equipmentSummary: optimizerEquipmentSummaryByIdx(equipmentIdxs, buff.metrics),
       equipmentConflicts: optimizerEquipmentConflictNames(equipmentIdxs),
-      capViolations: optimizerStatCapViolations(buff.metrics, settings).concat(optimizerTargetOverViolations(buff.metrics, settings)),
+      capViolations: optimizerFinalConstraintViolations(buff.metrics, settings),
       prunedCount: buff.prunedCount || 0,
       forceOtherBuffs: settings.forceOtherBuffs
     };
@@ -547,6 +547,9 @@ function runOptimizerCore(payload, onProgress=null) {
   if (typeof baseSort === "function") {
     global.optimizerSortByEvaluation = function optimizerSortByEvaluationSkillPlusV21(a, b) {
       const settings = currentSettings || {};
+      if (settings.requireAttackDelay60) {
+        return baseSort.call(this, a, b);
+      }
       if (skillPlusObjectiveEnabled(settings, settings.objective)) {
         const c = compareSkillPlus(a, b, settings);
         if (c) return c;
@@ -564,6 +567,9 @@ function runOptimizerCore(payload, onProgress=null) {
   if (typeof baseCompare === "function") {
     global.optimizerCompareEvaluations = function optimizerCompareEvaluationsSkillPlusV21(a, b) {
       const settings = currentSettings || {};
+      if (settings.requireAttackDelay60) {
+        return baseCompare.call(this, a, b);
+      }
       if (skillPlusObjectiveEnabled(settings, settings.objective)) {
         const c = compareSkillPlus(a, b, settings);
         if (c) return c < 0 ? 1 : -1;
