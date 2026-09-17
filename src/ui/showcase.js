@@ -83,10 +83,6 @@ function showcaseActiveBuffLines(resolvedState=null) {
   return lines;
 }
 
-function totalStatValue(base, flat=0, pct=0) {
-  return ((+base || 0) + (+flat || 0)) * (1 + ((+pct || 0) / 100));
-}
-
 function showcaseTotalStats(d, m) {
   const e = m?.extraStats || {};
   const rows = [

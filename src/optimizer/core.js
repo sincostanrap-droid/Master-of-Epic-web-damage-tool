@@ -435,7 +435,9 @@ function runOptimizerCore(payload, onProgress=null) {
       evaluated: buffEvalBeams.length,
       totalEquipmentCandidates: equipmentBeams.length,
       optimizerDiagnostic,
-      settings
+      // Run caches may contain hundreds of thousands of full metrics. They are
+      // private scratch data, not part of the result sent through postMessage.
+      settings: Object.fromEntries(Object.entries(settings).filter(([key]) => !key.startsWith("_")))
     }
   };
 }

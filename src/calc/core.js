@@ -10,9 +10,14 @@
   - buffSlotCountForState(st)
 */
 
+function totalStatValue(base, flat=0, pct=0) {
+  return ((+base || 0) + (+flat || 0)) * (1 + ((+pct || 0) / 100));
+}
+
 function computeMetrics(st, inputs) {
   // 装備行に内蔵されたBuffを計算用の装備以外Buffへ展開し、競合グループで重複しないよう代表だけ採用してから既存カテゴリへ展開する。
-  st = expandEquipmentBuffState(st);
+  const normalizedEquipment = normalizeEquipmentRows(st.equipment);
+  st = expandEquipmentBuffState(st, normalizedEquipment);
   st = applyBuffGroupRules(st);
   st = expandCompositeState(st);
   const raceCoeff = RACE_COEFFS[inputs.raceSelect] ?? parseFloat(inputs.raceCoeff) ?? 0.20;
@@ -20,7 +25,7 @@ function computeMetrics(st, inputs) {
   const magicCoeff = RACE_MAGIC_COEFFS[inputs.raceSelect] ?? 1.00;
   const baseMagicFromSpirit = spirit * magicCoeff;
   // 装備補正はBuff枠とは別枠。攻撃力/魔力/速度/ディレイを単純合算する。
-  const equipmentRows = normalizeEquipmentRows(st.equipment).filter(r => r.enabled !== false);
+  const equipmentRows = normalizedEquipment.filter(r => r.enabled !== false);
   const equipmentRaw = {
     attack: equipmentRows.reduce((s, r) => s + (+r.attack || 0), 0),
     magic: equipmentRows.reduce((s, r) => s + (+r.magic || 0), 0),
@@ -49,7 +54,7 @@ function computeMetrics(st, inputs) {
   const stats = pctStats.stats;
 
   // 武器性能発揮率を反映した武器攻撃力を計算する。
-  const effectiveWeapon = effectiveWeaponStats(st);
+  const effectiveWeapon = effectiveWeaponStats(st, normalizedEquipment);
   const selectedWeapon = effectiveWeapon.weapon;
   const selectedAmmo = effectiveWeapon.ammo;
   const weaponDamage = selectedWeapon ? effectiveWeapon.damage : (parseFloat(inputs.weaponDamage) || 0);

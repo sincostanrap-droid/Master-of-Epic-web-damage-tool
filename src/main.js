@@ -12,8 +12,8 @@
   onclick属性から呼ばれる関数があるため、現時点では module ではなく通常scriptとして読み込みます。
 */
 
-const APP_VERSION = "v1.24.4";
-const APP_VERSION_NOTE = "攻撃ディレイ-60確保後の過剰評価を修正";
+const APP_VERSION = "v1.24.5";
+const APP_VERSION_NOTE = "最適化の重複処理削減・Worker実行を修正";
 
 /* 種族係数。攻撃力係数と魔力係数は別管理。 */
 const RACE_COEFFS = {
@@ -6760,8 +6760,8 @@ function equipmentBuffStackKey(r) {
   return name ? `name:${name}` : "";
 }
 
-function resolveEquipmentBuffRowsForSameTechnic(rows) {
-  const eligible = normalizeEquipmentRows(rows)
+function resolveEquipmentBuffRowsForSameTechnic(rows, normalizedRows=null) {
+  const eligible = (normalizedRows || normalizeEquipmentRows(rows))
     .filter(r => r.enabled !== false && r.equipBuffEnabled)
     .map(resolveEquipmentBuffRow)
     .filter(equipmentBuffHasEffect);
@@ -6884,10 +6884,10 @@ function equipmentBuffToCompositeRow(r) {
 }
 
 /* 装備行に内蔵されたBuffを、計算時だけ装備以外Buffへ展開する。 */
-function expandEquipmentBuffState(st) {
+function expandEquipmentBuffState(st, normalizedEquipment=null) {
   const out = clone(st || {});
   out.composite = Array.isArray(out.composite) ? out.composite : [];
-  resolveEquipmentBuffRowsForSameTechnic((st || {}).equipment)
+  resolveEquipmentBuffRowsForSameTechnic((st || {}).equipment, normalizedEquipment)
     .map(r => restoreEquipmentBuffCompatibilityGroups(r))
     .forEach(r => out.composite.push(equipmentBuffToCompositeRow(r)));
   return out;
@@ -7832,8 +7832,8 @@ function weaponRowHasCalcData(row) {
   );
 }
 
-function selectedWeaponForCalc(st) {
-  const rows = normalizeEquipmentRows(st?.equipment).filter(r => r.enabled !== false && isWeaponEquipmentRow(r));
+function selectedWeaponForCalc(st, normalizedEquipment=null) {
+  const rows = (normalizedEquipment || normalizeEquipmentRows(st?.equipment)).filter(r => r.enabled !== false && isWeaponEquipmentRow(r));
   const withData = rows.filter(weaponRowHasCalcData);
   // 「武器: 弾丸」は武器本体ではない。右手、左手の順で計算武器を選ぶ。
   return withData.find(r => r.slot === "武器: 右手")
@@ -7842,8 +7842,8 @@ function selectedWeaponForCalc(st) {
     || null;
 }
 
-function selectedAmmoForCalc(st) {
-  return normalizeEquipmentRows(st?.equipment)
+function selectedAmmoForCalc(st, normalizedEquipment=null) {
+  return (normalizedEquipment || normalizeEquipmentRows(st?.equipment))
     .find(r => r.enabled !== false && r.slot === "武器: 弾丸" && weaponRowHasCalcData(r))
     || null;
 }
@@ -7859,10 +7859,10 @@ function projectileWeaponKind(row) {
   return "";
 }
 
-function effectiveWeaponStats(st) {
-  const weapon = selectedWeaponForCalc(st);
+function effectiveWeaponStats(st, normalizedEquipment=null) {
+  const weapon = selectedWeaponForCalc(st, normalizedEquipment);
   const kind = projectileWeaponKind(weapon);
-  const ammo = kind ? selectedAmmoForCalc(st) : null;
+  const ammo = kind ? selectedAmmoForCalc(st, normalizedEquipment) : null;
   const weaponDamage = +weapon?.weaponDamage || 0;
   const ammoDamage = +ammo?.weaponDamage || 0;
   const weaponRange = +weapon?.weaponRange || 0;
@@ -10241,6 +10241,16 @@ function optimizerPrepareRunCaches(settings) {
   settings.optimizerCacheHits = 0;
 }
 
+// Calculation-only projection: preserve row order and leave candidate indices in the
+// original arrays. Disabled candidates have no effect on metrics or Buff precedence.
+function optimizerComputeMetrics(st, inputs) {
+  const compact = {...st,
+    equipment: st.equipment.filter(row => row.enabled !== false),
+    composite: st.composite.filter(row => row.enabled)
+  };
+  return computeMetrics(compact, inputs);
+}
+
 function optimizerEquipmentRows(settings) {
   return settings?._equipmentRows || normalizeEquipmentRows(state.equipment);
 }
@@ -10654,7 +10664,7 @@ function optimizerBuildEquipmentExact(inputs, settings) {
     if (groupIndex >= groups.length) {
       if (!optimizerSelectionHasMainWeapon(selected, settings)) return;
       const st = optimizerStateForSelection(selected, [], settings);
-      const m = computeMetrics(st, inputs);
+      const m = optimizerComputeMetrics(st, inputs);
       if (globalThis.MOEOptimizerSkillPlusFixV1) {
         globalThis.MOEOptimizerSkillPlusFixV1.attachMetrics(m, selected, [], settings);
       }
@@ -10722,7 +10732,7 @@ function optimizerBuildEquipmentBeams(inputs, settings) {
 
         const equipmentIdxs = optimizerCanonicalEquipmentIdxs(beam.equipmentIdxs.concat([cand.idx]), settings);
         const st = optimizerStateForSelection(equipmentIdxs, [], settings);
-        const m = computeMetrics(st, inputs);
+        const m = optimizerComputeMetrics(st, inputs);
         if (globalThis.MOEOptimizerSkillPlusFixV1) {
           globalThis.MOEOptimizerSkillPlusFixV1.attachMetrics(m, equipmentIdxs, [], settings);
         }
@@ -10777,7 +10787,7 @@ function optimizerEvaluateBuffSelection(equipmentIdxs, compositeIdxs, inputs, se
   }
 
   const st = optimizerStateForSelection(equipmentIdxs, compositeIdxs, settings);
-  const metrics = computeMetrics(st, inputs);
+  const metrics = optimizerComputeMetrics(st, inputs);
   if (globalThis.MOEOptimizerSkillPlusFixV1) {
     globalThis.MOEOptimizerSkillPlusFixV1.attachMetrics(metrics, equipmentIdxs, compositeIdxs, settings);
   }
@@ -11281,6 +11291,26 @@ function ensureOptimizerWorker() {
   return optimizerWorker;
 }
 
+// Snapshot only the calculation data already loaded by the page. Sending these
+// references with each job also invalidates Worker lookups after a catalog refresh.
+const OPTIMIZER_RUNTIME_DATA_KEYS = [
+  "MOE_BUFF_RULES_MANUAL",
+  "MOE_EQUIP_BUFF_RULE_CANDIDATES_MANUAL", "MOE_EQUIP_BUFF_RULE_CANDIDATES", "MOE_EQUIP_BUFF_RULE_CANDIDATES_GENERATED",
+  "MOE_SKILL_BUFF_COMPATIBILITY_MANUAL", "MOE_SKILL_BUFF_COMPATIBILITY", "MOE_SKILL_BUFF_COMPATIBILITY_GENERATED",
+  "MOE_DAMAGE_BUFF_COMPATIBILITY_MANUAL", "MOE_DAMAGE_BUFF_COMPATIBILITY", "MOE_DAMAGE_BUFF_COMPATIBILITY_GENERATED",
+  "MOE_SKILL_SIM_KNOWLEDGE"
+];
+
+function optimizerRuntimeSnapshot() {
+  const data = Object.fromEntries(OPTIMIZER_RUNTIME_DATA_KEYS.map(key => [key, globalThis[key] ?? null]));
+  const npc = globalThis.MOE_NPC_EFFECT_SLOTS;
+  return {data, npc: {
+    acDelta: +(npc?.getAcDelta?.() || 0),
+    evasionDelta: +(npc?.getEvasionDelta?.() || 0),
+    damageTakenMultiplier: +(npc?.getDamageTakenMultiplier?.() || 1)
+  }};
+}
+
 function optimizerPayloadForCurrentState() {
   syncRaceCoeff();
   syncBaseMagic();
@@ -11296,7 +11326,8 @@ function optimizerPayloadForCurrentState() {
   return {
     inputs,
     state: clone(state),
-    settings: integratedOptimizerSettings()
+    settings: integratedOptimizerSettings(),
+    runtime: optimizerRuntimeSnapshot()
   };
 }
 
@@ -15271,6 +15302,7 @@ if (typeof document !== "undefined") {
  * 探索は再実行せず、選択装備数ぶんだけcomputeMetricsを追加実行する。
  */
 (function installOptimizerEquipmentContributionV1() {
+  if (typeof document === "undefined") return;
   if (typeof renderIntegratedOptimizerResults !== "function") return;
   if (renderIntegratedOptimizerResults.__equipmentContributionV1) return;
 
@@ -15536,6 +15568,7 @@ if (typeof document !== "undefined") {
  * 探索は再実行せず、選択Buff数ぶんだけcomputeMetricsを追加実行する。
  */
 (function installOptimizerBuffContributionV1() {
+  if (typeof document === "undefined") return;
   if (typeof renderIntegratedOptimizerResults !== "function") return;
   if (renderIntegratedOptimizerResults.__buffContributionV1) return;
 
@@ -15830,6 +15863,7 @@ if (typeof document !== "undefined") {
  * 元の主目的値を回復する最小量を二分探索する。
  */
 (function installOptimizerReplacementThresholdsV1() {
+  if (typeof document === "undefined") return;
   if (typeof renderIntegratedOptimizerResults !== "function") return;
   if (renderIntegratedOptimizerResults.__replacementThresholdsV1) return;
 
@@ -16367,6 +16401,7 @@ if (typeof document !== "undefined") {
  */
 (function installNpcEffectSlotsV1(global) {
   "use strict";
+  if (typeof document === "undefined") return;
   if (global.__MOE_NPC_EFFECT_SLOTS_V1_INSTALLED__) return;
   global.__MOE_NPC_EFFECT_SLOTS_V1_INSTALLED__ = true;
 
