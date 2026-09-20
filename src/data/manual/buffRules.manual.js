@@ -518,7 +518,6 @@ window.MOE_BUFF_RULES_MANUAL = window.MOE_BUFF_RULES_MANUAL || {};
     [3272, "精神集中", "詠唱妨害耐性+20%・移動詠唱速度低下"],
     [4835, "タヌキ変化", "物まねディレイ-5%"],
     [6605, "チェロソナタ", "音楽 詠唱時間-20%・ディレイ-20%"],
-    [12622, "騎心一槍 (ディア・フィアナ)", "槍ディレイ-15%・クリティカル率+20%"],
     [7302, "道化の極意", "物まねディレイ-20%"],
     [6471, "南国気分", "ダンスディレイ-15%・専用技"],
     [7633, "念珠", "全魔法 詠唱時間-10%・ディレイ-10%"],
@@ -2420,7 +2419,7 @@ Object.assign(window.MOE_BUFF_RULES_MANUAL, {
     name: "退魔の力", officialTechnicId: 14141, verified: true, applyDefault: true,
     conflictGroup: "special:latest", stackRule: "latest",
     stats: { magicPct: 3 },
-    misc: { targetRace: "devil", targetMultiplier: 1.2 },
+    misc: { targetRace: "demon", targetMultiplier: 1.2 },
     memo: "魔力+3%、悪魔系への特攻1.2倍（暫定）。特攻系は種別を問わず最新1件のみ。"
   },
   "technic-6394": {
@@ -2784,3 +2783,41 @@ Object.assign(window.MOE_BUFF_RULES_MANUAL, {
     rule.memo = "移動速度1.05倍のみ+5%として反映。攻撃力上昇量は数値根拠がなく最終未検証。";
   }
 })();
+
+
+// Verified critical values take priority over old imported/generated values.
+// Conditional night attack and incoming critical chance remain display-only.
+Object.assign(window.MOE_BUFF_RULES_MANUAL, {
+  "technic-12995": {
+    name: "リスキー ベット", wikiName: "リスキー ベッド", officialTechnicId: 12995,
+    verified: true, applyDefault: true, reviewStatus: "implemented", source: "manual",
+    conflictGroup: "critical:G", stackRule: "score", authoritativeConflict: true,
+    stats: { extraCritRatePct: 30, attackPct: 0 },
+    authoritativeStats: ["extraCritRatePct", "attackPct"],
+    customEffects: [
+      { name: "被クリティカル率+70%（表示のみ）", value: 0 },
+      { name: "夜間のみ攻撃力+5%（条件未対応・表示のみ）", value: 0 }
+    ],
+    sources: [
+      "https://idb.moepic.com/items/defences/22164",
+      "https://scrapbox.io/medianmoe/サイドパート%20ウィッグ",
+      "https://moeread.stars.ne.jp/?アイテム/追加効果/併用2"
+    ],
+    memo: "常時クリティカル率+30%、critical:G。夜間限定攻撃力は常時適用しない。保存済みの誤った攻撃力+5%も計算時に0へ補正。WarAge効果なし。"
+  },
+  "technic-12622": {
+    name: "騎心一槍 (ディア・フィアナ)", wikiName: "騎心一槍", officialTechnicId: 12622,
+    aliases: ["騎心一槍（ディア・フィアナ）"],
+    verified: true, applyDefault: true, reviewStatus: "implemented", source: "manual",
+    conflictGroup: "critical:F", stackRule: "score", authoritativeConflict: true,
+    stats: { extraCritRatePct: 20 },
+    authoritativeStats: ["extraCritRatePct"],
+    customEffects: [{ name: "槍ディレイ-15%（対象技計算未対応・表示のみ）", value: 0 }],
+    sources: [
+      "https://idb.moepic.com/items/weapons/21707",
+      "https://scrapbox.io/medianmoe/フォルテイア・スピア",
+      "https://moeread.stars.ne.jp/?アイテム/追加効果/併用2"
+    ],
+    memo: "クリティカル率は実測記録と常時発動2の+20%を採用。併用2由来の15%を補正し、競合分類critical:Fは維持。槍ディレイは共通攻撃ディレイへ加算しない。WarAge効果なし。"
+  }
+});

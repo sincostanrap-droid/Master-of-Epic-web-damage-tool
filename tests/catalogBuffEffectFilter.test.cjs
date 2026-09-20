@@ -14,7 +14,7 @@ const candidate = {
   conversions: { magicToAttackPct: 10 },
   skillEffects: [{ name: "戦闘技術", value: 20 }],
   customEffects: [{ name: "待機・移動モーション変化", value: 0 }],
-  misc: { targetRace: "devil", targetMultiplier: 1.2 },
+  misc: { targetRace: "demon", targetMultiplier: 1.2 },
   memo: "複合Buffの検証済み効果"
 };
 const item = {
@@ -29,7 +29,7 @@ const context = {
   escapeHtml: value => String(value),
   TOOL_STAT_DISPLAY_NAMES: {},
   findEquipBuffRuleCandidate: () => candidate,
-  targetRaceLabel: value => value === "devil" ? "悪魔" : value,
+  targetRaceLabel: value => value === "demon" ? "悪魔" : value,
   damageBuffCompatibilityRulesForBuff: () => [],
   MOESkillPlusV21: {
     totalsFromObject: () => ({ 戦闘技術: 20 })
@@ -91,7 +91,7 @@ assert.doesNotMatch(catalogTabSource, /スキル強化フィルタ/);
 assert.doesNotMatch(catalogTabSource, /catalogSkillPlus/);
 assert.match(mainTabsSource, /label:"装備カタログ"/);
 assert.doesNotMatch(mainTabsSource, /装備カタログ α/);
-assert.match(mainSource, /const APP_VERSION = "v1\.24\.5"/);
+assert.match(mainSource, /const APP_VERSION = "v1\.24\.6"/);
 assert.doesNotMatch(indexSource, /\?v=1\.24\.[01]/);
 assert.match(stylesSource, /@media \(max-width: 980px\)[\s\S]*?\.catalogBuffEffectFilterRow[\s\S]*?grid-template-columns:[^;]*1\.35fr[^;]*1fr/);
 assert.match(stylesSource, /@media \(max-width: 420px\)[\s\S]*?\.catalogBuffEffectFilterRow[\s\S]*?grid-template-columns: 1fr/);

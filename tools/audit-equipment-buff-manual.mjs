@@ -221,6 +221,21 @@ function runAudit() {
       if (!Number.isFinite(Number(value))) errors.push(`${label}: stats.${key} is not numeric`);
     }
 
+    const target = rule.misc?.targetRace;
+    if (target && !["dragon", "chaos", "undead", "giant", "goblin", "demon", "bull", "bird"].includes(target)) {
+      errors.push(`${label}: noncanonical target race ${target}`);
+    }
+    for (const key of rule.authoritativeStats || []) {
+      if (!rule.verified || !runtimeStats.has(key)
+          || !Object.prototype.hasOwnProperty.call(rule.stats || {}, key)
+          || !Number.isFinite(Number(rule.stats[key]))) {
+        errors.push(`${label}: invalid authoritative stat ${key}`);
+      }
+    }
+    if (rule.authoritativeConflict && (!rule.verified || !rule.conflictGroup || !rule.stackRule)) {
+      errors.push(`${label}: invalid authoritative conflict`);
+    }
+
     for (const key of Object.keys(rule.conversions || {})) {
       if (!["magicToAttackPct", "magicToSpeedPct", "speedToAttackPct"].includes(key)) {
         errors.push(`${label}: conversions.${key} is not supported`);

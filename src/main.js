@@ -12,8 +12,8 @@
   onclick属性から呼ばれる関数があるため、現時点では module ではなく通常scriptとして読み込みます。
 */
 
-const APP_VERSION = "v1.24.5";
-const APP_VERSION_NOTE = "最適化の重複処理削減・Worker実行を修正";
+const APP_VERSION = "v1.24.6";
+const APP_VERSION_NOTE = "装備Buffのクリティカル率・悪魔特攻を修正";
 
 /* 種族係数。攻撃力係数と魔力係数は別管理。 */
 const RACE_COEFFS = {
@@ -6614,6 +6614,9 @@ function equipmentBuffCompatibilityCandidateNames(row, item=null) {
   // 括弧を一律に除去すると「左」など別効果の名称まで一致し得るため、ここは明示別名のみ。
   const verifiedAliases = {
     "鉱人道士 (ドワーフシャーマン)": "鉱人道士",
+    "リスキー ベット": "リスキー ベッド",
+    "騎心一槍 (ディア・フィアナ)": "騎心一槍",
+    "騎心一槍（ディア・フィアナ）": "騎心一槍",
     // 3色はいずれも説明文に「魔力の30%を攻撃力へ加算」とあり、
     // 併用2の変換グループ F へ同じ値で掲載されている。
     "マナ フォース(紅)": "マナ フォース(蒼)",
@@ -7580,7 +7583,7 @@ function normalizeTargetRaceKey(value) {
     "アンデッド":"undead", "不死":"undead",
     "巨人":"giant",
     "ゴブリン":"goblin",
-    "悪魔":"demon",
+    "悪魔":"demon", "devil":"demon",
     "猛牛":"bull", "牛":"bull",
     "鳥":"bird", "鳥系":"bird"
   };
@@ -13026,6 +13029,7 @@ function equipBuffRuleCandidateIndex(rules) {
     if (rule?.officialTechnicId) add(`technic-${rule.officialTechnicId}`, rule);
     add(rule?.name, rule);
     add(rule?.wikiName, rule);
+    (rule?.aliases || []).forEach(alias => add(alias, rule));
   });
   equipBuffRuleLookupItems = rules;
   equipBuffRuleLookupIndex = {byKey, order};
@@ -13598,6 +13602,11 @@ function applyEquipBuffRuleCandidateToEquipment(row, rule, opts={}) {
   const ruleConflict = String(rule.conflictGroup || "").trim();
   if (!isGenericAttackConversionConflictGroup(ruleConflict) && !row.equipBuffConflictGroup && ruleConflict && ruleConflict !== autoConflict) row.equipBuffConflictGroup = ruleConflict;
   row.equipBuffStackRule = row.equipBuffStackRule || rule.stackRule || "same-technic";
+  if (rule.verified && rule.authoritativeConflict && ruleConflict
+      && !isGenericAttackConversionConflictGroup(ruleConflict)) {
+    row.equipBuffConflictGroup = ruleConflict;
+    row.equipBuffStackRule = rule.stackRule || "score";
+  }
   row.equipBuffRuleConfidence = row.equipBuffRuleConfidence || rule.confidence || (rule.verified ? "verified" : "candidate");
   row.equipBuffRuleSource = row.equipBuffRuleSource || rule.source || "tsv-candidate";
 
@@ -13629,7 +13638,17 @@ function applyEquipBuffRuleCandidateToEquipment(row, rule, opts={}) {
     extraReplicationGradeZone:"equipBuffExtraReplicationGradeZone", extraReplicationGaugeSlip:"equipBuffExtraReplicationGaugeSlip", extraReplicationHitZone:"equipBuffExtraReplicationHitZone",
     extraBeautyGaugeSlip:"equipBuffExtraBeautyGaugeSlip", extraBeautyHitZone:"equipBuffExtraBeautyHitZone"
   };
-  Object.entries(statMap).forEach(([key, prop]) => { if (setIfNumeric(row, prop, stats[key], overwrite)) applied = true; });
+  Object.entries(statMap).forEach(([key, prop]) => {
+    // Only explicitly reviewed fields override old imported values. Zero must
+    // also overwrite: conditional effects previously imported as always-on.
+    if (rule.verified && Array.isArray(rule.authoritativeStats)
+        && rule.authoritativeStats.includes(key)
+        && Object.prototype.hasOwnProperty.call(rule.stats || {}, key)
+        && Number.isFinite(Number(rule.stats[key]))) {
+      row[prop] = Number(rule.stats[key]);
+      applied = true;
+    } else if (setIfNumeric(row, prop, stats[key], overwrite)) applied = true;
+  });
 
   const conv = rule.conversions || {};
   if (setIfNumeric(row, "equipBuffConvMagicRate", conv.magicToAttackPct, overwrite)) applied = true;

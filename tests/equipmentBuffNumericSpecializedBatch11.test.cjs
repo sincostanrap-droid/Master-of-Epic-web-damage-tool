@@ -28,7 +28,7 @@ for (const [id, speed] of implementedSpeed) {
 const displayExamples = [
   "technic-8305", "technic-13284", "technic-10469",
   "technic-10677", "technic-6896", "technic-11213",
-  "technic-2823", "technic-9382", "technic-12622",
+  "technic-2823", "technic-9382",
   "technic-7466", "technic-6886", "technic-9997",
   "technic-8686", "technic-2497", "technic-9268"
 ];
