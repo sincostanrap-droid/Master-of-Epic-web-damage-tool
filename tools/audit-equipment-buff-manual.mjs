@@ -1,6 +1,8 @@
 import fs from "node:fs";
 import path from "node:path";
 import vm from "node:vm";
+import { createRequire } from "node:module";
+const { audit: auditPresentation } = createRequire(import.meta.url)("./audit-equipment-buff-presentation.cjs");
 import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -195,6 +197,9 @@ function runAudit() {
   const runtimeStats = supportedRuntimeStatKeys(mainSource);
   const errors = [];
   const warnings = [];
+  let presentation;
+  try { presentation = auditPresentation(); }
+  catch (error) { errors.push(`runtime presentation audit: ${error.message}`); }
   const statusCounts = {};
 
   for (const [id, rule] of Object.entries(manual)) {
@@ -345,6 +350,7 @@ function runAudit() {
   return {
     ok: errors.length === 0,
     counts: {
+      presentation,
       generatedRules: generated.length,
       manualRules: Object.keys(manual).length,
       runtimeStatKeys: runtimeStats.size,
@@ -382,6 +388,7 @@ if (process.argv.includes("--json")) {
 } else {
   const counts = result.counts;
   console.log(`equipment buff manual audit: ${result.ok ? "OK" : "FAILED"}`);
+  console.log(`presentation=${JSON.stringify(result.counts.presentation)}`);
   console.log(`generated=${counts.generatedRules} manual=${counts.manualRules} runtimeStats=${counts.runtimeStatKeys}`);
   console.log(`remaining=${counts.remainingWithoutNormalizedEffect} numericSource=${counts.remainingWithNumericSource} noNumericSource=${counts.remainingWithoutNumericSource}`);
   console.log(`percentPrefixArtifacts=${JSON.stringify(counts.percentPrefixArtifacts)}`);

@@ -12,8 +12,8 @@
   onclick属性から呼ばれる関数があるため、現時点では module ではなく通常scriptとして読み込みます。
 */
 
-const APP_VERSION = "v1.24.6";
-const APP_VERSION_NOTE = "装備Buffのクリティカル率・悪魔特攻を修正";
+const APP_VERSION = "v1.24.7";
+const APP_VERSION_NOTE = "装備Buffの限定ディレイ・モーション表示と特攻重複を修正";
 
 /* 種族係数。攻撃力係数と魔力係数は別管理。 */
 const RACE_COEFFS = {
@@ -6534,36 +6534,87 @@ function equipmentBuffDisplayName(r) {
 }
 
 function equipmentBuffSemanticEffectKey(label) {
-  let text = String(label || "")
-    .normalize("NFKC")
-    .replace(/[⇒➡➜]/g, "→")
-    .replace(/->/g, "→")
-    .replace(/\s+/g, "");
+  let text = String(label || "").normalize("NFKC")
+    .replace(/[⇒➡➜]/g, "→").replace(/->/g, "→").replace(/\s+/g, "");
   text = text.replace(/((?:魔力|速度|移動速度|酩酊度)→(?:攻撃力|移動速度))変換/g, "$1");
-
   const regen = text.match(/^(HP|ST|MP)自然回復(?:\/分)?([+-]?\d+(?:\.\d+)?)(?:\/分)?$/);
   if (regen) return `regen:${regen[1]}:${Number(regen[2])}`;
-
   const conversion = text.match(/^((?:魔力|速度|移動速度|酩酊度)→(?:攻撃力|移動速度))([+-]?\d+(?:\.\d+)?)%$/);
   if (conversion) return `conversion:${conversion[1]}:${Number(conversion[2])}`;
-
+  // 完全な倍率表記だけを同一視する。%加算・注記付き・別対象は潰さない。
+  const races = {dragon:"dragon",ドラゴン:"dragon",竜:"dragon",龍:"dragon",
+    chaos:"chaos",カオス:"chaos",undead:"undead",アンデッド:"undead",不死:"undead",
+    giant:"giant",巨人:"giant",goblin:"goblin",ゴブリン:"goblin",
+    demon:"demon",devil:"demon",悪魔:"demon",bull:"bull",猛牛:"bull",bird:"bird",鳥:"bird"};
+  const target = text.toLowerCase().match(/^(.+?)(?:特攻(?:[×x]|\+)?|:)(\d+(?:\.\d+)?)(?:倍)?$/);
+  if (target && races[target[1]]) return `target:${races[target[1]]}:${Number(target[2])}`;
+  const generic = text.match(/^特攻[×x](\d+(?:\.\d+)?)$/i);
+  if (generic) return `target:any:${Number(generic[1])}`;
   return `text:${text.toLowerCase()}`;
 }
 
 function deduplicateEquipmentBuffEffectLabels(labels) {
+  const input = Array.isArray(labels) ? labels : [];
+  const keys = input.map(equipmentBuffSemanticEffectKey);
   const seen = new Set();
-  return (Array.isArray(labels) ? labels : []).filter(label => {
-    const key = equipmentBuffSemanticEffectKey(label);
-    if (seen.has(key)) return false;
+  const names = {dragon:"ドラゴン",chaos:"カオス",undead:"アンデッド",giant:"巨人",
+    goblin:"ゴブリン",demon:"悪魔",bull:"猛牛",bird:"鳥"};
+  const out = [];
+  input.forEach((label, i) => {
+    let key = keys[i];
+    if (key.startsWith("target:any:")) {
+      const value = key.split(":")[2];
+      const specific = [...new Set(keys.filter(k => k.startsWith("target:") && !k.startsWith("target:any:") && k.split(":")[2] === value))];
+      if (specific.length === 1) key = specific[0];
+    }
+    if (seen.has(key)) return;
     seen.add(key);
-    return true;
+    const [, race, value] = key.split(":");
+    out.push(key.startsWith("target:") && names[race] ? `${names[race]}特攻×${value}` : label);
   });
+  return out;
 }
 
 /* 公式説明に含まれる見た目・モーション系の状態を表示だけに反映する。
  * ダメージ・ディレイ・最適化の入力値は一切変えない。 */
+let equipmentBuffPresentationSourceRef = null;
+let equipmentBuffPresentationSourceIndex = new Map();
+function equipmentBuffPresentationSourceText(row) {
+  const source = window.MOE_EQUIP_BUFF_RULE_CANDIDATES_GENERATED;
+  if (!Array.isArray(source)) return "";
+  if (equipmentBuffPresentationSourceRef !== source) {
+    equipmentBuffPresentationSourceRef = source;
+    equipmentBuffPresentationSourceIndex = new Map();
+    source.forEach(rule => {
+      // 同じIDに左右別名がある候補は、名前で区別する。
+      for (const name of [rule.name, rule.wikiName]) {
+        const key = catalogNorm(name);
+        if (key && !equipmentBuffPresentationSourceIndex.has(key)) {
+          equipmentBuffPresentationSourceIndex.set(key, rule.rawInfo || "");
+        }
+      }
+    });
+  }
+  return equipmentBuffPresentationSourceIndex.get(catalogNorm(row?.equipBuffName)) || "";
+}
+
+function equipmentBuffHasMotionPresentation(value) {
+  const text = String(value || "").normalize("NFKC").replace(/\s+/g, " ");
+  // 同じ短い節内で「モーション」と変化表現が結び付くものだけ。
+  // 単に移動速度・ダメージが変化した説明や否定文は対象外。
+  return text.split(/[。！!？?\n/]/).some(clause => {
+    const re = /モーション(?:変化|(?:が|は|を|に|と)[^。！？/]{0,36}?(?:変化|変わる|異なる|なる))/g;
+    let match;
+    while ((match = re.exec(clause))) {
+      const ending = clause.slice(match.index + match[0].length);
+      if (!/^(?:しない|しなく|しません|せず|なし|無し|することはない|ことはない)/.test(ending)) return true;
+    }
+    return false;
+  });
+}
+
 function equipmentBuffPresentationEffects(r) {
-  const text = [r?.equipBuffWikiText, r?.equipBuffScrapboxText, r?.equipBuffNote]
+  const text = [r?.equipBuffWikiText, r?.equipBuffScrapboxText, r?.equipBuffNote, equipmentBuffPresentationSourceText(r)]
     .filter(Boolean)
     .join("\n");
   if (!text) return [];
@@ -6578,7 +6629,7 @@ function equipmentBuffPresentationEffects(r) {
     }
   };
   if (/変身(?:できる|する|可能)|の姿に変身/.test(text)) add("変身状態");
-  if (/モーション(?:が|を)?変化|モーション変化/.test(text) && !Array.from(existingNames).some(name => name.includes("モーション"))) {
+  if (equipmentBuffHasMotionPresentation(text) && !Array.from(existingNames).some(name => name.includes("モーション"))) {
     add("モーション変化");
   }
   return out;
@@ -6804,7 +6855,7 @@ function equipmentBuffEffectText(r) {
   if (+r.equipBuffConvMagicSpeedRate) parts.push(`魔力→移動速度 ${r.equipBuffConvMagicSpeedRate}%`);
   if (+r.equipBuffConvSpeedRate) parts.push(`速度→攻撃力 ${r.equipBuffConvSpeedRate}%`);
   if (+r.equipBuffDmgPct) parts.push(`与ダメ+${r.equipBuffDmgPct}%`);
-  if (+r.equipBuffSpecial && +r.equipBuffSpecial !== 1) parts.push(`特攻×${r.equipBuffSpecial}`);
+  if (+r.equipBuffSpecial && +r.equipBuffSpecial !== 1) parts.push(`${r.equipBuffSpecialTarget ? targetRaceLabel(r.equipBuffSpecialTarget) : ""}特攻×${r.equipBuffSpecial}`);
   const recovery = equipmentBuffRecoveryValues(r);
   const addRecovery = (label, value, unit) => {
     const n = Number(value);
@@ -13680,7 +13731,7 @@ function applyEquipBuffRuleCandidateToEquipment(row, rule, opts={}) {
     if (target && Number.isFinite(multiplier) && multiplier > 0) {
       row.equipBuffSpecialTarget = target;
       row.equipBuffSpecial = multiplier;
-      pushDisplayEffect(row, "custom", multiplier, `${targetRaceLabel(target)}特攻`, "倍", "display", "manual");
+      // 対象と倍率は数値フィールドから表示する。表示用の同じ効果を重ねて保存しない。
       applied = true;
     }
   }

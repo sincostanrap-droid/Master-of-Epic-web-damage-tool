@@ -169,6 +169,12 @@ function catalogBuffEffectEntries(item) {
     if (name) add("effectText", name, effect?.value, name);
   });
 
+  // 表示補完と検索で同じ判定を使う。元説明の表記ゆれでも「モーション変化」で探せる。
+  if (typeof equipmentBuffPresentationEffects === "function") {
+    equipmentBuffPresentationEffects({equipBuffName:buff.name, equipBuffWikiText:[candidate?.rawInfo, buff.info].filter(Boolean).join(" / "), equipBuffScrapboxText:candidate?.scrapboxRawLines})
+      .forEach(effect => add("effectText", effect.name, effect.value, effect.name));
+  }
+
   const misc = candidate?.misc || {};
   const targetRace = misc.targetRace || misc.target || candidate?.targetRace || "";
   const targetMultiplier = Number(misc.targetMultiplier ?? candidate?.targetMultiplier);

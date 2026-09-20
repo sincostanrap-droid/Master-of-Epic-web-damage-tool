@@ -12,8 +12,8 @@ self.window = self;
 importScripts(
   "../domain/attackDpsState.js?v=1.24.5",
   "../domain/catalogData.js?v=1.24.5",
-  "../domain/catalogSearch.js?v=1.24.5",
-  "../main.js?v=1.24.6",
+  "../domain/catalogSearch.js?v=1.24.7",
+  "../main.js?v=1.24.7",
   "../calc/core.js?v=1.24.5",
   "./core.js?v=1.24.5"
 );

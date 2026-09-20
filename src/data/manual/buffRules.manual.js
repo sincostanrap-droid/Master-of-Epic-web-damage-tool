@@ -2150,7 +2150,6 @@ window.MOE_BUFF_RULES_MANUAL["technic-12614"] = {
   stackRule: "same-technic",
   stats: { attackPct: 5 },
   misc: {
-    targetDamageEffects: "dragon:1.5",
     targetRace: "dragon",
     targetMultiplier: 1.5
   },
@@ -2819,5 +2818,589 @@ Object.assign(window.MOE_BUFF_RULES_MANUAL, {
       "https://moeread.stars.ne.jp/?アイテム/追加効果/併用2"
     ],
     memo: "クリティカル率は実測記録と常時発動2の+20%を採用。併用2由来の15%を補正し、競合分類critical:Fは維持。槍ディレイは共通攻撃ディレイへ加算しない。WarAge効果なし。"
+  }
+});
+
+// v1.24.7: 原文に残る限定ディレイ等17件を復元。生成データへは書き戻さない。
+Object.assign(window.MOE_BUFF_RULES_MANUAL, {
+  "technic-11780": {
+    "name": "アヌビスの力",
+    "officialTechnicId": 11780,
+    "verified": true,
+    "applyDefault": true,
+    "source": "manual",
+    "confidence": "verified",
+    "reviewStatus": "display-only",
+    "reviewComplete": true,
+    "conflictGroup": "technic-11780",
+    "stackRule": "same-technic",
+    "stats": {},
+    "authoritativeStats": [],
+    "skillEffects": [
+      {
+        "name": "死の魔法",
+        "value": 10
+      }
+    ],
+    "customEffects": [
+      {
+        "name": "アイテム使用ディレイ",
+        "value": -15,
+        "unit": "%"
+      },
+      {
+        "name": "アイテム使用速度",
+        "value": -15,
+        "unit": "%"
+      },
+      {
+        "name": "専用技：冥界送り",
+        "value": 0,
+        "unit": ""
+      }
+    ],
+    "rawInfo": "死の魔法の効果が上昇し、アイテムの使用ディレイ短縮される 専用技『 冥界送り 』が使用可能になる ※秘伝の書を入手するには『 アヌビス サイス 』を装備した状態でメモリーズボックスを右クリックしてください。 死の魔法テクニックの効果がスキル+10相当される 死の魔法効果アップの併用関係は アイテム/追加効果/併用#死の魔法 を参照 アイテム使用ディレイ及びアイテム使用速度(包帯巻き速度など)-15% アイテム使用ディレイ短縮効果は1つのみ有効",
+    "memo": "収録原文の短縮対象・数値・併用条件を復元。限定ディレイ/詠唱・アイテム使用時間は表示・検索のみ。技の再使用時間計算は未対応。短縮部分の競合と、命中・魔力等の併用は別扱い。原文が単位を省略した値は単位を補っていない。"
+  },
+  "technic-9401": {
+    "name": "歌姫",
+    "officialTechnicId": 9401,
+    "verified": true,
+    "applyDefault": true,
+    "source": "manual",
+    "confidence": "verified",
+    "reviewStatus": "display-only",
+    "reviewComplete": true,
+    "conflictGroup": "technic-9401",
+    "stackRule": "same-technic",
+    "stats": {},
+    "authoritativeStats": [],
+    "skillEffects": [],
+    "customEffects": [
+      {
+        "name": "音楽ディレイ",
+        "value": -10,
+        "unit": "%"
+      },
+      {
+        "name": "音楽効果",
+        "value": 20,
+        "unit": "%"
+      }
+    ],
+    "rawInfo": "音楽技のディレイが減少して音楽スキルの効果が上昇する 音楽ディレイ -10% 音楽効果 +20% ミュージカル / バーチャル ステージ（音楽テク）:と併用不可 音楽効果アップの併用関係は アイテム/追加効果/併用#音楽 を参照 ※種別を特定するディレイ・詠唱短縮効果は最新の各1つのみ、また詠唱速度短縮は全体が優先で最新の１つのみ。 詳しくは アイテム/追加効果/検証 を参照",
+    "memo": "収録原文の短縮対象・数値・併用条件を復元。限定ディレイ/詠唱・アイテム使用時間は表示・検索のみ。技の再使用時間計算は未対応。短縮部分の競合と、命中・魔力等の併用は別扱い。原文が単位を省略した値は単位を補っていない。"
+  },
+  "technic-10062": {
+    "name": "永遠の献身",
+    "officialTechnicId": 10062,
+    "verified": true,
+    "applyDefault": true,
+    "source": "manual",
+    "confidence": "verified",
+    "reviewStatus": "display-only",
+    "reviewComplete": true,
+    "conflictGroup": "technic-10062",
+    "stackRule": "same-technic",
+    "stats": {},
+    "authoritativeStats": [],
+    "skillEffects": [],
+    "customEffects": [
+      {
+        "name": "回復魔法ディレイ",
+        "value": -15,
+        "unit": "%"
+      },
+      {
+        "name": "回復魔法詠唱時間",
+        "value": -15,
+        "unit": "%"
+      }
+    ],
+    "rawInfo": "回復魔法の効果が上昇して回復魔法の詠唱速度が速くなる ※WarAgeでは効果がない 回復魔法の詠唱・ディレイを15%短縮する いやしのかぜなどにも適用される。 回復魔法効果アップの併用関係は アイテム/追加効果/併用#回復魔法 を参照 時の審判者と併用不可能（時の審判者が常に優先） ※種別を特定するディレイ・詠唱短縮効果は最新の各1つのみ、また詠唱速度短縮は全体が優先で最新の１つのみ。 詳しくは アイテム/追加効果/検証 を参照",
+    "memo": "収録原文の短縮対象・数値・併用条件を復元。限定ディレイ/詠唱・アイテム使用時間は表示・検索のみ。技の再使用時間計算は未対応。短縮部分の競合と、命中・魔力等の併用は別扱い。原文が単位を省略した値は単位を補っていない。"
+  },
+  "technic-11160": {
+    "name": "神に仕える者",
+    "officialTechnicId": 11160,
+    "verified": true,
+    "applyDefault": true,
+    "source": "manual",
+    "confidence": "verified",
+    "reviewStatus": "display-only",
+    "reviewComplete": true,
+    "conflictGroup": "technic-11160",
+    "stackRule": "same-technic",
+    "stats": {
+      "extraMagicDelay": 0,
+      "extraMagicDelayPct": 0
+    },
+    "authoritativeStats": [
+      "extraMagicDelay",
+      "extraMagicDelayPct"
+    ],
+    "skillEffects": [
+      {
+        "name": "強化魔法",
+        "value": 15
+      }
+    ],
+    "customEffects": [
+      {
+        "name": "強化魔法ディレイ",
+        "value": -15,
+        "unit": "%"
+      },
+      {
+        "name": "強化魔法詠唱時間",
+        "value": -15,
+        "unit": "%"
+      }
+    ],
+    "rawInfo": "神に祈りを捧げることで、強化魔法の効果が上昇し、強化魔法の詠唱速度が速くなる ※WarAgeでは効果が無い ※「呪術師の極意」と併用不可 強化魔法テクニックの効果がスキル+15相当される 強化魔法効果アップの併用関係は アイテム/追加効果/併用#強化魔法 を参照 強化魔法の詠唱速度・魔法ディレイ-15% スペル サークル や 時の審判者 と 同時点灯 可能、 併用 不可 ※種別を特定するディレイ・詠唱短縮効果は最新の各1つのみ、また詠唱速度短縮は全体が優先で最新の１つのみ。 詳しくは アイテム/追加効果/検証 を参照 ※詠唱時間の算出方法は スキル/熟練(魔法) を参照",
+    "memo": "収録原文の短縮対象・数値・併用条件を復元。限定ディレイ/詠唱・アイテム使用時間は表示・検索のみ。技の再使用時間計算は未対応。短縮部分の競合と、命中・魔力等の併用は別扱い。原文が単位を省略した値は単位を補っていない。 限定値を共通ディレイへ誤加算しない。"
+  },
+  "technic-11357": {
+    "name": "黒魔術の書",
+    "officialTechnicId": 11357,
+    "verified": true,
+    "applyDefault": true,
+    "source": "manual",
+    "confidence": "verified",
+    "reviewStatus": "display-only",
+    "reviewComplete": true,
+    "conflictGroup": "technic-11357",
+    "stackRule": "same-technic",
+    "stats": {},
+    "authoritativeStats": [],
+    "skillEffects": [
+      {
+        "name": "召喚魔法",
+        "value": 10
+      }
+    ],
+    "customEffects": [
+      {
+        "name": "召喚魔法ディレイ",
+        "value": -30,
+        "unit": "%"
+      },
+      {
+        "name": "召喚魔法詠唱時間",
+        "value": -30,
+        "unit": "%"
+      },
+      {
+        "name": "専用技：ブラックマジック エンハンス",
+        "value": 0,
+        "unit": ""
+      }
+    ],
+    "rawInfo": "召喚魔法の効果が上昇し、召喚魔法の詠唱時間を大幅に短縮する ※秘伝の書を入手するには『 グリモア ロッド 』を装備した状態でメモリーズボックスを右クリックしてください。 召喚テクニックの効果がスキル+10相当される 召喚魔法効果アップの併用関係は アイテム/追加効果/併用#召喚魔法 を参照 召喚魔法スキルに分類される魔法の詠唱時間-30%・ディレイ-30% ※種別を特定するディレイ・詠唱短縮効果は最新の各1つのみ、また詠唱速度短縮は全体が優先で最新の１つのみ。 詳しくは アイテム/追加効果/検証 を参照",
+    "memo": "収録原文の短縮対象・数値・併用条件を復元。限定ディレイ/詠唱・アイテム使用時間は表示・検索のみ。技の再使用時間計算は未対応。短縮部分の競合と、命中・魔力等の併用は別扱い。原文が単位を省略した値は単位を補っていない。"
+  },
+  "technic-9286": {
+    "name": "サイレントキラー",
+    "officialTechnicId": 9286,
+    "verified": true,
+    "applyDefault": true,
+    "source": "manual",
+    "confidence": "verified",
+    "reviewStatus": "implemented",
+    "reviewComplete": true,
+    "conflictGroup": "technic-9286",
+    "stackRule": "same-technic",
+    "stats": {
+      "attackPct": 5
+    },
+    "authoritativeStats": [
+      "attackPct"
+    ],
+    "skillEffects": [],
+    "customEffects": [
+      {
+        "name": "刀剣ディレイ",
+        "value": -15,
+        "unit": "%"
+      },
+      {
+        "name": "呪文詠唱不可",
+        "value": 0,
+        "unit": ""
+      }
+    ],
+    "rawInfo": "攻撃力が上昇し、刀剣スキルのディレイが短縮されるが、呪文を詠唱することができなくなる。 ※WarAgeでは効果が無い 攻撃力+5%、刀剣スキルディレイ-15% ※種別を特定するディレイ・詠唱短縮効果は最新の各1つのみ、また詠唱速度短縮は全体が優先で最新の１つのみ。 詳しくは アイテム/追加効果/検証 を参照",
+    "memo": "収録原文の短縮対象・数値・併用条件を復元。限定ディレイ/詠唱・アイテム使用時間は表示・検索のみ。技の再使用時間計算は未対応。短縮部分の競合と、命中・魔力等の併用は別扱い。原文が単位を省略した値は単位を補っていない。"
+  },
+  "technic-12154": {
+    "name": "地雷系",
+    "officialTechnicId": 12154,
+    "verified": true,
+    "applyDefault": true,
+    "source": "manual",
+    "confidence": "verified",
+    "reviewStatus": "display-only",
+    "reviewComplete": true,
+    "conflictGroup": "technic-12154",
+    "stackRule": "same-technic",
+    "stats": {},
+    "authoritativeStats": [],
+    "skillEffects": [
+      {
+        "name": "暗黒命令",
+        "value": 10
+      },
+      {
+        "name": "罠",
+        "value": 10
+      }
+    ],
+    "customEffects": [
+      {
+        "name": "罠ディレイ",
+        "value": -20,
+        "unit": "%"
+      }
+    ],
+    "rawInfo": "暗黒命令と罠スキルの効果が上昇し、罠のディレイを短縮する ※WarAgeでは効果がない 暗黒命令・罠テクニックの効果がスキル+10相当される 罠スキルの効果上昇とあるがポイズンプラントなど設置型の罠の威力には影響がなく 複合テクニックにしか現状効果が無い模様 罠100でソーンプリズン94ダメージ、地雷系装備で100-102ダメージ(効果時間変化なし) 罠スキルのディレイ-20% ※種別を特定するディレイ・詠唱短縮効果は最新の各1つのみ、また詠唱速度短縮は全体が優先で最新の１つのみ。 詳しくは アイテム/追加効果/検証 を参照 暗黒命令効果アップの併用関係は アイテム/追加効果/併用#暗黒命令 を参照",
+    "memo": "収録原文の短縮対象・数値・併用条件を復元。限定ディレイ/詠唱・アイテム使用時間は表示・検索のみ。技の再使用時間計算は未対応。短縮部分の競合と、命中・魔力等の併用は別扱い。原文が単位を省略した値は単位を補っていない。"
+  },
+  "technic-11839": {
+    "name": "聖槍の使い手",
+    "officialTechnicId": 11839,
+    "verified": true,
+    "applyDefault": true,
+    "source": "manual",
+    "confidence": "verified",
+    "reviewStatus": "implemented",
+    "reviewComplete": true,
+    "conflictGroup": "technic-11839",
+    "stackRule": "same-technic",
+    "stats": {
+      "extraAvoid": 0,
+      "extraAvoidPct": 15
+    },
+    "authoritativeStats": [
+      "extraAvoid",
+      "extraAvoidPct"
+    ],
+    "skillEffects": [],
+    "customEffects": [
+      {
+        "name": "槍ディレイ",
+        "value": -15,
+        "unit": ""
+      }
+    ],
+    "rawInfo": "槍技のディレイが減少して、回避が大幅に上昇する ※WarAgeでは効果がない 槍のディレイ-15、回避+15% ※種別を特定するディレイ・詠唱短縮効果は最新の各1つのみ、また詠唱速度短縮は全体が優先で最新の１つのみ。 詳しくは アイテム/追加効果/検証 を参照",
+    "memo": "収録原文の短縮対象・数値・併用条件を復元。限定ディレイ/詠唱・アイテム使用時間は表示・検索のみ。技の再使用時間計算は未対応。短縮部分の競合と、命中・魔力等の併用は別扱い。原文が単位を省略した値は単位を補っていない。"
+  },
+  "technic-7758": {
+    "name": "ダークサイド",
+    "officialTechnicId": 7758,
+    "verified": true,
+    "applyDefault": true,
+    "source": "manual",
+    "confidence": "verified",
+    "reviewStatus": "implemented",
+    "reviewComplete": true,
+    "conflictGroup": "technic-7758",
+    "stackRule": "same-technic",
+    "stats": {
+      "magicPct": 3
+    },
+    "authoritativeStats": [
+      "magicPct"
+    ],
+    "skillEffects": [],
+    "customEffects": [
+      {
+        "name": "死の魔法ディレイ",
+        "value": -15,
+        "unit": ""
+      },
+      {
+        "name": "死の魔法詠唱時間",
+        "value": -15,
+        "unit": "%"
+      },
+      {
+        "name": "消費MP",
+        "value": 20,
+        "unit": "%"
+      }
+    ],
+    "rawInfo": "死の魔法のディレイ短縮と魔力が上昇する効果を得るが、消費MPが増加する ※WarAgeでは効果が無い 死の魔法の詠唱時間-15%、死の魔法のディレイ-15、魔力+3%、消費MP20%増加 ※種別を特定するディレイ・詠唱短縮効果は最新の各1つのみ、また詠唱速度短縮は全体が優先で最新の１つのみ。 詳しくは アイテム/追加効果/検証 を参照",
+    "memo": "収録原文の短縮対象・数値・併用条件を復元。限定ディレイ/詠唱・アイテム使用時間は表示・検索のみ。技の再使用時間計算は未対応。短縮部分の競合と、命中・魔力等の併用は別扱い。原文が単位を省略した値は単位を補っていない。"
+  },
+  "technic-10929": {
+    "name": "チアフリー",
+    "officialTechnicId": 10929,
+    "verified": true,
+    "applyDefault": true,
+    "source": "manual",
+    "confidence": "verified",
+    "reviewStatus": "display-only",
+    "reviewComplete": true,
+    "conflictGroup": "technic-10929",
+    "stackRule": "same-technic",
+    "stats": {},
+    "authoritativeStats": [],
+    "skillEffects": [
+      {
+        "name": "ダンス",
+        "value": 15
+      }
+    ],
+    "customEffects": [
+      {
+        "name": "ダンスディレイ",
+        "value": -15,
+        "unit": ""
+      },
+      {
+        "name": "ジャンプ力",
+        "value": 1.21,
+        "unit": "倍"
+      }
+    ],
+    "rawInfo": "ダンスの効果とジャンプ力が上昇し、ダンスのディレイが短縮される ※WarAgeでは効果がない ダンステクニックの効果がスキル+15相当される ダンス効果アップの併用関係は アイテム/追加効果/併用#ダンス を参照 ジャンプ力1.21倍 ダンスのディレイ-15 ※種別を特定するディレイ・詠唱短縮効果は最新の各1つのみ、また詠唱速度短縮は全体が優先で最新の１つのみ。 詳しくは アイテム/追加効果/検証 を参照",
+    "memo": "収録原文の短縮対象・数値・併用条件を復元。限定ディレイ/詠唱・アイテム使用時間は表示・検索のみ。技の再使用時間計算は未対応。短縮部分の競合と、命中・魔力等の併用は別扱い。原文が単位を省略した値は単位を補っていない。"
+  },
+  "technic-13083": {
+    "name": "月夜見の加護",
+    "officialTechnicId": 13083,
+    "verified": true,
+    "applyDefault": true,
+    "source": "manual",
+    "confidence": "verified",
+    "reviewStatus": "implemented",
+    "reviewComplete": true,
+    "conflictGroup": "technic-13083",
+    "stackRule": "same-technic",
+    "stats": {
+      "extraMagicDelay": 0,
+      "extraMagicDelayPct": -15,
+      "mpRegenPerMinute": 41.25
+    },
+    "authoritativeStats": [
+      "extraMagicDelay",
+      "extraMagicDelayPct",
+      "mpRegenPerMinute"
+    ],
+    "skillEffects": [
+      {
+        "name": "死の魔法",
+        "value": 20
+      }
+    ],
+    "customEffects": [
+      {
+        "name": "死の魔法ディレイ",
+        "value": -15,
+        "unit": "%"
+      },
+      {
+        "name": "詠唱速度短縮",
+        "value": 15,
+        "unit": "%"
+      }
+    ],
+    "rawInfo": "死の魔法の効果と魔法の詠唱速度とMPの自然回復速度が上昇する ※詠唱速度は他の効果と重複しない ※WarAgeでは効果がない 1分間にMPが41.25回復する 死の魔法テクニックの効果がスキル+20相当される 死の魔法効果アップの併用関係は アイテム/追加効果/併用#死の魔法 を参照 死の魔法スキルのディレイ-15 % 詠唱速度・魔法ディレイ-15% ※種別を特定するディレイ・詠唱短縮効果は最新の各1つのみ、また詠唱速度短縮は全体が優先で最新の１つのみ。 詳しくは アイテム/追加効果/検証 を参照 ちなみにラピキャスなどでディレイが上書きされても死魔の効果アップやMP自然回復の方には影響しない",
+    "memo": "収録原文の短縮対象・数値・併用条件を復元。限定ディレイ/詠唱・アイテム使用時間は表示・検索のみ。技の再使用時間計算は未対応。短縮部分の競合と、命中・魔力等の併用は別扱い。原文が単位を省略した値は単位を補っていない。"
+  },
+  "technic-11280": {
+    "name": "魔導の真髄",
+    "officialTechnicId": 11280,
+    "verified": true,
+    "applyDefault": true,
+    "source": "manual",
+    "confidence": "verified",
+    "reviewStatus": "implemented",
+    "reviewComplete": true,
+    "conflictGroup": "technic-11280",
+    "stackRule": "same-technic",
+    "stats": {
+      "extraMagicDelay": 0,
+      "extraMagicDelayPct": -10
+    },
+    "authoritativeStats": [
+      "extraMagicDelay",
+      "extraMagicDelayPct"
+    ],
+    "skillEffects": [
+      {
+        "name": "破壊魔法",
+        "value": 10
+      }
+    ],
+    "customEffects": [],
+    "rawInfo": "破壊魔法が上昇して、魔法ディレイが短縮される ※WarAgeでは効果がない 破壊魔法テクニックの効果がスキル+10相当される 魔法ディレイ-10% 破壊魔法効果アップの併用関係は アイテム/追加効果/併用#破壊魔法 を参照 ※種別を特定するディレイ・詠唱短縮効果は最新の各1つのみ、また詠唱速度短縮は全体が優先で最新の１つのみ。 詳しくは アイテム/追加効果/検証 を参照 ※詠唱時間の算出方法は スキル/熟練(魔法) を参照",
+    "memo": "収録原文の短縮対象・数値・併用条件を復元。限定ディレイ/詠唱・アイテム使用時間は表示・検索のみ。技の再使用時間計算は未対応。短縮部分の競合と、命中・魔力等の併用は別扱い。原文が単位を省略した値は単位を補っていない。"
+  },
+  "technic-7378": {
+    "name": "森の音楽家",
+    "officialTechnicId": 7378,
+    "verified": true,
+    "applyDefault": true,
+    "source": "manual",
+    "confidence": "verified",
+    "reviewStatus": "display-only",
+    "reviewComplete": true,
+    "conflictGroup": "technic-7378",
+    "stackRule": "same-technic",
+    "stats": {},
+    "authoritativeStats": [],
+    "skillEffects": [
+      {
+        "name": "音楽",
+        "value": 10
+      }
+    ],
+    "customEffects": [
+      {
+        "name": "音楽ディレイ",
+        "value": -20,
+        "unit": "%"
+      },
+      {
+        "name": "音楽詠唱時間",
+        "value": -20,
+        "unit": "%"
+      },
+      {
+        "name": "音楽・シャウト射程",
+        "value": 3,
+        "unit": ""
+      }
+    ],
+    "rawInfo": "音楽技のディレイが減少し、音楽技の射程が少し伸びる 復刻で効果変更 音楽のディレイが短縮して、音楽スキルの射程と効果が上昇する 音楽テクニックの詠唱時間-20%、ディレイ-20%短縮、射程が+3.0伸びる。 音楽テクニックの効果がスキル+10相当される チェロ エフェクトとの併用不可（バフ自体は両方点灯するが効果は片方のみ適用） 射程は他の射程増加装備と併用可（加算） シャウトの射程も+ 音楽効果アップの併用関係は アイテム/追加効果/併用#音楽 を参照 ※種別を特定するディレイ・詠唱短縮効果は最新の各1つのみ、また詠唱速度短縮は全体が優先で最新の１つのみ。 詳しくは アイテム/追加効果/検証 を参照",
+    "memo": "収録原文の短縮対象・数値・併用条件を復元。限定ディレイ/詠唱・アイテム使用時間は表示・検索のみ。技の再使用時間計算は未対応。短縮部分の競合と、命中・魔力等の併用は別扱い。原文が単位を省略した値は単位を補っていない。"
+  },
+  "technic-2967": {
+    "name": "弓攻撃ディレイ短縮",
+    "officialTechnicId": 2967,
+    "verified": true,
+    "applyDefault": true,
+    "source": "manual",
+    "confidence": "verified",
+    "reviewStatus": "display-only",
+    "reviewComplete": true,
+    "conflictGroup": "technic-2967",
+    "stackRule": "same-technic",
+    "stats": {
+      "extraAttackDelayPct": 0
+    },
+    "authoritativeStats": [
+      "extraAttackDelayPct"
+    ],
+    "skillEffects": [],
+    "customEffects": [
+      {
+        "name": "弓攻撃ディレイ",
+        "value": -5,
+        "unit": "%"
+      }
+    ],
+    "rawInfo": "弓攻撃の発射間隔が短くなる 弓攻撃ディレイ-5%短縮。 フォレスターマスタリーとは併用不可。(マスタリーが優先) バーサークとは併用不可。buff自体は点灯するが、最新のものが適用される。 ※種別を特定するディレイ・詠唱短縮効果は最新の各1つのみ、また詠唱速度短縮は全体が優先で最新の１つのみ。 詳しくは アイテム/追加効果/検証 を参照",
+    "memo": "収録原文の短縮対象・数値・併用条件を復元。限定ディレイ/詠唱・アイテム使用時間は表示・検索のみ。技の再使用時間計算は未対応。短縮部分の競合と、命中・魔力等の併用は別扱い。原文が単位を省略した値は単位を補っていない。 限定値を共通ディレイへ誤加算しない。"
+  },
+  "technic-13504": {
+    "name": "天職：錬成師",
+    "officialTechnicId": 13504,
+    "verified": true,
+    "applyDefault": true,
+    "source": "manual",
+    "confidence": "verified",
+    "reviewStatus": "implemented",
+    "reviewComplete": true,
+    "conflictGroup": "technic-13504",
+    "stackRule": "same-technic",
+    "stats": {
+      "extraHit": 0,
+      "extraHitPct": 15
+    },
+    "authoritativeStats": [
+      "extraHit",
+      "extraHitPct"
+    ],
+    "skillEffects": [],
+    "customEffects": [
+      {
+        "name": "銃器ディレイ",
+        "value": -20,
+        "unit": "%"
+      },
+      {
+        "name": "生産MGマス",
+        "value": 2,
+        "unit": ""
+      }
+    ],
+    "rawInfo": "銃器技のディレイが短縮されて、命中率が上昇し、生産品のMG枠が増加する ※WarAgeでは効果がない 命中+15%、生産MGマス+2 錬金術の極意 と併用不可 銃器スキルのディレイ-20% ※種別を特定するディレイ・詠唱短縮効果は最新の各1つのみ、また詠唱速度短縮は全体が優先で最新の１つのみ。 詳しくは アイテム/追加効果/検証 を参照",
+    "memo": "収録原文の短縮対象・数値・併用条件を復元。限定ディレイ/詠唱・アイテム使用時間は表示・検索のみ。技の再使用時間計算は未対応。短縮部分の競合と、命中・魔力等の併用は別扱い。原文が単位を省略した値は単位を補っていない。"
+  },
+  "technic-13962": {
+    "name": "ガンスリンガー",
+    "officialTechnicId": 13962,
+    "verified": true,
+    "applyDefault": true,
+    "source": "manual",
+    "confidence": "verified",
+    "reviewStatus": "implemented",
+    "reviewComplete": true,
+    "conflictGroup": "technic-13962",
+    "stackRule": "same-technic",
+    "stats": {
+      "extraHit": 0,
+      "extraHitPct": 20
+    },
+    "authoritativeStats": [
+      "extraHit",
+      "extraHitPct"
+    ],
+    "skillEffects": [],
+    "customEffects": [
+      {
+        "name": "銃器ディレイ",
+        "value": -20,
+        "unit": "%"
+      }
+    ],
+    "rawInfo": "命中が大幅に上昇して、銃器のディレイが大幅に減少する ※WarAgeでは効果がない 命中 +20%、銃器ディレイ -20%、命中上昇部分のみ 天職：錬成師 と併用可 ※種別を特定するディレイ・詠唱短縮効果は最新の各1つのみ、また詠唱速度短縮は全体が優先で最新の１つのみ。 詳しくは アイテム/追加効果/検証 を参照",
+    "memo": "収録原文の短縮対象・数値・併用条件を復元。限定ディレイ/詠唱・アイテム使用時間は表示・検索のみ。技の再使用時間計算は未対応。短縮部分の競合と、命中・魔力等の併用は別扱い。原文が単位を省略した値は単位を補っていない。"
+  },
+  "technic-14091": {
+    "name": "陰陽術の極意",
+    "officialTechnicId": 14091,
+    "verified": true,
+    "applyDefault": true,
+    "source": "manual",
+    "confidence": "verified",
+    "reviewStatus": "implemented",
+    "reviewComplete": true,
+    "conflictGroup": "technic-14091",
+    "stackRule": "same-technic",
+    "stats": {
+      "magicPct": 3
+    },
+    "authoritativeStats": [
+      "magicPct"
+    ],
+    "skillEffects": [
+      {
+        "name": "魔法熟練",
+        "value": 20
+      }
+    ],
+    "customEffects": [
+      {
+        "name": "召喚魔法ディレイ",
+        "value": -25,
+        "unit": "%"
+      }
+    ],
+    "rawInfo": "魔力と魔法熟練の効果が上昇して、召喚魔法のディレイが大幅に短縮される ※WarAgeでは効果がない 魔力+3%、魔法熟練テクニックの効果がスキル+20相当される、召喚魔法スキルのディレイ-25% 魔法熟練効果アップの併用関係は アイテム/追加効果/併用#魔法熟練 を参照 ※種別を特定するディレイ・詠唱短縮効果は最新の各1つのみ、また詠唱速度短縮は全体が優先で最新の１つのみ。 詳しくは アイテム/追加効果/検証 を参照",
+    "memo": "収録原文の短縮対象・数値・併用条件を復元。限定ディレイ/詠唱・アイテム使用時間は表示・検索のみ。技の再使用時間計算は未対応。短縮部分の競合と、命中・魔力等の併用は別扱い。原文が単位を省略した値は単位を補っていない。"
   }
 });
