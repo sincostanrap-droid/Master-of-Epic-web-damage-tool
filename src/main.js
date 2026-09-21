@@ -12,8 +12,8 @@
   onclick属性から呼ばれる関数があるため、現時点では module ではなく通常scriptとして読み込みます。
 */
 
-const APP_VERSION = "v1.24.8";
-const APP_VERSION_NOTE = "最適化のディレイ目標・固定枠・空欄候補を修正";
+const APP_VERSION = "v1.24.9";
+const APP_VERSION_NOTE = "見せびらかし集計の欠落修正・保守情報整理";
 
 /* 種族係数。攻撃力係数と魔力係数は別管理。 */
 const RACE_COEFFS = {

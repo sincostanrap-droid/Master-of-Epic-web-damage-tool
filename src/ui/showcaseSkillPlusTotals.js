@@ -153,6 +153,33 @@
     };
   })());
 
+  // 各集計はShowcaseの描画時に更新する。検索画面用の監視は追加しない。
+  global.renderShowcaseTotal = function(key, title, body, panelId) {
+    let panel = document.getElementById(panelId);
+    const view = document.getElementById("showcaseView");
+    if (!panel && view?.parentNode) {
+      panel = document.createElement("div");
+      panel.id = panelId;
+      panel.className = "showcaseSkillPlusTotals";
+      panel.setAttribute("aria-live", "polite");
+      view.parentNode.insertBefore(panel, view);
+    }
+    if (panel) {
+      panel.hidden = !body;
+      panel.textContent = "";
+      if (body) {
+        const heading = document.createElement("div");
+        heading.className = "showcaseSkillPlusTotalsTitle";
+        heading.textContent = title;
+        const content = document.createElement("div");
+        content.className = "showcaseSkillPlusTotalsBody";
+        content.textContent = body;
+        panel.append(heading, content);
+      }
+    }
+    copyHeaders.set(key, body ? `${title}: ${body}` : "");
+  };
+
   function updateShowcaseSkillPlusTotals() {
     if (typeof document === "undefined") return;
     const totals = currentSkillPlusTotals();
@@ -223,6 +250,13 @@
     function initializeShowcaseOnFirstDisplay(event) {
       if (event.detail?.id !== "showcase") return;
       installHooks();
+      // main.jsの初回描画は後続の集計JS読込より先に走ることがある。
+      // 保存済み構成を開いた場合も、全defer scriptの読込後に集計を描画する。
+      const refresh = () => {
+        if (typeof renderShowcaseTab === "function") renderShowcaseTab();
+      };
+      if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", refresh, {once:true});
+      else refresh();
       document.removeEventListener("moe:main-tab-activated", initializeShowcaseOnFirstDisplay);
     }
     document.addEventListener("moe:main-tab-activated", initializeShowcaseOnFirstDisplay);

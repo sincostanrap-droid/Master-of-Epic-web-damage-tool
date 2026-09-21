@@ -2,6 +2,8 @@
 
 **Master of Epic** の物理攻撃ダメージを、武器・ステータス・装備・Buffを組み合わせて試算するブラウザ用ツールです。
 
+現在の版: **v1.24.9**（2026-09-21）。変更内容と残課題は [保守記録](docs/maintenance-v1.24.9.md) を参照してください。
+
 GitHub Pages でそのまま使えます。
 
 https://sincostanrap-droid.github.io/Master-of-Epic-web-damage-tool/
@@ -94,7 +96,7 @@ Buff名、追加ステータス、必要スキルなどの確認にも使えま�
 - 物理与ダメージ+
 - 魔力から攻撃力への変換
 - 移動速度から攻撃力への変換
-- スキル値+
+- スキル強化（skillPlus）：表示・検索用。スキル値・成功率・必要スキル判定には加算しません。
 - 計算未対応の表示用効果
 
 カタログから装備を追加した場合、一部のBuff効果は自動入力されます。  
@@ -120,7 +122,8 @@ src/data/generated/
 手動管理データは主に以下に置かれています。
 
 ```text
-data/manual/
+src/data/manual/   実行時に読み込む確定ルール
+data/manual/       ルール生成・確認に使うTSV等
 ```
 
 開発・検証用の詳細メモは `docs/` を参照してください。
@@ -135,7 +138,8 @@ styles/main.css                    画面スタイル
 src/main.js                        UIと状態管理
 src/calc/core.js                   ダメージ計算本体
 src/data/generated/                生成済みカタログ/ルールデータ
-data/manual/                       手動管理データ
+src/data/manual/                   実行時の手動確定ルール
+data/manual/                       生成・確認用データ
 docs/                              開発・検証メモ
 ```
 

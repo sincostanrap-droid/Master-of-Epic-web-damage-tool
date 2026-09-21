@@ -314,6 +314,8 @@ function renderShowcaseTab(m=null) {
   }
 
   if (textBox) textBox.value = showcaseTextFromMetrics(m);
+  if (typeof renderShowcaseElementDamageTotals === "function") renderShowcaseElementDamageTotals(resolvedShowcaseState);
+  if (typeof renderShowcaseRecoveryTotals === "function") renderShowcaseRecoveryTotals(m);
 }
 
 
