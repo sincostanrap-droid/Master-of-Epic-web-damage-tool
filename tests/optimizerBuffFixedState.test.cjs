@@ -42,10 +42,6 @@ assert.deepEqual(
   "「現在ONのBuffは必ず使う」と行単位固定を併用できる"
 );
 
-assert.equal(
-  (source.match(/optimizerFixedCompositeCandidates\(settings(?:, candidates)?\)/g) || []).length,
-  3,
-  "3探索方式すべてで共通の固定判定を使う"
-);
+// Full searches in all three modes are covered by optimizerTargetRuntime.test.cjs.
 
 console.log("optimizer Buff fixed-state tests: OK");

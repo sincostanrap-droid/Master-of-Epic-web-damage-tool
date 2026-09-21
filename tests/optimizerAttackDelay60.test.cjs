@@ -12,10 +12,8 @@ assert.match(indexSource, /id="optimizerRequireAttackDelay60"[^>]*type="checkbox
 assert.match(indexSource, /攻撃ディレイ-60を確保する/);
 assert.match(mainSource, /requireAttackDelay60:\s*!!byId\("optimizerRequireAttackDelay60"\)\?\.checked/);
 assert.match(mainSource, /value <= -60 \+ eps/);
-assert.match(mainSource, /value <= -60 \+ 0\.000001\s*\? \[1, 0\]\s*: \[0, -Math\.abs\(value \+ 60\)\]/);
 assert.match(mainSource, /optimizerFinalConstraintViolations\(metrics, settings\)/);
 assert.match(mainSource, /return Math\.min\(60, -\(\+m\?\.extraStats\?\.extraAttackDelay \|\| 0\)\)/);
-assert.match(mainSource, /rank\.push\(-optimizerAttackDelay60Excess\(m\)\)/);
 assert.equal(
   (coreSource.match(/optimizerFinalConstraintViolations\([^)]*, settings\)/g) || []).length,
   3,

@@ -126,6 +126,17 @@ function optimizerBuildCurrentEquipmentBuffOptimizedResult(inputs, settings) {
     return null;
   }
 
+  // 「現在の装備」は探索の固定/除外指定と異なる場合がある。
+  // その場合は比較用の現在ON行だけを残し、最適化候補には混ぜない。
+  const selected = new Set(equipmentIdxs);
+  const fixedMismatch = optimizerEquipmentRows(settings).some((row, index) =>
+    (row.optimizerFixed && !row.optimizerExcluded && !selected.has(index))
+    || (row.optimizerExcluded && selected.has(index)));
+  if (fixedMismatch) {
+    settings.optimizerCurrentEquipmentSeedStatus = "固定・除外条件と不一致のため対象外";
+    return null;
+  }
+
   const buff = optimizerSelectExternalBuffs(equipmentIdxs, inputs, settings);
   const metrics = buff.metrics;
   const capViolations = optimizerFinalConstraintViolations(metrics, settings);

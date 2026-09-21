@@ -12,8 +12,8 @@
   onclick属性から呼ばれる関数があるため、現時点では module ではなく通常scriptとして読み込みます。
 */
 
-const APP_VERSION = "v1.24.7";
-const APP_VERSION_NOTE = "装備Buffの限定ディレイ・モーション表示と特攻重複を修正";
+const APP_VERSION = "v1.24.8";
+const APP_VERSION_NOTE = "最適化のディレイ目標・固定枠・空欄候補を修正";
 
 /* 種族係数。攻撃力係数と魔力係数は別管理。 */
 const RACE_COEFFS = {
@@ -10111,7 +10111,7 @@ function optimizerPrimaryTargetDescription(settings) {
     const over = t.over === null ? "" : ` / 超過許容 +${fmt(t.over, 1)}`;
     descriptions.push(`${optimizerObjectiveLabel(t.objective)} 目標 ${fmt(t.target, 1)}${over}`);
   }
-  if (settings?.requireAttackDelay60) descriptions.push("攻撃ディレイ -60以下");
+  if (settings?.requireAttackDelay60) descriptions.push("攻撃ディレイ -60以下（超過最小を優先）");
   return descriptions.join(" / ");
 }
 
@@ -10220,7 +10220,7 @@ function optimizerEvaluationFromMetrics(m, settings) {
     ? (() => {
         const value = +(m?.extraStats?.extraAttackDelay || 0);
         return value <= -60 + 0.000001
-          ? [1, 0]
+          ? [1, -optimizerAttackDelay60Excess(m)]
           : [0, -Math.abs(value + 60)];
       })()
     : [];
@@ -10230,7 +10230,6 @@ function optimizerEvaluationFromMetrics(m, settings) {
   } else {
     rank = rank.concat(objectives.map(obj => optimizerMetricValueForSettings(m, obj, settings)));
   }
-  if (settings?.requireAttackDelay60) rank.push(-optimizerAttackDelay60Excess(m));
   return {score: rank[0] ?? 0, rank, violations: []};
 }
 
@@ -10270,8 +10269,9 @@ function optimizerSortByEvaluation(a, b) {
 
 
 function equipmentCandidateHasData(row) {
+  // 初期空欄は使用ONでも装備候補ではない。固定された空欄は明示制約として残す。
   return !!(
-    row.enabled || row.optimizerFixed || row.optimizerExcluded || row.name || row.tags || row.note ||
+    row.optimizerFixed || row.optimizerExcluded || row.name || row.tags || row.note ||
     +row.attack || +row.magic || +row.speed || +row.delay ||
     +row.weaponDamage || +row.weaponWeight || +row.weaponAttackInterval || +row.weaponRange || +row.weaponDurability || row.weaponTwoHanded === "○" ||
     normalizeWeaponReqRowsForEquipment(row.weaponReq).some(r => +r.required) ||
@@ -10700,6 +10700,8 @@ function optimizerEquipmentGroupProduct(groups) {
 
 function optimizerBuildEquipmentExact(inputs, settings) {
   const groups = optimizerEquipmentGroups(settings);
+  const requiredBuffIdxs = settings.requireAttackDelay60
+    ? optimizerFixedCompositeCandidates(settings).map(candidate => candidate.idx) : [];
   const roughTotal = optimizerEquipmentGroupProduct(groups);
 
   if (!settings.exactEquipmentLimit || roughTotal > settings.exactEquipmentLimit) {
@@ -10717,10 +10719,10 @@ function optimizerBuildEquipmentExact(inputs, settings) {
 
     if (groupIndex >= groups.length) {
       if (!optimizerSelectionHasMainWeapon(selected, settings)) return;
-      const st = optimizerStateForSelection(selected, [], settings);
+      const st = optimizerStateForSelection(selected, requiredBuffIdxs, settings);
       const m = optimizerComputeMetrics(st, inputs);
       if (globalThis.MOEOptimizerSkillPlusFixV1) {
-        globalThis.MOEOptimizerSkillPlusFixV1.attachMetrics(m, selected, [], settings);
+        globalThis.MOEOptimizerSkillPlusFixV1.attachMetrics(m, selected, requiredBuffIdxs, settings);
       }
       const ev = optimizerEvaluationFromMetrics(m, settings);
       out.push({equipmentIdxs: optimizerCanonicalEquipmentIdxs(selected, settings), score: ev.score, rank: ev.rank, metrics: m});
@@ -10769,6 +10771,8 @@ function optimizerBuildEquipmentCandidates(inputs, settings) {
 
 function optimizerBuildEquipmentBeams(inputs, settings) {
   const groups = optimizerEquipmentGroups(settings);
+  const requiredBuffIdxs = settings.requireAttackDelay60
+    ? optimizerFixedCompositeCandidates(settings).map(candidate => candidate.idx) : [];
   settings.equipmentConflictSkipped = 0;
   settings.optimizerEquipmentSearchMode = "beam";
   if (!settings.optimizerEquipmentExactTotal) settings.optimizerEquipmentExactTotal = optimizerEquipmentGroupProduct(groups);
@@ -10785,10 +10789,10 @@ function optimizerBuildEquipmentBeams(inputs, settings) {
         }
 
         const equipmentIdxs = optimizerCanonicalEquipmentIdxs(beam.equipmentIdxs.concat([cand.idx]), settings);
-        const st = optimizerStateForSelection(equipmentIdxs, [], settings);
+        const st = optimizerStateForSelection(equipmentIdxs, requiredBuffIdxs, settings);
         const m = optimizerComputeMetrics(st, inputs);
         if (globalThis.MOEOptimizerSkillPlusFixV1) {
-          globalThis.MOEOptimizerSkillPlusFixV1.attachMetrics(m, equipmentIdxs, [], settings);
+          globalThis.MOEOptimizerSkillPlusFixV1.attachMetrics(m, equipmentIdxs, requiredBuffIdxs, settings);
         }
         const ev = optimizerEvaluationFromMetrics(m, settings);
         const skillPlusViolations = globalThis.MOEOptimizerSkillPlusFixV1
@@ -14675,7 +14679,7 @@ function ensureOptimizerCoreLoaded() {
 
   optimizerCoreLoadPromise = new Promise((resolve, reject) => {
     const script = document.createElement("script");
-    script.src = "./src/optimizer/core.js?v=1.22.4";
+    script.src = "./src/optimizer/core.js?v=1.24.8";
     script.dataset.optimizerCore = "1";
     script.onload = () => {
       if (typeof runOptimizerCore === "function") resolve();

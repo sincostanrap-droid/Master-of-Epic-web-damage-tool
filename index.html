@@ -65,7 +65,7 @@ MoE固有の主な仮定:
 </head>
 <body>
 <h1>Master of Epic 物理ダメージ計算webツール</h1>
-<p id="appBuildStamp" class="small appBuildStamp">v1.24.7 / 装備Buffの限定ディレイ・モーション表示と特攻重複を修正</p>
+<p id="appBuildStamp" class="small appBuildStamp">v1.24.8 / 最適化のディレイ目標・固定枠・空欄候補を修正</p>
 <section class="heroCard">
   <div>
     <div class="heroBadge">MoE / Physical Damage Calculator</div>
@@ -1236,7 +1236,7 @@ MoE固有の主な仮定:
         </details>
       </div>
       <div class="optimizerChecks">
-        <label title="装備・装備Buff・Buffの攻撃ディレイ短縮合計が-60以下になる構成だけを結果に残します。"><input id="optimizerRequireAttackDelay60" type="checkbox"> 攻撃ディレイ-60を確保する</label>
+        <label title="装備・装備Buff・Buffの攻撃ディレイ短縮合計が-60以下になる構成だけを結果に残し、-60からの超過が少ない順に優先します。"><input id="optimizerRequireAttackDelay60" type="checkbox"> 攻撃ディレイ-60を確保する</label>
         <label><input id="optimizerIncludeDisabledBuffs" type="checkbox" checked> OFFのBuffも候補として試す</label>
         <label><input id="optimizerFixCurrentBuffs" type="checkbox"> 現在ONのBuffは必ず使う</label>
         <label><input id="optimizerForceOtherBuffs" type="checkbox" checked> その他バフは現在のON/OFFをそのまま使う</label>
@@ -1319,13 +1319,13 @@ MoE固有の主な仮定:
 <script src="src/data/manual/reviewedBuffCatalog.manual.js"></script>
 <script src="./src/ui/idbImportPreview.js?v=1.24.4" defer></script>
 <script src="./src/domain/catalogData.js?v=1.24.4" defer></script>
-<script src="./src/domain/catalogSearch.js?v=1.24.7" defer></script>
+<script src="./src/domain/catalogSearch.js?v=1.24.8" defer></script>
 <script src="./src/domain/catalogSort.js?v=1.24.4" defer></script>
 <script src="./src/ui/catalogRows.js?v=1.24.4" defer></script>
 <script src="./src/ui/catalogResults.js?v=1.24.4" defer></script>
 <script src="./src/ui/catalogTab.js?v=1.24.4" defer></script>
-<script src="./src/data/manual/buffRules.manual.js?v=1.24.7" data-catalog-src="src/data/manual/buffRules.manual.js"></script>
-<script src="./src/main.js?v=1.24.7" defer></script>
+<script src="./src/data/manual/buffRules.manual.js?v=1.24.8" data-catalog-src="src/data/manual/buffRules.manual.js"></script>
+<script src="./src/main.js?v=1.24.8" defer></script>
 <script src="./src/ui/buildAnalysis.js?v=1.24.4" defer></script>
 <script src="./src/ui/showcaseSkillPlusTotals.js?v=1.24.4" defer></script>
 <script src="./src/ui/showcaseElementDamageTotals.js?v=1.24.4" defer></script>
