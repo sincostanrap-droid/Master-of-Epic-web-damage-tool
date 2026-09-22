@@ -5412,3 +5412,77 @@ window.MOE_DAMAGE_BUFF_COMPATIBILITY_GENERATED.push(...[
     "reviewFlags": []
   }
 ]);
+
+// Existing Buff corrections audited against uploaded Wiki, 2026-09-22.
+window.MOE_DAMAGE_BUFF_COMPATIBILITY_GENERATED.push(...[
+  {
+    "id": "damageBuffWiki-audit-20260922:石魔人の力",
+    "sourcePage": "アイテム/追加効果/併用2",
+    "sourceUrl": "https://moeread.stars.ne.jp/?アイテム/追加効果/併用2",
+    "sectionName": "物理攻撃ダメージアップ(物理与ダメージ増加バフ)",
+    "effectCategory": "physicalDamage",
+    "effectKey": "physicalDmgPct",
+    "effectLabel": "物理与ダメ",
+    "element": "",
+    "buffName": "石魔人の力",
+    "value": 10,
+    "valueRaw": "+10%",
+    "valueUnit": "%",
+    "valueUncertain": false,
+    "conversionSource": "",
+    "autoApplyKind": "equipBuffDmgPct",
+    "physicalCalcRelevant": true,
+    "group": "A",
+    "groupRaw": "A？",
+    "groupUncertain": true,
+    "conflictGroup": "damage:physical:A",
+    "safeForValueAutoApply": true,
+    "safeForConflictAutoApply": true,
+    "note": "2026-09-22添付Wiki併用2の欠落を補完。未知の数値は計算へ加算しない。",
+    "sectionNote": "",
+    "noteNeedsReview": false,
+    "matched": true,
+    "matchedEquipmentCount": 0,
+    "matchedEquipmentNames": [],
+    "matchedTechnicIds": [
+      "13682"
+    ],
+    "reviewFlags": []
+  },
+  {
+    "id": "damageBuffWiki-audit-20260922:幻竜の加護",
+    "sourcePage": "アイテム/追加効果/併用2",
+    "sourceUrl": "https://moeread.stars.ne.jp/?アイテム/追加効果/併用2",
+    "sectionName": "水属性効果アップ(水属性ダメージアップ)",
+    "effectCategory": "elementDamage",
+    "effectKey": "waterDmgPct",
+    "effectLabel": "水属性ダメージ",
+    "element": "水属性",
+    "buffName": "幻竜の加護",
+    "value": 0,
+    "valueRaw": "+？%",
+    "valueUnit": "%",
+    "valueUncertain": true,
+    "conversionSource": "",
+    "autoApplyKind": "displayElement",
+    "physicalCalcRelevant": false,
+    "group": "I",
+    "groupRaw": "I？",
+    "groupUncertain": true,
+    "conflictGroup": "damage:element:water:I",
+    "safeForValueAutoApply": false,
+    "safeForConflictAutoApply": true,
+    "note": "2026-09-22添付Wiki併用2の欠落を補完。未知の数値は計算へ加算しない。",
+    "sectionNote": "",
+    "noteNeedsReview": true,
+    "matched": true,
+    "matchedEquipmentCount": 0,
+    "matchedEquipmentNames": [],
+    "matchedTechnicIds": [
+      "14404"
+    ],
+    "reviewFlags": [
+      "valueUncertain"
+    ]
+  }
+]);

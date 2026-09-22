@@ -1174,8 +1174,8 @@ Object.assign(window.MOE_BUFF_RULES_MANUAL, {
     conflictGroup: "technic-13876", stackRule: "same-technic",
     stats: { attackPct: 3 },
     conversions: { magicToSpeedPct: 5 },
-    skillEffects: [{ name: "暗黒命令", value: 10 }],
-    memo: "攻撃力+3%、魔力の5%を移動速度へ加算、暗黒命令スキル効果+10。WarAgeでは効果なし。"
+    skillEffects: [{ name: "暗黒命令", value: 20 }],
+    memo: "攻撃力+3%、魔力の5%を移動速度へ加算、暗黒命令スキル効果+20。WarAgeでは効果なし。"
   },
   "technic-14299": {
     name: "魔法の靴", officialTechnicId: 14299,
@@ -4237,6 +4237,105 @@ Object.assign(window.MOE_BUFF_RULES_MANUAL, {
     "authoritativeStats": [
       "attackPct",
       "extraAvoidPct"
+    ]
+  }
+});
+
+// Confirmed corrections; established overrides (including critical:L) remain unchanged.
+Object.assign(window.MOE_BUFF_RULES_MANUAL, {
+  "technic-14426": {
+    "name": "アルテミスの加護",
+    "officialTechnicId": 14426,
+    "verified": true,
+    "applyDefault": true,
+    "reviewStatus": "implemented",
+    "reviewComplete": true,
+    "source": "manual-compat-audit-20260922",
+    "confidence": "wiki",
+    "conflictGroup": "technic-14426",
+    "stackRule": "same-technic",
+    "stats": {
+      "attackPct": 3,
+      "extraHitPct": 20
+    },
+    "authoritativeStats": [
+      "attackPct",
+      "extraHitPct"
+    ],
+    "skillEffects": [],
+    "customEffects": [
+      {
+        "name": "WarAgeでは効果なし",
+        "value": 0
+      }
+    ],
+    "memo": "2026-09-22添付Wiki常時発動3・併用・併用2を照合。スキル/属性効果とグループは併用表で補完。未知の数値は加算しない。",
+    "sourceUrls": [
+      "https://moeread.stars.ne.jp/?アイテム/追加効果/常時発動3"
+    ]
+  },
+  "technic-13682": {
+    "name": "石魔人の力",
+    "officialTechnicId": 13682,
+    "verified": true,
+    "applyDefault": true,
+    "reviewStatus": "implemented",
+    "reviewComplete": true,
+    "source": "manual-compat-audit-20260922",
+    "confidence": "wiki",
+    "conflictGroup": "technic-13682",
+    "stackRule": "same-technic",
+    "stats": {
+      "extraACPct": 10,
+      "dmgPct": 10
+    },
+    "authoritativeStats": [
+      "extraACPct",
+      "dmgPct"
+    ],
+    "skillEffects": [],
+    "customEffects": [
+      {
+        "name": "WarAgeでは効果なし",
+        "value": 0
+      }
+    ],
+    "memo": "2026-09-22添付Wiki常時発動3・併用・併用2を照合。スキル/属性効果とグループは併用表で補完。未知の数値は加算しない。",
+    "sourceUrls": [
+      "https://moeread.stars.ne.jp/?アイテム/追加効果/常時発動3"
+    ]
+  },
+  "technic-14404": {
+    "name": "幻竜の加護",
+    "officialTechnicId": 14404,
+    "verified": true,
+    "applyDefault": true,
+    "reviewStatus": "display-only",
+    "reviewComplete": true,
+    "source": "manual-compat-audit-20260922",
+    "confidence": "wiki",
+    "conflictGroup": "technic-14404",
+    "stackRule": "same-technic",
+    "stats": {},
+    "authoritativeStats": [],
+    "skillEffects": [],
+    "customEffects": [
+      {
+        "name": "水中呼吸可能",
+        "value": 0
+      },
+      {
+        "name": "水属性効果増加・水属性被効果軽減（数値未確認）",
+        "value": 0
+      },
+      {
+        "name": "WarAgeでは効果なし",
+        "value": 0
+      }
+    ],
+    "memo": "2026-09-22添付Wiki常時発動3・併用・併用2を照合。スキル/属性効果とグループは併用表で補完。未知の数値は加算しない。",
+    "sourceUrls": [
+      "https://moeread.stars.ne.jp/?アイテム/追加効果/常時発動3"
     ]
   }
 });

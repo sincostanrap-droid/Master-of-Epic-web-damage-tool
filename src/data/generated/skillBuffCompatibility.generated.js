@@ -3364,43 +3364,7 @@ window.MOE_SKILL_BUFF_COMPATIBILITY_GENERATED = [
     "source": "xlsx+wiki",
     "correctionReason": "Wiki table / likely spreadsheet typo for Single Blade Wig"
   },
-  {
-    "id": "skillbuff:回復魔法:O:魔術師の極意",
-    "skillName": "回復魔法",
-    "skill": "回復魔法",
-    "group": "O",
-    "groupRaw": "O?",
-    "groupUncertain": true,
-    "groupTentative": true,
-    "conflictGroup": "skillBuff:回復魔法:O",
-    "safeForConflictAutoApply": true,
-    "value": 10,
-    "valueRaw": "10",
-    "valueUncertain": false,
-    "amount": "10",
-    "buffName": "魔術師の極意",
-    "name": "魔術師の極意",
-    "canonicalBuffName": "錬金術の極意",
-    "aliasOf": "錬金術の極意",
-    "aliases": [
-      "魔術師の極意"
-    ],
-    "items": [
-      "シングルブレイドウィッグ"
-    ],
-    "notes": [
-      "ALC系魔法+10/生産MG枠+2"
-    ],
-    "confidence": "tentative",
-    "noteNeedsReview": true,
-    "reviewFlags": [
-      "groupTentative",
-      "confidenceTentative",
-      "aliasRow"
-    ],
-    "source": "xlsx+wiki",
-    "correctionReason": "Wiki table / likely spreadsheet typo for Single Blade Wig"
-  },
+
   {
     "id": "skillbuff:回復魔法:P:法力",
     "skillName": "回復魔法",
@@ -6086,14 +6050,14 @@ window.MOE_SKILL_BUFF_COMPATIBILITY_GENERATED = [
     "correctionReason": ""
   },
   {
-    "id": "skillbuff:死の魔法:F:闇の王",
+    "id": "skillbuff:死の魔法:W:闇の王",
     "skillName": "死の魔法",
     "skill": "死の魔法",
-    "group": "F",
-    "groupRaw": "F?",
+    "group": "W",
+    "groupRaw": "W?",
     "groupUncertain": true,
     "groupTentative": true,
-    "conflictGroup": "skillBuff:死の魔法:F",
+    "conflictGroup": "skillBuff:死の魔法:W",
     "safeForConflictAutoApply": true,
     "value": 15,
     "valueRaw": "15",
@@ -6117,7 +6081,7 @@ window.MOE_SKILL_BUFF_COMPATIBILITY_GENERATED = [
       "confidenceTentative"
     ],
     "source": "xlsx+wiki",
-    "correctionReason": ""
+    "correctionReason": "2026-09-22添付Wiki常時発動3・併用との全件照合"
   },
   {
     "id": "skillbuff:死の魔法:G:蠍の加護",
@@ -7249,14 +7213,14 @@ window.MOE_SKILL_BUFF_COMPATIBILITY_GENERATED = [
     "correctionReason": ""
   },
   {
-    "id": "skillbuff:暗黒命令:A:闇の王",
+    "id": "skillbuff:暗黒命令:M:闇の王",
     "skillName": "暗黒命令",
     "skill": "暗黒命令",
-    "group": "A",
-    "groupRaw": "A?",
-    "groupUncertain": true,
-    "groupTentative": true,
-    "conflictGroup": "skillBuff:暗黒命令:A",
+    "group": "M",
+    "groupRaw": "M",
+    "groupUncertain": false,
+    "groupTentative": false,
+    "conflictGroup": "skillBuff:暗黒命令:M",
     "safeForConflictAutoApply": true,
     "value": 15,
     "valueRaw": "+15",
@@ -7275,7 +7239,7 @@ window.MOE_SKILL_BUFF_COMPATIBILITY_GENERATED = [
       "groupTentative"
     ],
     "source": "wiki-full-skill-effects",
-    "correctionReason": ""
+    "correctionReason": "2026-09-22添付Wiki常時発動3・併用との全件照合"
   },
   {
     "id": "skillbuff:暗黒命令:A:魔法のお姫様",
@@ -7532,10 +7496,10 @@ window.MOE_SKILL_BUFF_COMPATIBILITY_GENERATED = [
     "groupTentative": false,
     "conflictGroup": "skillBuff:暗黒命令:J",
     "safeForConflictAutoApply": true,
-    "value": 10,
-    "valueRaw": "+10",
+    "value": 20,
+    "valueRaw": "+20",
     "valueUncertain": false,
-    "amount": "+10",
+    "amount": "+20",
     "buffName": "異形の力",
     "name": "異形の力",
     "canonicalBuffName": "異形の力",
@@ -7547,7 +7511,7 @@ window.MOE_SKILL_BUFF_COMPATIBILITY_GENERATED = [
     "noteNeedsReview": false,
     "reviewFlags": [],
     "source": "wiki-full-skill-effects",
-    "correctionReason": ""
+    "correctionReason": "2026-09-22添付Wiki常時発動3・併用との全件照合"
   },
   {
     "id": "skillbuff:暗黒命令:K:憑物",
@@ -8947,5 +8911,67 @@ window.MOE_SKILL_BUFF_COMPATIBILITY_GENERATED.push(...[
     "reviewFlags": [],
     "source": "wiki-upload-20260922",
     "correctionReason": ""
+  }
+]);
+
+// Existing Buff corrections audited against uploaded Wiki, 2026-09-22.
+window.MOE_SKILL_BUFF_COMPATIBILITY_GENERATED.push(...[
+  {
+    "id": "skillbuff:自然調和:E:自然崇拝",
+    "skillName": "自然調和",
+    "skill": "自然調和",
+    "group": "E",
+    "groupRaw": "E？",
+    "groupUncertain": true,
+    "groupTentative": true,
+    "conflictGroup": "skillBuff:自然調和:E",
+    "safeForConflictAutoApply": true,
+    "value": 20,
+    "valueRaw": "+20",
+    "valueUncertain": false,
+    "amount": "+20",
+    "buffName": "自然崇拝",
+    "name": "自然崇拝",
+    "canonicalBuffName": "自然崇拝",
+    "aliasOf": "",
+    "aliases": [],
+    "items": [],
+    "notes": [
+      "2026-09-22添付Wiki。暫定グループはユーザー指定により？を除いて適用。"
+    ],
+    "confidence": "wiki",
+    "noteNeedsReview": false,
+    "reviewFlags": [],
+    "source": "wiki-upload-20260922",
+    "correctionReason": "既存Buffの欠落を添付Wikiで補完"
+  },
+  {
+    "id": "skillbuff:自然調和:F:アルテミスの加護",
+    "skillName": "自然調和",
+    "skill": "自然調和",
+    "group": "F",
+    "groupRaw": "F？",
+    "groupUncertain": true,
+    "groupTentative": true,
+    "conflictGroup": "skillBuff:自然調和:F",
+    "safeForConflictAutoApply": true,
+    "value": 20,
+    "valueRaw": "+20",
+    "valueUncertain": false,
+    "amount": "+20",
+    "buffName": "アルテミスの加護",
+    "name": "アルテミスの加護",
+    "canonicalBuffName": "アルテミスの加護",
+    "aliasOf": "",
+    "aliases": [],
+    "items": [],
+    "notes": [
+      "2026-09-22添付Wiki。暫定グループはユーザー指定により？を除いて適用。"
+    ],
+    "confidence": "wiki",
+    "noteNeedsReview": false,
+    "reviewFlags": [],
+    "source": "wiki-upload-20260922",
+    "correctionReason": "既存Buffの欠落を添付Wikiで補完"
   }
 ]);
