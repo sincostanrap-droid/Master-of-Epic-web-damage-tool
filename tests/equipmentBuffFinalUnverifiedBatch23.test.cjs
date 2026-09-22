@@ -34,7 +34,9 @@ const audit = JSON.parse(childProcess.execFileSync(
 ));
 const newItems = JSON.parse(fs.readFileSync(path.join(root, "docs/official-catalog-update-20260921.json"), "utf8"));
 const pendingIds = Object.entries(rules).filter(([,r]) => r.reviewStatus === "unverified" && !r.reviewComplete).map(([id]) => id);
-assert.deepEqual(pendingIds.sort(), [...newItems.newBuffs].sort(), "Only the newly imported Buffs await review");
-assert.deepEqual(audit.counts.unverifiedReview, { finalized: 7, pending: newItems.newBuffs.length });
+const review = JSON.parse(fs.readFileSync(path.join(root, "docs/wiki-buff-review-20260922.json"), "utf8"));
+assert.deepEqual(pendingIds.sort(), [...review.pending].sort());
+assert.ok([...review.pending, ...review.partial].every(id => newItems.newBuffs.includes(id)));
+assert.deepEqual(audit.counts.unverifiedReview, { finalized: 7 + review.partial.length, pending: review.pending.length });
 
 console.log("equipmentBuffFinalUnverifiedBatch23 tests: OK");

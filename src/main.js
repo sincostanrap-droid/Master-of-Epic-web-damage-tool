@@ -12,8 +12,8 @@
   onclick属性から呼ばれる関数があるため、現時点では module ではなく通常scriptとして読み込みます。
 */
 
-const APP_VERSION = "v1.24.10";
-const APP_VERSION_NOTE = "公式DB装備45件を補完・Buff原文を収録";
+const APP_VERSION = "v1.24.11";
+const APP_VERSION_NOTE = "新規Buff22件の効果・併用を反映";
 
 /* 種族係数。攻撃力係数と魔力係数は別管理。 */
 const RACE_COEFFS = {
@@ -7249,25 +7249,36 @@ function resolveAllBuffRowsForGroups(st) {
   const out = clone(st || {});
   const byGroup = new Map();
 
-  collectActiveBuffConflictCandidates(out).forEach(candidate => {
-    const key = candidate.group.toLowerCase();
-    if (!byGroup.has(key)) {
-      byGroup.set(key, {group:candidate.group, winner:candidate, skipped:[], candidates:[candidate]});
-      return;
-    }
-    const rec = byGroup.get(key);
-    rec.candidates.push(candidate);
-    if (candidate._groupScore > rec.winner._groupScore) {
-      rec.skipped.push(rec.winner);
-      rec.winner = candidate;
-    } else {
-      rec.skipped.push(candidate);
-    }
-  });
-
+  // Resolve all declared groups. Pick higher-priority Buffs first so a Buff
+  // rejected in one group cannot suppress another Buff in a different group.
+  const candidates = collectActiveBuffConflictCandidates(out);
+  const groupKeys = candidate => Array.from(new Set([
+    candidate.group, ...splitTags(candidate.row.tags)
+  ].filter(Boolean).map(group => group.toLowerCase())));
+  const accepted = new Map();
   const suppressed = new Set();
-  byGroup.forEach(rec => {
-    rec.skipped.forEach(c => suppressed.add(`${c.type}:${c.idx}`));
+  [...candidates].sort((a, b) => b._groupScore - a._groupScore || a._groupOrder - b._groupOrder)
+    .forEach(candidate => {
+      const groups = groupKeys(candidate);
+      if (groups.some(group => accepted.has(group))) {
+        suppressed.add(`${candidate.type}:${candidate.idx}`);
+      } else {
+        groups.forEach(group => accepted.set(group, candidate));
+      }
+    });
+  candidates.forEach(candidate => {
+    groupKeys(candidate).forEach(key => {
+      const winner = accepted.get(key);
+      // A wholly suppressed Buff does not occupy its other groups.
+      if (!winner) return;
+      if (!byGroup.has(key)) byGroup.set(key, {
+        group: splitTags(candidate.row.tags).find(g => g.toLowerCase() === key) || candidate.group,
+        winner, skipped: [], candidates: []
+      });
+      const rec = byGroup.get(key);
+      rec.candidates.push(candidate);
+      if (candidate !== winner) rec.skipped.push(candidate);
+    });
   });
 
   out.composite = normalizeCompositeRows(out.composite || []).map((row, idx) =>
@@ -13647,6 +13658,11 @@ ${a}`;
 
 function applyEquipBuffRuleCandidateToEquipment(row, rule, opts={}) {
   if (!row || !rule) return false;
+  // Drop only the retired placeholder for these reviewed imports; preserve user effects.
+  if (rule.source === "manual-wiki-20260922") {
+    row.extraEffects = normalizeAdditionalEffects(row.extraEffects || []).filter(e =>
+      !(e.key === "custom" && String(e.name || "").startsWith("公式説明（数値計算・併用未検証）:")));
+  }
   const overwrite = !!opts.overwrite;
   let applied = false;
   row.equipBuffEnabled = true;

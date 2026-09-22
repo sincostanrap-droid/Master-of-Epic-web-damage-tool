@@ -3405,85 +3405,103 @@ Object.assign(window.MOE_BUFF_RULES_MANUAL, {
   }
 });
 
-// Official new items 2026-09-21: description preserved; calculation review pending.
+// New Buffs reviewed against uploaded Wiki on 2026-09-22.
 Object.assign(window.MOE_BUFF_RULES_MANUAL, {
   "technic-14635": {
     "name": "神楽",
     "officialTechnicId": 14635,
-    "verified": false,
+    "verified": true,
     "applyDefault": true,
-    "source": "manual-official-description",
-    "confidence": "unverified",
-    "reviewStatus": "unverified",
-    "reviewComplete": false,
+    "source": "manual-wiki-20260922",
+    "confidence": "wiki",
+    "reviewStatus": "display-only",
+    "reviewComplete": true,
     "conflictGroup": "technic-14635",
     "stackRule": "same-technic",
     "stats": {},
     "skillEffects": [],
     "customEffects": [
       {
-        "name": "公式説明（数値計算・併用未検証）: 神秘魔法、音楽、ダンスの効果が10上昇する\n※WarAgeでは効果がない",
+        "name": "WarAgeでは効果なし",
         "value": 0,
         "unit": ""
       }
     ],
     "rawInfo": "神秘魔法、音楽、ダンスの効果が10上昇する\n※WarAgeでは効果がない",
     "sourceUrls": [
-      "https://idb.moepic.com/items/weapons/23492"
+      "https://idb.moepic.com/items/weapons/23492",
+      "https://moeread.stars.ne.jp/?アイテム/追加効果/常時発動3"
     ],
-    "memo": "2026-09-21公式DBから補完。説明を保持する暫定表示ルール。新規Buffの数値計算・異なるBuff間の併用関係は未検証。装備本体の追加ステータスは別途計算する。"
+    "memo": "2026-09-22添付Wiki照合。暫定グループの？はユーザー指定により正規化。スキル強化は表示・検索用。魔法・属性・範囲・条件付き効果は表示用。WarAge無効。",
+    "authoritativeStats": []
   },
   "technic-14634": {
     "name": "あなたの後ろにいるの",
     "officialTechnicId": 14634,
-    "verified": false,
+    "verified": true,
     "applyDefault": true,
-    "source": "manual-official-description",
-    "confidence": "unverified",
-    "reviewStatus": "unverified",
-    "reviewComplete": false,
+    "source": "manual-wiki-20260922",
+    "confidence": "wiki",
+    "reviewStatus": "implemented",
+    "reviewComplete": true,
     "conflictGroup": "technic-14634",
     "stackRule": "same-technic",
-    "stats": {},
+    "stats": {
+      "speedPct": 15
+    },
     "skillEffects": [],
     "customEffects": [
       {
-        "name": "公式説明（数値計算・併用未検証）: 暗黒命令スキルの効果が15上昇して、移動速度が15%上昇する\n※WarAgeでは効果がない",
+        "name": "WarAgeでは効果なし",
         "value": 0,
         "unit": ""
       }
     ],
     "rawInfo": "暗黒命令スキルの効果が15上昇して、移動速度が15%上昇する\n※WarAgeでは効果がない",
     "sourceUrls": [
-      "https://idb.moepic.com/items/defences/23490"
+      "https://idb.moepic.com/items/defences/23490",
+      "https://moeread.stars.ne.jp/?アイテム/追加効果/常時発動3"
     ],
-    "memo": "2026-09-21公式DBから補完。説明を保持する暫定表示ルール。新規Buffの数値計算・異なるBuff間の併用関係は未検証。装備本体の追加ステータスは別途計算する。"
+    "memo": "2026-09-22添付Wiki照合。暫定グループの？はユーザー指定により正規化。スキル強化は表示・検索用。魔法・属性・範囲・条件付き効果は表示用。WarAge無効。",
+    "authoritativeStats": [
+      "speedPct"
+    ]
   },
   "technic-14633": {
     "name": "森精の加護",
     "officialTechnicId": 14633,
-    "verified": false,
+    "verified": true,
     "applyDefault": true,
-    "source": "manual-official-description",
-    "confidence": "unverified",
-    "reviewStatus": "unverified",
-    "reviewComplete": false,
+    "source": "manual-wiki-20260922",
+    "confidence": "wiki",
+    "reviewStatus": "implemented",
+    "reviewComplete": true,
     "conflictGroup": "technic-14633",
     "stackRule": "same-technic",
-    "stats": {},
+    "stats": {
+      "hpRegenPerMinute": 56.25,
+      "mpRegenPerMinute": 56.25,
+      "stRegenPerMinute": 56.25
+    },
     "skillEffects": [],
     "customEffects": [
       {
-        "name": "公式説明（数値計算・併用未検証）: 回復魔法と自然調和スキルの効果が20上昇して、HP / MP / ST の自然回復速度が大幅に上昇する\n※WarAgeでは効果がない",
+        "name": "WarAgeでは効果なし",
         "value": 0,
         "unit": ""
       }
     ],
     "rawInfo": "回復魔法と自然調和スキルの効果が20上昇して、HP / MP / ST の自然回復速度が大幅に上昇する\n※WarAgeでは効果がない",
     "sourceUrls": [
-      "https://idb.moepic.com/items/defences/23489"
+      "https://idb.moepic.com/items/defences/23489",
+      "https://moeread.stars.ne.jp/?アイテム/追加効果/常時発動3"
     ],
-    "memo": "2026-09-21公式DBから補完。説明を保持する暫定表示ルール。新規Buffの数値計算・異なるBuff間の併用関係は未検証。装備本体の追加ステータスは別途計算する。"
+    "memo": "2026-09-22添付Wiki照合。暫定グループの？はユーザー指定により正規化。スキル強化は表示・検索用。魔法・属性・範囲・条件付き効果は表示用。WarAge無効。",
+    "authoritativeStats": [
+      "hpRegenPerMinute",
+      "mpRegenPerMinute",
+      "stRegenPerMinute"
+    ]
   },
   "technic-14632": {
     "name": "コビトカバ フォーム",
@@ -3514,184 +3532,246 @@ Object.assign(window.MOE_BUFF_RULES_MANUAL, {
   "technic-14618": {
     "name": "マルカジリ",
     "officialTechnicId": 14618,
-    "verified": false,
+    "verified": true,
     "applyDefault": true,
-    "source": "manual-official-description",
-    "confidence": "unverified",
-    "reviewStatus": "unverified",
-    "reviewComplete": false,
+    "source": "manual-wiki-20260922",
+    "confidence": "wiki",
+    "reviewStatus": "display-only",
+    "reviewComplete": true,
     "conflictGroup": "technic-14618",
     "stackRule": "same-technic",
     "stats": {},
     "skillEffects": [],
     "customEffects": [
       {
-        "name": "公式説明（数値計算・併用未検証）: 牙スキルの威力と命中が上昇して、与えたダメージの10％分のHPを回復する\n※WarAgeでは効果がない",
+        "name": "牙の直接攻撃のみ威力・命中がスキル+20相当（牙Buffの時間・効果量は不変）",
+        "value": 0,
+        "unit": ""
+      },
+      {
+        "name": "与ダメージの10%をHP回復（与ダメ回復は資源種別を問わず最古の1件）",
+        "value": 0,
+        "unit": ""
+      },
+      {
+        "name": "WarAgeでは効果なし",
         "value": 0,
         "unit": ""
       }
     ],
     "rawInfo": "牙スキルの威力と命中が上昇して、与えたダメージの10％分のHPを回復する\n※WarAgeでは効果がない",
     "sourceUrls": [
-      "https://idb.moepic.com/items/defences/23483"
+      "https://idb.moepic.com/items/defences/23483",
+      "https://moeread.stars.ne.jp/?アイテム/追加効果/常時発動3"
     ],
-    "memo": "2026-09-21公式DBから補完。説明を保持する暫定表示ルール。新規Buffの数値計算・異なるBuff間の併用関係は未検証。装備本体の追加ステータスは別途計算する。"
+    "memo": "2026-09-22添付Wiki照合。暫定グループの？はユーザー指定により正規化。スキル強化は表示・検索用。魔法・属性・範囲・条件付き効果は表示用。WarAge無効。",
+    "authoritativeStats": []
   },
   "technic-14611": {
     "name": "カーバンクルの加護",
     "officialTechnicId": 14611,
-    "verified": false,
+    "verified": true,
     "applyDefault": true,
-    "source": "manual-official-description",
-    "confidence": "unverified",
+    "source": "manual-wiki-20260922",
+    "confidence": "wiki",
     "reviewStatus": "unverified",
-    "reviewComplete": false,
+    "reviewComplete": true,
     "conflictGroup": "technic-14611",
     "stackRule": "same-technic",
     "stats": {},
     "skillEffects": [],
     "customEffects": [
       {
-        "name": "公式説明（数値計算・併用未検証）: 火・水・風・地属性の効果を上昇させて、一定確率で敵の魔法を無効化する\n※WarAgeでは効果がない",
+        "name": "確率で敵の魔法を無効化（発動率未確認）",
+        "value": 0,
+        "unit": ""
+      },
+      {
+        "name": "WarAgeでは効果なし",
         "value": 0,
         "unit": ""
       }
     ],
     "rawInfo": "火・水・風・地属性の効果を上昇させて、一定確率で敵の魔法を無効化する\n※WarAgeでは効果がない",
     "sourceUrls": [
-      "https://idb.moepic.com/items/defences/23481"
+      "https://idb.moepic.com/items/defences/23481",
+      "https://moeread.stars.ne.jp/?アイテム/追加効果/常時発動3"
     ],
-    "memo": "2026-09-21公式DBから補完。説明を保持する暫定表示ルール。新規Buffの数値計算・異なるBuff間の併用関係は未検証。装備本体の追加ステータスは別途計算する。"
+    "memo": "2026-09-22添付Wiki照合。暫定グループの？はユーザー指定により正規化。スキル強化は表示・検索用。魔法・属性・範囲・条件付き効果は表示用。WarAge無効。 一部効果量・発動条件は未検証。",
+    "authoritativeStats": []
   },
   "technic-14610": {
     "name": "スペル チャージ",
     "officialTechnicId": 14610,
-    "verified": false,
+    "verified": true,
     "applyDefault": true,
-    "source": "manual-official-description",
-    "confidence": "unverified",
-    "reviewStatus": "unverified",
-    "reviewComplete": false,
+    "source": "manual-wiki-20260922",
+    "confidence": "wiki",
+    "reviewStatus": "display-only",
+    "reviewComplete": true,
     "conflictGroup": "technic-14610",
     "stackRule": "same-technic",
     "stats": {},
     "skillEffects": [],
     "customEffects": [
       {
-        "name": "公式説明（数値計算・併用未検証）: 魔法を一時的にチャージして、魔法の威力と範囲を増加させる\n※WarAgeでは効果がない",
+        "name": "魔法を一時チャージ",
+        "value": 0,
+        "unit": ""
+      },
+      {
+        "name": "WarAgeでは効果なし",
         "value": 0,
         "unit": ""
       }
     ],
     "rawInfo": "魔法を一時的にチャージして、魔法の威力と範囲を増加させる\n※WarAgeでは効果がない",
     "sourceUrls": [
-      "https://idb.moepic.com/items/defences/23478"
+      "https://idb.moepic.com/items/defences/23478",
+      "https://moeread.stars.ne.jp/?アイテム/追加効果/常時発動3"
     ],
-    "memo": "2026-09-21公式DBから補完。説明を保持する暫定表示ルール。新規Buffの数値計算・異なるBuff間の併用関係は未検証。装備本体の追加ステータスは別途計算する。"
+    "memo": "2026-09-22添付Wiki照合。暫定グループの？はユーザー指定により正規化。スキル強化は表示・検索用。魔法・属性・範囲・条件付き効果は表示用。WarAge無効。",
+    "authoritativeStats": []
   },
   "technic-14581": {
     "name": "エレクトリカル チャージ",
     "officialTechnicId": 14581,
-    "verified": false,
+    "verified": true,
     "applyDefault": true,
-    "source": "manual-official-description",
-    "confidence": "unverified",
-    "reviewStatus": "unverified",
-    "reviewComplete": false,
+    "source": "manual-wiki-20260922",
+    "confidence": "wiki",
+    "reviewStatus": "implemented",
+    "reviewComplete": true,
     "conflictGroup": "technic-14581",
     "stackRule": "same-technic",
-    "stats": {},
+    "stats": {
+      "hpRegenPerMinute": 75,
+      "mpRegenPerMinute": 75,
+      "stRegenPerMinute": 75
+    },
     "skillEffects": [],
     "customEffects": [
       {
-        "name": "公式説明（数値計算・併用未検証）: 自然回復量が大幅に上昇して、風属性の効果が増加する\n※WarAgeでは効果がない",
+        "name": "WarAgeでは効果なし",
         "value": 0,
         "unit": ""
       }
     ],
     "rawInfo": "自然回復量が大幅に上昇して、風属性の効果が増加する\n※WarAgeでは効果がない",
     "sourceUrls": [
-      "https://idb.moepic.com/items/defences/23477"
+      "https://idb.moepic.com/items/defences/23477",
+      "https://moeread.stars.ne.jp/?アイテム/追加効果/常時発動3"
     ],
-    "memo": "2026-09-21公式DBから補完。説明を保持する暫定表示ルール。新規Buffの数値計算・異なるBuff間の併用関係は未検証。装備本体の追加ステータスは別途計算する。"
+    "memo": "2026-09-22添付Wiki照合。暫定グループの？はユーザー指定により正規化。スキル強化は表示・検索用。魔法・属性・範囲・条件付き効果は表示用。WarAge無効。",
+    "authoritativeStats": [
+      "hpRegenPerMinute",
+      "mpRegenPerMinute",
+      "stRegenPerMinute"
+    ]
   },
   "technic-14580": {
     "name": "強化アーム",
     "officialTechnicId": 14580,
-    "verified": false,
+    "verified": true,
     "applyDefault": true,
-    "source": "manual-official-description",
-    "confidence": "unverified",
-    "reviewStatus": "unverified",
-    "reviewComplete": false,
+    "source": "manual-wiki-20260922",
+    "confidence": "wiki",
+    "reviewStatus": "implemented",
+    "reviewComplete": true,
     "conflictGroup": "technic-14580",
     "stackRule": "same-technic",
-    "stats": {},
+    "stats": {
+      "dmgPct": 10,
+      "extraMaxWeight": 30
+    },
     "skillEffects": [],
     "customEffects": [
       {
-        "name": "公式説明（数値計算・併用未検証）: 攻撃力依存のダメージが増加、筋力スキルの効果が20上昇して、所持可能重量が30増加する\n※WarAgeでは効果がない",
+        "name": "WarAgeでは効果なし",
         "value": 0,
         "unit": ""
       }
     ],
     "rawInfo": "攻撃力依存のダメージが増加、筋力スキルの効果が20上昇して、所持可能重量が30増加する\n※WarAgeでは効果がない",
     "sourceUrls": [
-      "https://idb.moepic.com/items/defences/23476"
+      "https://idb.moepic.com/items/defences/23476",
+      "https://moeread.stars.ne.jp/?アイテム/追加効果/常時発動3"
     ],
-    "memo": "2026-09-21公式DBから補完。説明を保持する暫定表示ルール。新規Buffの数値計算・異なるBuff間の併用関係は未検証。装備本体の追加ステータスは別途計算する。"
+    "memo": "2026-09-22添付Wiki照合。暫定グループの？はユーザー指定により正規化。スキル強化は表示・検索用。魔法・属性・範囲・条件付き効果は表示用。WarAge無効。 物理与ダメージ約10%を計算へ適用。",
+    "authoritativeStats": [
+      "dmgPct",
+      "extraMaxWeight"
+    ]
   },
   "technic-14578": {
     "name": "堅守の防壁",
     "officialTechnicId": 14578,
-    "verified": false,
+    "verified": true,
     "applyDefault": true,
-    "source": "manual-official-description",
-    "confidence": "unverified",
-    "reviewStatus": "unverified",
-    "reviewComplete": false,
+    "source": "manual-wiki-20260922",
+    "confidence": "wiki",
+    "reviewStatus": "display-only",
+    "reviewComplete": true,
     "conflictGroup": "technic-14578",
     "stackRule": "same-technic",
     "stats": {},
     "skillEffects": [],
     "customEffects": [
       {
-        "name": "公式説明（数値計算・併用未検証）: 20以下のダメージを無効化する\n※WarAgeでは効果がない",
+        "name": "20以下のダメージを無効化",
+        "value": 0,
+        "unit": ""
+      },
+      {
+        "name": "WarAgeでは効果なし",
         "value": 0,
         "unit": ""
       }
     ],
     "rawInfo": "20以下のダメージを無効化する\n※WarAgeでは効果がない ",
     "sourceUrls": [
-      "https://idb.moepic.com/items/defences/23473"
+      "https://idb.moepic.com/items/defences/23473",
+      "https://moeread.stars.ne.jp/?アイテム/追加効果/常時発動3"
     ],
-    "memo": "2026-09-21公式DBから補完。説明を保持する暫定表示ルール。新規Buffの数値計算・異なるBuff間の併用関係は未検証。装備本体の追加ステータスは別途計算する。"
+    "memo": "2026-09-22添付Wiki照合。暫定グループの？はユーザー指定により正規化。スキル強化は表示・検索用。魔法・属性・範囲・条件付き効果は表示用。WarAge無効。",
+    "authoritativeStats": []
   },
   "technic-14577": {
     "name": "竜封力",
     "officialTechnicId": 14577,
-    "verified": false,
+    "verified": true,
     "applyDefault": true,
-    "source": "manual-official-description",
-    "confidence": "unverified",
+    "source": "manual-wiki-20260922",
+    "confidence": "wiki",
     "reviewStatus": "unverified",
-    "reviewComplete": false,
+    "reviewComplete": true,
     "conflictGroup": "technic-14577",
     "stackRule": "same-technic",
-    "stats": {},
+    "stats": {
+      "dmgPct": 10
+    },
     "skillEffects": [],
     "customEffects": [
       {
-        "name": "公式説明（数値計算・併用未検証）: 攻撃力依存の物理ダメージとドラゴン系へのダメージが増加して、HPの自然回復速度が大幅に上昇する\n※WarAgeでは効果がない",
+        "name": "ドラゴン特攻・HP自然回復増加（倍率・回復量未確認）",
+        "value": 0,
+        "unit": ""
+      },
+      {
+        "name": "WarAgeでは効果なし",
         "value": 0,
         "unit": ""
       }
     ],
     "rawInfo": "攻撃力依存の物理ダメージとドラゴン系へのダメージが増加して、HPの自然回復速度が大幅に上昇する\n※WarAgeでは効果がない",
     "sourceUrls": [
-      "https://idb.moepic.com/items/defences/23472"
+      "https://idb.moepic.com/items/defences/23472",
+      "https://moeread.stars.ne.jp/?アイテム/追加効果/常時発動3"
     ],
-    "memo": "2026-09-21公式DBから補完。説明を保持する暫定表示ルール。新規Buffの数値計算・異なるBuff間の併用関係は未検証。装備本体の追加ステータスは別途計算する。"
+    "memo": "2026-09-22添付Wiki照合。暫定グループの？はユーザー指定により正規化。スキル強化は表示・検索用。魔法・属性・範囲・条件付き効果は表示用。WarAge無効。 一部効果量・発動条件は未検証。 物理与ダメージ約10%を計算へ適用。",
+    "authoritativeStats": [
+      "dmgPct"
+    ]
   },
   "technic-14543": {
     "name": "カブトムシ フォーム",
@@ -3722,80 +3802,114 @@ Object.assign(window.MOE_BUFF_RULES_MANUAL, {
   "technic-14540": {
     "name": "バエルの瞳",
     "officialTechnicId": 14540,
-    "verified": false,
+    "verified": true,
     "applyDefault": true,
-    "source": "manual-official-description",
-    "confidence": "unverified",
+    "source": "manual-wiki-20260922",
+    "confidence": "wiki",
     "reviewStatus": "unverified",
-    "reviewComplete": false,
+    "reviewComplete": true,
     "conflictGroup": "technic-14540",
     "stackRule": "same-technic",
     "stats": {},
     "skillEffects": [],
     "customEffects": [
       {
-        "name": "公式説明（数値計算・併用未検証）: 普段見えないものが見えるようになり、ダメージを受けた際に一定確率で「 ミニ バエル 」を召喚する\n※WarAgeでは効果がない",
+        "name": "不可視を見る・被ダメージ時に確率でミニ バエル召喚（発動率未確認）",
+        "value": 0,
+        "unit": ""
+      },
+      {
+        "name": "WarAgeでは効果なし",
         "value": 0,
         "unit": ""
       }
     ],
     "rawInfo": "普段見えないものが見えるようになり、ダメージを受けた際に一定確率で「 ミニ バエル 」を召喚する\n※WarAgeでは効果がない",
     "sourceUrls": [
-      "https://idb.moepic.com/items/defences/23447"
+      "https://idb.moepic.com/items/defences/23447",
+      "https://moeread.stars.ne.jp/?アイテム/追加効果/常時発動3"
     ],
-    "memo": "2026-09-21公式DBから補完。説明を保持する暫定表示ルール。新規Buffの数値計算・異なるBuff間の併用関係は未検証。装備本体の追加ステータスは別途計算する。"
+    "memo": "2026-09-22添付Wiki照合。暫定グループの？はユーザー指定により正規化。スキル強化は表示・検索用。魔法・属性・範囲・条件付き効果は表示用。WarAge無効。 一部効果量・発動条件は未検証。",
+    "authoritativeStats": []
   },
   "technic-14538": {
     "name": "闇の守護精霊",
     "officialTechnicId": 14538,
-    "verified": false,
+    "verified": true,
     "applyDefault": true,
-    "source": "manual-official-description",
-    "confidence": "unverified",
-    "reviewStatus": "unverified",
-    "reviewComplete": false,
+    "source": "manual-wiki-20260922",
+    "confidence": "wiki",
+    "reviewStatus": "implemented",
+    "reviewComplete": true,
     "conflictGroup": "technic-14538",
     "stackRule": "same-technic",
-    "stats": {},
+    "stats": {
+      "magicPct": 3
+    },
     "skillEffects": [],
     "customEffects": [
       {
-        "name": "公式説明（数値計算・併用未検証）: 魔力が3%と死の魔法の効果が20上昇して、魔法ダメージを25%軽減する\n※WarAgeでは効果がない",
+        "name": "魔法被ダメージ25%軽減（軽減率が最大の1件のみ）",
+        "value": 0,
+        "unit": ""
+      },
+      {
+        "name": "WarAgeでは効果なし",
         "value": 0,
         "unit": ""
       }
     ],
     "rawInfo": "魔力が3%と死の魔法の効果が20上昇して、魔法ダメージを25%軽減する\n※WarAgeでは効果がない",
     "sourceUrls": [
-      "https://idb.moepic.com/items/defences/23446"
+      "https://idb.moepic.com/items/defences/23446",
+      "https://moeread.stars.ne.jp/?アイテム/追加効果/常時発動3"
     ],
-    "memo": "2026-09-21公式DBから補完。説明を保持する暫定表示ルール。新規Buffの数値計算・異なるBuff間の併用関係は未検証。装備本体の追加ステータスは別途計算する。"
+    "memo": "2026-09-22添付Wiki照合。暫定グループの？はユーザー指定により正規化。スキル強化は表示・検索用。魔法・属性・範囲・条件付き効果は表示用。WarAge無効。",
+    "authoritativeStats": [
+      "magicPct"
+    ]
   },
   "technic-14539": {
     "name": "ドレイン ワーム",
     "officialTechnicId": 14539,
-    "verified": false,
+    "verified": true,
     "applyDefault": true,
-    "source": "manual-official-description",
-    "confidence": "unverified",
-    "reviewStatus": "unverified",
-    "reviewComplete": false,
+    "source": "manual-wiki-20260922",
+    "confidence": "wiki",
+    "reviewStatus": "implemented",
+    "reviewComplete": true,
     "conflictGroup": "technic-14539",
     "stackRule": "same-technic",
-    "stats": {},
+    "stats": {
+      "attackPct": 3
+    },
     "skillEffects": [],
     "customEffects": [
       {
-        "name": "公式説明（数値計算・併用未検証）: 攻撃力が3%上昇、与えたダメージ10%分のHPを回復して、受けたダメージ10％分のSTを回復する\n※WarAgeでは効果がない",
+        "name": "与ダメージの10%をHP回復（与ダメ回復は資源種別を問わず最古の1件）",
+        "value": 0,
+        "unit": ""
+      },
+      {
+        "name": "被ダメージの10%をST回復",
+        "value": 0,
+        "unit": ""
+      },
+      {
+        "name": "WarAgeでは効果なし",
         "value": 0,
         "unit": ""
       }
     ],
     "rawInfo": "攻撃力が3%上昇、与えたダメージ10%分のHPを回復して、受けたダメージ10％分のSTを回復する\n※WarAgeでは効果がない",
     "sourceUrls": [
-      "https://idb.moepic.com/items/defences/23445"
+      "https://idb.moepic.com/items/defences/23445",
+      "https://moeread.stars.ne.jp/?アイテム/追加効果/常時発動3"
     ],
-    "memo": "2026-09-21公式DBから補完。説明を保持する暫定表示ルール。新規Buffの数値計算・異なるBuff間の併用関係は未検証。装備本体の追加ステータスは別途計算する。"
+    "memo": "2026-09-22添付Wiki照合。暫定グループの？はユーザー指定により正規化。スキル強化は表示・検索用。魔法・属性・範囲・条件付き効果は表示用。WarAge無効。",
+    "authoritativeStats": [
+      "attackPct"
+    ]
   },
   "technic-14481": {
     "name": "ちびヒーロー（ギャンブラー）フォーム",
@@ -3826,235 +3940,303 @@ Object.assign(window.MOE_BUFF_RULES_MANUAL, {
   "technic-14486": {
     "name": "ドラゴン ジーン",
     "officialTechnicId": 14486,
-    "verified": false,
+    "verified": true,
     "applyDefault": true,
-    "source": "manual-official-description",
-    "confidence": "unverified",
-    "reviewStatus": "unverified",
-    "reviewComplete": false,
+    "source": "manual-wiki-20260922",
+    "confidence": "wiki",
+    "reviewStatus": "implemented",
+    "reviewComplete": true,
     "conflictGroup": "technic-14486",
     "stackRule": "same-technic",
-    "stats": {},
+    "stats": {
+      "attackPct": 3,
+      "extraACPct": 10,
+      "extraMaxWeightPct": 20
+    },
     "skillEffects": [],
     "customEffects": [
       {
-        "name": "公式説明（数値計算・併用未検証）: 攻撃力と防御力が上昇して、筋力スキルの効果と所持可能重量が増加する\n竜の脊椎に残された因子と共鳴して、専用技",
+        "name": "専用技ドラゴン フォームと派生技3種を使用可能",
+        "value": 0,
+        "unit": ""
+      },
+      {
+        "name": "WarAgeでは効果なし",
         "value": 0,
         "unit": ""
       }
     ],
     "rawInfo": "攻撃力と防御力が上昇して、筋力スキルの効果と所持可能重量が増加する\n竜の脊椎に残された因子と共鳴して、専用技",
     "sourceUrls": [
-      "https://idb.moepic.com/items/defences/23416"
+      "https://idb.moepic.com/items/defences/23416",
+      "https://moeread.stars.ne.jp/?アイテム/追加効果/常時発動3"
     ],
-    "memo": "2026-09-21公式DBから補完。説明を保持する暫定表示ルール。新規Buffの数値計算・異なるBuff間の併用関係は未検証。装備本体の追加ステータスは別途計算する。"
+    "memo": "2026-09-22添付Wiki照合。暫定グループの？はユーザー指定により正規化。スキル強化は表示・検索用。魔法・属性・範囲・条件付き効果は表示用。WarAge無効。",
+    "authoritativeStats": [
+      "attackPct",
+      "extraACPct",
+      "extraMaxWeightPct"
+    ]
   },
   "technic-14485": {
     "name": "プラネット グレイス",
     "officialTechnicId": 14485,
-    "verified": false,
+    "verified": true,
     "applyDefault": true,
-    "source": "manual-official-description",
-    "confidence": "unverified",
-    "reviewStatus": "unverified",
-    "reviewComplete": false,
+    "source": "manual-wiki-20260922",
+    "confidence": "wiki",
+    "reviewStatus": "display-only",
+    "reviewComplete": true,
     "conflictGroup": "technic-14485",
     "stackRule": "same-technic",
     "stats": {},
     "skillEffects": [],
     "customEffects": [
       {
-        "name": "公式説明（数値計算・併用未検証）: 神秘魔法の効果と地属性の効果が15上昇する\n※WarAgeでは効果ばない",
+        "name": "WarAgeでは効果なし",
         "value": 0,
         "unit": ""
       }
     ],
     "rawInfo": "神秘魔法の効果と地属性の効果が15上昇する\n※WarAgeでは効果ばない",
     "sourceUrls": [
-      "https://idb.moepic.com/items/defences/23415"
+      "https://idb.moepic.com/items/defences/23415",
+      "https://moeread.stars.ne.jp/?アイテム/追加効果/常時発動3"
     ],
-    "memo": "2026-09-21公式DBから補完。説明を保持する暫定表示ルール。新規Buffの数値計算・異なるBuff間の併用関係は未検証。装備本体の追加ステータスは別途計算する。"
+    "memo": "2026-09-22添付Wiki照合。暫定グループの？はユーザー指定により正規化。スキル強化は表示・検索用。魔法・属性・範囲・条件付き効果は表示用。WarAge無効。",
+    "authoritativeStats": []
   },
   "technic-14484": {
     "name": "双極共鳴",
     "officialTechnicId": 14484,
-    "verified": false,
+    "verified": true,
     "applyDefault": true,
-    "source": "manual-official-description",
-    "confidence": "unverified",
-    "reviewStatus": "unverified",
-    "reviewComplete": false,
+    "source": "manual-wiki-20260922",
+    "confidence": "wiki",
+    "reviewStatus": "display-only",
+    "reviewComplete": true,
     "conflictGroup": "technic-14484",
     "stackRule": "same-technic",
     "stats": {},
     "skillEffects": [],
     "customEffects": [
       {
-        "name": "公式説明（数値計算・併用未検証）: 回復魔法と破壊魔法の効果が15上昇して、無属性魔法のダメージが20%増加する\n※WarAgeでは効果がない",
+        "name": "WarAgeでは効果なし",
         "value": 0,
         "unit": ""
       }
     ],
     "rawInfo": "回復魔法と破壊魔法の効果が15上昇して、無属性魔法のダメージが20%増加する\n※WarAgeでは効果がない",
     "sourceUrls": [
-      "https://idb.moepic.com/items/defences/23414"
+      "https://idb.moepic.com/items/defences/23414",
+      "https://moeread.stars.ne.jp/?アイテム/追加効果/常時発動3"
     ],
-    "memo": "2026-09-21公式DBから補完。説明を保持する暫定表示ルール。新規Buffの数値計算・異なるBuff間の併用関係は未検証。装備本体の追加ステータスは別途計算する。"
+    "memo": "2026-09-22添付Wiki照合。暫定グループの？はユーザー指定により正規化。スキル強化は表示・検索用。魔法・属性・範囲・条件付き効果は表示用。WarAge無効。",
+    "authoritativeStats": []
   },
   "technic-14483": {
     "name": "サマーバケーション",
     "officialTechnicId": 14483,
-    "verified": false,
+    "verified": true,
     "applyDefault": true,
-    "source": "manual-official-description",
-    "confidence": "unverified",
+    "source": "manual-wiki-20260922",
+    "confidence": "wiki",
     "reviewStatus": "unverified",
-    "reviewComplete": false,
+    "reviewComplete": true,
     "conflictGroup": "technic-14483",
     "stackRule": "same-technic",
     "stats": {},
     "skillEffects": [],
     "customEffects": [
       {
-        "name": "公式説明（数値計算・併用未検証）: 自然回復速度が上昇して、スタミナの消費と火属性のダメージを軽減する\n※WarAgeでは効果ばない",
+        "name": "自然回復増加・ST消費軽減・火属性被効果軽減（数値未確認）",
+        "value": 0,
+        "unit": ""
+      },
+      {
+        "name": "WarAgeでは効果なし",
         "value": 0,
         "unit": ""
       }
     ],
     "rawInfo": "自然回復速度が上昇して、スタミナの消費と火属性のダメージを軽減する\n※WarAgeでは効果ばない",
     "sourceUrls": [
-      "https://idb.moepic.com/items/defences/23413"
+      "https://idb.moepic.com/items/defences/23413",
+      "https://moeread.stars.ne.jp/?アイテム/追加効果/常時発動3"
     ],
-    "memo": "2026-09-21公式DBから補完。説明を保持する暫定表示ルール。新規Buffの数値計算・異なるBuff間の併用関係は未検証。装備本体の追加ステータスは別途計算する。"
+    "memo": "2026-09-22添付Wiki照合。暫定グループの？はユーザー指定により正規化。スキル強化は表示・検索用。魔法・属性・範囲・条件付き効果は表示用。WarAge無効。 一部効果量・発動条件は未検証。",
+    "authoritativeStats": []
   },
   "technic-14482": {
     "name": "冥騎士の力",
     "officialTechnicId": 14482,
-    "verified": false,
+    "verified": true,
     "applyDefault": true,
-    "source": "manual-official-description",
-    "confidence": "unverified",
+    "source": "manual-wiki-20260922",
+    "confidence": "wiki",
     "reviewStatus": "unverified",
-    "reviewComplete": false,
+    "reviewComplete": true,
     "conflictGroup": "technic-14482",
     "stackRule": "same-technic",
     "stats": {},
     "skillEffects": [],
     "customEffects": [
       {
-        "name": "公式説明（数値計算・併用未検証）: 死の魔法と暗黒命令の効果が15上昇して、BUFF点灯中に即死ダメージを受けてもギリギリで耐えることができる\n※効果発動時にBUFFが消えるが、一定時間で再点灯する\n※装備を付け替えた場合は約8秒間点灯しない\n※WarAgeでは効果がない",
+        "name": "致死ダメージを耐えるとBuff消失・一定時間で再点灯（付替後約8秒は不点灯）",
+        "value": 0,
+        "unit": ""
+      },
+      {
+        "name": "WarAgeでは効果なし",
         "value": 0,
         "unit": ""
       }
     ],
     "rawInfo": "死の魔法と暗黒命令の効果が15上昇して、BUFF点灯中に即死ダメージを受けてもギリギリで耐えることができる\n※効果発動時にBUFFが消えるが、一定時間で再点灯する\n※装備を付け替えた場合は約8秒間点灯しない\n※WarAgeでは効果がない",
     "sourceUrls": [
-      "https://idb.moepic.com/items/defences/23412"
+      "https://idb.moepic.com/items/defences/23412",
+      "https://moeread.stars.ne.jp/?アイテム/追加効果/常時発動3"
     ],
-    "memo": "2026-09-21公式DBから補完。説明を保持する暫定表示ルール。新規Buffの数値計算・異なるBuff間の併用関係は未検証。装備本体の追加ステータスは別途計算する。"
+    "memo": "2026-09-22添付Wiki照合。暫定グループの？はユーザー指定により正規化。スキル強化は表示・検索用。魔法・属性・範囲・条件付き効果は表示用。WarAge無効。 一部効果量・発動条件は未検証。",
+    "authoritativeStats": []
   },
   "technic-14431": {
     "name": "冥府の祝福",
     "officialTechnicId": 14431,
-    "verified": false,
+    "verified": true,
     "applyDefault": true,
-    "source": "manual-official-description",
-    "confidence": "unverified",
-    "reviewStatus": "unverified",
-    "reviewComplete": false,
+    "source": "manual-wiki-20260922",
+    "confidence": "wiki",
+    "reviewStatus": "display-only",
+    "reviewComplete": true,
     "conflictGroup": "technic-14431",
     "stackRule": "same-technic",
     "stats": {},
     "skillEffects": [],
     "customEffects": [
       {
-        "name": "公式説明（数値計算・併用未検証）: 冥府の力に祝福され、死の魔法と回復魔法の効果が15上昇する\n※WarAgeでは効果がない",
+        "name": "WarAgeでは効果なし",
         "value": 0,
         "unit": ""
       }
     ],
     "rawInfo": "冥府の力に祝福され、死の魔法と回復魔法の効果が15上昇する\n※WarAgeでは効果がない",
     "sourceUrls": [
-      "https://idb.moepic.com/items/defences/23398"
+      "https://idb.moepic.com/items/defences/23398",
+      "https://moeread.stars.ne.jp/?アイテム/追加効果/常時発動3"
     ],
-    "memo": "2026-09-21公式DBから補完。説明を保持する暫定表示ルール。新規Buffの数値計算・異なるBuff間の併用関係は未検証。装備本体の追加ステータスは別途計算する。"
+    "memo": "2026-09-22添付Wiki照合。暫定グループの？はユーザー指定により正規化。スキル強化は表示・検索用。魔法・属性・範囲・条件付き効果は表示用。WarAge無効。",
+    "authoritativeStats": []
   },
   "technic-14430": {
     "name": "上位妖精の加護",
     "officialTechnicId": 14430,
-    "verified": false,
+    "verified": true,
     "applyDefault": true,
-    "source": "manual-official-description",
-    "confidence": "unverified",
-    "reviewStatus": "unverified",
-    "reviewComplete": false,
+    "source": "manual-wiki-20260922",
+    "confidence": "wiki",
+    "reviewStatus": "display-only",
+    "reviewComplete": true,
     "conflictGroup": "technic-14430",
     "stackRule": "same-technic",
     "stats": {},
     "skillEffects": [],
     "customEffects": [
       {
-        "name": "公式説明（数値計算・併用未検証）: 魔法の威力が増加して、魔法ダメージを25%軽減する\n※WarAgeでは効果がない",
+        "name": "魔法被ダメージ25%軽減（軽減率が最大の1件のみ）",
+        "value": 0,
+        "unit": ""
+      },
+      {
+        "name": "WarAgeでは効果なし",
         "value": 0,
         "unit": ""
       }
     ],
     "rawInfo": "魔法の威力が増加して、魔法ダメージを25%軽減する\n※WarAgeでは効果がない",
     "sourceUrls": [
-      "https://idb.moepic.com/items/defences/23396"
+      "https://idb.moepic.com/items/defences/23396",
+      "https://moeread.stars.ne.jp/?アイテム/追加効果/常時発動3"
     ],
-    "memo": "2026-09-21公式DBから補完。説明を保持する暫定表示ルール。新規Buffの数値計算・異なるBuff間の併用関係は未検証。装備本体の追加ステータスは別途計算する。"
+    "memo": "2026-09-22添付Wiki照合。暫定グループの？はユーザー指定により正規化。スキル強化は表示・検索用。魔法・属性・範囲・条件付き効果は表示用。WarAge無効。",
+    "authoritativeStats": []
   },
   "technic-14429": {
     "name": "エルフの叡智",
     "officialTechnicId": 14429,
-    "verified": false,
+    "verified": true,
     "applyDefault": true,
-    "source": "manual-official-description",
-    "confidence": "unverified",
-    "reviewStatus": "unverified",
-    "reviewComplete": false,
+    "source": "manual-wiki-20260922",
+    "confidence": "wiki",
+    "reviewStatus": "implemented",
+    "reviewComplete": true,
     "conflictGroup": "technic-14429",
     "stackRule": "same-technic",
-    "stats": {},
+    "stats": {
+      "magicPct": 5,
+      "extraMPPct": 10
+    },
     "skillEffects": [],
     "customEffects": [
       {
-        "name": "公式説明（数値計算・併用未検証）: 魔力が5%、最大MPが10%上昇して、専用魔法『 アルス・マグナ 』が使用可能になる\n※WarAgeでは効果がない",
+        "name": "専用魔法アルス・マグナ使用可能",
+        "value": 0,
+        "unit": ""
+      },
+      {
+        "name": "WarAgeでは効果なし",
         "value": 0,
         "unit": ""
       }
     ],
     "rawInfo": "魔力が5%、最大MPが10%上昇して、専用魔法『 アルス・マグナ 』が使用可能になる\n※WarAgeでは効果がない",
     "sourceUrls": [
-      "https://idb.moepic.com/items/defences/23395"
+      "https://idb.moepic.com/items/defences/23395",
+      "https://moeread.stars.ne.jp/?アイテム/追加効果/常時発動3"
     ],
-    "memo": "2026-09-21公式DBから補完。説明を保持する暫定表示ルール。新規Buffの数値計算・異なるBuff間の併用関係は未検証。装備本体の追加ステータスは別途計算する。"
+    "memo": "2026-09-22添付Wiki照合。暫定グループの？はユーザー指定により正規化。スキル強化は表示・検索用。魔法・属性・範囲・条件付き効果は表示用。WarAge無効。",
+    "authoritativeStats": [
+      "magicPct",
+      "extraMPPct"
+    ]
   },
   "technic-14576": {
     "name": "斉天大聖",
     "officialTechnicId": 14576,
-    "verified": false,
+    "verified": true,
     "applyDefault": true,
-    "source": "manual-official-description",
-    "confidence": "unverified",
-    "reviewStatus": "unverified",
-    "reviewComplete": false,
+    "source": "manual-wiki-20260922",
+    "confidence": "wiki",
+    "reviewStatus": "implemented",
+    "reviewComplete": true,
     "conflictGroup": "technic-14576",
     "stackRule": "same-technic",
-    "stats": {},
+    "stats": {
+      "attackPct": 5,
+      "extraAvoidPct": 5
+    },
     "skillEffects": [],
     "customEffects": [
       {
-        "name": "公式説明（数値計算・併用未検証）: 攻撃力と回避が5%上昇して、戦闘技術の効果が増加するが、魔法の詠唱ができなくなる\n※WarAgeでは効果がない",
+        "name": "魔法詠唱不可",
+        "value": 0,
+        "unit": ""
+      },
+      {
+        "name": "WarAgeでは効果なし",
         "value": 0,
         "unit": ""
       }
     ],
     "rawInfo": "攻撃力と回避が5%上昇して、戦闘技術の効果が増加するが、魔法の詠唱ができなくなる\n※WarAgeでは効果がない",
     "sourceUrls": [
-      "https://idb.moepic.com/items/defences/23393"
+      "https://idb.moepic.com/items/defences/23393",
+      "https://moeread.stars.ne.jp/?アイテム/追加効果/常時発動3"
     ],
-    "memo": "2026-09-21公式DBから補完。説明を保持する暫定表示ルール。新規Buffの数値計算・異なるBuff間の併用関係は未検証。装備本体の追加ステータスは別途計算する。"
+    "memo": "2026-09-22添付Wiki照合。暫定グループの？はユーザー指定により正規化。スキル強化は表示・検索用。魔法・属性・範囲・条件付き効果は表示用。WarAge無効。",
+    "authoritativeStats": [
+      "attackPct",
+      "extraAvoidPct"
+    ]
   }
 });

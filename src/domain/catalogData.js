@@ -30,7 +30,7 @@ function loadCatalogScriptsOnce() {
   catalogScriptsPromise = Promise.all(CATALOG_SCRIPT_URLS.map(src => new Promise(resolve => {
     if (document.querySelector(`script[data-catalog-src="${src}"]`)) return resolve();
     const script = document.createElement("script");
-    script.src = `${src}?v=1.24.10`;
+    script.src = `${src}?v=1.24.11`;
     script.async = false;
     script.dataset.catalogSrc = src;
     script.onload = () => resolve();
@@ -45,7 +45,7 @@ function loadEquipmentBuffRuntimeScriptsOnce() {
   equipmentBuffRuntimeScriptsPromise = Promise.all(EQUIPMENT_BUFF_RUNTIME_SCRIPT_URLS.map(src => new Promise(resolve => {
     if (document.querySelector(`script[data-catalog-src="${src}"]`)) return resolve();
     const script = document.createElement("script");
-    script.src = `${src}?v=1.24.10`;
+    script.src = `${src}?v=1.24.11`;
     script.async = false;
     script.dataset.catalogSrc = src;
     script.onload = () => resolve();
