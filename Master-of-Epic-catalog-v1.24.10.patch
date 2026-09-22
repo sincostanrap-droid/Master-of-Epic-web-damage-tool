@@ -1,0 +1,6419 @@
+diff --git a/README.md b/README.md
+index ede530a..166b827 100644
+--- a/README.md
++++ b/README.md
+@@ -2,7 +2,7 @@
+ 
+ **Master of Epic** の物理攻撃ダメージを、武器・ステータス・装備・Buffを組み合わせて試算するブラウザ用ツールです。
+ 
+-現在の版: **v1.24.9**（2026-09-21）。変更内容と残課題は [保守記録](docs/maintenance-v1.24.9.md) を参照してください。
++現在の版: **v1.24.10**（2026-09-21）。公式DBから装備45件を補完しました。新規25Buffは原文表示までで、数値計算・併用関係は未検証です。取得範囲と残課題は [更新記録](docs/official-catalog-update-v1.24.10.md) を参照してください。
+ 
+ GitHub Pages でそのまま使えます。
+ 
+diff --git a/README.txt b/README.txt
+index 7ba36b5..06f67c2 100644
+--- a/README.txt
++++ b/README.txt
+@@ -1,3 +1,11 @@
++v1.24.10 / 公式DB装備45件を補完・Buff原文を収録 (2026-09-21)
++
++- 新着43件と緊箍児・カラコンメガネの不足2件を追加。
++- 新規25Buffは公式説明を表示・検索へ収録。数値計算・併用関係は未検証。
++- 既存装備・確定済みBuffルールを維持。
++- 公式新着の取得・再生成ツールを追加。全既存IDの再取得ではありません。
++- 詳細: docs/official-catalog-update-v1.24.10.md
++
+ v1.24.9 / 見せびらかし集計の欠落修正・保守情報整理 (2026-09-21)
+ 
+ - 欠落していた属性強化合計・自然回復/継続増減合計のJSを復元。
+diff --git a/docs/official-catalog-update-20260921.json b/docs/official-catalog-update-20260921.json
+new file mode 100644
+index 0000000..8013d23
+--- /dev/null
++++ b/docs/official-catalog-update-20260921.json
+@@ -0,0 +1,606 @@
++{
++  "generatedAt": "2026-09-21T14:29:36.131Z",
++  "scope": "new IDs above baseline maximum plus explicitly selected missing IDs; existing items retained, not fully recrawled",
++  "coverage": [
++    {
++      "category": "weapons",
++      "baselineCount": 1840,
++      "baselineUniqueCount": 1840,
++      "officialTotal": 1843,
++      "cutoffId": 23377,
++      "pages": 1,
++      "lowestFetchedId": 23376
++    },
++    {
++      "category": "defences",
++      "baselineCount": 9553,
++      "baselineUniqueCount": 9548,
++      "officialTotal": 9590,
++      "cutoffId": 23394,
++      "pages": 9,
++      "lowestFetchedId": 23388
++    },
++    {
++      "category": "shields",
++      "baselineCount": 399,
++      "baselineUniqueCount": 334,
++      "officialTotal": 334,
++      "cutoffId": 23334,
++      "pages": 1,
++      "lowestFetchedId": 23170
++    }
++  ],
++  "included": [
++    "defences:23393",
++    "defences:23384"
++  ],
++  "addedEquipment": [
++    "official-weapon-23492",
++    "official-weapon-23463",
++    "official-weapon-23462",
++    "official-defense-23491",
++    "official-defense-23490",
++    "official-defense-23489",
++    "official-defense-23487",
++    "official-defense-23484",
++    "official-defense-23483",
++    "official-defense-23482",
++    "official-defense-23481",
++    "official-defense-23478",
++    "official-defense-23477",
++    "official-defense-23476",
++    "official-defense-23475",
++    "official-defense-23474",
++    "official-defense-23473",
++    "official-defense-23472",
++    "official-defense-23458",
++    "official-defense-23457",
++    "official-defense-23448",
++    "official-defense-23447",
++    "official-defense-23446",
++    "official-defense-23445",
++    "official-defense-23419",
++    "official-defense-23417",
++    "official-defense-23416",
++    "official-defense-23415",
++    "official-defense-23414",
++    "official-defense-23413",
++    "official-defense-23412",
++    "official-defense-23410",
++    "official-defense-23409",
++    "official-defense-23408",
++    "official-defense-23407",
++    "official-defense-23406",
++    "official-defense-23405",
++    "official-defense-23400",
++    "official-defense-23399",
++    "official-defense-23398",
++    "official-defense-23397",
++    "official-defense-23396",
++    "official-defense-23395",
++    "official-defense-23393",
++    "official-defense-23384"
++  ],
++  "newBuffs": [
++    "technic-14635",
++    "technic-14634",
++    "technic-14633",
++    "technic-14632",
++    "technic-14618",
++    "technic-14611",
++    "technic-14610",
++    "technic-14581",
++    "technic-14580",
++    "technic-14578",
++    "technic-14577",
++    "technic-14543",
++    "technic-14540",
++    "technic-14538",
++    "technic-14539",
++    "technic-14481",
++    "technic-14486",
++    "technic-14485",
++    "technic-14484",
++    "technic-14483",
++    "technic-14482",
++    "technic-14431",
++    "technic-14430",
++    "technic-14429",
++    "technic-14576"
++  ],
++  "changedBuffDescriptions": [],
++  "items": [
++    {
++      "category": "weapons",
++      "id": 23492,
++      "name": "神楽鈴",
++      "technic": {
++        "id": 14635,
++        "name": "神楽",
++        "info": "神秘魔法、音楽、ダンスの効果が10上昇する\n※WarAgeでは効果がない",
++        "created_at": "2026-09-15T04:47:06.000000Z",
++        "updated_at": "2026-09-15T04:47:06.000000Z"
++      }
++    },
++    {
++      "category": "weapons",
++      "id": 23463,
++      "name": "メカニカル チェイン ソー",
++      "technic": null
++    },
++    {
++      "category": "weapons",
++      "id": 23462,
++      "name": "メカニカル チェイン ソード",
++      "technic": null
++    },
++    {
++      "category": "defences",
++      "id": 23491,
++      "name": "とんがり帽子",
++      "technic": {
++        "id": 12762,
++        "name": "魔導の極み",
++        "info": "魔法の威力とMPの自然回復量が増加する\n※WarAgeでは効果がない",
++        "created_at": "2026-09-15T04:47:06.000000Z",
++        "updated_at": "2026-09-15T04:47:06.000000Z"
++      }
++    },
++    {
++      "category": "defences",
++      "id": 23490,
++      "name": "背後のメリーさん",
++      "technic": {
++        "id": 14634,
++        "name": "あなたの後ろにいるの",
++        "info": "暗黒命令スキルの効果が15上昇して、移動速度が15%上昇する\n※WarAgeでは効果がない",
++        "created_at": "2026-09-15T04:47:06.000000Z",
++        "updated_at": "2026-09-15T04:47:06.000000Z"
++      }
++    },
++    {
++      "category": "defences",
++      "id": 23489,
++      "name": "ドライアド クレスト ウィッグ",
++      "technic": {
++        "id": 14633,
++        "name": "森精の加護",
++        "info": "回復魔法と自然調和スキルの効果が20上昇して、HP / MP / ST の自然回復速度が大幅に上昇する\n※WarAgeでは効果がない",
++        "created_at": "2026-09-15T04:47:06.000000Z",
++        "updated_at": "2026-09-15T04:47:06.000000Z"
++      }
++    },
++    {
++      "category": "defences",
++      "id": 23487,
++      "name": "コビトカバのペンダント",
++      "technic": {
++        "id": 14632,
++        "name": "コビトカバ フォーム",
++        "info": "コビトカバに変身できる",
++        "created_at": "2026-09-15T04:47:06.000000Z",
++        "updated_at": "2026-09-15T04:47:06.000000Z"
++      }
++    },
++    {
++      "category": "defences",
++      "id": 23484,
++      "name": "リムレス メガネ",
++      "technic": {
++        "id": 2578,
++        "name": "サーチアイ",
++        "info": "魔法が届く範囲が広がり、見えないものが見えてくる\n※WarAgeでは効果が無い",
++        "created_at": "2026-09-15T04:47:06.000000Z",
++        "updated_at": "2026-09-15T04:47:06.000000Z"
++      }
++    },
++    {
++      "category": "defences",
++      "id": 23483,
++      "name": "口裂けマスク",
++      "technic": {
++        "id": 14618,
++        "name": "マルカジリ",
++        "info": "牙スキルの威力と命中が上昇して、与えたダメージの10％分のHPを回復する\n※WarAgeでは効果がない",
++        "created_at": "2026-09-15T04:47:06.000000Z",
++        "updated_at": "2026-09-15T04:47:06.000000Z"
++      }
++    },
++    {
++      "category": "defences",
++      "id": 23482,
++      "name": "シャドウ ブリンカー",
++      "technic": {
++        "id": 13685,
++        "name": "闇の王",
++        "info": "死の魔法と暗黒命令の効果が15上昇し、HPとMPの自然回復速度が上昇する\n※WarAgeでは効果がない",
++        "created_at": "2026-09-15T04:47:06.000000Z",
++        "updated_at": "2026-09-15T04:47:06.000000Z"
++      }
++    },
++    {
++      "category": "defences",
++      "id": 23481,
++      "name": "カーバンクル ジェム",
++      "technic": {
++        "id": 14611,
++        "name": "カーバンクルの加護",
++        "info": "火・水・風・地属性の効果を上昇させて、一定確率で敵の魔法を無効化する\n※WarAgeでは効果がない",
++        "created_at": "2026-09-15T04:47:06.000000Z",
++        "updated_at": "2026-09-15T04:47:06.000000Z"
++      }
++    },
++    {
++      "category": "defences",
++      "id": 23478,
++      "name": "マジック チャージ ストーン",
++      "technic": {
++        "id": 14610,
++        "name": "スペル チャージ",
++        "info": "魔法を一時的にチャージして、魔法の威力と範囲を増加させる\n※WarAgeでは効果がない",
++        "created_at": "2026-09-15T04:47:06.000000Z",
++        "updated_at": "2026-09-15T04:47:06.000000Z"
++      }
++    },
++    {
++      "category": "defences",
++      "id": 23477,
++      "name": "プラグ テール",
++      "technic": {
++        "id": 14581,
++        "name": "エレクトリカル チャージ",
++        "info": "自然回復量が大幅に上昇して、風属性の効果が増加する\n※WarAgeでは効果がない",
++        "created_at": "2026-09-15T04:47:06.000000Z",
++        "updated_at": "2026-09-15T04:47:06.000000Z"
++      }
++    },
++    {
++      "category": "defences",
++      "id": 23476,
++      "name": "メカニカル ラウンデッド アーム",
++      "technic": {
++        "id": 14580,
++        "name": "強化アーム",
++        "info": "攻撃力依存のダメージが増加、筋力スキルの効果が20上昇して、所持可能重量が30増加する\n※WarAgeでは効果がない",
++        "created_at": "2026-09-15T04:47:06.000000Z",
++        "updated_at": "2026-09-15T04:47:06.000000Z"
++      }
++    },
++    {
++      "category": "defences",
++      "id": 23475,
++      "name": "レザー スニーカー",
++      "technic": null
++    },
++    {
++      "category": "defences",
++      "id": 23474,
++      "name": "人体模型スーツ",
++      "technic": null
++    },
++    {
++      "category": "defences",
++      "id": 23473,
++      "name": "アーマード ショルダー クローク",
++      "technic": {
++        "id": 14578,
++        "name": "堅守の防壁",
++        "info": "20以下のダメージを無効化する\n※WarAgeでは効果がない ",
++        "created_at": "2026-09-15T04:47:06.000000Z",
++        "updated_at": "2026-09-15T04:47:06.000000Z"
++      }
++    },
++    {
++      "category": "defences",
++      "id": 23472,
++      "name": "竜封じのチョーカー",
++      "technic": {
++        "id": 14577,
++        "name": "竜封力",
++        "info": "攻撃力依存の物理ダメージとドラゴン系へのダメージが増加して、HPの自然回復速度が大幅に上昇する\n※WarAgeでは効果がない",
++        "created_at": "2026-09-15T04:47:06.000000Z",
++        "updated_at": "2026-09-15T04:47:06.000000Z"
++      }
++    },
++    {
++      "category": "defences",
++      "id": 23458,
++      "name": "カブトムシのペンダント",
++      "technic": {
++        "id": 14543,
++        "name": "カブトムシ フォーム",
++        "info": "カブトムシに変身出来る",
++        "created_at": "2026-09-15T04:47:06.000000Z",
++        "updated_at": "2026-09-15T04:47:06.000000Z"
++      }
++    },
++    {
++      "category": "defences",
++      "id": 23457,
++      "name": "ボタンの目",
++      "technic": null
++    },
++    {
++      "category": "defences",
++      "id": 23448,
++      "name": "サングラス付きシャツ",
++      "technic": null
++    },
++    {
++      "category": "defences",
++      "id": 23447,
++      "name": "バエル リング",
++      "technic": {
++        "id": 14540,
++        "name": "バエルの瞳",
++        "info": "普段見えないものが見えるようになり、ダメージを受けた際に一定確率で「 ミニ バエル 」を召喚する\n※WarAgeでは効果がない",
++        "created_at": "2026-09-15T04:47:06.000000Z",
++        "updated_at": "2026-09-15T04:47:06.000000Z"
++      }
++    },
++    {
++      "category": "defences",
++      "id": 23446,
++      "name": "シャドウ スピリット",
++      "technic": {
++        "id": 14538,
++        "name": "闇の守護精霊",
++        "info": "魔力が3%と死の魔法の効果が20上昇して、魔法ダメージを25%軽減する\n※WarAgeでは効果がない",
++        "created_at": "2026-09-15T04:47:06.000000Z",
++        "updated_at": "2026-09-15T04:47:06.000000Z"
++      }
++    },
++    {
++      "category": "defences",
++      "id": 23445,
++      "name": "メカニカル ワーム テイル",
++      "technic": {
++        "id": 14539,
++        "name": "ドレイン ワーム",
++        "info": "攻撃力が3%上昇、与えたダメージ10%分のHPを回復して、受けたダメージ10％分のSTを回復する\n※WarAgeでは効果がない",
++        "created_at": "2026-09-15T04:47:06.000000Z",
++        "updated_at": "2026-09-15T04:47:06.000000Z"
++      }
++    },
++    {
++      "category": "defences",
++      "id": 23419,
++      "name": "ちびヒーロー（ギャンブラー）のペンダント",
++      "technic": {
++        "id": 14481,
++        "name": "ちびヒーロー（ギャンブラー）フォーム",
++        "info": "ヒーロースクワッドのギャンブラーに変身できる",
++        "created_at": "2026-09-15T04:47:06.000000Z",
++        "updated_at": "2026-09-15T04:47:06.000000Z"
++      }
++    },
++    {
++      "category": "defences",
++      "id": 23417,
++      "name": "イルカのリュックサック",
++      "technic": null
++    },
++    {
++      "category": "defences",
++      "id": 23416,
++      "name": "ドラゴニック スパイン",
++      "technic": {
++        "id": 14486,
++        "name": "ドラゴン ジーン",
++        "info": "攻撃力と防御力が上昇して、筋力スキルの効果と所持可能重量が増加する\n竜の脊椎に残された因子と共鳴して、専用技",
++        "created_at": "2026-09-15T04:47:06.000000Z",
++        "updated_at": "2026-09-15T04:47:06.000000Z"
++      }
++    },
++    {
++      "category": "defences",
++      "id": 23415,
++      "name": "セレスティアル オービット",
++      "technic": {
++        "id": 14485,
++        "name": "プラネット グレイス",
++        "info": "神秘魔法の効果と地属性の効果が15上昇する\n※WarAgeでは効果ばない",
++        "created_at": "2026-09-15T04:47:06.000000Z",
++        "updated_at": "2026-09-15T04:47:06.000000Z"
++      }
++    },
++    {
++      "category": "defences",
++      "id": 23414,
++      "name": "双極の籠手",
++      "technic": {
++        "id": 14484,
++        "name": "双極共鳴",
++        "info": "回復魔法と破壊魔法の効果が15上昇して、無属性魔法のダメージが20%増加する\n※WarAgeでは効果がない",
++        "created_at": "2026-09-15T04:47:06.000000Z",
++        "updated_at": "2026-09-15T04:47:06.000000Z"
++      }
++    },
++    {
++      "category": "defences",
++      "id": 23413,
++      "name": "シースルー サマーウェア",
++      "technic": {
++        "id": 14483,
++        "name": "サマーバケーション",
++        "info": "自然回復速度が上昇して、スタミナの消費と火属性のダメージを軽減する\n※WarAgeでは効果ばない",
++        "created_at": "2026-09-15T04:47:06.000000Z",
++        "updated_at": "2026-09-15T04:47:06.000000Z"
++      }
++    },
++    {
++      "category": "defences",
++      "id": 23412,
++      "name": "冥騎士の兜",
++      "technic": {
++        "id": 14482,
++        "name": "冥騎士の力",
++        "info": "死の魔法と暗黒命令の効果が15上昇して、BUFF点灯中に即死ダメージを受けてもギリギリで耐えることができる\n※効果発動時にBUFFが消えるが、一定時間で再点灯する\n※装備を付け替えた場合は約8秒間点灯しない\n※WarAgeでは効果がない",
++        "created_at": "2026-09-15T04:47:06.000000Z",
++        "updated_at": "2026-09-15T04:47:06.000000Z"
++      }
++    },
++    {
++      "category": "defences",
++      "id": 23410,
++      "name": "あびにゃん サマーナイト パンツ",
++      "technic": {
++        "id": 10390,
++        "name": "リラックス タイム",
++        "info": "リラックスすることで消費スタミナを軽減し、スタミナの自然回復量が上昇する\n※WarAgeでは効果がない",
++        "created_at": "2026-09-15T04:47:06.000000Z",
++        "updated_at": "2026-09-15T04:47:06.000000Z"
++      }
++    },
++    {
++      "category": "defences",
++      "id": 23409,
++      "name": "あびにゃん サマーナイト ウェア",
++      "technic": {
++        "id": 10390,
++        "name": "リラックス タイム",
++        "info": "リラックスすることで消費スタミナを軽減し、スタミナの自然回復量が上昇する\n※WarAgeでは効果がない",
++        "created_at": "2026-09-15T04:47:06.000000Z",
++        "updated_at": "2026-09-15T04:47:06.000000Z"
++      }
++    },
++    {
++      "category": "defences",
++      "id": 23408,
++      "name": "ウォーター スプラッシュ シューズ",
++      "technic": {
++        "id": 12772,
++        "name": "水精の加護",
++        "info": "水属性のダメージが上昇して、水属性のダメージを軽減する\n※WarAgeでは効果がない",
++        "created_at": "2026-09-15T04:47:06.000000Z",
++        "updated_at": "2026-09-15T04:47:06.000000Z"
++      }
++    },
++    {
++      "category": "defences",
++      "id": 23407,
++      "name": "パンキッシュ スカート",
++      "technic": {
++        "id": 7824,
++        "name": "ロック魂",
++        "info": "魂の叫びにより、シャウトのディレイが短縮されて、技の効果範囲が増加する",
++        "created_at": "2026-09-15T04:47:06.000000Z",
++        "updated_at": "2026-09-15T04:47:06.000000Z"
++      }
++    },
++    {
++      "category": "defences",
++      "id": 23406,
++      "name": "スリットスリーブ ジャケット",
++      "technic": {
++        "id": 13997,
++        "name": "インフィニット エンハンス",
++        "info": "攻撃力、魔力、防御力、移動速度、最大所持可能重量を5%上昇させる\n※WarAgeでは効果がない",
++        "created_at": "2026-09-15T04:47:06.000000Z",
++        "updated_at": "2026-09-15T04:47:06.000000Z"
++      }
++    },
++    {
++      "category": "defences",
++      "id": 23405,
++      "name": "ノアストーン アームガード",
++      "technic": {
++        "id": 13722,
++        "name": "魔力供給",
++        "info": "魔力と自然回復量が大幅に増加する\n※WarAgeでは効果がない",
++        "created_at": "2026-09-15T04:47:06.000000Z",
++        "updated_at": "2026-09-15T04:47:06.000000Z"
++      }
++    },
++    {
++      "category": "defences",
++      "id": 23400,
++      "name": "プライバシー サングラス",
++      "technic": null
++    },
++    {
++      "category": "defences",
++      "id": 23399,
++      "name": "クラゲのベレー帽",
++      "technic": {
++        "id": 13688,
++        "name": "クラゲエフェクト",
++        "info": "周囲にクラゲのエフェクトが舞い、水属性のダメージを25%軽減する\n※WarAgeでは効果がない",
++        "created_at": "2026-09-15T04:47:06.000000Z",
++        "updated_at": "2026-09-15T04:47:06.000000Z"
++      }
++    },
++    {
++      "category": "defences",
++      "id": 23398,
++      "name": "ダーク ヴェール",
++      "technic": {
++        "id": 14431,
++        "name": "冥府の祝福",
++        "info": "冥府の力に祝福され、死の魔法と回復魔法の効果が15上昇する\n※WarAgeでは効果がない",
++        "created_at": "2026-09-15T04:47:06.000000Z",
++        "updated_at": "2026-09-15T04:47:06.000000Z"
++      }
++    },
++    {
++      "category": "defences",
++      "id": 23397,
++      "name": "隠密のマント",
++      "technic": {
++        "id": 10935,
++        "name": "スニーキング",
++        "info": "獣の臭いで敵を欺き襲われにくくなり、自然回復量が上昇する\n※WarAgeでは効果がない",
++        "created_at": "2026-09-15T04:47:06.000000Z",
++        "updated_at": "2026-09-15T04:47:06.000000Z"
++      }
++    },
++    {
++      "category": "defences",
++      "id": 23396,
++      "name": "上位妖精のローブ",
++      "technic": {
++        "id": 14430,
++        "name": "上位妖精の加護",
++        "info": "魔法の威力が増加して、魔法ダメージを25%軽減する\n※WarAgeでは効果がない",
++        "created_at": "2026-09-15T04:47:06.000000Z",
++        "updated_at": "2026-09-15T04:47:06.000000Z"
++      }
++    },
++    {
++      "category": "defences",
++      "id": 23395,
++      "name": "ハイエルフ ウィッグ",
++      "technic": {
++        "id": 14429,
++        "name": "エルフの叡智",
++        "info": "魔力が5%、最大MPが10%上昇して、専用魔法『 アルス・マグナ 』が使用可能になる\n※WarAgeでは効果がない",
++        "created_at": "2026-09-15T04:47:06.000000Z",
++        "updated_at": "2026-09-15T04:47:06.000000Z"
++      }
++    },
++    {
++      "category": "defences",
++      "id": 23393,
++      "name": "緊箍児",
++      "technic": {
++        "id": 14576,
++        "name": "斉天大聖",
++        "info": "攻撃力と回避が5%上昇して、戦闘技術の効果が増加するが、魔法の詠唱ができなくなる\n※WarAgeでは効果がない",
++        "created_at": "2026-09-15T04:47:06.000000Z",
++        "updated_at": "2026-09-15T04:47:06.000000Z"
++      }
++    },
++    {
++      "category": "defences",
++      "id": 23384,
++      "name": "カラコンメガネ",
++      "technic": {
++        "id": 2578,
++        "name": "サーチアイ",
++        "info": "魔法が届く範囲が広がり、見えないものが見えてくる\n※WarAgeでは効果が無い",
++        "created_at": "2026-09-15T04:47:06.000000Z",
++        "updated_at": "2026-09-15T04:47:06.000000Z"
++      }
++    }
++  ]
++}
+diff --git a/docs/official-catalog-update-v1.24.10.md b/docs/official-catalog-update-v1.24.10.md
+new file mode 100644
+index 0000000..8cc1642
+--- /dev/null
++++ b/docs/official-catalog-update-v1.24.10.md
+@@ -0,0 +1,82 @@
++# v1.24.10 公式DBカタログ補完（2026-09-21）
++
++基準: GitHub main `cc9f42cc6109dc83d2267bb22c58f98a03c25581`。
++
++## 収録内容
++
++公式DBの公開ページから新着43件と取りこぼし2件、合計45件を追加した。
++取りこぼしは [緊箍児](https://idb.moepic.com/items/defences/23393) と
++[カラコンメガネ](https://idb.moepic.com/items/defences/23384)。
++既存装備の行・取得日時・確定済みBuff定義は維持している。
++
++| カテゴリ | 更新前の一意ID数 | 追加 | 更新後 | 公式一覧の件数 |
++| --- | ---: | ---: | ---: | ---: |
++| 武器 | 1,840 | 3 | 1,843 | 1,843 |
++| 防具・装飾 | 9,548 | 42 | 9,590 | 9,590 |
++| 盾 | 334 | 0 | 334 | 334 |
++| 合計 | 11,722 | 45 | 11,767 | 11,767 |
++
++旧データには同一IDの重複行が防具5行・盾65行ある。
++今回はその除去を行っていないため、生成ファイルの行数は11,792→11,837。
++画面のカタログ処理は既存のID重複除去を使う。Buffカタログは1,648→1,673。
++
++一覧の件数一致は、全既存装備の数値・説明を再取得した保証ではない。
++今回の範囲は新着IDと判明した不足IDの補完。
++既存IDの性能変更・削除を全ページ走査して反映する処理ではない。
++
++## 新規Buffの扱い
++
++25件は公式原文を表示・検索できるよう収録し、
++`reviewStatus: unverified / reviewComplete: false` とした。
++数値が明記されている箇所も含め、今回は新規Buffの数値計算へは追加しない。
++効果量、条件、併用関係の確認が必要。
++倍率や回復量がない説明に推定値を入れていない。
++装備本体の追加ステータスは通常どおり計算する。
++既存Buffを持つ新装備には、これまでの確定済みルールが適用される。
++
++監査の `remaining=0` は新規Buffの計算実装完了を意味しない。
++今回追加分は `unverifiedReview.pending=25` として残る。
++従来の最終未検証7件も維持する。
++
++## 取得経路・更新ツール
++
++公式の [武器一覧](https://idb.moepic.com/items/weapons?sortby=0&order=1)、
++[防具一覧](https://idb.moepic.com/items/defences?sortby=0&order=1)、
++[盾一覧](https://idb.moepic.com/items/shields?sortby=0&order=1) の
++公開HTML内 `data-page` JSONを使用する。ログインやプロキシWorkerは不要。
++
++`tools/update-equipment-catalog-from-official.mjs` は新しいIDを降順に取得し、
++既存最大IDに達したところで止まる。ページ番号、降順、総件数、追加ステータス、
++Buff参照の欠落を検査する。古いIDの不足は `--include` で明示して取得できる。
++主武器スキルと `need_skills` の追加条件を合成して複数要件を保持する。
++従来のGoogleシート生成ツールの数値マッピングを共用している。
++
++Node.js 18以上。更新結果はまず別ディレクトリへ出す。
++
++```powershell
++node .\tools\update-equipment-catalog-from-official.mjs --out=dist/official-update --cache-dir=dist/official-source --include=defences:23393,defences:23384
++```
++
++出力の `official-update-report.json` で追加装備、新規Buff、既存Buff説明の差分を確認する。
++ツールはmanualのBuff計算ルールを自動作成しない。
++新規Buffを追加するときは、原文表示と未検証状態も併せて登録して監査する。
++既存IDの不足は自動検出しないため、公式件数と一意ID数の照合が必要。
++
++`--offline` は保存したページJSONから再生成する。
++同じ45件を再現する場合は、基準コミットのカタログ2ファイルを用意して
++`--base=そのディレクトリ` を指定する。
++更新後のカタログを基準にした場合、収録済みIDは再追加しない。
++
++追加45件と25Buffの一覧・公式原文・取得範囲は
++`docs/official-catalog-update-20260921.json` に保存した。
++
++## 確認範囲
++
++- 実カタログを読み込む回帰テストとBuff監査。
++- 45件の追加・既存行の非変更・既存Buff定義の維持。
++- 新規Buff原文の表示・検索、未検証フラグ、計算値を追加していないこと。
++- 複数必要スキル、追加ステータスの一度だけの加算、ページ不整合時の停止。
++- カタログJSのキャッシュ更新。
++
++ブラウザ実機での表示確認はユーザー側で行う。
++次の課題は新規25Buffの効果量・条件・併用関係の調査と反映。
+diff --git a/index.html b/index.html
+index 134c33b..b7e94e8 100644
+--- a/index.html
++++ b/index.html
+@@ -65,7 +65,7 @@ MoE固有の主な仮定:
+ </head>
+ <body>
+ <h1>Master of Epic 物理ダメージ計算webツール</h1>
+-<p id="appBuildStamp" class="small appBuildStamp">v1.24.9 / 見せびらかし集計の欠落修正・保守情報整理</p>
++<p id="appBuildStamp" class="small appBuildStamp">v1.24.10 / 公式DB装備45件を補完・Buff原文を収録</p>
+ <section class="heroCard">
+   <div>
+     <div class="heroBadge">MoE / Physical Damage Calculator</div>
+@@ -1318,14 +1318,14 @@ MoE固有の主な仮定:
+ <script src="./src/data/skillSimKnowledge.js?v=1.22.4" defer></script>
+ <script src="src/data/manual/reviewedBuffCatalog.manual.js"></script>
+ <script src="./src/ui/idbImportPreview.js?v=1.24.4" defer></script>
+-<script src="./src/domain/catalogData.js?v=1.24.4" defer></script>
++<script src="./src/domain/catalogData.js?v=1.24.10" defer></script>
+ <script src="./src/domain/catalogSearch.js?v=1.24.8" defer></script>
+ <script src="./src/domain/catalogSort.js?v=1.24.4" defer></script>
+ <script src="./src/ui/catalogRows.js?v=1.24.4" defer></script>
+ <script src="./src/ui/catalogResults.js?v=1.24.4" defer></script>
+ <script src="./src/ui/catalogTab.js?v=1.24.4" defer></script>
+-<script src="./src/data/manual/buffRules.manual.js?v=1.24.8" data-catalog-src="src/data/manual/buffRules.manual.js"></script>
+-<script src="./src/main.js?v=1.24.9" defer></script>
++<script src="./src/data/manual/buffRules.manual.js?v=1.24.10" data-catalog-src="src/data/manual/buffRules.manual.js"></script>
++<script src="./src/main.js?v=1.24.10" defer></script>
+ <script src="./src/ui/buildAnalysis.js?v=1.24.4" defer></script>
+ <script src="./src/ui/showcaseSkillPlusTotals.js?v=1.24.9" defer></script>
+ <script src="./src/ui/showcaseElementDamageTotals.js?v=1.24.9" defer></script>
+diff --git a/src/data/generated/buffCatalog.generated.js b/src/data/generated/buffCatalog.generated.js
+index 2ab6e05..5f8513f 100644
+--- a/src/data/generated/buffCatalog.generated.js
++++ b/src/data/generated/buffCatalog.generated.js
+@@ -1,10 +1,10 @@
+-// Generated by tools/build-equipment-catalog-from-google-sheet.mjs
+-// 2026-07-10T12:59:16.989Z
++// Generated by tools/update-equipment-catalog-from-official.mjs
++// Existing entries retained; incremental official new IDs only.
+ window.MOE_BUFF_CATALOG_META = {
+-  "generatedAt": "2026-07-10T12:59:16.989Z",
++  "generatedAt": "2026-09-21T14:29:36.131Z",
+   "sourceSheetUrl": "https://docs.google.com/spreadsheets/d/10nHr68XojjuxxJrpLBENrDWUB4TywMGy8CTe9lzclSE/edit",
+-  "equipmentCount": 11792,
+-  "buffCount": 1648,
++  "equipmentCount": 11837,
++  "buffCount": 1673,
+   "addStatusKeyMap": {
+     "攻撃力": "attack",
+     "魔力": "magic",
+@@ -82,79 +82,114 @@ window.MOE_BUFF_CATALOG_META = {
+   },
+   "knownIgnoredAddStatuses": [],
+   "mappedStatusCounts": {
+-    "BREATH -> extraBreath": 9,
+-    "HEARING -> extraHearing": 28,
+-    "SEEING -> extraSeeing": 165,
+-    "SMELLING -> extraSmelling": 38,
+-    "キック攻撃力補正 -> attack": 80,
+-    "キック命中率補正 -> extraHit": 137,
+-    "ピッキング回転速度補正 -> speed": 3,
+-    "ピッキング失敗回数補正 -> extraLockpickingFail": 8,
+-    "移動速度 -> speed": 829,
+-    "泳ぎ速度 -> speed": 217,
+-    "牙攻撃補正 -> extraFangAttack": 35,
+-    "牙命中率補正 -> extraHit": 72,
+-    "回避 -> extraAvoid": 3045,
+-    "攻撃ディレイ -> extraAttackDelay": 1635,
+-    "攻撃力 -> attack": 2632,
+-    "最大HP -> extraHP": 2773,
+-    "最大MP -> extraMP": 1627,
+-    "最大ST -> extraST": 1755,
+-    "最大重量 -> extraMaxWeight": 537,
+-    "栽培ゲージ速度 -> speed": 1,
+-    "裁縫グレードゾーン -> extraTailoringGradeZone": 82,
+-    "裁縫ゲージ滑り -> extraTailoringGaugeSlip": 21,
++    "命中 -> extraHit": 2142,
++    "最大HP -> extraHP": 2781,
++    "耐無属性 -> extraNeutralRes": 639,
++    "耐火属性 -> extraFireRes": 800,
++    "耐水属性 -> extraWaterRes": 844,
++    "耐風属性 -> extraWindRes": 730,
++    "耐地属性 -> extraEarthRes": 432,
++    "魔力 -> magic": 3373,
++    "防御力 -> extraAC": 482,
++    "攻撃力 -> attack": 2644,
++    "最大ST -> extraST": 1766,
++    "最大MP -> extraMP": 1638,
++    "移動速度 -> speed": 835,
++    "回避 -> extraAvoid": 3049,
++    "攻撃ディレイ -> extraAttackDelay": 1646,
++    "釣りゲージ速度 -> speed": 25,
++    "釣りヒットゾーン -> extraFishingHitZone": 41,
++    "釣りゲージ長 -> extraFishingGaugeLength": 60,
++    "鍛冶ゲージ速度 -> speed": 13,
++    "鍛冶ヒットゾーン -> extraSmithingHitZone": 36,
++    "鍛冶グレードゾーン -> extraSmithingGradeZone": 45,
++    "魔法ディレイ -> extraMagicDelay": 827,
+     "裁縫ゲージ速度 -> speed": 13,
+     "裁縫ヒットゾーン -> extraTailoringHitZone": 14,
+-    "潤喉度 -> extraThirst": 4,
+-    "醸造グレードゾーン -> extraBrewingGradeZone": 6,
+-    "醸造ゲージ滑り -> extraBrewingGaugeSlip": 13,
++    "裁縫グレードゾーン -> extraTailoringGradeZone": 82,
++    "鍛冶ゲージ滑り -> extraSmithingGaugeSlip": 8,
++    "料理ゲージ速度 -> speed": 51,
++    "料理ヒットゾーン -> extraCookingHitZone": 106,
++    "料理グレードゾーン -> extraCookingGradeZone": 54,
+     "醸造ゲージ速度 -> speed": 9,
+     "醸造ヒットゾーン -> extraBrewingHitZone": 34,
+-    "装飾細工グレードゾーン -> extraDecorationGradeZone": 30,
+-    "装飾細工ゲージ滑り -> extraDecorationGaugeSlip": 15,
++    "醸造グレードゾーン -> extraBrewingGradeZone": 6,
++    "大工ゲージ速度 -> speed": 22,
++    "大工ヒットゾーン -> extraCarpentryHitZone": 21,
++    "大工グレードゾーン -> extraCarpentryGradeZone": 59,
++    "薬調合ゲージ速度 -> speed": 23,
++    "薬調合ヒットゾーン -> extraAlchemyHitZone": 53,
++    "薬調合グレードゾーン -> extraAlchemyGradeZone": 6,
+     "装飾細工ゲージ速度 -> speed": 10,
+     "装飾細工ヒットゾーン -> extraDecorationHitZone": 11,
+-    "耐火属性 -> extraFireRes": 795,
+-    "耐水属性 -> extraWaterRes": 840,
+-    "耐地属性 -> extraEarthRes": 430,
+-    "耐風属性 -> extraWindRes": 727,
+-    "耐無属性 -> extraNeutralRes": 636,
+-    "大工グレードゾーン -> extraCarpentryGradeZone": 59,
++    "装飾細工グレードゾーン -> extraDecorationGradeZone": 30,
++    "複製ゲージ速度 -> speed": 19,
++    "複製ヒットゾーン -> extraReplicationHitZone": 29,
++    "複製グレードゾーン -> extraReplicationGradeZone": 39,
+     "大工ゲージ滑り -> extraCarpentryGaugeSlip": 17,
+-    "大工ゲージ速度 -> speed": 22,
+-    "大工ヒットゾーン -> extraCarpentryHitZone": 21,
+-    "鍛冶グレードゾーン -> extraSmithingGradeZone": 45,
+-    "鍛冶ゲージ滑り -> extraSmithingGaugeSlip": 8,
+-    "鍛冶ゲージ速度 -> speed": 13,
+-    "鍛冶ヒットゾーン -> extraSmithingHitZone": 36,
+-    "釣りゲージ速度 -> speed": 25,
+-    "釣りゲージ長 -> extraFishingGaugeLength": 60,
+-    "釣りヒットゾーン -> extraFishingHitZone": 41,
+-    "盗み補正 -> extraSteal": 84,
++    "裁縫ゲージ滑り -> extraTailoringGaugeSlip": 21,
++    "薬調合ゲージ滑り -> extraAlchemyGaugeSlip": 7,
++    "装飾細工ゲージ滑り -> extraDecorationGaugeSlip": 15,
++    "料理ゲージ滑り -> extraCookingGaugeSlip": 44,
++    "醸造ゲージ滑り -> extraBrewingGaugeSlip": 13,
++    "複製ゲージ滑り -> extraReplicationGaugeSlip": 14,
+     "美容ゲージ滑り -> extraBeautyGaugeSlip": 22,
+     "美容ゲージ速度 -> speed": 26,
+     "美容ヒットゾーン -> extraBeautyHitZone": 45,
+-    "複製グレードゾーン -> extraReplicationGradeZone": 39,
+-    "複製ゲージ滑り -> extraReplicationGaugeSlip": 14,
+-    "複製ゲージ速度 -> speed": 19,
+-    "複製ヒットゾーン -> extraReplicationHitZone": 29,
+-    "防御力 -> extraAC": 480,
+-    "魔法ディレイ -> extraMagicDelay": 815,
+-    "魔力 -> magic": 3349,
++    "SEEING -> extraSeeing": 165,
++    "SMELLING -> extraSmelling": 38,
++    "HEARING -> extraHearing": 28,
++    "最大重量 -> extraMaxWeight": 538,
++    "泳ぎ速度 -> speed": 219,
++    "キック命中率補正 -> extraHit": 137,
++    "キック攻撃力補正 -> attack": 80,
+     "満腹度 -> extraFullness": 4,
+-    "命中 -> extraHit": 2136,
+-    "薬調合グレードゾーン -> extraAlchemyGradeZone": 6,
+-    "薬調合ゲージ滑り -> extraAlchemyGaugeSlip": 7,
+-    "薬調合ゲージ速度 -> speed": 23,
+-    "薬調合ヒットゾーン -> extraAlchemyHitZone": 53,
+-    "料理グレードゾーン -> extraCookingGradeZone": 54,
+-    "料理ゲージ滑り -> extraCookingGaugeSlip": 44,
+-    "料理ゲージ速度 -> speed": 51,
+-    "料理ヒットゾーン -> extraCookingHitZone": 106
++    "潤喉度 -> extraThirst": 4,
++    "牙命中率補正 -> extraHit": 73,
++    "BREATH -> extraBreath": 9,
++    "盗み補正 -> extraSteal": 84,
++    "栽培ゲージ速度 -> speed": 1,
++    "ピッキング失敗回数補正 -> extraLockpickingFail": 8,
++    "牙攻撃補正 -> extraFangAttack": 36,
++    "ピッキング回転速度補正 -> speed": 3
+   },
+   "ignoredStatusCounts": {},
+-  "unmappedStatusCounts": {}
++  "unmappedStatusCounts": {},
++  "lastOfficialIncrementalUpdate": {
++    "generatedAt": "2026-09-21T14:29:36.131Z",
++    "scope": "new IDs above baseline maximum plus explicitly selected missing IDs; existing items retained, not fully recrawled",
++    "coverage": [
++      {
++        "category": "weapons",
++        "baselineCount": 1840,
++        "baselineUniqueCount": 1840,
++        "officialTotal": 1843,
++        "cutoffId": 23377,
++        "pages": 1,
++        "lowestFetchedId": 23376
++      },
++      {
++        "category": "defences",
++        "baselineCount": 9553,
++        "baselineUniqueCount": 9548,
++        "officialTotal": 9590,
++        "cutoffId": 23394,
++        "pages": 9,
++        "lowestFetchedId": 23388
++      },
++      {
++        "category": "shields",
++        "baselineCount": 399,
++        "baselineUniqueCount": 334,
++        "officialTotal": 334,
++        "cutoffId": 23334,
++        "pages": 1,
++        "lowestFetchedId": 23170
++      }
++    ],
++    "addedEquipment": 45,
++    "newBuffs": 25
++  }
+ };
+ window.MOE_BUFF_CATALOG_GENERATED = [
+   {
+@@ -5044,7 +5079,9 @@ window.MOE_BUFF_CATALOG_GENERATED = [
+       "20323",
+       "20324",
+       "20750",
+-      "22532"
++      "22532",
++      "23484",
++      "23384"
+     ],
+     "sourceEquipmentNames": [
+       "ファントム モノクル",
+@@ -5066,7 +5103,9 @@ window.MOE_BUFF_CATALOG_GENERATED = [
+       "桜のコンタクト",
+       "桜のコンタクト（耳装）",
+       "ハートアイ コンタクト <GMコモモ>",
+-      "ジュエリー アイパッチ"
++      "ジュエリー アイパッチ",
++      "リムレス メガネ",
++      "カラコンメガネ"
+     ],
+     "parsedStats": {},
+     "conflictGroup": "technic-2578",
+@@ -13425,12 +13464,14 @@ window.MOE_BUFF_CATALOG_GENERATED = [
+     "sourceEquipmentIds": [
+       "17291",
+       "19724",
+-      "19725"
++      "19725",
++      "23407"
+     ],
+     "sourceEquipmentNames": [
+       "ヴィジュアル系 ウィッグ",
+       "パンキッシュ パンツ",
+-      "パンキッシュ グローブ"
++      "パンキッシュ グローブ",
++      "パンキッシュ スカート"
+     ],
+     "parsedStats": {},
+     "conflictGroup": "technic-7824",
+@@ -20841,14 +20882,18 @@ window.MOE_BUFF_CATALOG_GENERATED = [
+       "19688",
+       "20769",
+       "20770",
+-      "22165"
++      "22165",
++      "23410",
++      "23409"
+     ],
+     "sourceEquipmentNames": [
+       "ふわもこ パジャマ ウェア",
+       "ふわもこ パジャマ パンツ",
+       "さめぱじゃま ふーど",
+       "さめぱじゃま うぇあ",
+-      "脱ぎかけパーカー"
++      "脱ぎかけパーカー",
++      "あびにゃん サマーナイト パンツ",
++      "あびにゃん サマーナイト ウェア"
+     ],
+     "parsedStats": {},
+     "conflictGroup": "technic-10390",
+@@ -22279,10 +22324,12 @@ window.MOE_BUFF_CATALOG_GENERATED = [
+     "source": "official-idb-sheet",
+     "sourceSheetUrl": "https://docs.google.com/spreadsheets/d/10nHr68XojjuxxJrpLBENrDWUB4TywMGy8CTe9lzclSE/edit",
+     "sourceEquipmentIds": [
+-      "20106"
++      "20106",
++      "23397"
+     ],
+     "sourceEquipmentNames": [
+-      "ラグ クロース クローク"
++      "ラグ クロース クローク",
++      "隠密のマント"
+     ],
+     "parsedStats": {},
+     "conflictGroup": "technic-10935",
+@@ -27356,13 +27403,15 @@ window.MOE_BUFF_CATALOG_GENERATED = [
+       "21845",
+       "22331",
+       "23363",
+-      "23364"
++      "23364",
++      "23491"
+     ],
+     "sourceEquipmentNames": [
+       "ゴージャス ウィッチ ハット",
+       "魔導書のネックレス",
+       "マジック ジェム ハット A",
+-      "マジック ジェム ハット B"
++      "マジック ジェム ハット B",
++      "とんがり帽子"
+     ],
+     "parsedStats": {},
+     "conflictGroup": "technic-12762",
+@@ -27450,11 +27499,13 @@ window.MOE_BUFF_CATALOG_GENERATED = [
+     "sourceSheetUrl": "https://docs.google.com/spreadsheets/d/10nHr68XojjuxxJrpLBENrDWUB4TywMGy8CTe9lzclSE/edit",
+     "sourceEquipmentIds": [
+       "22035",
+-      "22387"
++      "22387",
++      "23408"
+     ],
+     "sourceEquipmentNames": [
+       "水精の指輪",
+-      "水精の耳飾り"
++      "水精の耳飾り",
++      "ウォーター スプラッシュ シューズ"
+     ],
+     "parsedStats": {},
+     "conflictGroup": "technic-12772",
+@@ -29981,10 +30032,12 @@ window.MOE_BUFF_CATALOG_GENERATED = [
+     "source": "official-idb-sheet",
+     "sourceSheetUrl": "https://docs.google.com/spreadsheets/d/10nHr68XojjuxxJrpLBENrDWUB4TywMGy8CTe9lzclSE/edit",
+     "sourceEquipmentIds": [
+-      "22824"
++      "22824",
++      "23482"
+     ],
+     "sourceEquipmentNames": [
+-      "シャドウロード ヘッド"
++      "シャドウロード ヘッド",
++      "シャドウ ブリンカー"
+     ],
+     "parsedStats": {},
+     "conflictGroup": "technic-13685",
+@@ -30053,10 +30106,12 @@ window.MOE_BUFF_CATALOG_GENERATED = [
+     "source": "official-idb-sheet",
+     "sourceSheetUrl": "https://docs.google.com/spreadsheets/d/10nHr68XojjuxxJrpLBENrDWUB4TywMGy8CTe9lzclSE/edit",
+     "sourceEquipmentIds": [
+-      "22831"
++      "22831",
++      "23399"
+     ],
+     "sourceEquipmentNames": [
+-      "ジェリーフィッシュ イヤリング"
++      "ジェリーフィッシュ イヤリング",
++      "クラゲのベレー帽"
+     ],
+     "parsedStats": {},
+     "conflictGroup": "technic-13688",
+@@ -30144,11 +30199,13 @@ window.MOE_BUFF_CATALOG_GENERATED = [
+     "sourceSheetUrl": "https://docs.google.com/spreadsheets/d/10nHr68XojjuxxJrpLBENrDWUB4TywMGy8CTe9lzclSE/edit",
+     "sourceEquipmentIds": [
+       "22853",
+-      "22946"
++      "22946",
++      "23405"
+     ],
+     "sourceEquipmentNames": [
+       "マジカル マスコット",
+-      "マナ アンプリファイア"
++      "マナ アンプリファイア",
++      "ノアストーン アームガード"
+     ],
+     "parsedStats": {},
+     "conflictGroup": "technic-13722",
+@@ -30797,10 +30854,12 @@ window.MOE_BUFF_CATALOG_GENERATED = [
+     "source": "official-idb-sheet",
+     "sourceSheetUrl": "https://docs.google.com/spreadsheets/d/10nHr68XojjuxxJrpLBENrDWUB4TywMGy8CTe9lzclSE/edit",
+     "sourceEquipmentIds": [
+-      "23096"
++      "23096",
++      "23406"
+     ],
+     "sourceEquipmentNames": [
+-      "インフィニティ ブレスレット"
++      "インフィニティ ブレスレット",
++      "スリットスリーブ ジャケット"
+     ],
+     "parsedStats": {},
+     "conflictGroup": "technic-13997",
+@@ -33443,5 +33502,455 @@ window.MOE_BUFF_CATALOG_GENERATED = [
+     "parsedStats": {},
+     "conflictGroup": "technic-14427",
+     "verified": false
++  },
++  {
++    "catalogId": "technic-14635",
++    "id": "technic-14635",
++    "officialTechnicId": 14635,
++    "name": "神楽",
++    "info": "神秘魔法、音楽、ダンスの効果が10上昇する\n※WarAgeでは効果がない",
++    "source": "official-idb",
++    "sourceSheetUrl": "",
++    "sourceEquipmentIds": [
++      "23492"
++    ],
++    "sourceEquipmentNames": [
++      "神楽鈴"
++    ],
++    "parsedStats": {},
++    "conflictGroup": "technic-14635",
++    "verified": false
++  },
++  {
++    "catalogId": "technic-14634",
++    "id": "technic-14634",
++    "officialTechnicId": 14634,
++    "name": "あなたの後ろにいるの",
++    "info": "暗黒命令スキルの効果が15上昇して、移動速度が15%上昇する\n※WarAgeでは効果がない",
++    "source": "official-idb",
++    "sourceSheetUrl": "",
++    "sourceEquipmentIds": [
++      "23490"
++    ],
++    "sourceEquipmentNames": [
++      "背後のメリーさん"
++    ],
++    "parsedStats": {},
++    "conflictGroup": "technic-14634",
++    "verified": false
++  },
++  {
++    "catalogId": "technic-14633",
++    "id": "technic-14633",
++    "officialTechnicId": 14633,
++    "name": "森精の加護",
++    "info": "回復魔法と自然調和スキルの効果が20上昇して、HP / MP / ST の自然回復速度が大幅に上昇する\n※WarAgeでは効果がない",
++    "source": "official-idb",
++    "sourceSheetUrl": "",
++    "sourceEquipmentIds": [
++      "23489"
++    ],
++    "sourceEquipmentNames": [
++      "ドライアド クレスト ウィッグ"
++    ],
++    "parsedStats": {},
++    "conflictGroup": "technic-14633",
++    "verified": false
++  },
++  {
++    "catalogId": "technic-14632",
++    "id": "technic-14632",
++    "officialTechnicId": 14632,
++    "name": "コビトカバ フォーム",
++    "info": "コビトカバに変身できる",
++    "source": "official-idb",
++    "sourceSheetUrl": "",
++    "sourceEquipmentIds": [
++      "23487"
++    ],
++    "sourceEquipmentNames": [
++      "コビトカバのペンダント"
++    ],
++    "parsedStats": {},
++    "conflictGroup": "technic-14632",
++    "verified": false
++  },
++  {
++    "catalogId": "technic-14618",
++    "id": "technic-14618",
++    "officialTechnicId": 14618,
++    "name": "マルカジリ",
++    "info": "牙スキルの威力と命中が上昇して、与えたダメージの10％分のHPを回復する\n※WarAgeでは効果がない",
++    "source": "official-idb",
++    "sourceSheetUrl": "",
++    "sourceEquipmentIds": [
++      "23483"
++    ],
++    "sourceEquipmentNames": [
++      "口裂けマスク"
++    ],
++    "parsedStats": {},
++    "conflictGroup": "technic-14618",
++    "verified": false
++  },
++  {
++    "catalogId": "technic-14611",
++    "id": "technic-14611",
++    "officialTechnicId": 14611,
++    "name": "カーバンクルの加護",
++    "info": "火・水・風・地属性の効果を上昇させて、一定確率で敵の魔法を無効化する\n※WarAgeでは効果がない",
++    "source": "official-idb",
++    "sourceSheetUrl": "",
++    "sourceEquipmentIds": [
++      "23481"
++    ],
++    "sourceEquipmentNames": [
++      "カーバンクル ジェム"
++    ],
++    "parsedStats": {},
++    "conflictGroup": "technic-14611",
++    "verified": false
++  },
++  {
++    "catalogId": "technic-14610",
++    "id": "technic-14610",
++    "officialTechnicId": 14610,
++    "name": "スペル チャージ",
++    "info": "魔法を一時的にチャージして、魔法の威力と範囲を増加させる\n※WarAgeでは効果がない",
++    "source": "official-idb",
++    "sourceSheetUrl": "",
++    "sourceEquipmentIds": [
++      "23478"
++    ],
++    "sourceEquipmentNames": [
++      "マジック チャージ ストーン"
++    ],
++    "parsedStats": {},
++    "conflictGroup": "technic-14610",
++    "verified": false
++  },
++  {
++    "catalogId": "technic-14581",
++    "id": "technic-14581",
++    "officialTechnicId": 14581,
++    "name": "エレクトリカル チャージ",
++    "info": "自然回復量が大幅に上昇して、風属性の効果が増加する\n※WarAgeでは効果がない",
++    "source": "official-idb",
++    "sourceSheetUrl": "",
++    "sourceEquipmentIds": [
++      "23477"
++    ],
++    "sourceEquipmentNames": [
++      "プラグ テール"
++    ],
++    "parsedStats": {},
++    "conflictGroup": "technic-14581",
++    "verified": false
++  },
++  {
++    "catalogId": "technic-14580",
++    "id": "technic-14580",
++    "officialTechnicId": 14580,
++    "name": "強化アーム",
++    "info": "攻撃力依存のダメージが増加、筋力スキルの効果が20上昇して、所持可能重量が30増加する\n※WarAgeでは効果がない",
++    "source": "official-idb",
++    "sourceSheetUrl": "",
++    "sourceEquipmentIds": [
++      "23476"
++    ],
++    "sourceEquipmentNames": [
++      "メカニカル ラウンデッド アーム"
++    ],
++    "parsedStats": {},
++    "conflictGroup": "technic-14580",
++    "verified": false
++  },
++  {
++    "catalogId": "technic-14578",
++    "id": "technic-14578",
++    "officialTechnicId": 14578,
++    "name": "堅守の防壁",
++    "info": "20以下のダメージを無効化する\n※WarAgeでは効果がない",
++    "source": "official-idb",
++    "sourceSheetUrl": "",
++    "sourceEquipmentIds": [
++      "23473"
++    ],
++    "sourceEquipmentNames": [
++      "アーマード ショルダー クローク"
++    ],
++    "parsedStats": {},
++    "conflictGroup": "technic-14578",
++    "verified": false
++  },
++  {
++    "catalogId": "technic-14577",
++    "id": "technic-14577",
++    "officialTechnicId": 14577,
++    "name": "竜封力",
++    "info": "攻撃力依存の物理ダメージとドラゴン系へのダメージが増加して、HPの自然回復速度が大幅に上昇する\n※WarAgeでは効果がない",
++    "source": "official-idb",
++    "sourceSheetUrl": "",
++    "sourceEquipmentIds": [
++      "23472"
++    ],
++    "sourceEquipmentNames": [
++      "竜封じのチョーカー"
++    ],
++    "parsedStats": {},
++    "conflictGroup": "technic-14577",
++    "verified": false
++  },
++  {
++    "catalogId": "technic-14543",
++    "id": "technic-14543",
++    "officialTechnicId": 14543,
++    "name": "カブトムシ フォーム",
++    "info": "カブトムシに変身出来る",
++    "source": "official-idb",
++    "sourceSheetUrl": "",
++    "sourceEquipmentIds": [
++      "23458"
++    ],
++    "sourceEquipmentNames": [
++      "カブトムシのペンダント"
++    ],
++    "parsedStats": {},
++    "conflictGroup": "technic-14543",
++    "verified": false
++  },
++  {
++    "catalogId": "technic-14540",
++    "id": "technic-14540",
++    "officialTechnicId": 14540,
++    "name": "バエルの瞳",
++    "info": "普段見えないものが見えるようになり、ダメージを受けた際に一定確率で「 ミニ バエル 」を召喚する\n※WarAgeでは効果がない",
++    "source": "official-idb",
++    "sourceSheetUrl": "",
++    "sourceEquipmentIds": [
++      "23447"
++    ],
++    "sourceEquipmentNames": [
++      "バエル リング"
++    ],
++    "parsedStats": {},
++    "conflictGroup": "technic-14540",
++    "verified": false
++  },
++  {
++    "catalogId": "technic-14538",
++    "id": "technic-14538",
++    "officialTechnicId": 14538,
++    "name": "闇の守護精霊",
++    "info": "魔力が3%と死の魔法の効果が20上昇して、魔法ダメージを25%軽減する\n※WarAgeでは効果がない",
++    "source": "official-idb",
++    "sourceSheetUrl": "",
++    "sourceEquipmentIds": [
++      "23446"
++    ],
++    "sourceEquipmentNames": [
++      "シャドウ スピリット"
++    ],
++    "parsedStats": {},
++    "conflictGroup": "technic-14538",
++    "verified": false
++  },
++  {
++    "catalogId": "technic-14539",
++    "id": "technic-14539",
++    "officialTechnicId": 14539,
++    "name": "ドレイン ワーム",
++    "info": "攻撃力が3%上昇、与えたダメージ10%分のHPを回復して、受けたダメージ10％分のSTを回復する\n※WarAgeでは効果がない",
++    "source": "official-idb",
++    "sourceSheetUrl": "",
++    "sourceEquipmentIds": [
++      "23445"
++    ],
++    "sourceEquipmentNames": [
++      "メカニカル ワーム テイル"
++    ],
++    "parsedStats": {},
++    "conflictGroup": "technic-14539",
++    "verified": false
++  },
++  {
++    "catalogId": "technic-14481",
++    "id": "technic-14481",
++    "officialTechnicId": 14481,
++    "name": "ちびヒーロー（ギャンブラー）フォーム",
++    "info": "ヒーロースクワッドのギャンブラーに変身できる",
++    "source": "official-idb",
++    "sourceSheetUrl": "",
++    "sourceEquipmentIds": [
++      "23419"
++    ],
++    "sourceEquipmentNames": [
++      "ちびヒーロー（ギャンブラー）のペンダント"
++    ],
++    "parsedStats": {},
++    "conflictGroup": "technic-14481",
++    "verified": false
++  },
++  {
++    "catalogId": "technic-14486",
++    "id": "technic-14486",
++    "officialTechnicId": 14486,
++    "name": "ドラゴン ジーン",
++    "info": "攻撃力と防御力が上昇して、筋力スキルの効果と所持可能重量が増加する\n竜の脊椎に残された因子と共鳴して、専用技",
++    "source": "official-idb",
++    "sourceSheetUrl": "",
++    "sourceEquipmentIds": [
++      "23416"
++    ],
++    "sourceEquipmentNames": [
++      "ドラゴニック スパイン"
++    ],
++    "parsedStats": {},
++    "conflictGroup": "technic-14486",
++    "verified": false
++  },
++  {
++    "catalogId": "technic-14485",
++    "id": "technic-14485",
++    "officialTechnicId": 14485,
++    "name": "プラネット グレイス",
++    "info": "神秘魔法の効果と地属性の効果が15上昇する\n※WarAgeでは効果ばない",
++    "source": "official-idb",
++    "sourceSheetUrl": "",
++    "sourceEquipmentIds": [
++      "23415"
++    ],
++    "sourceEquipmentNames": [
++      "セレスティアル オービット"
++    ],
++    "parsedStats": {},
++    "conflictGroup": "technic-14485",
++    "verified": false
++  },
++  {
++    "catalogId": "technic-14484",
++    "id": "technic-14484",
++    "officialTechnicId": 14484,
++    "name": "双極共鳴",
++    "info": "回復魔法と破壊魔法の効果が15上昇して、無属性魔法のダメージが20%増加する\n※WarAgeでは効果がない",
++    "source": "official-idb",
++    "sourceSheetUrl": "",
++    "sourceEquipmentIds": [
++      "23414"
++    ],
++    "sourceEquipmentNames": [
++      "双極の籠手"
++    ],
++    "parsedStats": {},
++    "conflictGroup": "technic-14484",
++    "verified": false
++  },
++  {
++    "catalogId": "technic-14483",
++    "id": "technic-14483",
++    "officialTechnicId": 14483,
++    "name": "サマーバケーション",
++    "info": "自然回復速度が上昇して、スタミナの消費と火属性のダメージを軽減する\n※WarAgeでは効果ばない",
++    "source": "official-idb",
++    "sourceSheetUrl": "",
++    "sourceEquipmentIds": [
++      "23413"
++    ],
++    "sourceEquipmentNames": [
++      "シースルー サマーウェア"
++    ],
++    "parsedStats": {},
++    "conflictGroup": "technic-14483",
++    "verified": false
++  },
++  {
++    "catalogId": "technic-14482",
++    "id": "technic-14482",
++    "officialTechnicId": 14482,
++    "name": "冥騎士の力",
++    "info": "死の魔法と暗黒命令の効果が15上昇して、BUFF点灯中に即死ダメージを受けてもギリギリで耐えることができる\n※効果発動時にBUFFが消えるが、一定時間で再点灯する\n※装備を付け替えた場合は約8秒間点灯しない\n※WarAgeでは効果がない",
++    "source": "official-idb",
++    "sourceSheetUrl": "",
++    "sourceEquipmentIds": [
++      "23412"
++    ],
++    "sourceEquipmentNames": [
++      "冥騎士の兜"
++    ],
++    "parsedStats": {},
++    "conflictGroup": "technic-14482",
++    "verified": false
++  },
++  {
++    "catalogId": "technic-14431",
++    "id": "technic-14431",
++    "officialTechnicId": 14431,
++    "name": "冥府の祝福",
++    "info": "冥府の力に祝福され、死の魔法と回復魔法の効果が15上昇する\n※WarAgeでは効果がない",
++    "source": "official-idb",
++    "sourceSheetUrl": "",
++    "sourceEquipmentIds": [
++      "23398"
++    ],
++    "sourceEquipmentNames": [
++      "ダーク ヴェール"
++    ],
++    "parsedStats": {},
++    "conflictGroup": "technic-14431",
++    "verified": false
++  },
++  {
++    "catalogId": "technic-14430",
++    "id": "technic-14430",
++    "officialTechnicId": 14430,
++    "name": "上位妖精の加護",
++    "info": "魔法の威力が増加して、魔法ダメージを25%軽減する\n※WarAgeでは効果がない",
++    "source": "official-idb",
++    "sourceSheetUrl": "",
++    "sourceEquipmentIds": [
++      "23396"
++    ],
++    "sourceEquipmentNames": [
++      "上位妖精のローブ"
++    ],
++    "parsedStats": {},
++    "conflictGroup": "technic-14430",
++    "verified": false
++  },
++  {
++    "catalogId": "technic-14429",
++    "id": "technic-14429",
++    "officialTechnicId": 14429,
++    "name": "エルフの叡智",
++    "info": "魔力が5%、最大MPが10%上昇して、専用魔法『 アルス・マグナ 』が使用可能になる\n※WarAgeでは効果がない",
++    "source": "official-idb",
++    "sourceSheetUrl": "",
++    "sourceEquipmentIds": [
++      "23395"
++    ],
++    "sourceEquipmentNames": [
++      "ハイエルフ ウィッグ"
++    ],
++    "parsedStats": {},
++    "conflictGroup": "technic-14429",
++    "verified": false
++  },
++  {
++    "catalogId": "technic-14576",
++    "id": "technic-14576",
++    "officialTechnicId": 14576,
++    "name": "斉天大聖",
++    "info": "攻撃力と回避が5%上昇して、戦闘技術の効果が増加するが、魔法の詠唱ができなくなる\n※WarAgeでは効果がない",
++    "source": "official-idb",
++    "sourceSheetUrl": "",
++    "sourceEquipmentIds": [
++      "23393"
++    ],
++    "sourceEquipmentNames": [
++      "緊箍児"
++    ],
++    "parsedStats": {},
++    "conflictGroup": "technic-14576",
++    "verified": false
+   }
+ ];
+diff --git a/src/data/generated/equipmentCatalog.generated.js b/src/data/generated/equipmentCatalog.generated.js
+index f22c0c8..3ce3f25 100644
+--- a/src/data/generated/equipmentCatalog.generated.js
++++ b/src/data/generated/equipmentCatalog.generated.js
+@@ -1,10 +1,10 @@
+-// Generated by tools/build-equipment-catalog-from-google-sheet.mjs
+-// 2026-07-10T12:59:16.989Z
++// Generated by tools/update-equipment-catalog-from-official.mjs
++// Existing entries retained; incremental official new IDs only.
+ window.MOE_EQUIPMENT_CATALOG_META = {
+-  "generatedAt": "2026-07-10T12:59:16.989Z",
++  "generatedAt": "2026-09-21T14:29:36.131Z",
+   "sourceSheetUrl": "https://docs.google.com/spreadsheets/d/10nHr68XojjuxxJrpLBENrDWUB4TywMGy8CTe9lzclSE/edit",
+-  "equipmentCount": 11792,
+-  "buffCount": 1648,
++  "equipmentCount": 11837,
++  "buffCount": 1673,
+   "addStatusKeyMap": {
+     "攻撃力": "attack",
+     "魔力": "magic",
+@@ -82,79 +82,114 @@ window.MOE_EQUIPMENT_CATALOG_META = {
+   },
+   "knownIgnoredAddStatuses": [],
+   "mappedStatusCounts": {
+-    "BREATH -> extraBreath": 9,
+-    "HEARING -> extraHearing": 28,
+-    "SEEING -> extraSeeing": 165,
+-    "SMELLING -> extraSmelling": 38,
+-    "キック攻撃力補正 -> attack": 80,
+-    "キック命中率補正 -> extraHit": 137,
+-    "ピッキング回転速度補正 -> speed": 3,
+-    "ピッキング失敗回数補正 -> extraLockpickingFail": 8,
+-    "移動速度 -> speed": 829,
+-    "泳ぎ速度 -> speed": 217,
+-    "牙攻撃補正 -> extraFangAttack": 35,
+-    "牙命中率補正 -> extraHit": 72,
+-    "回避 -> extraAvoid": 3045,
+-    "攻撃ディレイ -> extraAttackDelay": 1635,
+-    "攻撃力 -> attack": 2632,
+-    "最大HP -> extraHP": 2773,
+-    "最大MP -> extraMP": 1627,
+-    "最大ST -> extraST": 1755,
+-    "最大重量 -> extraMaxWeight": 537,
+-    "栽培ゲージ速度 -> speed": 1,
+-    "裁縫グレードゾーン -> extraTailoringGradeZone": 82,
+-    "裁縫ゲージ滑り -> extraTailoringGaugeSlip": 21,
++    "命中 -> extraHit": 2142,
++    "最大HP -> extraHP": 2781,
++    "耐無属性 -> extraNeutralRes": 639,
++    "耐火属性 -> extraFireRes": 800,
++    "耐水属性 -> extraWaterRes": 844,
++    "耐風属性 -> extraWindRes": 730,
++    "耐地属性 -> extraEarthRes": 432,
++    "魔力 -> magic": 3373,
++    "防御力 -> extraAC": 482,
++    "攻撃力 -> attack": 2644,
++    "最大ST -> extraST": 1766,
++    "最大MP -> extraMP": 1638,
++    "移動速度 -> speed": 835,
++    "回避 -> extraAvoid": 3049,
++    "攻撃ディレイ -> extraAttackDelay": 1646,
++    "釣りゲージ速度 -> speed": 25,
++    "釣りヒットゾーン -> extraFishingHitZone": 41,
++    "釣りゲージ長 -> extraFishingGaugeLength": 60,
++    "鍛冶ゲージ速度 -> speed": 13,
++    "鍛冶ヒットゾーン -> extraSmithingHitZone": 36,
++    "鍛冶グレードゾーン -> extraSmithingGradeZone": 45,
++    "魔法ディレイ -> extraMagicDelay": 827,
+     "裁縫ゲージ速度 -> speed": 13,
+     "裁縫ヒットゾーン -> extraTailoringHitZone": 14,
+-    "潤喉度 -> extraThirst": 4,
+-    "醸造グレードゾーン -> extraBrewingGradeZone": 6,
+-    "醸造ゲージ滑り -> extraBrewingGaugeSlip": 13,
++    "裁縫グレードゾーン -> extraTailoringGradeZone": 82,
++    "鍛冶ゲージ滑り -> extraSmithingGaugeSlip": 8,
++    "料理ゲージ速度 -> speed": 51,
++    "料理ヒットゾーン -> extraCookingHitZone": 106,
++    "料理グレードゾーン -> extraCookingGradeZone": 54,
+     "醸造ゲージ速度 -> speed": 9,
+     "醸造ヒットゾーン -> extraBrewingHitZone": 34,
+-    "装飾細工グレードゾーン -> extraDecorationGradeZone": 30,
+-    "装飾細工ゲージ滑り -> extraDecorationGaugeSlip": 15,
++    "醸造グレードゾーン -> extraBrewingGradeZone": 6,
++    "大工ゲージ速度 -> speed": 22,
++    "大工ヒットゾーン -> extraCarpentryHitZone": 21,
++    "大工グレードゾーン -> extraCarpentryGradeZone": 59,
++    "薬調合ゲージ速度 -> speed": 23,
++    "薬調合ヒットゾーン -> extraAlchemyHitZone": 53,
++    "薬調合グレードゾーン -> extraAlchemyGradeZone": 6,
+     "装飾細工ゲージ速度 -> speed": 10,
+     "装飾細工ヒットゾーン -> extraDecorationHitZone": 11,
+-    "耐火属性 -> extraFireRes": 795,
+-    "耐水属性 -> extraWaterRes": 840,
+-    "耐地属性 -> extraEarthRes": 430,
+-    "耐風属性 -> extraWindRes": 727,
+-    "耐無属性 -> extraNeutralRes": 636,
+-    "大工グレードゾーン -> extraCarpentryGradeZone": 59,
++    "装飾細工グレードゾーン -> extraDecorationGradeZone": 30,
++    "複製ゲージ速度 -> speed": 19,
++    "複製ヒットゾーン -> extraReplicationHitZone": 29,
++    "複製グレードゾーン -> extraReplicationGradeZone": 39,
+     "大工ゲージ滑り -> extraCarpentryGaugeSlip": 17,
+-    "大工ゲージ速度 -> speed": 22,
+-    "大工ヒットゾーン -> extraCarpentryHitZone": 21,
+-    "鍛冶グレードゾーン -> extraSmithingGradeZone": 45,
+-    "鍛冶ゲージ滑り -> extraSmithingGaugeSlip": 8,
+-    "鍛冶ゲージ速度 -> speed": 13,
+-    "鍛冶ヒットゾーン -> extraSmithingHitZone": 36,
+-    "釣りゲージ速度 -> speed": 25,
+-    "釣りゲージ長 -> extraFishingGaugeLength": 60,
+-    "釣りヒットゾーン -> extraFishingHitZone": 41,
+-    "盗み補正 -> extraSteal": 84,
++    "裁縫ゲージ滑り -> extraTailoringGaugeSlip": 21,
++    "薬調合ゲージ滑り -> extraAlchemyGaugeSlip": 7,
++    "装飾細工ゲージ滑り -> extraDecorationGaugeSlip": 15,
++    "料理ゲージ滑り -> extraCookingGaugeSlip": 44,
++    "醸造ゲージ滑り -> extraBrewingGaugeSlip": 13,
++    "複製ゲージ滑り -> extraReplicationGaugeSlip": 14,
+     "美容ゲージ滑り -> extraBeautyGaugeSlip": 22,
+     "美容ゲージ速度 -> speed": 26,
+     "美容ヒットゾーン -> extraBeautyHitZone": 45,
+-    "複製グレードゾーン -> extraReplicationGradeZone": 39,
+-    "複製ゲージ滑り -> extraReplicationGaugeSlip": 14,
+-    "複製ゲージ速度 -> speed": 19,
+-    "複製ヒットゾーン -> extraReplicationHitZone": 29,
+-    "防御力 -> extraAC": 480,
+-    "魔法ディレイ -> extraMagicDelay": 815,
+-    "魔力 -> magic": 3349,
++    "SEEING -> extraSeeing": 165,
++    "SMELLING -> extraSmelling": 38,
++    "HEARING -> extraHearing": 28,
++    "最大重量 -> extraMaxWeight": 538,
++    "泳ぎ速度 -> speed": 219,
++    "キック命中率補正 -> extraHit": 137,
++    "キック攻撃力補正 -> attack": 80,
+     "満腹度 -> extraFullness": 4,
+-    "命中 -> extraHit": 2136,
+-    "薬調合グレードゾーン -> extraAlchemyGradeZone": 6,
+-    "薬調合ゲージ滑り -> extraAlchemyGaugeSlip": 7,
+-    "薬調合ゲージ速度 -> speed": 23,
+-    "薬調合ヒットゾーン -> extraAlchemyHitZone": 53,
+-    "料理グレードゾーン -> extraCookingGradeZone": 54,
+-    "料理ゲージ滑り -> extraCookingGaugeSlip": 44,
+-    "料理ゲージ速度 -> speed": 51,
+-    "料理ヒットゾーン -> extraCookingHitZone": 106
++    "潤喉度 -> extraThirst": 4,
++    "牙命中率補正 -> extraHit": 73,
++    "BREATH -> extraBreath": 9,
++    "盗み補正 -> extraSteal": 84,
++    "栽培ゲージ速度 -> speed": 1,
++    "ピッキング失敗回数補正 -> extraLockpickingFail": 8,
++    "牙攻撃補正 -> extraFangAttack": 36,
++    "ピッキング回転速度補正 -> speed": 3
+   },
+   "ignoredStatusCounts": {},
+-  "unmappedStatusCounts": {}
++  "unmappedStatusCounts": {},
++  "lastOfficialIncrementalUpdate": {
++    "generatedAt": "2026-09-21T14:29:36.131Z",
++    "scope": "new IDs above baseline maximum plus explicitly selected missing IDs; existing items retained, not fully recrawled",
++    "coverage": [
++      {
++        "category": "weapons",
++        "baselineCount": 1840,
++        "baselineUniqueCount": 1840,
++        "officialTotal": 1843,
++        "cutoffId": 23377,
++        "pages": 1,
++        "lowestFetchedId": 23376
++      },
++      {
++        "category": "defences",
++        "baselineCount": 9553,
++        "baselineUniqueCount": 9548,
++        "officialTotal": 9590,
++        "cutoffId": 23394,
++        "pages": 9,
++        "lowestFetchedId": 23388
++      },
++      {
++        "category": "shields",
++        "baselineCount": 399,
++        "baselineUniqueCount": 334,
++        "officialTotal": 334,
++        "cutoffId": 23334,
++        "pages": 1,
++        "lowestFetchedId": 23170
++      }
++    ],
++    "addedEquipment": 45,
++    "newBuffs": 25
++  }
+ };
+ window.MOE_EQUIPMENT_CATALOG_GENERATED = [
+   {
+@@ -840923,5 +840958,3632 @@ window.MOE_EQUIPMENT_CATALOG_GENERATED = [
+     "fetchedAt": "2026-07-10T04:58:33.224Z",
+     "updatedAt": "2026-07-07T06:02:47.000000Z",
+     "verified": false
++  },
++  {
++    "catalogId": "official-weapon-23492",
++    "id": "official-weapon-23492",
++    "officialId": 23492,
++    "category": "weapon",
++    "categoryLabel": "武器",
++    "name": "神楽鈴",
++    "info": "巫女が神楽舞を舞う際に用いる柄のついた伝統的な鈴",
++    "slot": "武器: 右手",
++    "equip": "右手 左手",
++    "equipGender": "ALL",
++    "equipRace": "ALL",
++    "itemType": "",
++    "requiredSkill": "こんぼう",
++    "needLevel": 21,
++    "armorClass": 0,
++    "weaponDamage": 24,
++    "weaponAttackInterval": 150,
++    "weaponRange": 4,
++    "weaponType": "こんぼう",
++    "weaponHand": "1HAND",
++    "requirements": [
++      {
++        "name": "こんぼう",
++        "required": 21
++      }
++    ],
++    "weaponReq": [
++      {
++        "name": "こんぼう",
++        "required": 21
++      }
++    ],
++    "technicId": 14635,
++    "addStatuses": [
++      {
++        "statusId": "7",
++        "name": "魔力",
++        "normalizedName": "魔力",
++        "statKey": "magic",
++        "statLabel": "魔力",
++        "value": 5,
++        "mapped": true,
++        "ignored": false
++      }
++    ],
++    "addStatusText": "魔力 +5\nなし +0\nなし +0\nなし +0\nなし +0",
++    "unmappedAddStatuses": [],
++    "extraStats": {
++      "magic": 5
++    },
++    "buffRefs": [
++      "technic-14635"
++    ],
++    "equipBuff": {
++      "id": "technic-14635",
++      "name": "神楽",
++      "info": "神秘魔法、音楽、ダンスの効果が10上昇する\n※WarAgeでは効果がない"
++    },
++    "source": "official-idb",
++    "sourceUrl": "https://idb.moepic.com/items/weapons/23492",
++    "sourceSheetUrl": "",
++    "fetchedAt": "2026-09-21T09:03:50.752884Z",
++    "updatedAt": "2026-09-15T04:47:05.000000Z",
++    "verified": false
++  },
++  {
++    "catalogId": "official-weapon-23463",
++    "id": "official-weapon-23463",
++    "officialId": 23463,
++    "category": "weapon",
++    "categoryLabel": "武器",
++    "name": "メカニカル チェイン ソー",
++    "info": "ノアストーンの力で鎖の刃を高速で回転させる伐採用の武器",
++    "slot": "武器: 右手",
++    "equip": "右手",
++    "equipGender": "ALL",
++    "equipRace": "ALL",
++    "itemType": "",
++    "requiredSkill": "刀剣",
++    "needLevel": 31,
++    "armorClass": 0,
++    "weaponDamage": 13.5,
++    "weaponAttackInterval": 180,
++    "weaponRange": 4.6,
++    "weaponType": "刀剣",
++    "weaponHand": "1HAND",
++    "requirements": [
++      {
++        "name": "刀剣",
++        "required": 31
++      }
++    ],
++    "weaponReq": [
++      {
++        "name": "刀剣",
++        "required": 31
++      }
++    ],
++    "technicId": 0,
++    "addStatuses": [
++      {
++        "statusId": "4",
++        "name": "命中",
++        "normalizedName": "命中",
++        "statKey": "extraHit",
++        "statLabel": "命中",
++        "value": 5,
++        "mapped": true,
++        "ignored": false
++      }
++    ],
++    "addStatusText": "命中 +5\nなし +0\nなし +0\nなし +0\nなし +0",
++    "unmappedAddStatuses": [],
++    "extraStats": {
++      "extraHit": 5
++    },
++    "buffRefs": [],
++    "equipBuff": null,
++    "source": "official-idb",
++    "sourceUrl": "https://idb.moepic.com/items/weapons/23463",
++    "sourceSheetUrl": "",
++    "fetchedAt": "2026-09-21T09:03:50.752884Z",
++    "updatedAt": "2026-09-15T04:47:05.000000Z",
++    "verified": false
++  },
++  {
++    "catalogId": "official-weapon-23462",
++    "id": "official-weapon-23462",
++    "officialId": 23462,
++    "category": "weapon",
++    "categoryLabel": "武器",
++    "name": "メカニカル チェイン ソード",
++    "info": "ノアストーンの力で鎖の刃を高速で回転させる武器",
++    "slot": "武器: 右手",
++    "equip": "右手",
++    "equipGender": "ALL",
++    "equipRace": "ALL",
++    "itemType": "",
++    "requiredSkill": "刀剣",
++    "needLevel": 91,
++    "armorClass": 0,
++    "weaponDamage": 69.5,
++    "weaponAttackInterval": 300,
++    "weaponRange": 4.6,
++    "weaponType": "刀剣",
++    "weaponHand": "1HAND",
++    "requirements": [
++      {
++        "name": "刀剣",
++        "required": 91
++      }
++    ],
++    "weaponReq": [
++      {
++        "name": "刀剣",
++        "required": 91
++      }
++    ],
++    "technicId": 0,
++    "addStatuses": [
++      {
++        "statusId": "4",
++        "name": "命中",
++        "normalizedName": "命中",
++        "statKey": "extraHit",
++        "statLabel": "命中",
++        "value": 5,
++        "mapped": true,
++        "ignored": false
++      }
++    ],
++    "addStatusText": "命中 +5\nなし +0\nなし +0\nなし +0\nなし +0",
++    "unmappedAddStatuses": [],
++    "extraStats": {
++      "extraHit": 5
++    },
++    "buffRefs": [],
++    "equipBuff": null,
++    "source": "official-idb",
++    "sourceUrl": "https://idb.moepic.com/items/weapons/23462",
++    "sourceSheetUrl": "",
++    "fetchedAt": "2026-09-21T09:03:50.752884Z",
++    "updatedAt": "2026-09-15T04:47:05.000000Z",
++    "verified": false
++  },
++  {
++    "catalogId": "official-defense-23491",
++    "id": "official-defense-23491",
++    "officialId": 23491,
++    "category": "defense",
++    "categoryLabel": "防具/装飾",
++    "name": "とんがり帽子",
++    "info": "魔法使いが身に着ける三角形の帽子",
++    "slot": "装飾: 頭",
++    "equip": "頭（装）",
++    "equipGender": "ALL",
++    "equipRace": "ALL",
++    "itemType": "防具",
++    "requiredSkill": "着こなし",
++    "needLevel": 1,
++    "armorClass": 0,
++    "weaponDamage": 0,
++    "weaponAttackInterval": 0,
++    "weaponRange": 0,
++    "weaponType": "",
++    "weaponHand": "",
++    "requirements": [
++      {
++        "name": "着こなし",
++        "required": 1
++      }
++    ],
++    "weaponReq": [],
++    "technicId": 12762,
++    "addStatuses": [
++      {
++        "statusId": "7",
++        "name": "魔力",
++        "normalizedName": "魔力",
++        "statKey": "magic",
++        "statLabel": "魔力",
++        "value": 4,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "16",
++        "name": "魔法ディレイ",
++        "normalizedName": "魔法ディレイ",
++        "statKey": "extraMagicDelay",
++        "statLabel": "魔法ディレイ",
++        "value": -3,
++        "mapped": true,
++        "ignored": false
++      }
++    ],
++    "addStatusText": "魔力 +4\n魔法ディレイ -3\nなし +0\nなし +0\nなし +0",
++    "unmappedAddStatuses": [],
++    "extraStats": {
++      "magic": 4,
++      "extraMagicDelay": -3
++    },
++    "buffRefs": [
++      "technic-12762"
++    ],
++    "equipBuff": {
++      "id": "technic-12762",
++      "name": "魔導の極み",
++      "info": "魔法の威力とMPの自然回復量が増加する\n※WarAgeでは効果がない"
++    },
++    "source": "official-idb",
++    "sourceUrl": "https://idb.moepic.com/items/defences/23491",
++    "sourceSheetUrl": "",
++    "fetchedAt": "2026-09-21T09:03:50.381888Z",
++    "updatedAt": "2026-09-15T04:47:02.000000Z",
++    "verified": false
++  },
++  {
++    "catalogId": "official-defense-23490",
++    "id": "official-defense-23490",
++    "officialId": 23490,
++    "category": "defense",
++    "categoryLabel": "防具/装飾",
++    "name": "背後のメリーさん",
++    "info": "背後まで近づいてきたメリーさんの人形\n振り向かずに逃げてぇぇぇえええ！！！",
++    "slot": "装飾: 背中",
++    "equip": "背中（装）",
++    "equipGender": "ALL",
++    "equipRace": "ALL",
++    "itemType": "防具",
++    "requiredSkill": "着こなし",
++    "needLevel": 1,
++    "armorClass": 0,
++    "weaponDamage": 0,
++    "weaponAttackInterval": 0,
++    "weaponRange": 0,
++    "weaponType": "",
++    "weaponHand": "",
++    "requirements": [
++      {
++        "name": "着こなし",
++        "required": 1
++      }
++    ],
++    "weaponReq": [],
++    "technicId": 14634,
++    "addStatuses": [
++      {
++        "statusId": "7",
++        "name": "魔力",
++        "normalizedName": "魔力",
++        "statKey": "magic",
++        "statLabel": "魔力",
++        "value": 3,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "17",
++        "name": "攻撃ディレイ",
++        "normalizedName": "攻撃ディレイ",
++        "statKey": "extraAttackDelay",
++        "statLabel": "攻撃ディレイ",
++        "value": -3,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "16",
++        "name": "魔法ディレイ",
++        "normalizedName": "魔法ディレイ",
++        "statKey": "extraMagicDelay",
++        "statLabel": "魔法ディレイ",
++        "value": -3,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "15",
++        "name": "移動速度",
++        "normalizedName": "移動速度",
++        "statKey": "speed",
++        "statLabel": "移動速度",
++        "value": 5,
++        "mapped": true,
++        "ignored": false
++      }
++    ],
++    "addStatusText": "魔力 +3\n攻撃ディレイ -3\n魔法ディレイ -3\n移動速度 +5\nなし +0",
++    "unmappedAddStatuses": [],
++    "extraStats": {
++      "magic": 3,
++      "extraAttackDelay": -3,
++      "extraMagicDelay": -3,
++      "speed": 5
++    },
++    "buffRefs": [
++      "technic-14634"
++    ],
++    "equipBuff": {
++      "id": "technic-14634",
++      "name": "あなたの後ろにいるの",
++      "info": "暗黒命令スキルの効果が15上昇して、移動速度が15%上昇する\n※WarAgeでは効果がない"
++    },
++    "source": "official-idb",
++    "sourceUrl": "https://idb.moepic.com/items/defences/23490",
++    "sourceSheetUrl": "",
++    "fetchedAt": "2026-09-21T09:03:50.381888Z",
++    "updatedAt": "2026-09-15T04:47:02.000000Z",
++    "verified": false
++  },
++  {
++    "catalogId": "official-defense-23489",
++    "id": "official-defense-23489",
++    "officialId": 23489,
++    "category": "defense",
++    "categoryLabel": "防具/装飾",
++    "name": "ドライアド クレスト ウィッグ",
++    "info": "森に息づく精霊をイメージして作られたウィッグ\n※髪色が反映されます",
++    "slot": "防具: 頭",
++    "equip": "頭（防）",
++    "equipGender": "ALL",
++    "equipRace": "ALL",
++    "itemType": "防具",
++    "requiredSkill": "着こなし",
++    "needLevel": 31,
++    "armorClass": 6,
++    "weaponDamage": 0,
++    "weaponAttackInterval": 0,
++    "weaponRange": 0,
++    "weaponType": "",
++    "weaponHand": "",
++    "requirements": [
++      {
++        "name": "着こなし",
++        "required": 31
++      }
++    ],
++    "weaponReq": [],
++    "technicId": 14633,
++    "addStatuses": [
++      {
++        "statusId": "7",
++        "name": "魔力",
++        "normalizedName": "魔力",
++        "statKey": "magic",
++        "statLabel": "魔力",
++        "value": 5,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "1",
++        "name": "最大HP",
++        "normalizedName": "最大HP",
++        "statKey": "extraHP",
++        "statLabel": "HP",
++        "value": 15,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "22",
++        "name": "最大ST",
++        "normalizedName": "最大ST",
++        "statKey": "extraST",
++        "statLabel": "ST",
++        "value": 15,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "2",
++        "name": "最大MP",
++        "normalizedName": "最大MP",
++        "statKey": "extraMP",
++        "statLabel": "MP",
++        "value": 15,
++        "mapped": true,
++        "ignored": false
++      }
++    ],
++    "addStatusText": "魔力 +5\n最大HP +15\n最大ST +15\n最大MP +15\nなし +0",
++    "unmappedAddStatuses": [],
++    "extraStats": {
++      "magic": 5,
++      "extraHP": 15,
++      "extraST": 15,
++      "extraMP": 15
++    },
++    "buffRefs": [
++      "technic-14633"
++    ],
++    "equipBuff": {
++      "id": "technic-14633",
++      "name": "森精の加護",
++      "info": "回復魔法と自然調和スキルの効果が20上昇して、HP / MP / ST の自然回復速度が大幅に上昇する\n※WarAgeでは効果がない"
++    },
++    "source": "official-idb",
++    "sourceUrl": "https://idb.moepic.com/items/defences/23489",
++    "sourceSheetUrl": "",
++    "fetchedAt": "2026-09-21T09:03:50.381888Z",
++    "updatedAt": "2026-09-15T04:47:02.000000Z",
++    "verified": false
++  },
++  {
++    "catalogId": "official-defense-23487",
++    "id": "official-defense-23487",
++    "officialId": 23487,
++    "category": "defense",
++    "categoryLabel": "防具/装飾",
++    "name": "コビトカバのペンダント",
++    "info": "コビトカバに変身できるペンダント",
++    "slot": "装飾: 胸",
++    "equip": "胸（装）",
++    "equipGender": "ALL",
++    "equipRace": "ALL",
++    "itemType": "防具",
++    "requiredSkill": "着こなし",
++    "needLevel": 1,
++    "armorClass": 0,
++    "weaponDamage": 0,
++    "weaponAttackInterval": 0,
++    "weaponRange": 0,
++    "weaponType": "",
++    "weaponHand": "",
++    "requirements": [
++      {
++        "name": "着こなし",
++        "required": 1
++      }
++    ],
++    "weaponReq": [],
++    "technicId": 14632,
++    "addStatuses": [],
++    "addStatusText": "なし +0\nなし +0\nなし +0\nなし +0\nなし +0",
++    "unmappedAddStatuses": [],
++    "extraStats": {},
++    "buffRefs": [
++      "technic-14632"
++    ],
++    "equipBuff": {
++      "id": "technic-14632",
++      "name": "コビトカバ フォーム",
++      "info": "コビトカバに変身できる"
++    },
++    "source": "official-idb",
++    "sourceUrl": "https://idb.moepic.com/items/defences/23487",
++    "sourceSheetUrl": "",
++    "fetchedAt": "2026-09-21T09:03:50.381888Z",
++    "updatedAt": "2026-09-15T04:47:02.000000Z",
++    "verified": false
++  },
++  {
++    "catalogId": "official-defense-23484",
++    "id": "official-defense-23484",
++    "officialId": 23484,
++    "category": "defense",
++    "categoryLabel": "防具/装飾",
++    "name": "リムレス メガネ",
++    "info": "レンズ部分のリムなしで直接智をレンズに固定した眼鏡",
++    "slot": "装飾: 顔",
++    "equip": "顔（装）",
++    "equipGender": "ALL",
++    "equipRace": "ALL",
++    "itemType": "防具",
++    "requiredSkill": "着こなし",
++    "needLevel": 1,
++    "armorClass": 0,
++    "weaponDamage": 0,
++    "weaponAttackInterval": 0,
++    "weaponRange": 0,
++    "weaponType": "",
++    "weaponHand": "",
++    "requirements": [
++      {
++        "name": "着こなし",
++        "required": 1
++      }
++    ],
++    "weaponReq": [],
++    "technicId": 2578,
++    "addStatuses": [
++      {
++        "statusId": "7",
++        "name": "魔力",
++        "normalizedName": "魔力",
++        "statKey": "magic",
++        "statLabel": "魔力",
++        "value": 3,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "2",
++        "name": "最大MP",
++        "normalizedName": "最大MP",
++        "statKey": "extraMP",
++        "statLabel": "MP",
++        "value": 5,
++        "mapped": true,
++        "ignored": false
++      }
++    ],
++    "addStatusText": "魔力 +3\n最大MP +5\nなし +0\nなし +0\nなし +0",
++    "unmappedAddStatuses": [],
++    "extraStats": {
++      "magic": 3,
++      "extraMP": 5
++    },
++    "buffRefs": [
++      "technic-2578"
++    ],
++    "equipBuff": {
++      "id": "technic-2578",
++      "name": "サーチアイ",
++      "info": "魔法が届く範囲が広がり、見えないものが見えてくる\n※WarAgeでは効果が無い"
++    },
++    "source": "official-idb",
++    "sourceUrl": "https://idb.moepic.com/items/defences/23484",
++    "sourceSheetUrl": "",
++    "fetchedAt": "2026-09-21T09:03:50.381888Z",
++    "updatedAt": "2026-09-15T04:47:02.000000Z",
++    "verified": false
++  },
++  {
++    "catalogId": "official-defense-23483",
++    "id": "official-defense-23483",
++    "officialId": 23483,
++    "category": "defense",
++    "categoryLabel": "防具/装飾",
++    "name": "口裂けマスク",
++    "info": "左右に大きく裂けた口",
++    "slot": "装飾: 顔",
++    "equip": "顔（装）",
++    "equipGender": "ALL",
++    "equipRace": "ALL",
++    "itemType": "防具",
++    "requiredSkill": "着こなし",
++    "needLevel": 1,
++    "armorClass": 0,
++    "weaponDamage": 0,
++    "weaponAttackInterval": 0,
++    "weaponRange": 0,
++    "weaponType": "",
++    "weaponHand": "",
++    "requirements": [
++      {
++        "name": "着こなし",
++        "required": 1
++      }
++    ],
++    "weaponReq": [],
++    "technicId": 14618,
++    "addStatuses": [
++      {
++        "statusId": "3",
++        "name": "攻撃力",
++        "normalizedName": "攻撃力",
++        "statKey": "attack",
++        "statLabel": "攻撃力",
++        "value": 3,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "17",
++        "name": "攻撃ディレイ",
++        "normalizedName": "攻撃ディレイ",
++        "statKey": "extraAttackDelay",
++        "statLabel": "攻撃ディレイ",
++        "value": -3,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "15",
++        "name": "移動速度",
++        "normalizedName": "移動速度",
++        "statKey": "speed",
++        "statLabel": "移動速度",
++        "value": 3,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "98",
++        "name": "牙攻撃補正",
++        "normalizedName": "牙攻撃補正",
++        "statKey": "extraFangAttack",
++        "statLabel": "牙攻撃補正",
++        "value": 5,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "91",
++        "name": "牙命中率補正",
++        "normalizedName": "牙命中率補正",
++        "statKey": "extraHit",
++        "statLabel": "命中",
++        "value": 5,
++        "mapped": true,
++        "ignored": false
++      }
++    ],
++    "addStatusText": "攻撃力 +3\n攻撃ディレイ -3\n移動速度 +3\n牙攻撃補正 +5\n牙命中率補正 +5",
++    "unmappedAddStatuses": [],
++    "extraStats": {
++      "attack": 3,
++      "extraAttackDelay": -3,
++      "speed": 3,
++      "extraFangAttack": 5,
++      "extraHit": 5
++    },
++    "buffRefs": [
++      "technic-14618"
++    ],
++    "equipBuff": {
++      "id": "technic-14618",
++      "name": "マルカジリ",
++      "info": "牙スキルの威力と命中が上昇して、与えたダメージの10％分のHPを回復する\n※WarAgeでは効果がない"
++    },
++    "source": "official-idb",
++    "sourceUrl": "https://idb.moepic.com/items/defences/23483",
++    "sourceSheetUrl": "",
++    "fetchedAt": "2026-09-21T09:03:58.995043Z",
++    "updatedAt": "2026-09-15T04:47:02.000000Z",
++    "verified": false
++  },
++  {
++    "catalogId": "official-defense-23482",
++    "id": "official-defense-23482",
++    "officialId": 23482,
++    "category": "defense",
++    "categoryLabel": "防具/装飾",
++    "name": "シャドウ ブリンカー",
++    "info": "闇を統べる者のために作られた眼冠\nその瞳を闇で覆い、秘められた力を引き出す",
++    "slot": "装飾: 顔",
++    "equip": "顔（装）",
++    "equipGender": "ALL",
++    "equipRace": "ALL",
++    "itemType": "防具",
++    "requiredSkill": "着こなし",
++    "needLevel": 1,
++    "armorClass": 0,
++    "weaponDamage": 0,
++    "weaponAttackInterval": 0,
++    "weaponRange": 0,
++    "weaponType": "",
++    "weaponHand": "",
++    "requirements": [
++      {
++        "name": "着こなし",
++        "required": 1
++      }
++    ],
++    "weaponReq": [],
++    "technicId": 13685,
++    "addStatuses": [
++      {
++        "statusId": "7",
++        "name": "魔力",
++        "normalizedName": "魔力",
++        "statKey": "magic",
++        "statLabel": "魔力",
++        "value": 4,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "8",
++        "name": "耐無属性",
++        "normalizedName": "耐無属性",
++        "statKey": "extraNeutralRes",
++        "statLabel": "耐無属性",
++        "value": 20,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "16",
++        "name": "魔法ディレイ",
++        "normalizedName": "魔法ディレイ",
++        "statKey": "extraMagicDelay",
++        "statLabel": "魔法ディレイ",
++        "value": -2,
++        "mapped": true,
++        "ignored": false
++      }
++    ],
++    "addStatusText": "魔力 +4\n耐無属性 +20\n魔法ディレイ -2\nなし +0\nなし +0",
++    "unmappedAddStatuses": [],
++    "extraStats": {
++      "magic": 4,
++      "extraNeutralRes": 20,
++      "extraMagicDelay": -2
++    },
++    "buffRefs": [
++      "technic-13685"
++    ],
++    "equipBuff": {
++      "id": "technic-13685",
++      "name": "闇の王",
++      "info": "死の魔法と暗黒命令の効果が15上昇し、HPとMPの自然回復速度が上昇する\n※WarAgeでは効果がない"
++    },
++    "source": "official-idb",
++    "sourceUrl": "https://idb.moepic.com/items/defences/23482",
++    "sourceSheetUrl": "",
++    "fetchedAt": "2026-09-21T09:03:58.995043Z",
++    "updatedAt": "2026-09-15T04:47:02.000000Z",
++    "verified": false
++  },
++  {
++    "catalogId": "official-defense-23481",
++    "id": "official-defense-23481",
++    "officialId": 23481,
++    "category": "defense",
++    "categoryLabel": "防具/装飾",
++    "name": "カーバンクル ジェム",
++    "info": "幻獣カーバンクルを象徴する額の魔石",
++    "slot": "装飾: 顔",
++    "equip": "顔（装）",
++    "equipGender": "ALL",
++    "equipRace": "ALL",
++    "itemType": "防具",
++    "requiredSkill": "着こなし",
++    "needLevel": 1,
++    "armorClass": 0,
++    "weaponDamage": 0,
++    "weaponAttackInterval": 0,
++    "weaponRange": 0,
++    "weaponType": "",
++    "weaponHand": "",
++    "requirements": [
++      {
++        "name": "着こなし",
++        "required": 1
++      }
++    ],
++    "weaponReq": [],
++    "technicId": 14611,
++    "addStatuses": [
++      {
++        "statusId": "7",
++        "name": "魔力",
++        "normalizedName": "魔力",
++        "statKey": "magic",
++        "statLabel": "魔力",
++        "value": 5,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "2",
++        "name": "最大MP",
++        "normalizedName": "最大MP",
++        "statKey": "extraMP",
++        "statLabel": "MP",
++        "value": 20,
++        "mapped": true,
++        "ignored": false
++      }
++    ],
++    "addStatusText": "魔力 +5\n最大MP +20\nなし +0\nなし +0\nなし +0",
++    "unmappedAddStatuses": [],
++    "extraStats": {
++      "magic": 5,
++      "extraMP": 20
++    },
++    "buffRefs": [
++      "technic-14611"
++    ],
++    "equipBuff": {
++      "id": "technic-14611",
++      "name": "カーバンクルの加護",
++      "info": "火・水・風・地属性の効果を上昇させて、一定確率で敵の魔法を無効化する\n※WarAgeでは効果がない"
++    },
++    "source": "official-idb",
++    "sourceUrl": "https://idb.moepic.com/items/defences/23481",
++    "sourceSheetUrl": "",
++    "fetchedAt": "2026-09-21T09:03:58.995043Z",
++    "updatedAt": "2026-09-15T04:47:02.000000Z",
++    "verified": false
++  },
++  {
++    "catalogId": "official-defense-23478",
++    "id": "official-defense-23478",
++    "officialId": 23478,
++    "category": "defense",
++    "categoryLabel": "防具/装飾",
++    "name": "マジック チャージ ストーン",
++    "info": "魔法を一時的にチャージして魔法の効果を高める特殊な魔石",
++    "slot": "装飾: 腰",
++    "equip": "腰（装）",
++    "equipGender": "ALL",
++    "equipRace": "ALL",
++    "itemType": "防具",
++    "requiredSkill": "着こなし",
++    "needLevel": 1,
++    "armorClass": 0,
++    "weaponDamage": 0,
++    "weaponAttackInterval": 0,
++    "weaponRange": 0,
++    "weaponType": "",
++    "weaponHand": "",
++    "requirements": [
++      {
++        "name": "着こなし",
++        "required": 1
++      }
++    ],
++    "weaponReq": [],
++    "technicId": 14610,
++    "addStatuses": [
++      {
++        "statusId": "7",
++        "name": "魔力",
++        "normalizedName": "魔力",
++        "statKey": "magic",
++        "statLabel": "魔力",
++        "value": 4,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "2",
++        "name": "最大MP",
++        "normalizedName": "最大MP",
++        "statKey": "extraMP",
++        "statLabel": "MP",
++        "value": 5,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "16",
++        "name": "魔法ディレイ",
++        "normalizedName": "魔法ディレイ",
++        "statKey": "extraMagicDelay",
++        "statLabel": "魔法ディレイ",
++        "value": -2,
++        "mapped": true,
++        "ignored": false
++      }
++    ],
++    "addStatusText": "魔力 +4\n最大MP +5\n魔法ディレイ -2\nなし +0\nなし +0",
++    "unmappedAddStatuses": [],
++    "extraStats": {
++      "magic": 4,
++      "extraMP": 5,
++      "extraMagicDelay": -2
++    },
++    "buffRefs": [
++      "technic-14610"
++    ],
++    "equipBuff": {
++      "id": "technic-14610",
++      "name": "スペル チャージ",
++      "info": "魔法を一時的にチャージして、魔法の威力と範囲を増加させる\n※WarAgeでは効果がない"
++    },
++    "source": "official-idb",
++    "sourceUrl": "https://idb.moepic.com/items/defences/23478",
++    "sourceSheetUrl": "",
++    "fetchedAt": "2026-09-21T09:03:58.995043Z",
++    "updatedAt": "2026-09-15T04:47:02.000000Z",
++    "verified": false
++  },
++  {
++    "catalogId": "official-defense-23477",
++    "id": "official-defense-23477",
++    "officialId": 23477,
++    "category": "defense",
++    "categoryLabel": "防具/装飾",
++    "name": "プラグ テール",
++    "info": "尾の先端に電源プラグが付いた可愛らしい尻尾",
++    "slot": "装飾: 腰",
++    "equip": "腰（装）",
++    "equipGender": "ALL",
++    "equipRace": "ALL",
++    "itemType": "防具",
++    "requiredSkill": "着こなし",
++    "needLevel": 1,
++    "armorClass": 0,
++    "weaponDamage": 0,
++    "weaponAttackInterval": 0,
++    "weaponRange": 0,
++    "weaponType": "",
++    "weaponHand": "",
++    "requirements": [
++      {
++        "name": "着こなし",
++        "required": 1
++      }
++    ],
++    "weaponReq": [],
++    "technicId": 14581,
++    "addStatuses": [
++      {
++        "statusId": "7",
++        "name": "魔力",
++        "normalizedName": "魔力",
++        "statKey": "magic",
++        "statLabel": "魔力",
++        "value": 4,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "17",
++        "name": "攻撃ディレイ",
++        "normalizedName": "攻撃ディレイ",
++        "statKey": "extraAttackDelay",
++        "statLabel": "攻撃ディレイ",
++        "value": -2,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "16",
++        "name": "魔法ディレイ",
++        "normalizedName": "魔法ディレイ",
++        "statKey": "extraMagicDelay",
++        "statLabel": "魔法ディレイ",
++        "value": -2,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "11",
++        "name": "耐風属性",
++        "normalizedName": "耐風属性",
++        "statKey": "extraWindRes",
++        "statLabel": "耐風属性",
++        "value": 10,
++        "mapped": true,
++        "ignored": false
++      }
++    ],
++    "addStatusText": "魔力 +4\n攻撃ディレイ -2\n魔法ディレイ -2\n耐風属性 +10\nなし +0",
++    "unmappedAddStatuses": [],
++    "extraStats": {
++      "magic": 4,
++      "extraAttackDelay": -2,
++      "extraMagicDelay": -2,
++      "extraWindRes": 10
++    },
++    "buffRefs": [
++      "technic-14581"
++    ],
++    "equipBuff": {
++      "id": "technic-14581",
++      "name": "エレクトリカル チャージ",
++      "info": "自然回復量が大幅に上昇して、風属性の効果が増加する\n※WarAgeでは効果がない"
++    },
++    "source": "official-idb",
++    "sourceUrl": "https://idb.moepic.com/items/defences/23477",
++    "sourceSheetUrl": "",
++    "fetchedAt": "2026-09-21T09:03:58.995043Z",
++    "updatedAt": "2026-09-15T04:47:02.000000Z",
++    "verified": false
++  },
++  {
++    "catalogId": "official-defense-23476",
++    "id": "official-defense-23476",
++    "officialId": 23476,
++    "category": "defense",
++    "categoryLabel": "防具/装飾",
++    "name": "メカニカル ラウンデッド アーム",
++    "info": "丸みを帯びた機械の腕",
++    "slot": "防具: 手",
++    "equip": "手（防）",
++    "equipGender": "ALL",
++    "equipRace": "ALL",
++    "itemType": "防具",
++    "requiredSkill": "着こなし",
++    "needLevel": 41,
++    "armorClass": 8.28,
++    "weaponDamage": 0,
++    "weaponAttackInterval": 0,
++    "weaponRange": 0,
++    "weaponType": "",
++    "weaponHand": "",
++    "requirements": [
++      {
++        "name": "着こなし",
++        "required": 41
++      }
++    ],
++    "weaponReq": [],
++    "technicId": 14580,
++    "addStatuses": [
++      {
++        "statusId": "3",
++        "name": "攻撃力",
++        "normalizedName": "攻撃力",
++        "statKey": "attack",
++        "statLabel": "攻撃力",
++        "value": 5,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "1",
++        "name": "最大HP",
++        "normalizedName": "最大HP",
++        "statKey": "extraHP",
++        "statLabel": "HP",
++        "value": 10,
++        "mapped": true,
++        "ignored": false
++      }
++    ],
++    "addStatusText": "攻撃力 +5\n最大HP +10\nなし +0\nなし +0\nなし +0",
++    "unmappedAddStatuses": [],
++    "extraStats": {
++      "attack": 5,
++      "extraHP": 10
++    },
++    "buffRefs": [
++      "technic-14580"
++    ],
++    "equipBuff": {
++      "id": "technic-14580",
++      "name": "強化アーム",
++      "info": "攻撃力依存のダメージが増加、筋力スキルの効果が20上昇して、所持可能重量が30増加する\n※WarAgeでは効果がない"
++    },
++    "source": "official-idb",
++    "sourceUrl": "https://idb.moepic.com/items/defences/23476",
++    "sourceSheetUrl": "",
++    "fetchedAt": "2026-09-21T09:04:06.858564Z",
++    "updatedAt": "2026-09-15T04:47:02.000000Z",
++    "verified": false
++  },
++  {
++    "catalogId": "official-defense-23475",
++    "id": "official-defense-23475",
++    "officialId": 23475,
++    "category": "defense",
++    "categoryLabel": "防具/装飾",
++    "name": "レザー スニーカー",
++    "info": "革製のオシャレなスニーカー",
++    "slot": "防具: 靴",
++    "equip": "靴（防）",
++    "equipGender": "ALL",
++    "equipRace": "ALL",
++    "itemType": "防具",
++    "requiredSkill": "着こなし",
++    "needLevel": 51,
++    "armorClass": 10.08,
++    "weaponDamage": 0,
++    "weaponAttackInterval": 0,
++    "weaponRange": 0,
++    "weaponType": "",
++    "weaponHand": "",
++    "requirements": [
++      {
++        "name": "着こなし",
++        "required": 51
++      }
++    ],
++    "weaponReq": [],
++    "technicId": 0,
++    "addStatuses": [
++      {
++        "statusId": "6",
++        "name": "回避",
++        "normalizedName": "回避",
++        "statKey": "extraAvoid",
++        "statLabel": "回避",
++        "value": 3,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "15",
++        "name": "移動速度",
++        "normalizedName": "移動速度",
++        "statKey": "speed",
++        "statLabel": "移動速度",
++        "value": 3,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "22",
++        "name": "最大ST",
++        "normalizedName": "最大ST",
++        "statKey": "extraST",
++        "statLabel": "ST",
++        "value": 5,
++        "mapped": true,
++        "ignored": false
++      }
++    ],
++    "addStatusText": "回避 +3\n移動速度 +3\n最大ST +5\nなし +0\nなし +0",
++    "unmappedAddStatuses": [],
++    "extraStats": {
++      "extraAvoid": 3,
++      "speed": 3,
++      "extraST": 5
++    },
++    "buffRefs": [],
++    "equipBuff": null,
++    "source": "official-idb",
++    "sourceUrl": "https://idb.moepic.com/items/defences/23475",
++    "sourceSheetUrl": "",
++    "fetchedAt": "2026-09-21T09:04:06.858564Z",
++    "updatedAt": "2026-09-15T04:47:02.000000Z",
++    "verified": false
++  },
++  {
++    "catalogId": "official-defense-23474",
++    "id": "official-defense-23474",
++    "officialId": 23474,
++    "category": "defense",
++    "categoryLabel": "防具/装飾",
++    "name": "人体模型スーツ",
++    "info": "人体の半分を筋肉で表現したスーツ",
++    "slot": "防具: 胴",
++    "equip": "胴（防）",
++    "equipGender": "ALL",
++    "equipRace": "ALL",
++    "itemType": "防具",
++    "requiredSkill": "着こなし",
++    "needLevel": 21,
++    "armorClass": 5.52,
++    "weaponDamage": 0,
++    "weaponAttackInterval": 0,
++    "weaponRange": 0,
++    "weaponType": "",
++    "weaponHand": "",
++    "requirements": [
++      {
++        "name": "着こなし",
++        "required": 21
++      }
++    ],
++    "weaponReq": [],
++    "technicId": 0,
++    "addStatuses": [
++      {
++        "statusId": "3",
++        "name": "攻撃力",
++        "normalizedName": "攻撃力",
++        "statKey": "attack",
++        "statLabel": "攻撃力",
++        "value": 3,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "4",
++        "name": "命中",
++        "normalizedName": "命中",
++        "statKey": "extraHit",
++        "statLabel": "命中",
++        "value": 3,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "6",
++        "name": "回避",
++        "normalizedName": "回避",
++        "statKey": "extraAvoid",
++        "statLabel": "回避",
++        "value": 3,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "7",
++        "name": "魔力",
++        "normalizedName": "魔力",
++        "statKey": "magic",
++        "statLabel": "魔力",
++        "value": 3,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "15",
++        "name": "移動速度",
++        "normalizedName": "移動速度",
++        "statKey": "speed",
++        "statLabel": "移動速度",
++        "value": 5,
++        "mapped": true,
++        "ignored": false
++      }
++    ],
++    "addStatusText": "攻撃力 +3\n命中 +3\n回避 +3\n魔力 +3\n移動速度 +5",
++    "unmappedAddStatuses": [],
++    "extraStats": {
++      "attack": 3,
++      "extraHit": 3,
++      "extraAvoid": 3,
++      "magic": 3,
++      "speed": 5
++    },
++    "buffRefs": [],
++    "equipBuff": null,
++    "source": "official-idb",
++    "sourceUrl": "https://idb.moepic.com/items/defences/23474",
++    "sourceSheetUrl": "",
++    "fetchedAt": "2026-09-21T09:04:06.858564Z",
++    "updatedAt": "2026-09-15T04:47:02.000000Z",
++    "verified": false
++  },
++  {
++    "catalogId": "official-defense-23473",
++    "id": "official-defense-23473",
++    "officialId": 23473,
++    "category": "defense",
++    "categoryLabel": "防具/装飾",
++    "name": "アーマード ショルダー クローク",
++    "info": "ショルダーガードとマントが一体となった防具",
++    "slot": "防具: 肩",
++    "equip": "肩（防）",
++    "equipGender": "ALL",
++    "equipRace": "ALL",
++    "itemType": "防具",
++    "requiredSkill": "着こなし",
++    "needLevel": 51,
++    "armorClass": 7.28,
++    "weaponDamage": 0,
++    "weaponAttackInterval": 0,
++    "weaponRange": 0,
++    "weaponType": "",
++    "weaponHand": "",
++    "requirements": [
++      {
++        "name": "着こなし",
++        "required": 51
++      }
++    ],
++    "weaponReq": [],
++    "technicId": 14578,
++    "addStatuses": [
++      {
++        "statusId": "9",
++        "name": "耐火属性",
++        "normalizedName": "耐火属性",
++        "statKey": "extraFireRes",
++        "statLabel": "耐火属性",
++        "value": 15,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "10",
++        "name": "耐水属性",
++        "normalizedName": "耐水属性",
++        "statKey": "extraWaterRes",
++        "statLabel": "耐水属性",
++        "value": 15,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "11",
++        "name": "耐風属性",
++        "normalizedName": "耐風属性",
++        "statKey": "extraWindRes",
++        "statLabel": "耐風属性",
++        "value": 15,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "12",
++        "name": "耐地属性",
++        "normalizedName": "耐地属性",
++        "statKey": "extraEarthRes",
++        "statLabel": "耐地属性",
++        "value": 15,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "8",
++        "name": "耐無属性",
++        "normalizedName": "耐無属性",
++        "statKey": "extraNeutralRes",
++        "statLabel": "耐無属性",
++        "value": 15,
++        "mapped": true,
++        "ignored": false
++      }
++    ],
++    "addStatusText": "耐火属性 +15\n耐水属性 +15\n耐風属性 +15\n耐地属性 +15\n耐無属性 +15",
++    "unmappedAddStatuses": [],
++    "extraStats": {
++      "extraFireRes": 15,
++      "extraWaterRes": 15,
++      "extraWindRes": 15,
++      "extraEarthRes": 15,
++      "extraNeutralRes": 15
++    },
++    "buffRefs": [
++      "technic-14578"
++    ],
++    "equipBuff": {
++      "id": "technic-14578",
++      "name": "堅守の防壁",
++      "info": "20以下のダメージを無効化する\n※WarAgeでは効果がない"
++    },
++    "source": "official-idb",
++    "sourceUrl": "https://idb.moepic.com/items/defences/23473",
++    "sourceSheetUrl": "",
++    "fetchedAt": "2026-09-21T09:04:06.858564Z",
++    "updatedAt": "2026-09-15T04:47:02.000000Z",
++    "verified": false
++  },
++  {
++    "catalogId": "official-defense-23472",
++    "id": "official-defense-23472",
++    "officialId": 23472,
++    "category": "defense",
++    "categoryLabel": "防具/装飾",
++    "name": "竜封じのチョーカー",
++    "info": "竜の力を封じた南京錠付きのチョーカー\n封じられた竜の力を引き出して行使することがきる",
++    "slot": "防具: 肩",
++    "equip": "肩（防）",
++    "equipGender": "ALL",
++    "equipRace": "ALL",
++    "itemType": "防具",
++    "requiredSkill": "着こなし",
++    "needLevel": 21,
++    "armorClass": 2.34,
++    "weaponDamage": 0,
++    "weaponAttackInterval": 0,
++    "weaponRange": 0,
++    "weaponType": "",
++    "weaponHand": "",
++    "requirements": [
++      {
++        "name": "着こなし",
++        "required": 21
++      }
++    ],
++    "weaponReq": [],
++    "technicId": 14577,
++    "addStatuses": [
++      {
++        "statusId": "3",
++        "name": "攻撃力",
++        "normalizedName": "攻撃力",
++        "statKey": "attack",
++        "statLabel": "攻撃力",
++        "value": 4,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "5",
++        "name": "防御力",
++        "normalizedName": "防御力",
++        "statKey": "extraAC",
++        "statLabel": "AC",
++        "value": 5,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "1",
++        "name": "最大HP",
++        "normalizedName": "最大HP",
++        "statKey": "extraHP",
++        "statLabel": "HP",
++        "value": 10,
++        "mapped": true,
++        "ignored": false
++      }
++    ],
++    "addStatusText": "攻撃力 +4\n防御力 +5\n最大HP +10\nなし +0\nなし +0",
++    "unmappedAddStatuses": [],
++    "extraStats": {
++      "attack": 4,
++      "extraAC": 5,
++      "extraHP": 10
++    },
++    "buffRefs": [
++      "technic-14577"
++    ],
++    "equipBuff": {
++      "id": "technic-14577",
++      "name": "竜封力",
++      "info": "攻撃力依存の物理ダメージとドラゴン系へのダメージが増加して、HPの自然回復速度が大幅に上昇する\n※WarAgeでは効果がない"
++    },
++    "source": "official-idb",
++    "sourceUrl": "https://idb.moepic.com/items/defences/23472",
++    "sourceSheetUrl": "",
++    "fetchedAt": "2026-09-21T09:04:06.858564Z",
++    "updatedAt": "2026-09-15T04:47:02.000000Z",
++    "verified": false
++  },
++  {
++    "catalogId": "official-defense-23458",
++    "id": "official-defense-23458",
++    "officialId": 23458,
++    "category": "defense",
++    "categoryLabel": "防具/装飾",
++    "name": "カブトムシのペンダント",
++    "info": "カブトムシに変身できるペンダント",
++    "slot": "装飾: 胸",
++    "equip": "胸（装）",
++    "equipGender": "ALL",
++    "equipRace": "ALL",
++    "itemType": "防具",
++    "requiredSkill": "着こなし",
++    "needLevel": 1,
++    "armorClass": 0,
++    "weaponDamage": 0,
++    "weaponAttackInterval": 0,
++    "weaponRange": 0,
++    "weaponType": "",
++    "weaponHand": "",
++    "requirements": [
++      {
++        "name": "着こなし",
++        "required": 1
++      }
++    ],
++    "weaponReq": [],
++    "technicId": 14543,
++    "addStatuses": [],
++    "addStatusText": "なし +0\nなし +0\nなし +0\nなし +0\nなし +0",
++    "unmappedAddStatuses": [],
++    "extraStats": {},
++    "buffRefs": [
++      "technic-14543"
++    ],
++    "equipBuff": {
++      "id": "technic-14543",
++      "name": "カブトムシ フォーム",
++      "info": "カブトムシに変身出来る"
++    },
++    "source": "official-idb",
++    "sourceUrl": "https://idb.moepic.com/items/defences/23458",
++    "sourceSheetUrl": "",
++    "fetchedAt": "2026-09-21T09:04:15.260605Z",
++    "updatedAt": "2026-09-15T04:47:02.000000Z",
++    "verified": false
++  },
++  {
++    "catalogId": "official-defense-23457",
++    "id": "official-defense-23457",
++    "officialId": 23457,
++    "category": "defense",
++    "categoryLabel": "防具/装飾",
++    "name": "ボタンの目",
++    "info": "人形の様な目になれるアイテム\n装備すると騙せるかも",
++    "slot": "装飾: 耳",
++    "equip": "耳（装）",
++    "equipGender": "ALL",
++    "equipRace": "ALL",
++    "itemType": "防具",
++    "requiredSkill": "着こなし",
++    "needLevel": 1,
++    "armorClass": 0,
++    "weaponDamage": 0,
++    "weaponAttackInterval": 0,
++    "weaponRange": 0,
++    "weaponType": "",
++    "weaponHand": "",
++    "requirements": [
++      {
++        "name": "着こなし",
++        "required": 1
++      }
++    ],
++    "weaponReq": [],
++    "technicId": 0,
++    "addStatuses": [],
++    "addStatusText": "なし +0\nなし +0\nなし +0\nなし +0\nなし +0",
++    "unmappedAddStatuses": [],
++    "extraStats": {},
++    "buffRefs": [],
++    "equipBuff": null,
++    "source": "official-idb",
++    "sourceUrl": "https://idb.moepic.com/items/defences/23457",
++    "sourceSheetUrl": "",
++    "fetchedAt": "2026-09-21T09:04:15.260605Z",
++    "updatedAt": "2026-09-15T04:47:02.000000Z",
++    "verified": false
++  },
++  {
++    "catalogId": "official-defense-23448",
++    "id": "official-defense-23448",
++    "officialId": 23448,
++    "category": "defense",
++    "categoryLabel": "防具/装飾",
++    "name": "サングラス付きシャツ",
++    "info": "サングラスを胸元に挿したオシャレな夏の装い",
++    "slot": "防具: 胴",
++    "equip": "胴（防）",
++    "equipGender": "ALL",
++    "equipRace": "ALL",
++    "itemType": "防具",
++    "requiredSkill": "着こなし",
++    "needLevel": 21,
++    "armorClass": 4.14,
++    "weaponDamage": 0,
++    "weaponAttackInterval": 0,
++    "weaponRange": 0,
++    "weaponType": "",
++    "weaponHand": "",
++    "requirements": [
++      {
++        "name": "着こなし",
++        "required": 21
++      }
++    ],
++    "weaponReq": [],
++    "technicId": 0,
++    "addStatuses": [
++      {
++        "statusId": "1",
++        "name": "最大HP",
++        "normalizedName": "最大HP",
++        "statKey": "extraHP",
++        "statLabel": "HP",
++        "value": 10,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "22",
++        "name": "最大ST",
++        "normalizedName": "最大ST",
++        "statKey": "extraST",
++        "statLabel": "ST",
++        "value": 10,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "2",
++        "name": "最大MP",
++        "normalizedName": "最大MP",
++        "statKey": "extraMP",
++        "statLabel": "MP",
++        "value": 10,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "9",
++        "name": "耐火属性",
++        "normalizedName": "耐火属性",
++        "statKey": "extraFireRes",
++        "statLabel": "耐火属性",
++        "value": 10,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "17",
++        "name": "攻撃ディレイ",
++        "normalizedName": "攻撃ディレイ",
++        "statKey": "extraAttackDelay",
++        "statLabel": "攻撃ディレイ",
++        "value": -2,
++        "mapped": true,
++        "ignored": false
++      }
++    ],
++    "addStatusText": "最大HP +10\n最大ST +10\n最大MP +10\n耐火属性 +10\n攻撃ディレイ -2",
++    "unmappedAddStatuses": [],
++    "extraStats": {
++      "extraHP": 10,
++      "extraST": 10,
++      "extraMP": 10,
++      "extraFireRes": 10,
++      "extraAttackDelay": -2
++    },
++    "buffRefs": [],
++    "equipBuff": null,
++    "source": "official-idb",
++    "sourceUrl": "https://idb.moepic.com/items/defences/23448",
++    "sourceSheetUrl": "",
++    "fetchedAt": "2026-09-21T09:04:15.260605Z",
++    "updatedAt": "2026-09-15T04:47:02.000000Z",
++    "verified": false
++  },
++  {
++    "catalogId": "official-defense-23447",
++    "id": "official-defense-23447",
++    "officialId": 23447,
++    "category": "defense",
++    "categoryLabel": "防具/装飾",
++    "name": "バエル リング",
++    "info": "バエルを模った指輪",
++    "slot": "装飾: 指",
++    "equip": "指（装）",
++    "equipGender": "ALL",
++    "equipRace": "ALL",
++    "itemType": "防具",
++    "requiredSkill": "着こなし",
++    "needLevel": 1,
++    "armorClass": 0,
++    "weaponDamage": 0,
++    "weaponAttackInterval": 0,
++    "weaponRange": 0,
++    "weaponType": "",
++    "weaponHand": "",
++    "requirements": [
++      {
++        "name": "着こなし",
++        "required": 1
++      }
++    ],
++    "weaponReq": [],
++    "technicId": 14540,
++    "addStatuses": [
++      {
++        "statusId": "7",
++        "name": "魔力",
++        "normalizedName": "魔力",
++        "statKey": "magic",
++        "statLabel": "魔力",
++        "value": 3,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "4",
++        "name": "命中",
++        "normalizedName": "命中",
++        "statKey": "extraHit",
++        "statLabel": "命中",
++        "value": 3,
++        "mapped": true,
++        "ignored": false
++      }
++    ],
++    "addStatusText": "魔力 +3\n命中 +3\nなし +0\nなし +0\nなし +0",
++    "unmappedAddStatuses": [],
++    "extraStats": {
++      "magic": 3,
++      "extraHit": 3
++    },
++    "buffRefs": [
++      "technic-14540"
++    ],
++    "equipBuff": {
++      "id": "technic-14540",
++      "name": "バエルの瞳",
++      "info": "普段見えないものが見えるようになり、ダメージを受けた際に一定確率で「 ミニ バエル 」を召喚する\n※WarAgeでは効果がない"
++    },
++    "source": "official-idb",
++    "sourceUrl": "https://idb.moepic.com/items/defences/23447",
++    "sourceSheetUrl": "",
++    "fetchedAt": "2026-09-21T09:04:15.260605Z",
++    "updatedAt": "2026-09-15T04:47:02.000000Z",
++    "verified": false
++  },
++  {
++    "catalogId": "official-defense-23446",
++    "id": "official-defense-23446",
++    "officialId": 23446,
++    "category": "defense",
++    "categoryLabel": "防具/装飾",
++    "name": "シャドウ スピリット",
++    "info": "契約者を守護して力を貸してくれる闇の精霊",
++    "slot": "装飾: 背中",
++    "equip": "背中（装）",
++    "equipGender": "ALL",
++    "equipRace": "ALL",
++    "itemType": "防具",
++    "requiredSkill": "着こなし",
++    "needLevel": 1,
++    "armorClass": 0,
++    "weaponDamage": 0,
++    "weaponAttackInterval": 0,
++    "weaponRange": 0,
++    "weaponType": "",
++    "weaponHand": "",
++    "requirements": [
++      {
++        "name": "着こなし",
++        "required": 1
++      }
++    ],
++    "weaponReq": [],
++    "technicId": 14538,
++    "addStatuses": [
++      {
++        "statusId": "7",
++        "name": "魔力",
++        "normalizedName": "魔力",
++        "statKey": "magic",
++        "statLabel": "魔力",
++        "value": 5,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "2",
++        "name": "最大MP",
++        "normalizedName": "最大MP",
++        "statKey": "extraMP",
++        "statLabel": "MP",
++        "value": 20,
++        "mapped": true,
++        "ignored": false
++      }
++    ],
++    "addStatusText": "魔力 +5\n最大MP +20\nなし +0\nなし +0\nなし +0",
++    "unmappedAddStatuses": [],
++    "extraStats": {
++      "magic": 5,
++      "extraMP": 20
++    },
++    "buffRefs": [
++      "technic-14538"
++    ],
++    "equipBuff": {
++      "id": "technic-14538",
++      "name": "闇の守護精霊",
++      "info": "魔力が3%と死の魔法の効果が20上昇して、魔法ダメージを25%軽減する\n※WarAgeでは効果がない"
++    },
++    "source": "official-idb",
++    "sourceUrl": "https://idb.moepic.com/items/defences/23446",
++    "sourceSheetUrl": "",
++    "fetchedAt": "2026-09-21T09:04:15.260605Z",
++    "updatedAt": "2026-09-15T04:47:02.000000Z",
++    "verified": false
++  },
++  {
++    "catalogId": "official-defense-23445",
++    "id": "official-defense-23445",
++    "officialId": 23445,
++    "category": "defense",
++    "categoryLabel": "防具/装飾",
++    "name": "メカニカル ワーム テイル",
++    "info": "サンドワームを模した機械の尻尾\n先端の口のような器官からエネルギーを吸収する",
++    "slot": "装飾: 腰",
++    "equip": "腰（装）",
++    "equipGender": "ALL",
++    "equipRace": "ALL",
++    "itemType": "防具",
++    "requiredSkill": "着こなし",
++    "needLevel": 1,
++    "armorClass": 0,
++    "weaponDamage": 0,
++    "weaponAttackInterval": 0,
++    "weaponRange": 0,
++    "weaponType": "",
++    "weaponHand": "",
++    "requirements": [
++      {
++        "name": "着こなし",
++        "required": 1
++      }
++    ],
++    "weaponReq": [],
++    "technicId": 14539,
++    "addStatuses": [
++      {
++        "statusId": "3",
++        "name": "攻撃力",
++        "normalizedName": "攻撃力",
++        "statKey": "attack",
++        "statLabel": "攻撃力",
++        "value": 4,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "1",
++        "name": "最大HP",
++        "normalizedName": "最大HP",
++        "statKey": "extraHP",
++        "statLabel": "HP",
++        "value": 10,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "22",
++        "name": "最大ST",
++        "normalizedName": "最大ST",
++        "statKey": "extraST",
++        "statLabel": "ST",
++        "value": 10,
++        "mapped": true,
++        "ignored": false
++      }
++    ],
++    "addStatusText": "攻撃力 +4\n最大HP +10\n最大ST +10\nなし +0\nなし +0",
++    "unmappedAddStatuses": [],
++    "extraStats": {
++      "attack": 4,
++      "extraHP": 10,
++      "extraST": 10
++    },
++    "buffRefs": [
++      "technic-14539"
++    ],
++    "equipBuff": {
++      "id": "technic-14539",
++      "name": "ドレイン ワーム",
++      "info": "攻撃力が3%上昇、与えたダメージ10%分のHPを回復して、受けたダメージ10％分のSTを回復する\n※WarAgeでは効果がない"
++    },
++    "source": "official-idb",
++    "sourceUrl": "https://idb.moepic.com/items/defences/23445",
++    "sourceSheetUrl": "",
++    "fetchedAt": "2026-09-21T09:04:23.465598Z",
++    "updatedAt": "2026-09-15T04:47:02.000000Z",
++    "verified": false
++  },
++  {
++    "catalogId": "official-defense-23419",
++    "id": "official-defense-23419",
++    "officialId": 23419,
++    "category": "defense",
++    "categoryLabel": "防具/装飾",
++    "name": "ちびヒーロー（ギャンブラー）のペンダント",
++    "info": "ちびヒーロー（ギャンブラー）に変身できるペンダント",
++    "slot": "装飾: 胸",
++    "equip": "胸（装）",
++    "equipGender": "ALL",
++    "equipRace": "ALL",
++    "itemType": "防具",
++    "requiredSkill": "着こなし",
++    "needLevel": 1,
++    "armorClass": 0,
++    "weaponDamage": 0,
++    "weaponAttackInterval": 0,
++    "weaponRange": 0,
++    "weaponType": "",
++    "weaponHand": "",
++    "requirements": [
++      {
++        "name": "着こなし",
++        "required": 1
++      }
++    ],
++    "weaponReq": [],
++    "technicId": 14481,
++    "addStatuses": [],
++    "addStatusText": "なし +0\nなし +0\nなし +0\nなし +0\nなし +0",
++    "unmappedAddStatuses": [],
++    "extraStats": {},
++    "buffRefs": [
++      "technic-14481"
++    ],
++    "equipBuff": {
++      "id": "technic-14481",
++      "name": "ちびヒーロー（ギャンブラー）フォーム",
++      "info": "ヒーロースクワッドのギャンブラーに変身できる"
++    },
++    "source": "official-idb",
++    "sourceUrl": "https://idb.moepic.com/items/defences/23419",
++    "sourceSheetUrl": "",
++    "fetchedAt": "2026-09-21T09:04:23.465598Z",
++    "updatedAt": "2026-09-15T04:47:02.000000Z",
++    "verified": false
++  },
++  {
++    "catalogId": "official-defense-23417",
++    "id": "official-defense-23417",
++    "officialId": 23417,
++    "category": "defense",
++    "categoryLabel": "防具/装飾",
++    "name": "イルカのリュックサック",
++    "info": "イルカをモチーフにした可愛らしいリュックサック",
++    "slot": "装飾: 背中",
++    "equip": "背中（装）",
++    "equipGender": "ALL",
++    "equipRace": "ALL",
++    "itemType": "防具",
++    "requiredSkill": "着こなし",
++    "needLevel": 1,
++    "armorClass": 0,
++    "weaponDamage": 0,
++    "weaponAttackInterval": 0,
++    "weaponRange": 0,
++    "weaponType": "",
++    "weaponHand": "",
++    "requirements": [
++      {
++        "name": "着こなし",
++        "required": 1
++      }
++    ],
++    "weaponReq": [],
++    "technicId": 0,
++    "addStatuses": [
++      {
++        "statusId": "14",
++        "name": "最大重量",
++        "normalizedName": "最大重量",
++        "statKey": "extraMaxWeight",
++        "statLabel": "最大重量",
++        "value": 10,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "22",
++        "name": "最大ST",
++        "normalizedName": "最大ST",
++        "statKey": "extraST",
++        "statLabel": "ST",
++        "value": 10,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "70",
++        "name": "泳ぎ速度",
++        "normalizedName": "泳ぎ速度",
++        "statKey": "speed",
++        "statLabel": "移動速度",
++        "value": 5,
++        "mapped": true,
++        "ignored": false
++      }
++    ],
++    "addStatusText": "最大重量 +10\n最大ST +10\n泳ぎ速度 +5\nなし +0\nなし +0",
++    "unmappedAddStatuses": [],
++    "extraStats": {
++      "extraMaxWeight": 10,
++      "extraST": 10,
++      "speed": 5
++    },
++    "buffRefs": [],
++    "equipBuff": null,
++    "source": "official-idb",
++    "sourceUrl": "https://idb.moepic.com/items/defences/23417",
++    "sourceSheetUrl": "",
++    "fetchedAt": "2026-09-21T09:04:23.465598Z",
++    "updatedAt": "2026-09-15T04:47:02.000000Z",
++    "verified": false
++  },
++  {
++    "catalogId": "official-defense-23416",
++    "id": "official-defense-23416",
++    "officialId": 23416,
++    "category": "defense",
++    "categoryLabel": "防具/装飾",
++    "name": "ドラゴニック スパイン",
++    "info": "滅びし竜の脊椎から作られた装具",
++    "slot": "装飾: 背中",
++    "equip": "背中（装）",
++    "equipGender": "ALL",
++    "equipRace": "ALL",
++    "itemType": "防具",
++    "requiredSkill": "着こなし",
++    "needLevel": 1,
++    "armorClass": 0,
++    "weaponDamage": 0,
++    "weaponAttackInterval": 0,
++    "weaponRange": 0,
++    "weaponType": "",
++    "weaponHand": "",
++    "requirements": [
++      {
++        "name": "着こなし",
++        "required": 1
++      }
++    ],
++    "weaponReq": [],
++    "technicId": 14486,
++    "addStatuses": [
++      {
++        "statusId": "3",
++        "name": "攻撃力",
++        "normalizedName": "攻撃力",
++        "statKey": "attack",
++        "statLabel": "攻撃力",
++        "value": 5,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "5",
++        "name": "防御力",
++        "normalizedName": "防御力",
++        "statKey": "extraAC",
++        "statLabel": "AC",
++        "value": 5,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "1",
++        "name": "最大HP",
++        "normalizedName": "最大HP",
++        "statKey": "extraHP",
++        "statLabel": "HP",
++        "value": 10,
++        "mapped": true,
++        "ignored": false
++      }
++    ],
++    "addStatusText": "攻撃力 +5\n防御力 +5\n最大HP +10\nなし +0\nなし +0",
++    "unmappedAddStatuses": [],
++    "extraStats": {
++      "attack": 5,
++      "extraAC": 5,
++      "extraHP": 10
++    },
++    "buffRefs": [
++      "technic-14486"
++    ],
++    "equipBuff": {
++      "id": "technic-14486",
++      "name": "ドラゴン ジーン",
++      "info": "攻撃力と防御力が上昇して、筋力スキルの効果と所持可能重量が増加する\n竜の脊椎に残された因子と共鳴して、専用技"
++    },
++    "source": "official-idb",
++    "sourceUrl": "https://idb.moepic.com/items/defences/23416",
++    "sourceSheetUrl": "",
++    "fetchedAt": "2026-09-21T09:04:23.465598Z",
++    "updatedAt": "2026-09-15T04:47:02.000000Z",
++    "verified": false
++  },
++  {
++    "catalogId": "official-defense-23415",
++    "id": "official-defense-23415",
++    "officialId": 23415,
++    "category": "defense",
++    "categoryLabel": "防具/装飾",
++    "name": "セレスティアル オービット",
++    "info": "頭上を惑星が軌道に沿って巡る装飾品",
++    "slot": "装飾: 頭",
++    "equip": "頭（装）",
++    "equipGender": "ALL",
++    "equipRace": "ALL",
++    "itemType": "防具",
++    "requiredSkill": "着こなし",
++    "needLevel": 1,
++    "armorClass": 0,
++    "weaponDamage": 0,
++    "weaponAttackInterval": 0,
++    "weaponRange": 0,
++    "weaponType": "",
++    "weaponHand": "",
++    "requirements": [
++      {
++        "name": "着こなし",
++        "required": 1
++      }
++    ],
++    "weaponReq": [],
++    "technicId": 14485,
++    "addStatuses": [
++      {
++        "statusId": "7",
++        "name": "魔力",
++        "normalizedName": "魔力",
++        "statKey": "magic",
++        "statLabel": "魔力",
++        "value": 4,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "17",
++        "name": "攻撃ディレイ",
++        "normalizedName": "攻撃ディレイ",
++        "statKey": "extraAttackDelay",
++        "statLabel": "攻撃ディレイ",
++        "value": -4,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "16",
++        "name": "魔法ディレイ",
++        "normalizedName": "魔法ディレイ",
++        "statKey": "extraMagicDelay",
++        "statLabel": "魔法ディレイ",
++        "value": -4,
++        "mapped": true,
++        "ignored": false
++      }
++    ],
++    "addStatusText": "魔力 +4\n攻撃ディレイ -4\n魔法ディレイ -4\nなし +0\nなし +0",
++    "unmappedAddStatuses": [],
++    "extraStats": {
++      "magic": 4,
++      "extraAttackDelay": -4,
++      "extraMagicDelay": -4
++    },
++    "buffRefs": [
++      "technic-14485"
++    ],
++    "equipBuff": {
++      "id": "technic-14485",
++      "name": "プラネット グレイス",
++      "info": "神秘魔法の効果と地属性の効果が15上昇する\n※WarAgeでは効果ばない"
++    },
++    "source": "official-idb",
++    "sourceUrl": "https://idb.moepic.com/items/defences/23415",
++    "sourceSheetUrl": "",
++    "fetchedAt": "2026-09-21T09:04:23.465598Z",
++    "updatedAt": "2026-09-15T04:47:02.000000Z",
++    "verified": false
++  },
++  {
++    "catalogId": "official-defense-23414",
++    "id": "official-defense-23414",
++    "officialId": 23414,
++    "category": "defense",
++    "categoryLabel": "防具/装飾",
++    "name": "双極の籠手",
++    "info": "左右に光と闇の相反する二つの力を宿す籠手\n身に着けた者は光と闇が両方そなわり最強に見える",
++    "slot": "防具: 手",
++    "equip": "手（防）",
++    "equipGender": "ALL",
++    "equipRace": "ALL",
++    "itemType": "防具",
++    "requiredSkill": "着こなし",
++    "needLevel": 31,
++    "armorClass": 6.48,
++    "weaponDamage": 0,
++    "weaponAttackInterval": 0,
++    "weaponRange": 0,
++    "weaponType": "",
++    "weaponHand": "",
++    "requirements": [
++      {
++        "name": "着こなし",
++        "required": 31
++      }
++    ],
++    "weaponReq": [],
++    "technicId": 14484,
++    "addStatuses": [
++      {
++        "statusId": "3",
++        "name": "攻撃力",
++        "normalizedName": "攻撃力",
++        "statKey": "attack",
++        "statLabel": "攻撃力",
++        "value": 4,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "7",
++        "name": "魔力",
++        "normalizedName": "魔力",
++        "statKey": "magic",
++        "statLabel": "魔力",
++        "value": 4,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "1",
++        "name": "最大HP",
++        "normalizedName": "最大HP",
++        "statKey": "extraHP",
++        "statLabel": "HP",
++        "value": 8,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "2",
++        "name": "最大MP",
++        "normalizedName": "最大MP",
++        "statKey": "extraMP",
++        "statLabel": "MP",
++        "value": 8,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "8",
++        "name": "耐無属性",
++        "normalizedName": "耐無属性",
++        "statKey": "extraNeutralRes",
++        "statLabel": "耐無属性",
++        "value": 20,
++        "mapped": true,
++        "ignored": false
++      }
++    ],
++    "addStatusText": "攻撃力 +4\n魔力 +4\n最大HP +8\n最大MP +8\n耐無属性 +20",
++    "unmappedAddStatuses": [],
++    "extraStats": {
++      "attack": 4,
++      "magic": 4,
++      "extraHP": 8,
++      "extraMP": 8,
++      "extraNeutralRes": 20
++    },
++    "buffRefs": [
++      "technic-14484"
++    ],
++    "equipBuff": {
++      "id": "technic-14484",
++      "name": "双極共鳴",
++      "info": "回復魔法と破壊魔法の効果が15上昇して、無属性魔法のダメージが20%増加する\n※WarAgeでは効果がない"
++    },
++    "source": "official-idb",
++    "sourceUrl": "https://idb.moepic.com/items/defences/23414",
++    "sourceSheetUrl": "",
++    "fetchedAt": "2026-09-21T09:04:31.487901Z",
++    "updatedAt": "2026-09-15T04:47:02.000000Z",
++    "verified": false
++  },
++  {
++    "catalogId": "official-defense-23413",
++    "id": "official-defense-23413",
++    "officialId": 23413,
++    "category": "defense",
++    "categoryLabel": "防具/装飾",
++    "name": "シースルー サマーウェア",
++    "info": "透き通る生地が涼しげな海辺の装いをイメージしたサマーウェア",
++    "slot": "防具: 胴",
++    "equip": "胴（防）",
++    "equipGender": "ALL",
++    "equipRace": "ALL",
++    "itemType": "防具",
++    "requiredSkill": "着こなし",
++    "needLevel": 26,
++    "armorClass": 5.52,
++    "weaponDamage": 0,
++    "weaponAttackInterval": 0,
++    "weaponRange": 0,
++    "weaponType": "",
++    "weaponHand": "",
++    "requirements": [
++      {
++        "name": "着こなし",
++        "required": 26
++      }
++    ],
++    "weaponReq": [],
++    "technicId": 14483,
++    "addStatuses": [
++      {
++        "statusId": "22",
++        "name": "最大ST",
++        "normalizedName": "最大ST",
++        "statKey": "extraST",
++        "statLabel": "ST",
++        "value": 10,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "9",
++        "name": "耐火属性",
++        "normalizedName": "耐火属性",
++        "statKey": "extraFireRes",
++        "statLabel": "耐火属性",
++        "value": 20,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "17",
++        "name": "攻撃ディレイ",
++        "normalizedName": "攻撃ディレイ",
++        "statKey": "extraAttackDelay",
++        "statLabel": "攻撃ディレイ",
++        "value": -3,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "16",
++        "name": "魔法ディレイ",
++        "normalizedName": "魔法ディレイ",
++        "statKey": "extraMagicDelay",
++        "statLabel": "魔法ディレイ",
++        "value": -3,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "15",
++        "name": "移動速度",
++        "normalizedName": "移動速度",
++        "statKey": "speed",
++        "statLabel": "移動速度",
++        "value": 3,
++        "mapped": true,
++        "ignored": false
++      }
++    ],
++    "addStatusText": "最大ST +10\n耐火属性 +20\n攻撃ディレイ -3\n魔法ディレイ -3\n移動速度 +3",
++    "unmappedAddStatuses": [],
++    "extraStats": {
++      "extraST": 10,
++      "extraFireRes": 20,
++      "extraAttackDelay": -3,
++      "extraMagicDelay": -3,
++      "speed": 3
++    },
++    "buffRefs": [
++      "technic-14483"
++    ],
++    "equipBuff": {
++      "id": "technic-14483",
++      "name": "サマーバケーション",
++      "info": "自然回復速度が上昇して、スタミナの消費と火属性のダメージを軽減する\n※WarAgeでは効果ばない"
++    },
++    "source": "official-idb",
++    "sourceUrl": "https://idb.moepic.com/items/defences/23413",
++    "sourceSheetUrl": "",
++    "fetchedAt": "2026-09-21T09:04:31.487901Z",
++    "updatedAt": "2026-09-15T04:47:02.000000Z",
++    "verified": false
++  },
++  {
++    "catalogId": "official-defense-23412",
++    "id": "official-defense-23412",
++    "officialId": 23412,
++    "category": "defense",
++    "categoryLabel": "防具/装飾",
++    "name": "冥騎士の兜",
++    "info": "敵の命と魂を刈り取る姿から死神と恐れられた者の兜",
++    "slot": "防具: 頭",
++    "equip": "頭（防）",
++    "equipGender": "ALL",
++    "equipRace": "ALL",
++    "itemType": "防具",
++    "requiredSkill": "着こなし",
++    "needLevel": 41,
++    "armorClass": 9.2,
++    "weaponDamage": 0,
++    "weaponAttackInterval": 0,
++    "weaponRange": 0,
++    "weaponType": "",
++    "weaponHand": "",
++    "requirements": [
++      {
++        "name": "着こなし",
++        "required": 41
++      }
++    ],
++    "weaponReq": [],
++    "technicId": 14482,
++    "addStatuses": [
++      {
++        "statusId": "3",
++        "name": "攻撃力",
++        "normalizedName": "攻撃力",
++        "statKey": "attack",
++        "statLabel": "攻撃力",
++        "value": 3,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "7",
++        "name": "魔力",
++        "normalizedName": "魔力",
++        "statKey": "magic",
++        "statLabel": "魔力",
++        "value": 3,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "17",
++        "name": "攻撃ディレイ",
++        "normalizedName": "攻撃ディレイ",
++        "statKey": "extraAttackDelay",
++        "statLabel": "攻撃ディレイ",
++        "value": -2,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "16",
++        "name": "魔法ディレイ",
++        "normalizedName": "魔法ディレイ",
++        "statKey": "extraMagicDelay",
++        "statLabel": "魔法ディレイ",
++        "value": -2,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "2",
++        "name": "最大MP",
++        "normalizedName": "最大MP",
++        "statKey": "extraMP",
++        "statLabel": "MP",
++        "value": 10,
++        "mapped": true,
++        "ignored": false
++      }
++    ],
++    "addStatusText": "攻撃力 +3\n魔力 +3\n攻撃ディレイ -2\n魔法ディレイ -2\n最大MP +10",
++    "unmappedAddStatuses": [],
++    "extraStats": {
++      "attack": 3,
++      "magic": 3,
++      "extraAttackDelay": -2,
++      "extraMagicDelay": -2,
++      "extraMP": 10
++    },
++    "buffRefs": [
++      "technic-14482"
++    ],
++    "equipBuff": {
++      "id": "technic-14482",
++      "name": "冥騎士の力",
++      "info": "死の魔法と暗黒命令の効果が15上昇して、BUFF点灯中に即死ダメージを受けてもギリギリで耐えることができる\n※効果発動時にBUFFが消えるが、一定時間で再点灯する\n※装備を付け替えた場合は約8秒間点灯しない\n※WarAgeでは効果がない"
++    },
++    "source": "official-idb",
++    "sourceUrl": "https://idb.moepic.com/items/defences/23412",
++    "sourceSheetUrl": "",
++    "fetchedAt": "2026-09-21T09:04:31.487901Z",
++    "updatedAt": "2026-09-15T04:47:02.000000Z",
++    "verified": false
++  },
++  {
++    "catalogId": "official-defense-23410",
++    "id": "official-defense-23410",
++    "officialId": 23410,
++    "category": "defense",
++    "categoryLabel": "防具/装飾",
++    "name": "あびにゃん サマーナイト パンツ",
++    "info": "ちょっと気合を入れたいときのサマーナイトウェア",
++    "slot": "防具: パンツ",
++    "equip": "パンツ（防）",
++    "equipGender": "ALL",
++    "equipRace": "ALL",
++    "itemType": "防具",
++    "requiredSkill": "着こなし",
++    "needLevel": 16,
++    "armorClass": 2.94,
++    "weaponDamage": 0,
++    "weaponAttackInterval": 0,
++    "weaponRange": 0,
++    "weaponType": "",
++    "weaponHand": "",
++    "requirements": [
++      {
++        "name": "着こなし",
++        "required": 16
++      }
++    ],
++    "weaponReq": [],
++    "technicId": 10390,
++    "addStatuses": [
++      {
++        "statusId": "7",
++        "name": "魔力",
++        "normalizedName": "魔力",
++        "statKey": "magic",
++        "statLabel": "魔力",
++        "value": 3,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "22",
++        "name": "最大ST",
++        "normalizedName": "最大ST",
++        "statKey": "extraST",
++        "statLabel": "ST",
++        "value": 5,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "2",
++        "name": "最大MP",
++        "normalizedName": "最大MP",
++        "statKey": "extraMP",
++        "statLabel": "MP",
++        "value": 5,
++        "mapped": true,
++        "ignored": false
++      }
++    ],
++    "addStatusText": "魔力 +3\n最大ST +5\n最大MP +5\nなし +0\nなし +0",
++    "unmappedAddStatuses": [],
++    "extraStats": {
++      "magic": 3,
++      "extraST": 5,
++      "extraMP": 5
++    },
++    "buffRefs": [
++      "technic-10390"
++    ],
++    "equipBuff": {
++      "id": "technic-10390",
++      "name": "リラックス タイム",
++      "info": "リラックスすることで消費スタミナを軽減し、スタミナの自然回復量が上昇する\n※WarAgeでは効果がない"
++    },
++    "source": "official-idb",
++    "sourceUrl": "https://idb.moepic.com/items/defences/23410",
++    "sourceSheetUrl": "",
++    "fetchedAt": "2026-09-21T09:04:31.487901Z",
++    "updatedAt": "2026-09-15T04:47:02.000000Z",
++    "verified": false
++  },
++  {
++    "catalogId": "official-defense-23409",
++    "id": "official-defense-23409",
++    "officialId": 23409,
++    "category": "defense",
++    "categoryLabel": "防具/装飾",
++    "name": "あびにゃん サマーナイト ウェア",
++    "info": "ちょっと気合を入れたいときのサマーナイトウェア",
++    "slot": "防具: 胴",
++    "equip": "胴（防）",
++    "equipGender": "ALL",
++    "equipRace": "ALL",
++    "itemType": "防具",
++    "requiredSkill": "着こなし",
++    "needLevel": 16,
++    "armorClass": 3.22,
++    "weaponDamage": 0,
++    "weaponAttackInterval": 0,
++    "weaponRange": 0,
++    "weaponType": "",
++    "weaponHand": "",
++    "requirements": [
++      {
++        "name": "着こなし",
++        "required": 16
++      }
++    ],
++    "weaponReq": [],
++    "technicId": 10390,
++    "addStatuses": [
++      {
++        "statusId": "7",
++        "name": "魔力",
++        "normalizedName": "魔力",
++        "statKey": "magic",
++        "statLabel": "魔力",
++        "value": 3,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "22",
++        "name": "最大ST",
++        "normalizedName": "最大ST",
++        "statKey": "extraST",
++        "statLabel": "ST",
++        "value": 5,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "2",
++        "name": "最大MP",
++        "normalizedName": "最大MP",
++        "statKey": "extraMP",
++        "statLabel": "MP",
++        "value": 5,
++        "mapped": true,
++        "ignored": false
++      }
++    ],
++    "addStatusText": "魔力 +3\n最大ST +5\n最大MP +5\nなし +0\nなし +0",
++    "unmappedAddStatuses": [],
++    "extraStats": {
++      "magic": 3,
++      "extraST": 5,
++      "extraMP": 5
++    },
++    "buffRefs": [
++      "technic-10390"
++    ],
++    "equipBuff": {
++      "id": "technic-10390",
++      "name": "リラックス タイム",
++      "info": "リラックスすることで消費スタミナを軽減し、スタミナの自然回復量が上昇する\n※WarAgeでは効果がない"
++    },
++    "source": "official-idb",
++    "sourceUrl": "https://idb.moepic.com/items/defences/23409",
++    "sourceSheetUrl": "",
++    "fetchedAt": "2026-09-21T09:04:31.487901Z",
++    "updatedAt": "2026-09-15T04:47:02.000000Z",
++    "verified": false
++  },
++  {
++    "catalogId": "official-defense-23408",
++    "id": "official-defense-23408",
++    "officialId": 23408,
++    "category": "defense",
++    "categoryLabel": "防具/装飾",
++    "name": "ウォーター スプラッシュ シューズ",
++    "info": "水しぶきをイメージしてデザインされた靴",
++    "slot": "防具: 靴",
++    "equip": "靴（防）",
++    "equipGender": "ALL",
++    "equipRace": "ALL",
++    "itemType": "防具",
++    "requiredSkill": "着こなし",
++    "needLevel": 16,
++    "armorClass": 2.52,
++    "weaponDamage": 0,
++    "weaponAttackInterval": 0,
++    "weaponRange": 0,
++    "weaponType": "",
++    "weaponHand": "",
++    "requirements": [
++      {
++        "name": "着こなし",
++        "required": 16
++      }
++    ],
++    "weaponReq": [],
++    "technicId": 12772,
++    "addStatuses": [
++      {
++        "statusId": "7",
++        "name": "魔力",
++        "normalizedName": "魔力",
++        "statKey": "magic",
++        "statLabel": "魔力",
++        "value": 4,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "15",
++        "name": "移動速度",
++        "normalizedName": "移動速度",
++        "statKey": "speed",
++        "statLabel": "移動速度",
++        "value": 2,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "70",
++        "name": "泳ぎ速度",
++        "normalizedName": "泳ぎ速度",
++        "statKey": "speed",
++        "statLabel": "移動速度",
++        "value": 5,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "10",
++        "name": "耐水属性",
++        "normalizedName": "耐水属性",
++        "statKey": "extraWaterRes",
++        "statLabel": "耐水属性",
++        "value": 20,
++        "mapped": true,
++        "ignored": false
++      }
++    ],
++    "addStatusText": "魔力 +4\n移動速度 +2\n泳ぎ速度 +5\n耐水属性 +20\nなし +0",
++    "unmappedAddStatuses": [],
++    "extraStats": {
++      "magic": 4,
++      "speed": 7,
++      "extraWaterRes": 20
++    },
++    "buffRefs": [
++      "technic-12772"
++    ],
++    "equipBuff": {
++      "id": "technic-12772",
++      "name": "水精の加護",
++      "info": "水属性のダメージが上昇して、水属性のダメージを軽減する\n※WarAgeでは効果がない"
++    },
++    "source": "official-idb",
++    "sourceUrl": "https://idb.moepic.com/items/defences/23408",
++    "sourceSheetUrl": "",
++    "fetchedAt": "2026-09-21T09:04:39.475142Z",
++    "updatedAt": "2026-09-15T04:47:02.000000Z",
++    "verified": false
++  },
++  {
++    "catalogId": "official-defense-23407",
++    "id": "official-defense-23407",
++    "officialId": 23407,
++    "category": "defense",
++    "categoryLabel": "防具/装飾",
++    "name": "パンキッシュ スカート",
++    "info": "パンク・ロック風なベルト付きのミニスカート",
++    "slot": "防具: パンツ",
++    "equip": "パンツ（防）",
++    "equipGender": "ALL",
++    "equipRace": "ALL",
++    "itemType": "防具",
++    "requiredSkill": "着こなし",
++    "needLevel": 21,
++    "armorClass": 4.2,
++    "weaponDamage": 0,
++    "weaponAttackInterval": 0,
++    "weaponRange": 0,
++    "weaponType": "",
++    "weaponHand": "",
++    "requirements": [
++      {
++        "name": "着こなし",
++        "required": 21
++      }
++    ],
++    "weaponReq": [],
++    "technicId": 7824,
++    "addStatuses": [
++      {
++        "statusId": "3",
++        "name": "攻撃力",
++        "normalizedName": "攻撃力",
++        "statKey": "attack",
++        "statLabel": "攻撃力",
++        "value": 3,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "17",
++        "name": "攻撃ディレイ",
++        "normalizedName": "攻撃ディレイ",
++        "statKey": "extraAttackDelay",
++        "statLabel": "攻撃ディレイ",
++        "value": -1,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "22",
++        "name": "最大ST",
++        "normalizedName": "最大ST",
++        "statKey": "extraST",
++        "statLabel": "ST",
++        "value": 5,
++        "mapped": true,
++        "ignored": false
++      }
++    ],
++    "addStatusText": "攻撃力 +3\n攻撃ディレイ -1\n最大ST +5\nなし +0\nなし +0",
++    "unmappedAddStatuses": [],
++    "extraStats": {
++      "attack": 3,
++      "extraAttackDelay": -1,
++      "extraST": 5
++    },
++    "buffRefs": [
++      "technic-7824"
++    ],
++    "equipBuff": {
++      "id": "technic-7824",
++      "name": "ロック魂",
++      "info": "魂の叫びにより、シャウトのディレイが短縮されて、技の効果範囲が増加する"
++    },
++    "source": "official-idb",
++    "sourceUrl": "https://idb.moepic.com/items/defences/23407",
++    "sourceSheetUrl": "",
++    "fetchedAt": "2026-09-21T09:04:39.475142Z",
++    "updatedAt": "2026-09-15T04:47:02.000000Z",
++    "verified": false
++  },
++  {
++    "catalogId": "official-defense-23406",
++    "id": "official-defense-23406",
++    "officialId": 23406,
++    "category": "defense",
++    "categoryLabel": "防具/装飾",
++    "name": "スリットスリーブ ジャケット",
++    "info": "背中に能力を上昇させる特殊な魔法陣が付いた\nスリットの入った長袖が特徴なショート丈のジャケット",
++    "slot": "防具: 肩",
++    "equip": "肩（防）",
++    "equipGender": "ALL",
++    "equipRace": "ALL",
++    "itemType": "防具",
++    "requiredSkill": "着こなし",
++    "needLevel": 21,
++    "armorClass": 3.38,
++    "weaponDamage": 0,
++    "weaponAttackInterval": 0,
++    "weaponRange": 0,
++    "weaponType": "",
++    "weaponHand": "",
++    "requirements": [
++      {
++        "name": "着こなし",
++        "required": 21
++      }
++    ],
++    "weaponReq": [],
++    "technicId": 13997,
++    "addStatuses": [
++      {
++        "statusId": "3",
++        "name": "攻撃力",
++        "normalizedName": "攻撃力",
++        "statKey": "attack",
++        "statLabel": "攻撃力",
++        "value": 4,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "7",
++        "name": "魔力",
++        "normalizedName": "魔力",
++        "statKey": "magic",
++        "statLabel": "魔力",
++        "value": 4,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "17",
++        "name": "攻撃ディレイ",
++        "normalizedName": "攻撃ディレイ",
++        "statKey": "extraAttackDelay",
++        "statLabel": "攻撃ディレイ",
++        "value": -2,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "16",
++        "name": "魔法ディレイ",
++        "normalizedName": "魔法ディレイ",
++        "statKey": "extraMagicDelay",
++        "statLabel": "魔法ディレイ",
++        "value": -2,
++        "mapped": true,
++        "ignored": false
++      }
++    ],
++    "addStatusText": "攻撃力 +4\n魔力 +4\n攻撃ディレイ -2\n魔法ディレイ -2\nなし +0",
++    "unmappedAddStatuses": [],
++    "extraStats": {
++      "attack": 4,
++      "magic": 4,
++      "extraAttackDelay": -2,
++      "extraMagicDelay": -2
++    },
++    "buffRefs": [
++      "technic-13997"
++    ],
++    "equipBuff": {
++      "id": "technic-13997",
++      "name": "インフィニット エンハンス",
++      "info": "攻撃力、魔力、防御力、移動速度、最大所持可能重量を5%上昇させる\n※WarAgeでは効果がない"
++    },
++    "source": "official-idb",
++    "sourceUrl": "https://idb.moepic.com/items/defences/23406",
++    "sourceSheetUrl": "",
++    "fetchedAt": "2026-09-21T09:04:39.475142Z",
++    "updatedAt": "2026-09-15T04:47:02.000000Z",
++    "verified": false
++  },
++  {
++    "catalogId": "official-defense-23405",
++    "id": "official-defense-23405",
++    "officialId": 23405,
++    "category": "defense",
++    "categoryLabel": "防具/装飾",
++    "name": "ノアストーン アームガード",
++    "info": "腕にはめるノアストーンの魔力を効率的に増幅させる特殊な装置",
++    "slot": "防具: 手",
++    "equip": "手（防）",
++    "equipGender": "ALL",
++    "equipRace": "ALL",
++    "itemType": "防具",
++    "requiredSkill": "着こなし",
++    "needLevel": 31,
++    "armorClass": 6.48,
++    "weaponDamage": 0,
++    "weaponAttackInterval": 0,
++    "weaponRange": 0,
++    "weaponType": "",
++    "weaponHand": "",
++    "requirements": [
++      {
++        "name": "着こなし",
++        "required": 31
++      }
++    ],
++    "weaponReq": [],
++    "technicId": 13722,
++    "addStatuses": [
++      {
++        "statusId": "7",
++        "name": "魔力",
++        "normalizedName": "魔力",
++        "statKey": "magic",
++        "statLabel": "魔力",
++        "value": 5,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "16",
++        "name": "魔法ディレイ",
++        "normalizedName": "魔法ディレイ",
++        "statKey": "extraMagicDelay",
++        "statLabel": "魔法ディレイ",
++        "value": -5,
++        "mapped": true,
++        "ignored": false
++      }
++    ],
++    "addStatusText": "魔力 +5\n魔法ディレイ -5\nなし +0\nなし +0\nなし +0",
++    "unmappedAddStatuses": [],
++    "extraStats": {
++      "magic": 5,
++      "extraMagicDelay": -5
++    },
++    "buffRefs": [
++      "technic-13722"
++    ],
++    "equipBuff": {
++      "id": "technic-13722",
++      "name": "魔力供給",
++      "info": "魔力と自然回復量が大幅に増加する\n※WarAgeでは効果がない"
++    },
++    "source": "official-idb",
++    "sourceUrl": "https://idb.moepic.com/items/defences/23405",
++    "sourceSheetUrl": "",
++    "fetchedAt": "2026-09-21T09:04:39.475142Z",
++    "updatedAt": "2026-09-15T04:47:02.000000Z",
++    "verified": false
++  },
++  {
++    "catalogId": "official-defense-23400",
++    "id": "official-defense-23400",
++    "officialId": 23400,
++    "category": "defense",
++    "categoryLabel": "防具/装飾",
++    "name": "プライバシー サングラス",
++    "info": "あなたのプライバシーを守るユニークなサングラス",
++    "slot": "装飾: 顔",
++    "equip": "顔（装）",
++    "equipGender": "ALL",
++    "equipRace": "ALL",
++    "itemType": "防具",
++    "requiredSkill": "着こなし",
++    "needLevel": 1,
++    "armorClass": 0,
++    "weaponDamage": 0,
++    "weaponAttackInterval": 0,
++    "weaponRange": 0,
++    "weaponType": "",
++    "weaponHand": "",
++    "requirements": [
++      {
++        "name": "着こなし",
++        "required": 1
++      }
++    ],
++    "weaponReq": [],
++    "technicId": 0,
++    "addStatuses": [
++      {
++        "statusId": "4",
++        "name": "命中",
++        "normalizedName": "命中",
++        "statKey": "extraHit",
++        "statLabel": "命中",
++        "value": 3,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "22",
++        "name": "最大ST",
++        "normalizedName": "最大ST",
++        "statKey": "extraST",
++        "statLabel": "ST",
++        "value": 5,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "9",
++        "name": "耐火属性",
++        "normalizedName": "耐火属性",
++        "statKey": "extraFireRes",
++        "statLabel": "耐火属性",
++        "value": 10,
++        "mapped": true,
++        "ignored": false
++      }
++    ],
++    "addStatusText": "命中 +3\n最大ST +5\n耐火属性 +10\nなし +0\nなし +0",
++    "unmappedAddStatuses": [],
++    "extraStats": {
++      "extraHit": 3,
++      "extraST": 5,
++      "extraFireRes": 10
++    },
++    "buffRefs": [],
++    "equipBuff": null,
++    "source": "official-idb",
++    "sourceUrl": "https://idb.moepic.com/items/defences/23400",
++    "sourceSheetUrl": "",
++    "fetchedAt": "2026-09-21T09:04:39.475142Z",
++    "updatedAt": "2026-09-15T04:47:02.000000Z",
++    "verified": false
++  },
++  {
++    "catalogId": "official-defense-23399",
++    "id": "official-defense-23399",
++    "officialId": 23399,
++    "category": "defense",
++    "categoryLabel": "防具/装飾",
++    "name": "クラゲのベレー帽",
++    "info": "クラゲを模したオシャレなベレー帽",
++    "slot": "装飾: 頭",
++    "equip": "頭（装）",
++    "equipGender": "ALL",
++    "equipRace": "ALL",
++    "itemType": "防具",
++    "requiredSkill": "着こなし",
++    "needLevel": 1,
++    "armorClass": 0,
++    "weaponDamage": 0,
++    "weaponAttackInterval": 0,
++    "weaponRange": 0,
++    "weaponType": "",
++    "weaponHand": "",
++    "requirements": [
++      {
++        "name": "着こなし",
++        "required": 1
++      }
++    ],
++    "weaponReq": [],
++    "technicId": 13688,
++    "addStatuses": [
++      {
++        "statusId": "7",
++        "name": "魔力",
++        "normalizedName": "魔力",
++        "statKey": "magic",
++        "statLabel": "魔力",
++        "value": 3,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "16",
++        "name": "魔法ディレイ",
++        "normalizedName": "魔法ディレイ",
++        "statKey": "extraMagicDelay",
++        "statLabel": "魔法ディレイ",
++        "value": -2,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "10",
++        "name": "耐水属性",
++        "normalizedName": "耐水属性",
++        "statKey": "extraWaterRes",
++        "statLabel": "耐水属性",
++        "value": 10,
++        "mapped": true,
++        "ignored": false
++      }
++    ],
++    "addStatusText": "魔力 +3\n魔法ディレイ -2\n耐水属性 +10\nなし +0\nなし +0",
++    "unmappedAddStatuses": [],
++    "extraStats": {
++      "magic": 3,
++      "extraMagicDelay": -2,
++      "extraWaterRes": 10
++    },
++    "buffRefs": [
++      "technic-13688"
++    ],
++    "equipBuff": {
++      "id": "technic-13688",
++      "name": "クラゲエフェクト",
++      "info": "周囲にクラゲのエフェクトが舞い、水属性のダメージを25%軽減する\n※WarAgeでは効果がない"
++    },
++    "source": "official-idb",
++    "sourceUrl": "https://idb.moepic.com/items/defences/23399",
++    "sourceSheetUrl": "",
++    "fetchedAt": "2026-09-21T09:04:47.424035Z",
++    "updatedAt": "2026-09-15T04:47:02.000000Z",
++    "verified": false
++  },
++  {
++    "catalogId": "official-defense-23398",
++    "id": "official-defense-23398",
++    "officialId": 23398,
++    "category": "defense",
++    "categoryLabel": "防具/装飾",
++    "name": "ダーク ヴェール",
++    "info": "闇の力を宿した豪華なヴェール",
++    "slot": "装飾: 頭",
++    "equip": "頭（装）",
++    "equipGender": "ALL",
++    "equipRace": "ALL",
++    "itemType": "防具",
++    "requiredSkill": "着こなし",
++    "needLevel": 1,
++    "armorClass": 0,
++    "weaponDamage": 0,
++    "weaponAttackInterval": 0,
++    "weaponRange": 0,
++    "weaponType": "",
++    "weaponHand": "",
++    "requirements": [
++      {
++        "name": "着こなし",
++        "required": 1
++      }
++    ],
++    "weaponReq": [],
++    "technicId": 14431,
++    "addStatuses": [
++      {
++        "statusId": "7",
++        "name": "魔力",
++        "normalizedName": "魔力",
++        "statKey": "magic",
++        "statLabel": "魔力",
++        "value": 5,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "22",
++        "name": "最大ST",
++        "normalizedName": "最大ST",
++        "statKey": "extraST",
++        "statLabel": "ST",
++        "value": 10,
++        "mapped": true,
++        "ignored": false
++      }
++    ],
++    "addStatusText": "魔力 +5\n最大ST +10\nなし +0\nなし +0\nなし +0",
++    "unmappedAddStatuses": [],
++    "extraStats": {
++      "magic": 5,
++      "extraST": 10
++    },
++    "buffRefs": [
++      "technic-14431"
++    ],
++    "equipBuff": {
++      "id": "technic-14431",
++      "name": "冥府の祝福",
++      "info": "冥府の力に祝福され、死の魔法と回復魔法の効果が15上昇する\n※WarAgeでは効果がない"
++    },
++    "source": "official-idb",
++    "sourceUrl": "https://idb.moepic.com/items/defences/23398",
++    "sourceSheetUrl": "",
++    "fetchedAt": "2026-09-21T09:04:47.424035Z",
++    "updatedAt": "2026-09-15T04:47:02.000000Z",
++    "verified": false
++  },
++  {
++    "catalogId": "official-defense-23397",
++    "id": "official-defense-23397",
++    "officialId": 23397,
++    "category": "defense",
++    "categoryLabel": "防具/装飾",
++    "name": "隠密のマント",
++    "info": "秘密裏に探るために身に着けていたマント",
++    "slot": "防具: 肩",
++    "equip": "肩（防）",
++    "equipGender": "ALL",
++    "equipRace": "ALL",
++    "itemType": "防具",
++    "requiredSkill": "着こなし",
++    "needLevel": 26,
++    "armorClass": 3.12,
++    "weaponDamage": 0,
++    "weaponAttackInterval": 0,
++    "weaponRange": 0,
++    "weaponType": "",
++    "weaponHand": "",
++    "requirements": [
++      {
++        "name": "着こなし",
++        "required": 26
++      }
++    ],
++    "weaponReq": [],
++    "technicId": 10935,
++    "addStatuses": [
++      {
++        "statusId": "6",
++        "name": "回避",
++        "normalizedName": "回避",
++        "statKey": "extraAvoid",
++        "statLabel": "回避",
++        "value": 3,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "17",
++        "name": "攻撃ディレイ",
++        "normalizedName": "攻撃ディレイ",
++        "statKey": "extraAttackDelay",
++        "statLabel": "攻撃ディレイ",
++        "value": -3,
++        "mapped": true,
++        "ignored": false
++      }
++    ],
++    "addStatusText": "回避 +3\n攻撃ディレイ -3\nなし +0\nなし +0\nなし +0",
++    "unmappedAddStatuses": [],
++    "extraStats": {
++      "extraAvoid": 3,
++      "extraAttackDelay": -3
++    },
++    "buffRefs": [
++      "technic-10935"
++    ],
++    "equipBuff": {
++      "id": "technic-10935",
++      "name": "スニーキング",
++      "info": "獣の臭いで敵を欺き襲われにくくなり、自然回復量が上昇する\n※WarAgeでは効果がない"
++    },
++    "source": "official-idb",
++    "sourceUrl": "https://idb.moepic.com/items/defences/23397",
++    "sourceSheetUrl": "",
++    "fetchedAt": "2026-09-21T09:04:47.424035Z",
++    "updatedAt": "2026-09-15T04:47:02.000000Z",
++    "verified": false
++  },
++  {
++    "catalogId": "official-defense-23396",
++    "id": "official-defense-23396",
++    "officialId": 23396,
++    "category": "defense",
++    "categoryLabel": "防具/装飾",
++    "name": "上位妖精のローブ",
++    "info": "エルフの上位種として高い知性と優れた魔法適性を持つ種族が身に着けていたローブ",
++    "slot": "防具: 胴",
++    "equip": "胴（防）",
++    "equipGender": "ALL",
++    "equipRace": "ALL",
++    "itemType": "防具",
++    "requiredSkill": "着こなし",
++    "needLevel": 26,
++    "armorClass": 5.52,
++    "weaponDamage": 0,
++    "weaponAttackInterval": 0,
++    "weaponRange": 0,
++    "weaponType": "",
++    "weaponHand": "",
++    "requirements": [
++      {
++        "name": "着こなし",
++        "required": 26
++      }
++    ],
++    "weaponReq": [],
++    "technicId": 14430,
++    "addStatuses": [
++      {
++        "statusId": "7",
++        "name": "魔力",
++        "normalizedName": "魔力",
++        "statKey": "magic",
++        "statLabel": "魔力",
++        "value": 5,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "9",
++        "name": "耐火属性",
++        "normalizedName": "耐火属性",
++        "statKey": "extraFireRes",
++        "statLabel": "耐火属性",
++        "value": 15,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "10",
++        "name": "耐水属性",
++        "normalizedName": "耐水属性",
++        "statKey": "extraWaterRes",
++        "statLabel": "耐水属性",
++        "value": 15,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "11",
++        "name": "耐風属性",
++        "normalizedName": "耐風属性",
++        "statKey": "extraWindRes",
++        "statLabel": "耐風属性",
++        "value": 15,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "12",
++        "name": "耐地属性",
++        "normalizedName": "耐地属性",
++        "statKey": "extraEarthRes",
++        "statLabel": "耐地属性",
++        "value": 15,
++        "mapped": true,
++        "ignored": false
++      }
++    ],
++    "addStatusText": "魔力 +5\n耐火属性 +15\n耐水属性 +15\n耐風属性 +15\n耐地属性 +15",
++    "unmappedAddStatuses": [],
++    "extraStats": {
++      "magic": 5,
++      "extraFireRes": 15,
++      "extraWaterRes": 15,
++      "extraWindRes": 15,
++      "extraEarthRes": 15
++    },
++    "buffRefs": [
++      "technic-14430"
++    ],
++    "equipBuff": {
++      "id": "technic-14430",
++      "name": "上位妖精の加護",
++      "info": "魔法の威力が増加して、魔法ダメージを25%軽減する\n※WarAgeでは効果がない"
++    },
++    "source": "official-idb",
++    "sourceUrl": "https://idb.moepic.com/items/defences/23396",
++    "sourceSheetUrl": "",
++    "fetchedAt": "2026-09-21T09:04:47.424035Z",
++    "updatedAt": "2026-09-15T04:47:02.000000Z",
++    "verified": false
++  },
++  {
++    "catalogId": "official-defense-23395",
++    "id": "official-defense-23395",
++    "officialId": 23395,
++    "category": "defense",
++    "categoryLabel": "防具/装飾",
++    "name": "ハイエルフ ウィッグ",
++    "info": "エルフの上位種として高い知性と優れた魔法適性を持つ種族のウィッグ\n※髪色が反映されます",
++    "slot": "防具: 頭",
++    "equip": "頭（防）",
++    "equipGender": "ALL",
++    "equipRace": "ALL",
++    "itemType": "防具",
++    "requiredSkill": "着こなし",
++    "needLevel": 26,
++    "armorClass": 4.8,
++    "weaponDamage": 0,
++    "weaponAttackInterval": 0,
++    "weaponRange": 0,
++    "weaponType": "",
++    "weaponHand": "",
++    "requirements": [
++      {
++        "name": "着こなし",
++        "required": 26
++      }
++    ],
++    "weaponReq": [],
++    "technicId": 14429,
++    "addStatuses": [
++      {
++        "statusId": "7",
++        "name": "魔力",
++        "normalizedName": "魔力",
++        "statKey": "magic",
++        "statLabel": "魔力",
++        "value": 4,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "2",
++        "name": "最大MP",
++        "normalizedName": "最大MP",
++        "statKey": "extraMP",
++        "statLabel": "MP",
++        "value": 10,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "16",
++        "name": "魔法ディレイ",
++        "normalizedName": "魔法ディレイ",
++        "statKey": "extraMagicDelay",
++        "statLabel": "魔法ディレイ",
++        "value": -2,
++        "mapped": true,
++        "ignored": false
++      }
++    ],
++    "addStatusText": "魔力 +4\n最大MP +10\n魔法ディレイ -2\nなし +0\nなし +0",
++    "unmappedAddStatuses": [],
++    "extraStats": {
++      "magic": 4,
++      "extraMP": 10,
++      "extraMagicDelay": -2
++    },
++    "buffRefs": [
++      "technic-14429"
++    ],
++    "equipBuff": {
++      "id": "technic-14429",
++      "name": "エルフの叡智",
++      "info": "魔力が5%、最大MPが10%上昇して、専用魔法『 アルス・マグナ 』が使用可能になる\n※WarAgeでは効果がない"
++    },
++    "source": "official-idb",
++    "sourceUrl": "https://idb.moepic.com/items/defences/23395",
++    "sourceSheetUrl": "",
++    "fetchedAt": "2026-09-21T09:04:47.424035Z",
++    "updatedAt": "2026-09-15T04:47:02.000000Z",
++    "verified": false
++  },
++  {
++    "catalogId": "official-defense-23393",
++    "id": "official-defense-23393",
++    "officialId": 23393,
++    "category": "defense",
++    "categoryLabel": "防具/装飾",
++    "name": "緊箍児",
++    "info": "特殊な力が宿る頭にはめる金属製の輪\n呪文を唱えると輪が縮まって頭を激しく締め付けるため、魔法が使えない",
++    "slot": "装飾: 頭",
++    "equip": "頭（装）",
++    "equipGender": "ALL",
++    "equipRace": "ALL",
++    "itemType": "防具",
++    "requiredSkill": "着こなし",
++    "needLevel": 1,
++    "armorClass": 0,
++    "weaponDamage": 0,
++    "weaponAttackInterval": 0,
++    "weaponRange": 0,
++    "weaponType": "",
++    "weaponHand": "",
++    "requirements": [
++      {
++        "name": "着こなし",
++        "required": 1
++      }
++    ],
++    "weaponReq": [],
++    "technicId": 14576,
++    "addStatuses": [
++      {
++        "statusId": "3",
++        "name": "攻撃力",
++        "normalizedName": "攻撃力",
++        "statKey": "attack",
++        "statLabel": "攻撃力",
++        "value": 3,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "6",
++        "name": "回避",
++        "normalizedName": "回避",
++        "statKey": "extraAvoid",
++        "statLabel": "回避",
++        "value": 3,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "17",
++        "name": "攻撃ディレイ",
++        "normalizedName": "攻撃ディレイ",
++        "statKey": "extraAttackDelay",
++        "statLabel": "攻撃ディレイ",
++        "value": -3,
++        "mapped": true,
++        "ignored": false
++      }
++    ],
++    "addStatusText": "攻撃力 +3\n回避 +3\n攻撃ディレイ -3\nなし +0\nなし +0",
++    "unmappedAddStatuses": [],
++    "extraStats": {
++      "attack": 3,
++      "extraAvoid": 3,
++      "extraAttackDelay": -3
++    },
++    "buffRefs": [
++      "technic-14576"
++    ],
++    "equipBuff": {
++      "id": "technic-14576",
++      "name": "斉天大聖",
++      "info": "攻撃力と回避が5%上昇して、戦闘技術の効果が増加するが、魔法の詠唱ができなくなる\n※WarAgeでは効果がない"
++    },
++    "source": "official-idb",
++    "sourceUrl": "https://idb.moepic.com/items/defences/23393",
++    "sourceSheetUrl": "",
++    "fetchedAt": "2026-09-21T14:29:18.077469+00:00",
++    "updatedAt": "2026-09-15T04:47:02.000000Z",
++    "verified": false
++  },
++  {
++    "catalogId": "official-defense-23384",
++    "id": "official-defense-23384",
++    "officialId": 23384,
++    "category": "defense",
++    "categoryLabel": "防具/装飾",
++    "name": "カラコンメガネ",
++    "info": "染色で色が変わるカラコンとメガネのセットアクセサリー",
++    "slot": "装飾: 顔",
++    "equip": "顔（装）",
++    "equipGender": "ALL",
++    "equipRace": "ALL",
++    "itemType": "防具",
++    "requiredSkill": "着こなし",
++    "needLevel": 1,
++    "armorClass": 0,
++    "weaponDamage": 0,
++    "weaponAttackInterval": 0,
++    "weaponRange": 0,
++    "weaponType": "",
++    "weaponHand": "",
++    "requirements": [
++      {
++        "name": "着こなし",
++        "required": 1
++      }
++    ],
++    "weaponReq": [],
++    "technicId": 2578,
++    "addStatuses": [
++      {
++        "statusId": "3",
++        "name": "攻撃力",
++        "normalizedName": "攻撃力",
++        "statKey": "attack",
++        "statLabel": "攻撃力",
++        "value": 3,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "4",
++        "name": "命中",
++        "normalizedName": "命中",
++        "statKey": "extraHit",
++        "statLabel": "命中",
++        "value": 3,
++        "mapped": true,
++        "ignored": false
++      },
++      {
++        "statusId": "1",
++        "name": "最大HP",
++        "normalizedName": "最大HP",
++        "statKey": "extraHP",
++        "statLabel": "HP",
++        "value": 5,
++        "mapped": true,
++        "ignored": false
++      }
++    ],
++    "addStatusText": "攻撃力 +3\n命中 +3\n最大HP +5\nなし +0\nなし +0",
++    "unmappedAddStatuses": [],
++    "extraStats": {
++      "attack": 3,
++      "extraHit": 3,
++      "extraHP": 5
++    },
++    "buffRefs": [
++      "technic-2578"
++    ],
++    "equipBuff": {
++      "id": "technic-2578",
++      "name": "サーチアイ",
++      "info": "魔法が届く範囲が広がり、見えないものが見えてくる\n※WarAgeでは効果が無い"
++    },
++    "source": "official-idb",
++    "sourceUrl": "https://idb.moepic.com/items/defences/23384",
++    "sourceSheetUrl": "",
++    "fetchedAt": "2026-09-21T14:29:32.710662+00:00",
++    "updatedAt": "2026-09-15T04:47:02.000000Z",
++    "verified": false
+   }
+ ];
+diff --git a/src/data/manual/buffRules.manual.js b/src/data/manual/buffRules.manual.js
+index c4450e5..cded101 100644
+--- a/src/data/manual/buffRules.manual.js
++++ b/src/data/manual/buffRules.manual.js
+@@ -3404,3 +3404,657 @@ Object.assign(window.MOE_BUFF_RULES_MANUAL, {
+     "memo": "収録原文の短縮対象・数値・併用条件を復元。限定ディレイ/詠唱・アイテム使用時間は表示・検索のみ。技の再使用時間計算は未対応。短縮部分の競合と、命中・魔力等の併用は別扱い。原文が単位を省略した値は単位を補っていない。"
+   }
+ });
++
++// Official new items 2026-09-21: description preserved; calculation review pending.
++Object.assign(window.MOE_BUFF_RULES_MANUAL, {
++  "technic-14635": {
++    "name": "神楽",
++    "officialTechnicId": 14635,
++    "verified": false,
++    "applyDefault": true,
++    "source": "manual-official-description",
++    "confidence": "unverified",
++    "reviewStatus": "unverified",
++    "reviewComplete": false,
++    "conflictGroup": "technic-14635",
++    "stackRule": "same-technic",
++    "stats": {},
++    "skillEffects": [],
++    "customEffects": [
++      {
++        "name": "公式説明（数値計算・併用未検証）: 神秘魔法、音楽、ダンスの効果が10上昇する\n※WarAgeでは効果がない",
++        "value": 0,
++        "unit": ""
++      }
++    ],
++    "rawInfo": "神秘魔法、音楽、ダンスの効果が10上昇する\n※WarAgeでは効果がない",
++    "sourceUrls": [
++      "https://idb.moepic.com/items/weapons/23492"
++    ],
++    "memo": "2026-09-21公式DBから補完。説明を保持する暫定表示ルール。新規Buffの数値計算・異なるBuff間の併用関係は未検証。装備本体の追加ステータスは別途計算する。"
++  },
++  "technic-14634": {
++    "name": "あなたの後ろにいるの",
++    "officialTechnicId": 14634,
++    "verified": false,
++    "applyDefault": true,
++    "source": "manual-official-description",
++    "confidence": "unverified",
++    "reviewStatus": "unverified",
++    "reviewComplete": false,
++    "conflictGroup": "technic-14634",
++    "stackRule": "same-technic",
++    "stats": {},
++    "skillEffects": [],
++    "customEffects": [
++      {
++        "name": "公式説明（数値計算・併用未検証）: 暗黒命令スキルの効果が15上昇して、移動速度が15%上昇する\n※WarAgeでは効果がない",
++        "value": 0,
++        "unit": ""
++      }
++    ],
++    "rawInfo": "暗黒命令スキルの効果が15上昇して、移動速度が15%上昇する\n※WarAgeでは効果がない",
++    "sourceUrls": [
++      "https://idb.moepic.com/items/defences/23490"
++    ],
++    "memo": "2026-09-21公式DBから補完。説明を保持する暫定表示ルール。新規Buffの数値計算・異なるBuff間の併用関係は未検証。装備本体の追加ステータスは別途計算する。"
++  },
++  "technic-14633": {
++    "name": "森精の加護",
++    "officialTechnicId": 14633,
++    "verified": false,
++    "applyDefault": true,
++    "source": "manual-official-description",
++    "confidence": "unverified",
++    "reviewStatus": "unverified",
++    "reviewComplete": false,
++    "conflictGroup": "technic-14633",
++    "stackRule": "same-technic",
++    "stats": {},
++    "skillEffects": [],
++    "customEffects": [
++      {
++        "name": "公式説明（数値計算・併用未検証）: 回復魔法と自然調和スキルの効果が20上昇して、HP / MP / ST の自然回復速度が大幅に上昇する\n※WarAgeでは効果がない",
++        "value": 0,
++        "unit": ""
++      }
++    ],
++    "rawInfo": "回復魔法と自然調和スキルの効果が20上昇して、HP / MP / ST の自然回復速度が大幅に上昇する\n※WarAgeでは効果がない",
++    "sourceUrls": [
++      "https://idb.moepic.com/items/defences/23489"
++    ],
++    "memo": "2026-09-21公式DBから補完。説明を保持する暫定表示ルール。新規Buffの数値計算・異なるBuff間の併用関係は未検証。装備本体の追加ステータスは別途計算する。"
++  },
++  "technic-14632": {
++    "name": "コビトカバ フォーム",
++    "officialTechnicId": 14632,
++    "verified": false,
++    "applyDefault": true,
++    "source": "manual-official-description",
++    "confidence": "unverified",
++    "reviewStatus": "unverified",
++    "reviewComplete": false,
++    "conflictGroup": "technic-14632",
++    "stackRule": "same-technic",
++    "stats": {},
++    "skillEffects": [],
++    "customEffects": [
++      {
++        "name": "公式説明（数値計算・併用未検証）: コビトカバに変身できる",
++        "value": 0,
++        "unit": ""
++      }
++    ],
++    "rawInfo": "コビトカバに変身できる",
++    "sourceUrls": [
++      "https://idb.moepic.com/items/defences/23487"
++    ],
++    "memo": "2026-09-21公式DBから補完。説明を保持する暫定表示ルール。新規Buffの数値計算・異なるBuff間の併用関係は未検証。装備本体の追加ステータスは別途計算する。"
++  },
++  "technic-14618": {
++    "name": "マルカジリ",
++    "officialTechnicId": 14618,
++    "verified": false,
++    "applyDefault": true,
++    "source": "manual-official-description",
++    "confidence": "unverified",
++    "reviewStatus": "unverified",
++    "reviewComplete": false,
++    "conflictGroup": "technic-14618",
++    "stackRule": "same-technic",
++    "stats": {},
++    "skillEffects": [],
++    "customEffects": [
++      {
++        "name": "公式説明（数値計算・併用未検証）: 牙スキルの威力と命中が上昇して、与えたダメージの10％分のHPを回復する\n※WarAgeでは効果がない",
++        "value": 0,
++        "unit": ""
++      }
++    ],
++    "rawInfo": "牙スキルの威力と命中が上昇して、与えたダメージの10％分のHPを回復する\n※WarAgeでは効果がない",
++    "sourceUrls": [
++      "https://idb.moepic.com/items/defences/23483"
++    ],
++    "memo": "2026-09-21公式DBから補完。説明を保持する暫定表示ルール。新規Buffの数値計算・異なるBuff間の併用関係は未検証。装備本体の追加ステータスは別途計算する。"
++  },
++  "technic-14611": {
++    "name": "カーバンクルの加護",
++    "officialTechnicId": 14611,
++    "verified": false,
++    "applyDefault": true,
++    "source": "manual-official-description",
++    "confidence": "unverified",
++    "reviewStatus": "unverified",
++    "reviewComplete": false,
++    "conflictGroup": "technic-14611",
++    "stackRule": "same-technic",
++    "stats": {},
++    "skillEffects": [],
++    "customEffects": [
++      {
++        "name": "公式説明（数値計算・併用未検証）: 火・水・風・地属性の効果を上昇させて、一定確率で敵の魔法を無効化する\n※WarAgeでは効果がない",
++        "value": 0,
++        "unit": ""
++      }
++    ],
++    "rawInfo": "火・水・風・地属性の効果を上昇させて、一定確率で敵の魔法を無効化する\n※WarAgeでは効果がない",
++    "sourceUrls": [
++      "https://idb.moepic.com/items/defences/23481"
++    ],
++    "memo": "2026-09-21公式DBから補完。説明を保持する暫定表示ルール。新規Buffの数値計算・異なるBuff間の併用関係は未検証。装備本体の追加ステータスは別途計算する。"
++  },
++  "technic-14610": {
++    "name": "スペル チャージ",
++    "officialTechnicId": 14610,
++    "verified": false,
++    "applyDefault": true,
++    "source": "manual-official-description",
++    "confidence": "unverified",
++    "reviewStatus": "unverified",
++    "reviewComplete": false,
++    "conflictGroup": "technic-14610",
++    "stackRule": "same-technic",
++    "stats": {},
++    "skillEffects": [],
++    "customEffects": [
++      {
++        "name": "公式説明（数値計算・併用未検証）: 魔法を一時的にチャージして、魔法の威力と範囲を増加させる\n※WarAgeでは効果がない",
++        "value": 0,
++        "unit": ""
++      }
++    ],
++    "rawInfo": "魔法を一時的にチャージして、魔法の威力と範囲を増加させる\n※WarAgeでは効果がない",
++    "sourceUrls": [
++      "https://idb.moepic.com/items/defences/23478"
++    ],
++    "memo": "2026-09-21公式DBから補完。説明を保持する暫定表示ルール。新規Buffの数値計算・異なるBuff間の併用関係は未検証。装備本体の追加ステータスは別途計算する。"
++  },
++  "technic-14581": {
++    "name": "エレクトリカル チャージ",
++    "officialTechnicId": 14581,
++    "verified": false,
++    "applyDefault": true,
++    "source": "manual-official-description",
++    "confidence": "unverified",
++    "reviewStatus": "unverified",
++    "reviewComplete": false,
++    "conflictGroup": "technic-14581",
++    "stackRule": "same-technic",
++    "stats": {},
++    "skillEffects": [],
++    "customEffects": [
++      {
++        "name": "公式説明（数値計算・併用未検証）: 自然回復量が大幅に上昇して、風属性の効果が増加する\n※WarAgeでは効果がない",
++        "value": 0,
++        "unit": ""
++      }
++    ],
++    "rawInfo": "自然回復量が大幅に上昇して、風属性の効果が増加する\n※WarAgeでは効果がない",
++    "sourceUrls": [
++      "https://idb.moepic.com/items/defences/23477"
++    ],
++    "memo": "2026-09-21公式DBから補完。説明を保持する暫定表示ルール。新規Buffの数値計算・異なるBuff間の併用関係は未検証。装備本体の追加ステータスは別途計算する。"
++  },
++  "technic-14580": {
++    "name": "強化アーム",
++    "officialTechnicId": 14580,
++    "verified": false,
++    "applyDefault": true,
++    "source": "manual-official-description",
++    "confidence": "unverified",
++    "reviewStatus": "unverified",
++    "reviewComplete": false,
++    "conflictGroup": "technic-14580",
++    "stackRule": "same-technic",
++    "stats": {},
++    "skillEffects": [],
++    "customEffects": [
++      {
++        "name": "公式説明（数値計算・併用未検証）: 攻撃力依存のダメージが増加、筋力スキルの効果が20上昇して、所持可能重量が30増加する\n※WarAgeでは効果がない",
++        "value": 0,
++        "unit": ""
++      }
++    ],
++    "rawInfo": "攻撃力依存のダメージが増加、筋力スキルの効果が20上昇して、所持可能重量が30増加する\n※WarAgeでは効果がない",
++    "sourceUrls": [
++      "https://idb.moepic.com/items/defences/23476"
++    ],
++    "memo": "2026-09-21公式DBから補完。説明を保持する暫定表示ルール。新規Buffの数値計算・異なるBuff間の併用関係は未検証。装備本体の追加ステータスは別途計算する。"
++  },
++  "technic-14578": {
++    "name": "堅守の防壁",
++    "officialTechnicId": 14578,
++    "verified": false,
++    "applyDefault": true,
++    "source": "manual-official-description",
++    "confidence": "unverified",
++    "reviewStatus": "unverified",
++    "reviewComplete": false,
++    "conflictGroup": "technic-14578",
++    "stackRule": "same-technic",
++    "stats": {},
++    "skillEffects": [],
++    "customEffects": [
++      {
++        "name": "公式説明（数値計算・併用未検証）: 20以下のダメージを無効化する\n※WarAgeでは効果がない",
++        "value": 0,
++        "unit": ""
++      }
++    ],
++    "rawInfo": "20以下のダメージを無効化する\n※WarAgeでは効果がない ",
++    "sourceUrls": [
++      "https://idb.moepic.com/items/defences/23473"
++    ],
++    "memo": "2026-09-21公式DBから補完。説明を保持する暫定表示ルール。新規Buffの数値計算・異なるBuff間の併用関係は未検証。装備本体の追加ステータスは別途計算する。"
++  },
++  "technic-14577": {
++    "name": "竜封力",
++    "officialTechnicId": 14577,
++    "verified": false,
++    "applyDefault": true,
++    "source": "manual-official-description",
++    "confidence": "unverified",
++    "reviewStatus": "unverified",
++    "reviewComplete": false,
++    "conflictGroup": "technic-14577",
++    "stackRule": "same-technic",
++    "stats": {},
++    "skillEffects": [],
++    "customEffects": [
++      {
++        "name": "公式説明（数値計算・併用未検証）: 攻撃力依存の物理ダメージとドラゴン系へのダメージが増加して、HPの自然回復速度が大幅に上昇する\n※WarAgeでは効果がない",
++        "value": 0,
++        "unit": ""
++      }
++    ],
++    "rawInfo": "攻撃力依存の物理ダメージとドラゴン系へのダメージが増加して、HPの自然回復速度が大幅に上昇する\n※WarAgeでは効果がない",
++    "sourceUrls": [
++      "https://idb.moepic.com/items/defences/23472"
++    ],
++    "memo": "2026-09-21公式DBから補完。説明を保持する暫定表示ルール。新規Buffの数値計算・異なるBuff間の併用関係は未検証。装備本体の追加ステータスは別途計算する。"
++  },
++  "technic-14543": {
++    "name": "カブトムシ フォーム",
++    "officialTechnicId": 14543,
++    "verified": false,
++    "applyDefault": true,
++    "source": "manual-official-description",
++    "confidence": "unverified",
++    "reviewStatus": "unverified",
++    "reviewComplete": false,
++    "conflictGroup": "technic-14543",
++    "stackRule": "same-technic",
++    "stats": {},
++    "skillEffects": [],
++    "customEffects": [
++      {
++        "name": "公式説明（数値計算・併用未検証）: カブトムシに変身出来る",
++        "value": 0,
++        "unit": ""
++      }
++    ],
++    "rawInfo": "カブトムシに変身出来る",
++    "sourceUrls": [
++      "https://idb.moepic.com/items/defences/23458"
++    ],
++    "memo": "2026-09-21公式DBから補完。説明を保持する暫定表示ルール。新規Buffの数値計算・異なるBuff間の併用関係は未検証。装備本体の追加ステータスは別途計算する。"
++  },
++  "technic-14540": {
++    "name": "バエルの瞳",
++    "officialTechnicId": 14540,
++    "verified": false,
++    "applyDefault": true,
++    "source": "manual-official-description",
++    "confidence": "unverified",
++    "reviewStatus": "unverified",
++    "reviewComplete": false,
++    "conflictGroup": "technic-14540",
++    "stackRule": "same-technic",
++    "stats": {},
++    "skillEffects": [],
++    "customEffects": [
++      {
++        "name": "公式説明（数値計算・併用未検証）: 普段見えないものが見えるようになり、ダメージを受けた際に一定確率で「 ミニ バエル 」を召喚する\n※WarAgeでは効果がない",
++        "value": 0,
++        "unit": ""
++      }
++    ],
++    "rawInfo": "普段見えないものが見えるようになり、ダメージを受けた際に一定確率で「 ミニ バエル 」を召喚する\n※WarAgeでは効果がない",
++    "sourceUrls": [
++      "https://idb.moepic.com/items/defences/23447"
++    ],
++    "memo": "2026-09-21公式DBから補完。説明を保持する暫定表示ルール。新規Buffの数値計算・異なるBuff間の併用関係は未検証。装備本体の追加ステータスは別途計算する。"
++  },
++  "technic-14538": {
++    "name": "闇の守護精霊",
++    "officialTechnicId": 14538,
++    "verified": false,
++    "applyDefault": true,
++    "source": "manual-official-description",
++    "confidence": "unverified",
++    "reviewStatus": "unverified",
++    "reviewComplete": false,
++    "conflictGroup": "technic-14538",
++    "stackRule": "same-technic",
++    "stats": {},
++    "skillEffects": [],
++    "customEffects": [
++      {
++        "name": "公式説明（数値計算・併用未検証）: 魔力が3%と死の魔法の効果が20上昇して、魔法ダメージを25%軽減する\n※WarAgeでは効果がない",
++        "value": 0,
++        "unit": ""
++      }
++    ],
++    "rawInfo": "魔力が3%と死の魔法の効果が20上昇して、魔法ダメージを25%軽減する\n※WarAgeでは効果がない",
++    "sourceUrls": [
++      "https://idb.moepic.com/items/defences/23446"
++    ],
++    "memo": "2026-09-21公式DBから補完。説明を保持する暫定表示ルール。新規Buffの数値計算・異なるBuff間の併用関係は未検証。装備本体の追加ステータスは別途計算する。"
++  },
++  "technic-14539": {
++    "name": "ドレイン ワーム",
++    "officialTechnicId": 14539,
++    "verified": false,
++    "applyDefault": true,
++    "source": "manual-official-description",
++    "confidence": "unverified",
++    "reviewStatus": "unverified",
++    "reviewComplete": false,
++    "conflictGroup": "technic-14539",
++    "stackRule": "same-technic",
++    "stats": {},
++    "skillEffects": [],
++    "customEffects": [
++      {
++        "name": "公式説明（数値計算・併用未検証）: 攻撃力が3%上昇、与えたダメージ10%分のHPを回復して、受けたダメージ10％分のSTを回復する\n※WarAgeでは効果がない",
++        "value": 0,
++        "unit": ""
++      }
++    ],
++    "rawInfo": "攻撃力が3%上昇、与えたダメージ10%分のHPを回復して、受けたダメージ10％分のSTを回復する\n※WarAgeでは効果がない",
++    "sourceUrls": [
++      "https://idb.moepic.com/items/defences/23445"
++    ],
++    "memo": "2026-09-21公式DBから補完。説明を保持する暫定表示ルール。新規Buffの数値計算・異なるBuff間の併用関係は未検証。装備本体の追加ステータスは別途計算する。"
++  },
++  "technic-14481": {
++    "name": "ちびヒーロー（ギャンブラー）フォーム",
++    "officialTechnicId": 14481,
++    "verified": false,
++    "applyDefault": true,
++    "source": "manual-official-description",
++    "confidence": "unverified",
++    "reviewStatus": "unverified",
++    "reviewComplete": false,
++    "conflictGroup": "technic-14481",
++    "stackRule": "same-technic",
++    "stats": {},
++    "skillEffects": [],
++    "customEffects": [
++      {
++        "name": "公式説明（数値計算・併用未検証）: ヒーロースクワッドのギャンブラーに変身できる",
++        "value": 0,
++        "unit": ""
++      }
++    ],
++    "rawInfo": "ヒーロースクワッドのギャンブラーに変身できる",
++    "sourceUrls": [
++      "https://idb.moepic.com/items/defences/23419"
++    ],
++    "memo": "2026-09-21公式DBから補完。説明を保持する暫定表示ルール。新規Buffの数値計算・異なるBuff間の併用関係は未検証。装備本体の追加ステータスは別途計算する。"
++  },
++  "technic-14486": {
++    "name": "ドラゴン ジーン",
++    "officialTechnicId": 14486,
++    "verified": false,
++    "applyDefault": true,
++    "source": "manual-official-description",
++    "confidence": "unverified",
++    "reviewStatus": "unverified",
++    "reviewComplete": false,
++    "conflictGroup": "technic-14486",
++    "stackRule": "same-technic",
++    "stats": {},
++    "skillEffects": [],
++    "customEffects": [
++      {
++        "name": "公式説明（数値計算・併用未検証）: 攻撃力と防御力が上昇して、筋力スキルの効果と所持可能重量が増加する\n竜の脊椎に残された因子と共鳴して、専用技",
++        "value": 0,
++        "unit": ""
++      }
++    ],
++    "rawInfo": "攻撃力と防御力が上昇して、筋力スキルの効果と所持可能重量が増加する\n竜の脊椎に残された因子と共鳴して、専用技",
++    "sourceUrls": [
++      "https://idb.moepic.com/items/defences/23416"
++    ],
++    "memo": "2026-09-21公式DBから補完。説明を保持する暫定表示ルール。新規Buffの数値計算・異なるBuff間の併用関係は未検証。装備本体の追加ステータスは別途計算する。"
++  },
++  "technic-14485": {
++    "name": "プラネット グレイス",
++    "officialTechnicId": 14485,
++    "verified": false,
++    "applyDefault": true,
++    "source": "manual-official-description",
++    "confidence": "unverified",
++    "reviewStatus": "unverified",
++    "reviewComplete": false,
++    "conflictGroup": "technic-14485",
++    "stackRule": "same-technic",
++    "stats": {},
++    "skillEffects": [],
++    "customEffects": [
++      {
++        "name": "公式説明（数値計算・併用未検証）: 神秘魔法の効果と地属性の効果が15上昇する\n※WarAgeでは効果ばない",
++        "value": 0,
++        "unit": ""
++      }
++    ],
++    "rawInfo": "神秘魔法の効果と地属性の効果が15上昇する\n※WarAgeでは効果ばない",
++    "sourceUrls": [
++      "https://idb.moepic.com/items/defences/23415"
++    ],
++    "memo": "2026-09-21公式DBから補完。説明を保持する暫定表示ルール。新規Buffの数値計算・異なるBuff間の併用関係は未検証。装備本体の追加ステータスは別途計算する。"
++  },
++  "technic-14484": {
++    "name": "双極共鳴",
++    "officialTechnicId": 14484,
++    "verified": false,
++    "applyDefault": true,
++    "source": "manual-official-description",
++    "confidence": "unverified",
++    "reviewStatus": "unverified",
++    "reviewComplete": false,
++    "conflictGroup": "technic-14484",
++    "stackRule": "same-technic",
++    "stats": {},
++    "skillEffects": [],
++    "customEffects": [
++      {
++        "name": "公式説明（数値計算・併用未検証）: 回復魔法と破壊魔法の効果が15上昇して、無属性魔法のダメージが20%増加する\n※WarAgeでは効果がない",
++        "value": 0,
++        "unit": ""
++      }
++    ],
++    "rawInfo": "回復魔法と破壊魔法の効果が15上昇して、無属性魔法のダメージが20%増加する\n※WarAgeでは効果がない",
++    "sourceUrls": [
++      "https://idb.moepic.com/items/defences/23414"
++    ],
++    "memo": "2026-09-21公式DBから補完。説明を保持する暫定表示ルール。新規Buffの数値計算・異なるBuff間の併用関係は未検証。装備本体の追加ステータスは別途計算する。"
++  },
++  "technic-14483": {
++    "name": "サマーバケーション",
++    "officialTechnicId": 14483,
++    "verified": false,
++    "applyDefault": true,
++    "source": "manual-official-description",
++    "confidence": "unverified",
++    "reviewStatus": "unverified",
++    "reviewComplete": false,
++    "conflictGroup": "technic-14483",
++    "stackRule": "same-technic",
++    "stats": {},
++    "skillEffects": [],
++    "customEffects": [
++      {
++        "name": "公式説明（数値計算・併用未検証）: 自然回復速度が上昇して、スタミナの消費と火属性のダメージを軽減する\n※WarAgeでは効果ばない",
++        "value": 0,
++        "unit": ""
++      }
++    ],
++    "rawInfo": "自然回復速度が上昇して、スタミナの消費と火属性のダメージを軽減する\n※WarAgeでは効果ばない",
++    "sourceUrls": [
++      "https://idb.moepic.com/items/defences/23413"
++    ],
++    "memo": "2026-09-21公式DBから補完。説明を保持する暫定表示ルール。新規Buffの数値計算・異なるBuff間の併用関係は未検証。装備本体の追加ステータスは別途計算する。"
++  },
++  "technic-14482": {
++    "name": "冥騎士の力",
++    "officialTechnicId": 14482,
++    "verified": false,
++    "applyDefault": true,
++    "source": "manual-official-description",
++    "confidence": "unverified",
++    "reviewStatus": "unverified",
++    "reviewComplete": false,
++    "conflictGroup": "technic-14482",
++    "stackRule": "same-technic",
++    "stats": {},
++    "skillEffects": [],
++    "customEffects": [
++      {
++        "name": "公式説明（数値計算・併用未検証）: 死の魔法と暗黒命令の効果が15上昇して、BUFF点灯中に即死ダメージを受けてもギリギリで耐えることができる\n※効果発動時にBUFFが消えるが、一定時間で再点灯する\n※装備を付け替えた場合は約8秒間点灯しない\n※WarAgeでは効果がない",
++        "value": 0,
++        "unit": ""
++      }
++    ],
++    "rawInfo": "死の魔法と暗黒命令の効果が15上昇して、BUFF点灯中に即死ダメージを受けてもギリギリで耐えることができる\n※効果発動時にBUFFが消えるが、一定時間で再点灯する\n※装備を付け替えた場合は約8秒間点灯しない\n※WarAgeでは効果がない",
++    "sourceUrls": [
++      "https://idb.moepic.com/items/defences/23412"
++    ],
++    "memo": "2026-09-21公式DBから補完。説明を保持する暫定表示ルール。新規Buffの数値計算・異なるBuff間の併用関係は未検証。装備本体の追加ステータスは別途計算する。"
++  },
++  "technic-14431": {
++    "name": "冥府の祝福",
++    "officialTechnicId": 14431,
++    "verified": false,
++    "applyDefault": true,
++    "source": "manual-official-description",
++    "confidence": "unverified",
++    "reviewStatus": "unverified",
++    "reviewComplete": false,
++    "conflictGroup": "technic-14431",
++    "stackRule": "same-technic",
++    "stats": {},
++    "skillEffects": [],
++    "customEffects": [
++      {
++        "name": "公式説明（数値計算・併用未検証）: 冥府の力に祝福され、死の魔法と回復魔法の効果が15上昇する\n※WarAgeでは効果がない",
++        "value": 0,
++        "unit": ""
++      }
++    ],
++    "rawInfo": "冥府の力に祝福され、死の魔法と回復魔法の効果が15上昇する\n※WarAgeでは効果がない",
++    "sourceUrls": [
++      "https://idb.moepic.com/items/defences/23398"
++    ],
++    "memo": "2026-09-21公式DBから補完。説明を保持する暫定表示ルール。新規Buffの数値計算・異なるBuff間の併用関係は未検証。装備本体の追加ステータスは別途計算する。"
++  },
++  "technic-14430": {
++    "name": "上位妖精の加護",
++    "officialTechnicId": 14430,
++    "verified": false,
++    "applyDefault": true,
++    "source": "manual-official-description",
++    "confidence": "unverified",
++    "reviewStatus": "unverified",
++    "reviewComplete": false,
++    "conflictGroup": "technic-14430",
++    "stackRule": "same-technic",
++    "stats": {},
++    "skillEffects": [],
++    "customEffects": [
++      {
++        "name": "公式説明（数値計算・併用未検証）: 魔法の威力が増加して、魔法ダメージを25%軽減する\n※WarAgeでは効果がない",
++        "value": 0,
++        "unit": ""
++      }
++    ],
++    "rawInfo": "魔法の威力が増加して、魔法ダメージを25%軽減する\n※WarAgeでは効果がない",
++    "sourceUrls": [
++      "https://idb.moepic.com/items/defences/23396"
++    ],
++    "memo": "2026-09-21公式DBから補完。説明を保持する暫定表示ルール。新規Buffの数値計算・異なるBuff間の併用関係は未検証。装備本体の追加ステータスは別途計算する。"
++  },
++  "technic-14429": {
++    "name": "エルフの叡智",
++    "officialTechnicId": 14429,
++    "verified": false,
++    "applyDefault": true,
++    "source": "manual-official-description",
++    "confidence": "unverified",
++    "reviewStatus": "unverified",
++    "reviewComplete": false,
++    "conflictGroup": "technic-14429",
++    "stackRule": "same-technic",
++    "stats": {},
++    "skillEffects": [],
++    "customEffects": [
++      {
++        "name": "公式説明（数値計算・併用未検証）: 魔力が5%、最大MPが10%上昇して、専用魔法『 アルス・マグナ 』が使用可能になる\n※WarAgeでは効果がない",
++        "value": 0,
++        "unit": ""
++      }
++    ],
++    "rawInfo": "魔力が5%、最大MPが10%上昇して、専用魔法『 アルス・マグナ 』が使用可能になる\n※WarAgeでは効果がない",
++    "sourceUrls": [
++      "https://idb.moepic.com/items/defences/23395"
++    ],
++    "memo": "2026-09-21公式DBから補完。説明を保持する暫定表示ルール。新規Buffの数値計算・異なるBuff間の併用関係は未検証。装備本体の追加ステータスは別途計算する。"
++  },
++  "technic-14576": {
++    "name": "斉天大聖",
++    "officialTechnicId": 14576,
++    "verified": false,
++    "applyDefault": true,
++    "source": "manual-official-description",
++    "confidence": "unverified",
++    "reviewStatus": "unverified",
++    "reviewComplete": false,
++    "conflictGroup": "technic-14576",
++    "stackRule": "same-technic",
++    "stats": {},
++    "skillEffects": [],
++    "customEffects": [
++      {
++        "name": "公式説明（数値計算・併用未検証）: 攻撃力と回避が5%上昇して、戦闘技術の効果が増加するが、魔法の詠唱ができなくなる\n※WarAgeでは効果がない",
++        "value": 0,
++        "unit": ""
++      }
++    ],
++    "rawInfo": "攻撃力と回避が5%上昇して、戦闘技術の効果が増加するが、魔法の詠唱ができなくなる\n※WarAgeでは効果がない",
++    "sourceUrls": [
++      "https://idb.moepic.com/items/defences/23393"
++    ],
++    "memo": "2026-09-21公式DBから補完。説明を保持する暫定表示ルール。新規Buffの数値計算・異なるBuff間の併用関係は未検証。装備本体の追加ステータスは別途計算する。"
++  }
++});
+diff --git a/src/domain/catalogData.js b/src/domain/catalogData.js
+index 18b9122..fc76a60 100644
+--- a/src/domain/catalogData.js
++++ b/src/domain/catalogData.js
+@@ -30,7 +30,7 @@ function loadCatalogScriptsOnce() {
+   catalogScriptsPromise = Promise.all(CATALOG_SCRIPT_URLS.map(src => new Promise(resolve => {
+     if (document.querySelector(`script[data-catalog-src="${src}"]`)) return resolve();
+     const script = document.createElement("script");
+-    script.src = src;
++    script.src = `${src}?v=1.24.10`;
+     script.async = false;
+     script.dataset.catalogSrc = src;
+     script.onload = () => resolve();
+@@ -45,7 +45,7 @@ function loadEquipmentBuffRuntimeScriptsOnce() {
+   equipmentBuffRuntimeScriptsPromise = Promise.all(EQUIPMENT_BUFF_RUNTIME_SCRIPT_URLS.map(src => new Promise(resolve => {
+     if (document.querySelector(`script[data-catalog-src="${src}"]`)) return resolve();
+     const script = document.createElement("script");
+-    script.src = src;
++    script.src = `${src}?v=1.24.10`;
+     script.async = false;
+     script.dataset.catalogSrc = src;
+     script.onload = () => resolve();
+diff --git a/src/main.js b/src/main.js
+index c6d7905..8d066e8 100644
+--- a/src/main.js
++++ b/src/main.js
+@@ -12,8 +12,8 @@
+   onclick属性から呼ばれる関数があるため、現時点では module ではなく通常scriptとして読み込みます。
+ */
+ 
+-const APP_VERSION = "v1.24.9";
+-const APP_VERSION_NOTE = "見せびらかし集計の欠落修正・保守情報整理";
++const APP_VERSION = "v1.24.10";
++const APP_VERSION_NOTE = "公式DB装備45件を補完・Buff原文を収録";
+ 
+ /* 種族係数。攻撃力係数と魔力係数は別管理。 */
+ const RACE_COEFFS = {
+diff --git a/tests/catalogBuffEffectFilter.test.cjs b/tests/catalogBuffEffectFilter.test.cjs
+index 587c70b..a38f72a 100644
+--- a/tests/catalogBuffEffectFilter.test.cjs
++++ b/tests/catalogBuffEffectFilter.test.cjs
+@@ -91,8 +91,8 @@ assert.doesNotMatch(catalogTabSource, /スキル強化フィルタ/);
+ assert.doesNotMatch(catalogTabSource, /catalogSkillPlus/);
+ assert.match(mainTabsSource, /label:"装備カタログ"/);
+ assert.doesNotMatch(mainTabsSource, /装備カタログ α/);
+-assert.match(mainSource, /const APP_VERSION = "v1\.24\.9"/);
+-assert.doesNotMatch(indexSource, /\?v=1\.24\.[01]/);
++assert.match(mainSource, /const APP_VERSION = "v1\.24\.10"/);
++assert.doesNotMatch(indexSource, /\?v=1\.24\.[01](?!\d)/);
+ assert.match(stylesSource, /@media \(max-width: 980px\)[\s\S]*?\.catalogBuffEffectFilterRow[\s\S]*?grid-template-columns:[^;]*1\.35fr[^;]*1fr/);
+ assert.match(stylesSource, /@media \(max-width: 420px\)[\s\S]*?\.catalogBuffEffectFilterRow[\s\S]*?grid-template-columns: 1fr/);
+ 
+diff --git a/tests/equipmentBuffFinalUnverifiedBatch23.test.cjs b/tests/equipmentBuffFinalUnverifiedBatch23.test.cjs
+index e17e20b..e8d0af8 100644
+--- a/tests/equipmentBuffFinalUnverifiedBatch23.test.cjs
++++ b/tests/equipmentBuffFinalUnverifiedBatch23.test.cjs
+@@ -32,6 +32,9 @@ const audit = JSON.parse(childProcess.execFileSync(
+   [path.join(root, "tools/audit-equipment-buff-manual.mjs"), "--json"],
+   { encoding: "utf8" }
+ ));
+-assert.deepEqual(audit.counts.unverifiedReview, { finalized: 7, pending: 0 });
++const newItems = JSON.parse(fs.readFileSync(path.join(root, "docs/official-catalog-update-20260921.json"), "utf8"));
++const pendingIds = Object.entries(rules).filter(([,r]) => r.reviewStatus === "unverified" && !r.reviewComplete).map(([id]) => id);
++assert.deepEqual(pendingIds.sort(), [...newItems.newBuffs].sort(), "Only the newly imported Buffs await review");
++assert.deepEqual(audit.counts.unverifiedReview, { finalized: 7, pending: newItems.newBuffs.length });
+ 
+ console.log("equipmentBuffFinalUnverifiedBatch23 tests: OK");
+diff --git a/tests/officialCatalogUpdate.test.cjs b/tests/officialCatalogUpdate.test.cjs
+new file mode 100644
+index 0000000..56a4b3b
+--- /dev/null
++++ b/tests/officialCatalogUpdate.test.cjs
+@@ -0,0 +1,60 @@
++const assert=require('node:assert/strict');
++const fs=require('node:fs');
++const path=require('node:path');
++const vm=require('node:vm');
++const {pathToFileURL}=require('node:url');
++const {context,json,root}=require('../tools/benchmark-optimizer.cjs');
++(async()=>{
++  const {convertRows,validatePage,mergeCatalog,parsePage}=await import(pathToFileURL(path.join(root,'tools/update-equipment-catalog-from-official.mjs')));
++  const row={id:4856,name:'SGK ウェポン',info:'説明\\n次行',weponType:'刀剣',weponHand:'2HAND',need_level:100,equip:'右手',
++    need_skills:[{name:'素手',pivot:{value:100}},{name:'槍',pivot:{value:100}}],
++    add_statuses:[{id:7,name:'魔力',pivot:{value:5}},{id:0,name:'なし',pivot:{value:0}}],technic:null,technic_id:0};
++  const delta=convertRows([{category:'weapons',row,fetchedAt:'2026-09-21T00:00:00Z'}]);
++  assert.deepEqual(delta.equipment[0].requirements,[{name:'刀剣',required:100},{name:'素手',required:100},{name:'槍',required:100}]);
++  assert.equal(delta.equipment[0].extraStats.magic,5,'additional status counted once');
++  assert.equal(delta.equipment[0].info,'説明\n次行');
++  const page={props:{weapons:{current_page:1,last_page:1,total:1,per_page:5,data:[row]}}};
++  assert.equal(validatePage(page,'weapons',1).total,1);
++  assert.throws(()=>validatePage(page,'weapons',2));
++  assert.throws(()=>validatePage(page,'weapons',1,4856),'duplicate/non-descending ID');
++  assert.throws(()=>validatePage({props:{}},'weapons',1));
++  const encoded=JSON.stringify(page).replaceAll('&','&amp;').replaceAll('"','&quot;');
++  assert.deepEqual(parsePage(`<div data-page="${encoded}"></div>`),page);
++  const old=[{catalogId:'old-item',name:'旧装備',fetchedAt:'2026-06-29'}];
++  const merged=mergeCatalog(old,[],delta);
++  assert.deepEqual(merged.equipment[0],old[0],'keep old rows and dates verbatim');
++  assert.throws(()=>mergeCatalog(delta.equipment,[],delta),'no overwrite');
++  assert.equal(old.length,1,'no caller mutation');
++
++  const p=context(root,{catalog:true});
++  const report=JSON.parse(fs.readFileSync(path.join(root,'docs/official-catalog-update-20260921.json'),'utf8'));
++  assert.equal(report.addedEquipment.length,45);
++  assert.equal(report.newBuffs.length,25);
++  const items=p.equipmentCatalogItems();
++  for(const id of report.addedEquipment){
++    const item=items.find(x=>x.catalogId===id);assert.ok(item,id);
++    assert.equal(item.source,'official-idb');
++    const r=p.catalogEquipmentToRow(item);
++    if(report.newBuffs.includes(item.buffRefs[0])) {
++      const rule=p.findEquipBuffRuleCandidate({catalogId:item.buffRefs[0]});
++      assert.equal(rule.reviewStatus,'unverified');assert.equal(rule.reviewComplete,false);
++      assert.deepEqual(json(rule.stats),{});
++      assert.ok(p.equipmentBuffEffectText(r).includes('公式説明'),item.name);
++      assert.ok(p.catalogBuffEffectEntries(item).length,item.name+' searchable');
++      const st=vm.runInContext('DEFAULT_STATE()',p);st.equipment=[{...r,enabled:true,equipBuffEnabled:true}];
++      const inputs={raceSelect:'newtar',str:100,spirit:100,weaponDamage:100,atkCap:500,techMultiplier:1};
++      const on=p.computeMetrics(st,inputs);
++      st.equipment[0].equipBuffEnabled=false;
++      const off=p.computeMetrics(st,inputs);
++      assert.equal(on.finalDamage,off.finalDamage,item.name+' pending Buff must not alter damage');
++      assert.deepEqual(json(on.extraStats),json(off.extraStats),item.name+' pending Buff must not alter stats');
++    }
++  }
++  const bell=items.find(x=>x.catalogId==='official-weapon-23492');
++  assert.equal(bell.extraStats.magic,5);
++  assert.deepEqual(json(bell.requirements),[{name:'こんぼう',required:21}]);
++  assert.equal(bell.weaponAttackInterval,150);
++  assert.equal(p.MOE_EQUIPMENT_CATALOG_GENERATED.length,11837);
++  assert.equal(p.MOE_BUFF_CATALOG_GENERATED.length,1673);
++  console.log('official catalog update: OK (45 items, 25 pending Buffs, primary + secondary requirements, provenance, no overwrite)');
++})().catch(e=>{console.error(e);process.exitCode=1;});
+diff --git a/tools/build-equipment-catalog-from-google-sheet.mjs b/tools/build-equipment-catalog-from-google-sheet.mjs
+index 72097aa..3245462 100644
+--- a/tools/build-equipment-catalog-from-google-sheet.mjs
++++ b/tools/build-equipment-catalog-from-google-sheet.mjs
+@@ -15,6 +15,7 @@
+ import fs from 'node:fs/promises';
+ import path from 'node:path';
+ import process from 'node:process';
++import { pathToFileURL } from 'node:url';
+ 
+ const GENERATOR_VERSION = 'v1.23.11';
+ const DEFAULT_SPREADSHEET_ID = '10nHr68XojjuxxJrpLBENrDWUB4TywMGy8CTe9lzclSE';
+@@ -524,7 +525,7 @@ function jsonForJs(value) {
+   return JSON.stringify(value, null, 2).replace(/<\/script/gi, '<\\/script');
+ }
+ 
+-function toCatalog(items, addStatuses, equipBuffs) {
++export function toCatalog(items, addStatuses, equipBuffs) {
+   const statusMap = new Map();
+   for (const st of addStatuses) {
+     const cat = categoryKey(st.category);
+@@ -694,7 +695,7 @@ async function main() {
+   }
+ }
+ 
+-main().catch(err => {
++if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) main().catch(err => {
+   console.error(err);
+   process.exit(1);
+ });
+diff --git a/tools/update-equipment-catalog-from-official.mjs b/tools/update-equipment-catalog-from-official.mjs
+new file mode 100644
+index 0000000..429b484
+--- /dev/null
++++ b/tools/update-equipment-catalog-from-official.mjs
+@@ -0,0 +1,179 @@
++#!/usr/bin/env node
++// Public official lists, newest IDs + explicitly selected missing IDs. NOT a full recrawl.
++// Existing rows/manual rules are preserved. Review the report before publishing.
++import fs from 'node:fs/promises';
++import path from 'node:path';
++import vm from 'node:vm';
++import {pathToFileURL} from 'node:url';
++import {toCatalog} from './build-equipment-catalog-from-google-sheet.mjs';
++
++export const categories = {weapons:'weapon',defences:'defense',shields:'shield'};
++export function decodeText(value) {
++  return String(value ?? '').replace(/\\u([0-9a-f]{4})|\\([nrt])/gi, (_,hex,escape) =>
++    hex ? String.fromCharCode(parseInt(hex,16)) : ({n:'\n',r:'\r',t:'\t'})[escape]);
++}
++export function parsePage(text) {
++  if (text.trim().startsWith('{')) return JSON.parse(text);
++  const encoded = text.match(/\bdata-page="([^"]+)"/)?.[1];
++  if (!encoded) throw Error('Official page has no data-page JSON');
++  const decoded = encoded.replace(/&quot;/g,'"').replace(/&#039;|&apos;/g,"'")
++    .replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&');
++  return JSON.parse(decoded);
++}
++export function validatePage(page, category, expectedPage, previousId=Infinity) {
++  const list=page.props?.[category];
++  if (!list || list.current_page!==expectedPage || !Array.isArray(list.data)
++      || !Number.isInteger(list.total) || !Number.isInteger(list.last_page)
++      || !list.data.length || list.data.length>list.per_page) throw Error(`Invalid page: ${category}/${expectedPage}`);
++  for (const row of list.data) {
++    if (!row || !Number.isInteger(row.id) || row.id>=previousId || !row.name || !Array.isArray(row.add_statuses)
++        || !Object.hasOwn(row,'technic') || (category==='weapons' && !Array.isArray(row.need_skills))) {
++      throw Error(`Incomplete or non-descending item: ${category}/${row?.id}`);
++    }
++    if (Number(row.technic_id)>0 && Number(row.technic?.id)!==Number(row.technic_id)) throw Error('Missing technic relation');
++    previousId=row.id;
++  }
++  return list;
++}
++export function convertRows(records) {
++  const items=[], statuses=[], buffs=[];
++  for (const {category, row:r, fetchedAt} of records) {
++    const cat=categories[category];
++    if (!cat) throw Error('Unknown category');
++    const primary=r.requiredSkill || r.useSkill || r.weponType || '';
++    const req=(r.need_skills || []).map(s=>{
++      const name=decodeText(s.name),required=Number(s.pivot?.value);
++      if (!name || !Number.isFinite(required)) throw Error(`Unknown need_skills schema: ${r.id}`);
++      return {name,required};
++    });
++    // need_skills contains additional requirements, not the weapon's primary skill.
++    if(primary && Number(r.need_level)>0) req.unshift({name:primary,required:Number(r.need_level)});
++    items.push({...r,category:cat,name:decodeText(r.name),info:decodeText(r.info),
++      requiredSkill:r.requiredSkill || r.useSkill || r.weponType || '',
++      requirements_json:JSON.stringify(req),source_url:`https://idb.moepic.com/items/${category}/${r.id}`,
++      fetched_at:fetchedAt,add_status_text:r.add_statuses.map(s=>`${s.name} ${Number(s.pivot.value)>=0?'+':''}${s.pivot.value}`).join('\n')});
++    // Each official relation is consumed once; do not also parse add_status_text.
++    for(const s of r.add_statuses) {
++      if (!s.name || !Number.isFinite(Number(s.pivot?.value))) throw Error(`Invalid add_status: ${r.id}`);
++      statuses.push({category:cat,item_id:r.id,status_id:s.id,status_name:s.name,value:s.pivot.value});
++    }
++    if(r.technic) buffs.push({category:cat,item_id:r.id,item_name:decodeText(r.name),
++      technic_id:r.technic.id,technic_name:decodeText(r.technic.name),technic_info:decodeText(r.technic.info)});
++  }
++  const result=toCatalog(items,statuses,buffs);
++  for(const item of [...result.equipment,...result.buffs]) {
++    item.source='official-idb'; item.sourceSheetUrl='';
++  }
++  for(const item of result.equipment) if(item.unmappedAddStatuses.length) throw Error(`Unmapped status: ${item.catalogId}`);
++  return result;
++}
++export function mergeCatalog(baseEquipment,baseBuffs,delta) {
++  const equipment=structuredClone(baseEquipment),buffs=structuredClone(baseBuffs);
++  const ids=new Set(equipment.map(x=>x.catalogId)), byBuff=new Map(buffs.map(x=>[x.catalogId,x]));
++  const added=[],newBuffs=[],changedBuffDescriptions=[];
++  for(const row of delta.equipment) {
++    if(ids.has(row.catalogId)) throw Error(`Refusing to overwrite existing item: ${row.catalogId}`);
++    ids.add(row.catalogId);equipment.push(row);added.push(row.catalogId);
++  }
++  for(const row of delta.buffs) {
++    const old=byBuff.get(row.catalogId);
++    if(!old){buffs.push(row);byBuff.set(row.catalogId,row);newBuffs.push(row.catalogId);continue;}
++    if(old.name!==row.name || old.info!==row.info) changedBuffDescriptions.push({id:row.catalogId,previous:{name:old.name,info:old.info},current:{name:row.name,info:row.info}});
++    // Preserve existing descriptions/rules until reviewed; add provenance links only.
++    for(const key of ['sourceEquipmentIds','sourceEquipmentNames']) old[key]=[...new Set([...(old[key]||[]),...(row[key]||[])])];
++  }
++  return {equipment,buffs,added,newBuffs,changedBuffDescriptions};
++}
++async function readCatalog(dir) {
++  const context=vm.createContext({window:{}});
++  for(const name of ['equipmentCatalog','buffCatalog']) vm.runInContext(await fs.readFile(path.join(dir,name+'.generated.js'),'utf8'),context);
++  return JSON.parse(JSON.stringify(context.window));
++}
++async function writeText(file,text) {
++  const handle=await fs.open(file,'w');
++  try {
++    const bytes=Buffer.from(text);
++    for(let offset=0;offset<bytes.length;) {
++      const {bytesWritten}=await handle.write(bytes,offset,Math.min(65536,bytes.length-offset),offset);
++      if(!bytesWritten) throw Error(`Could not write ${file}`);
++      offset+=bytesWritten;
++    }
++    await handle.sync();
++  } finally {await handle.close();}
++}
++async function main() {
++  const args=Object.fromEntries(process.argv.slice(2).map(s=>{const i=s.indexOf('=');return i<0?[s,true]:[s.slice(0,i),s.slice(i+1)];}));
++  if(!args['--out']) throw Error('Usage: node tools/update-equipment-catalog-from-official.mjs --out=DIR [--base=src/data/generated] [--cache-dir=DIR] [--offline] [--include=defences:ID,...]');
++  const base=await readCatalog(args['--base']||'src/data/generated');
++  const cache=args['--cache-dir']||'dist/official-new-items';await fs.mkdir(cache,{recursive:true});
++  const records=[],coverage=[];
++  for(const [category,cat] of Object.entries(categories)) {
++    const baseline=base.MOE_EQUIPMENT_CATALOG_GENERATED.filter(x=>x.category===cat);
++    const cutoff=Math.max(...baseline.map(x=>x.officialId));
++    if(!Number.isFinite(cutoff)) throw Error(`Missing baseline category ${cat}`);
++    let previousId=Infinity,total=null,boundary=false;
++    for(let number=1;number<=500;number++) {
++      const url=`https://idb.moepic.com/items/${category}?sortby=0&order=1&page=${number}`;
++      const file=path.join(cache,`${category}-desc-${number}.json`);
++      let page;
++      if(args['--offline']) page=JSON.parse(await fs.readFile(file,'utf8'));
++      else {
++        const response=await fetch(url,{signal:AbortSignal.timeout(45000)});
++        if(!response.ok) throw Error(`${url}: HTTP ${response.status}`);
++        page=parsePage(await response.text());page.fetchedAt=new Date().toISOString();page.sourceUrl=url;
++        await fs.writeFile(file,JSON.stringify(page,null,2)+'\n');
++        await new Promise(resolve=>setTimeout(resolve,300));
++      }
++      if(!page.fetchedAt || page.sourceUrl!==url) throw Error('Cache must have fetchedAt and matching sourceUrl');
++      const list=validatePage(page,category,number,previousId);
++      if(total!==null && list.total!==total) throw Error('Official total changed during fetch; retry');
++      total=list.total;previousId=list.data.at(-1).id;
++      for(const row of list.data) if(row.id>cutoff) records.push({category,row,fetchedAt:page.fetchedAt});
++      if(previousId<=cutoff || number===list.last_page) {
++        boundary=true;coverage.push({category,baselineCount:baseline.length,baselineUniqueCount:new Set(baseline.map(x=>x.catalogId)).size,officialTotal:total,cutoffId:cutoff,pages:number,lowestFetchedId:previousId});break;
++      }
++    }
++    if(!boundary) throw Error(`Page limit reached before boundary: ${category}`);
++  }
++  const included=[];
++  for(const selection of String(args['--include']||'').split(',').filter(Boolean)) {
++    const [category,rawId]=selection.split(':');const id=Number(rawId);
++    if(!categories[category] || !Number.isSafeInteger(id) || id<=0) throw Error(`Invalid selection: ${selection}`);
++    if(base.MOE_EQUIPMENT_CATALOG_GENERATED.some(x=>x.catalogId===`official-${categories[category]}-${id}`)
++        || records.some(x=>x.category===category && x.row.id===id)) continue;
++    const url=`https://idb.moepic.com/items/${category}/${id}`;
++    const file=path.join(cache,`${category}-item-${id}.json`);let page;
++    if(args['--offline']) page=JSON.parse(await fs.readFile(file,'utf8'));
++    else {
++      const response=await fetch(url,{signal:AbortSignal.timeout(45000)});
++      if(!response.ok) throw Error(`${url}: HTTP ${response.status}`);
++      page=parsePage(await response.text());page.fetchedAt=new Date().toISOString();page.sourceUrl=url;
++      await fs.writeFile(file,JSON.stringify(page,null,2)+'\n');
++    }
++    if(page.sourceUrl!==url || !page.fetchedAt) throw Error('Invalid individual page provenance');
++    const row=Object.values(page.props||{}).find(x=>x?.id===id && Array.isArray(x.add_statuses));
++    validatePage({props:{[category]:{current_page:1,last_page:1,per_page:1,total:1,data:[row]}}},category,1);
++    records.push({category,row,fetchedAt:page.fetchedAt});included.push(selection);
++  }
++  const merged=mergeCatalog(base.MOE_EQUIPMENT_CATALOG_GENERATED,base.MOE_BUFF_CATALOG_GENERATED,convertRows(records));
++  const generatedAt=new Date().toISOString();
++  const report={generatedAt,scope:'new IDs above baseline maximum plus explicitly selected missing IDs; existing items retained, not fully recrawled',coverage,included,
++    addedEquipment:merged.added,newBuffs:merged.newBuffs,changedBuffDescriptions:merged.changedBuffDescriptions,
++    items:records.map(x=>({category:x.category,id:x.row.id,name:x.row.name,technic:x.row.technic}))};
++  await fs.mkdir(args['--out'],{recursive:true});
++  const safe=value=>JSON.stringify(value,null,2).replace(/<\/script/gi,'<\\/script');
++  for(const [name,key,items] of [['equipmentCatalog','EQUIPMENT',merged.equipment],['buffCatalog','BUFF',merged.buffs]]) {
++    const meta={...base[`MOE_${key}_CATALOG_META`],generatedAt,equipmentCount:merged.equipment.length,buffCount:merged.buffs.length,
++      lastOfficialIncrementalUpdate:{generatedAt,scope:report.scope,coverage,addedEquipment:merged.added.length,newBuffs:merged.newBuffs.length}};
++    for(const field of ['mappedStatusCounts','ignoredStatusCounts','unmappedStatusCounts']) meta[field]={};
++    for(const item of merged.equipment) for(const status of item.addStatuses||[]) {
++      const field=status.statKey?'mappedStatusCounts':status.ignored?'ignoredStatusCounts':'unmappedStatusCounts';
++      const label=status.statKey?`${status.name} -> ${status.statKey}`:status.name;
++      meta[field][label]=(meta[field][label]||0)+1;
++    }
++    await writeText(path.join(args['--out'],name+'.generated.js'),`// Generated by tools/update-equipment-catalog-from-official.mjs\n// Existing entries retained; incremental official new IDs only.\nwindow.MOE_${key}_CATALOG_META = ${safe(meta)};\nwindow.MOE_${key}_CATALOG_GENERATED = ${safe(items)};\n`);
++  }
++  await fs.writeFile(path.join(args['--out'],'official-update-report.json'),safe(report)+'\n');
++  console.log(JSON.stringify({equipment:merged.equipment.length,buffs:merged.buffs.length,added:merged.added.length,newBuffs:merged.newBuffs.length,changedDescriptions:merged.changedBuffDescriptions.length,coverage},null,2));
++}
++if(process.argv[1] && import.meta.url===pathToFileURL(path.resolve(process.argv[1])).href) main().catch(error=>{console.error(error);process.exitCode=1;});

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Master of Epic 物理ダメージ計算webツール
+ * Master of Epic 戦闘シミュレーター
  * data/manual/buffRules.manual.input.tsv を Scrapbox(Medi記録) の検索結果で補完する。
  *
  * 使い方:

@@ -2,7 +2,7 @@ v1.24.12: 最適化UIを目的・条件・詳細設定へ整理。スキル強�
 
 v1.24.11: 添付Wikiから新規Buff22件を反映。暫定併用グループは？を除去して適用。詳細: docs/wiki-buff-review-v1.24.11.md
 
-# Master of Epic 物理ダメージ計算webツール
+# Master of Epic 戦闘シミュレーター
 
 **Master of Epic** の物理攻撃ダメージを、武器・ステータス・装備・Buffを組み合わせて試算するブラウザ用ツールです。
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Master of Epic 物理ダメージ計算webツール
+ * Master of Epic 戦闘シミュレーター
  * Wiki装備Buff効果候補から、手入力用TSVテンプレートを生成する。
  *
  * 使い方:

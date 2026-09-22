@@ -1,5 +1,5 @@
 // moe-idb-proxy-worker.js
-// Cloudflare Worker for Master of Epic 物理ダメージ計算webツール
+// Cloudflare Worker for Master of Epic 戦闘シミュレーター
 //
 // v1.18.4:
 // - Fixed for this tool's GitHub Pages deployment.

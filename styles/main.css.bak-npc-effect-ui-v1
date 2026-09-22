@@ -1,5 +1,5 @@
 /*
-  Master of Epic 戦闘シミュレーター
+  Master of Epic 物理ダメージ計算webツール
   Split version: stylesheet.
 */
 
@@ -127,39 +127,6 @@
   .scrollX {
     overflow-x: auto;
     max-width: 100%;
-  }
-  .combatLogSummaryGrid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr));
-    gap: 12px;
-    align-items: start;
-    margin-top: 10px;
-  }
-  .combatLogSummaryBlock {
-    min-width: 0;
-    padding: 8px 10px;
-    border-left: 3px solid #ddd;
-    background: #fcfcfc;
-  }
-  .combatLogSummaryBlock h3 {
-    margin: 0 0 4px;
-    font-size: 15px;
-  }
-  .combatLogSummaryHeadline {
-    margin-bottom: 5px;
-    font-weight: 700;
-    font-variant-numeric: tabular-nums;
-  }
-  .combatLogTextStats {
-    font-size: 13px;
-    line-height: 1.45;
-  }
-  .combatLogTextStats > div {
-    white-space: normal;
-    overflow-wrap: anywhere;
-  }
-  #combatLogEncounter {
-    width: min(100%, 620px);
   }
   .compactControls {
     display: grid;
@@ -4466,8 +4433,8 @@ button[onclick*="applySkillSimToCalc"],
   }
 }
 
-/* 装備Buff効果フィルタ / v21 optimizer skillPlus filters */
-.catalogBuffEffectFilters,
+/* v21: skillPlus catalog/optimizer filters */
+.catalogSkillPlusFilters,
 .optimizerSkillPlusFilters {
   grid-column: 1 / -1;
   border: 1px solid var(--border, rgba(127, 127, 127, .28));
@@ -4475,79 +4442,39 @@ button[onclick*="applySkillSimToCalc"],
   padding: .55rem .7rem;
   background: color-mix(in srgb, currentColor 2%, transparent);
 }
-.catalogBuffEffectFilters > summary,
+.catalogSkillPlusFilters > summary,
 .optimizerSkillPlusFilters > summary {
   cursor: pointer;
   font-weight: 800;
 }
-.catalogBuffEffectFilterHelp,
+.catalogSkillPlusFilterHelp,
 .optimizerSkillPlusHelp {
   margin: .45rem 0 .6rem;
 }
-.catalogBuffEffectFilterRows,
+.catalogSkillPlusFilterRows,
 .optimizerSkillPlusFilterRows {
   display: grid;
   gap: .55rem;
 }
-.catalogBuffEffectFilterRow {
-  display: grid;
-  grid-template-columns: minmax(13rem, 1.45fr) minmax(10rem, 1fr) minmax(7rem, .7fr) minmax(7rem, .7fr);
-  gap: .55rem;
-  align-items: end;
-  padding: .65rem;
-  border: 1px solid color-mix(in srgb, var(--border, currentColor) 70%, transparent);
-  border-radius: 10px;
-  background: color-mix(in srgb, currentColor 2.5%, transparent);
-}
+.catalogSkillPlusFilterRow,
 .optimizerSkillPlusFilterRow {
   display: grid;
   grid-template-columns: minmax(12rem, 1.5fr) minmax(7rem, .75fr) minmax(7rem, .75fr);
   gap: .55rem;
   align-items: end;
 }
-.catalogBuffEffectFilterRow label {
-  display: grid;
-  gap: .25rem;
-  min-width: 0;
-  font-size: .82rem;
-  font-weight: 700;
-}
-.catalogBuffEffectFilterRow select,
-.catalogBuffEffectFilterRow input,
+.catalogSkillPlusFilterRow select,
+.catalogSkillPlusFilterRow input,
 .optimizerSkillPlusFilterRow select,
 .optimizerSkillPlusFilterRow input,
 .optimizerSkillPlusTargetRow select {
   width: 100%;
   box-sizing: border-box;
 }
-@media (max-width: 980px) {
-  .catalogBuffEffectFilterRow {
-    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
-  }
-}
 @media (max-width: 720px) {
+  .catalogSkillPlusFilterRow,
   .optimizerSkillPlusFilterRow {
     grid-template-columns: 1fr;
-  }
-  .catalogBuffEffectFilters {
-    padding: .5rem;
-  }
-  .catalogBuffEffectFilterRow {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    gap: .5rem;
-    padding: .6rem;
-  }
-  .catalogBuffEffectKind,
-  .catalogBuffEffectTarget {
-    grid-column: 1 / -1;
-  }
-}
-@media (max-width: 420px) {
-  .catalogBuffEffectFilterRow {
-    grid-template-columns: 1fr;
-  }
-  .catalogBuffEffectFilterRow > label {
-    grid-column: 1;
   }
 }
 
@@ -5138,94 +5065,142 @@ button[onclick*="applySkillSimToCalc"],
   }
 }
 
-/* __MOE_NPC_EFFECT_UI_UNIFIED_V1__ */
-.npcEffectInputRow {
-  display: grid;
-  grid-template-columns:
-    minmax(150px, 1.2fr)
-    minmax(100px, 0.65fr)
-    minmax(120px, 0.8fr)
-    minmax(80px, 0.45fr)
-    minmax(190px, 1.5fr)
-    auto;
-  gap: 8px;
-  align-items: end;
-  margin-bottom: 12px;
+/* __MOE_NPC_EFFECT_SLOTS_V1_CSS__ */
+.npcEffectSlotsPanel {
+  margin: 18px 0;
+  padding: 16px;
+  border: 1px solid rgba(79, 99, 130, 0.28);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.72);
 }
 
-.npcEffectInputRow label {
+.npcEffectSlotsTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.npcEffectSlotsTitleRow h3 {
+  margin: 0;
+}
+
+.npcEffectSlotBadge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 2px 10px;
+  border: 1px solid rgba(65, 103, 165, 0.35);
+  border-radius: 999px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.npcEffectSlotBadge.isFull {
+  border-color: rgba(177, 55, 55, 0.5);
+  background: rgba(177, 55, 55, 0.1);
+}
+
+.npcEffectSlotsHelp {
+  margin: 7px 0 0;
+}
+
+.npcEffectAddRow {
+  display: grid;
+  grid-template-columns: minmax(180px, 1.1fr) minmax(110px, 0.55fr) minmax(220px, 1.6fr) auto;
+  align-items: end;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.npcEffectAddRow label {
   display: grid;
   gap: 4px;
 }
 
-.npcEffectInputRow input,
-.npcEffectInputRow select {
+.npcEffectAddRow input,
+.npcEffectAddRow select {
   width: 100%;
   box-sizing: border-box;
 }
 
-.npcEffectTable {
-  width: 100%;
+.npcEffectLimitMessage {
+  margin-top: 10px;
+  font-weight: 800;
 }
 
-.npcEffectNoCol {
-  width: 3.5em;
+.npcEffectList {
+  margin-top: 12px;
+}
+
+.npcEffectRows {
+  display: grid;
+  gap: 7px;
+}
+
+.npcEffectRow {
+  display: grid;
+  grid-template-columns: 2.2em minmax(82px, auto) minmax(150px, 1fr) 3.5em minmax(120px, 1.5fr) auto;
+  gap: 8px;
+  align-items: center;
+  padding: 8px 10px;
+  border: 1px solid rgba(79, 99, 130, 0.2);
+  border-radius: 9px;
+}
+
+.npcEffectOrder,
+.npcEffectSlotCost {
   text-align: center;
+  white-space: nowrap;
 }
 
-.npcEffectActions {
-  margin-top: 8px;
+.npcEffectCategory {
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.npcEffectName {
+  font-weight: 800;
+}
+
+.npcEffectNote {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  opacity: 0.82;
 }
 
 .npcEffectEmpty {
-  padding: 8px 0;
+  padding: 14px;
+  border: 1px dashed rgba(79, 99, 130, 0.3);
+  border-radius: 9px;
+  text-align: center;
+  opacity: 0.75;
 }
 
-@media (max-width: 1050px) {
-  .npcEffectInputRow {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+.npcEffectFooter {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 9px;
+}
+
+@media (max-width: 850px) {
+  .npcEffectAddRow {
+    grid-template-columns: 1fr 1fr;
   }
 
-  .npcEffectNoteField {
+  .npcEffectNoteLabel {
     grid-column: 1 / -1;
   }
-}
 
-@media (max-width: 620px) {
-  .npcEffectInputRow {
-    grid-template-columns: 1fr;
+  .npcEffectRow {
+    grid-template-columns: 2em minmax(78px, auto) 1fr auto;
   }
 
-  .npcEffectNoteField {
-    grid-column: auto;
+  .npcEffectSlotCost {
+    display: none;
   }
 
-  .npcEffectTable {
-    min-width: 720px;
+  .npcEffectNote {
+    grid-column: 2 / -1;
   }
-
-  #npcEffectList {
-    overflow-x: auto;
-  }
-}
-
-/* Optimizer setup: common choices first, tuning and help folded away. */
-.optimizerSetupPanel { padding: 16px; margin: 12px 0; border: 1px solid #d4d9df; border-radius: 10px; }
-.optimizerSetupPanel h3 { margin: 0 0 12px; font-size: 1.05rem; }
-.optimizerBody .optimizerControls { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px 16px; }
-.optimizerBody .optimizerControls > label { min-width: 0; display: flex; flex-direction: column; gap: 6px; }
-.optimizerBody .optimizerControls input, .optimizerBody .optimizerControls select { width: 100%; box-sizing: border-box; }
-.optimizerBody [hidden] { display: none !important; }
-.optimizerAdvanced, .optimizerCompactGuide, .optimizerSearchDetails { margin: 12px 0; padding: 12px 16px; border: 1px solid #d4d9df; border-radius: 10px; }
-.optimizerAdvanced > summary, .optimizerCompactGuide > summary, .optimizerSearchDetails > summary { cursor: pointer; font-weight: 600; }
-.optimizerAdvanced h4 { margin: 18px 0 10px; }
-.optimizerBody .optimizerChecks { display: flex; flex-wrap: wrap; gap: 10px 20px; }
-.optimizerBody .optimizerSkillPlusFilters { margin-top: 14px; }
-.optimizerBody .optimizerSkillPlusFilterRows { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-.optimizerBody .optimizerSkillPlusFilterRow { display: grid; grid-template-columns: minmax(120px, 2fr) minmax(70px, 1fr) minmax(70px, 1fr); gap: 8px; }
-.optimizerBody .optimizerSkillPlusFilterRow input, .optimizerBody .optimizerSkillPlusFilterRow select { width: 100%; min-width: 0; box-sizing: border-box; }
-.optimizerBody .optimizerButtons { margin: 18px 0; }
-@media(max-width: 700px) {
-  .optimizerBody .optimizerSkillPlusFilterRows { grid-template-columns: 1fr; }
-  .optimizerSetupPanel, .optimizerAdvanced, .optimizerCompactGuide { padding: 12px; }
 }

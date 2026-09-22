@@ -53,7 +53,7 @@ node tools/build-equip-buff-candidates-from-tsv.mjs --input=data/manual/buffRule
 node tools/clear-dev-cache.mjs
 または PowerShell: Remove-Item -Recurse -Force data\cache\scrapbox
 
-Master of Epic 物理ダメージ計算webツール v1.23.19 / Buff変換系列・TSV精度補正
+Master of Epic 戦闘シミュレーター v1.23.19 / Buff変換系列・TSV精度補正
 
 差し替え対象:
 - src/main.js

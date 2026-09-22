@@ -570,7 +570,7 @@
 +
 +function setupAppVersionBadge(nav) {
 +  const versionText = `${APP_VERSION} / ${APP_VERSION_NOTE}`;
-+  document.title = `Master of Epic 物理ダメージ計算webツール ${APP_VERSION}`;
++  document.title = `Master of Epic 戦闘シミュレーター ${APP_VERSION}`;
 +
 +  // 既存HTML側にバージョン専用要素がある場合は、それを必ず更新する。
 +  [
@@ -585,7 +585,7 @@
 +  let badge = byId("appVersionBadge");
 +
 +  const title = Array.from(document.querySelectorAll("h1"))
-+    .find(el => /Master of Epic 物理ダメージ計算webツール/.test(el.textContent || ""));
++    .find(el => /Master of Epic 戦闘シミュレーター/.test(el.textContent || ""));
 +
 +  // 旧HTMLに「タイトル直下の静的バージョン表記」が残っている場合は、それを再利用して更新する。
 +  if (!badge && title) {

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Master of Epic 物理ダメージ計算webツール
+ * Master of Epic 戦闘シミュレーター
  * Scrapbox/Wiki補完済みBuff TSVから、変換系・ジャンプ倍率・競合候補などを補助抽出する。
  *
  * 使い方:

@@ -1,4 +1,4 @@
-﻿// __MOE_REVIEWED_BUFF_MAGIC_DELAY_FIX_V1__
+// __MOE_REVIEWED_BUFF_MAGIC_DELAY_FIX_V1__
 // Reviewed Buffの魔法ディレイ固定値反映漏れを補完。
 // タケミカヅチ -25 / リリース オブ マジック -25。
 // __MOE_REVIEWED_BUFF_ATTACK_DELAY_FLAT_FIX_V2__
@@ -9,7 +9,7 @@
 // フォース ステップはユーザー確認値 -10。
 /* __MOE_BATCH1_RUNTIME_AND_LIMIT_BREAK_V3__ */
 // __MOE_REVIEWED_BUFF_CATALOG_DATA_SPLIT_V1__
-// Master of Epic 物理ダメージ計算webツール
+// Master of Epic 戦闘シミュレーター
 //
 // 精査済みの技・魔法Buff定義。
 // このファイルは src/main.js より先に読み込む。

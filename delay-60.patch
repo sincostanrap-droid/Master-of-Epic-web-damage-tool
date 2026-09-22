@@ -1,0 +1,348 @@
+diff --git a/index.html b/index.html
+index 062e9d5..923685f 100644
+--- a/index.html
++++ b/index.html
+@@ -65,7 +65,7 @@ MoE固有の主な仮定:
+ </head>
+ <body>
+ <h1>Master of Epic 物理ダメージ計算webツール</h1>
+-<p id="appBuildStamp" class="small appBuildStamp">v1.24.2 / 最適化のBuff固定状態を修正</p>
++<p id="appBuildStamp" class="small appBuildStamp">v1.24.3 / 最適化に攻撃ディレイ-60確保条件を追加</p>
+ <section class="heroCard">
+   <div>
+     <div class="heroBadge">MoE / Physical Damage Calculator</div>
+@@ -1236,6 +1236,7 @@ MoE固有の主な仮定:
+         </details>
+       </div>
+       <div class="optimizerChecks">
++        <label title="装備・装備Buff・Buffの攻撃ディレイ短縮合計が-60以下になる構成だけを結果に残します。"><input id="optimizerRequireAttackDelay60" type="checkbox"> 攻撃ディレイ-60を確保する</label>
+         <label><input id="optimizerIncludeDisabledBuffs" type="checkbox" checked> OFFのBuffも候補として試す</label>
+         <label><input id="optimizerFixCurrentBuffs" type="checkbox"> 現在ONのBuffは必ず使う</label>
+         <label><input id="optimizerForceOtherBuffs" type="checkbox" checked> その他バフは現在のON/OFFをそのまま使う</label>
+@@ -1304,31 +1305,31 @@ MoE固有の主な仮定:
+   <textarea id="configBox" placeholder="JSONまたはTSVをここに貼り付けて読み込み可能"></textarea>
+ </section>
+ 
+-<script src="./src/domain/attackDpsState.js?v=1.24.2" defer></script>
+-<script src="./src/ui/attackDpsResult.js?v=1.24.2" defer></script>
+-<script src="./src/ui/attackDpsControls.js?v=1.24.2" defer></script>
+-<script src="./src/ui/appVersionBadge.js?v=1.24.2" defer></script>
+-<script src="./src/ui/mainTabs.js?v=1.24.2" defer></script>
+-<script src="./src/ui/combatLogTab.js?v=1.24.2" defer></script>
+-<script src="./src/ui/showcase.js?v=1.24.2" defer></script>
++<script src="./src/domain/attackDpsState.js?v=1.24.3" defer></script>
++<script src="./src/ui/attackDpsResult.js?v=1.24.3" defer></script>
++<script src="./src/ui/attackDpsControls.js?v=1.24.3" defer></script>
++<script src="./src/ui/appVersionBadge.js?v=1.24.3" defer></script>
++<script src="./src/ui/mainTabs.js?v=1.24.3" defer></script>
++<script src="./src/ui/combatLogTab.js?v=1.24.3" defer></script>
++<script src="./src/ui/showcase.js?v=1.24.3" defer></script>
+ <script src="./src/storage/shareUrl.js?v=1.22.4" defer></script>
+ <script src="./src/storage/importExport.js?v=1.22.4" defer></script>
+ <script src="./src/calc/core.js?v=1.22.4" defer></script>
+ <script src="./src/data/skillSimKnowledge.js?v=1.22.4" defer></script>
+ <script src="src/data/manual/reviewedBuffCatalog.manual.js"></script>
+-<script src="./src/ui/idbImportPreview.js?v=1.24.2" defer></script>
+-<script src="./src/domain/catalogData.js?v=1.24.2" defer></script>
+-<script src="./src/domain/catalogSearch.js?v=1.24.2" defer></script>
+-<script src="./src/domain/catalogSort.js?v=1.24.2" defer></script>
+-<script src="./src/ui/catalogRows.js?v=1.24.2" defer></script>
+-<script src="./src/ui/catalogResults.js?v=1.24.2" defer></script>
+-<script src="./src/ui/catalogTab.js?v=1.24.2" defer></script>
+-<script src="./src/data/manual/buffRules.manual.js?v=1.24.2" data-catalog-src="src/data/manual/buffRules.manual.js"></script>
+-<script src="./src/main.js?v=1.24.2" defer></script>
+-<script src="./src/ui/buildAnalysis.js?v=1.24.2" defer></script>
+-<script src="./src/ui/showcaseSkillPlusTotals.js?v=1.24.2" defer></script>
+-<script src="./src/ui/showcaseElementDamageTotals.js?v=1.24.2" defer></script>
+-<script src="./src/ui/showcaseRecoveryTotals.js?v=1.24.2" defer></script>
+-<script src="./src/ui/equipmentCatalogSearchCache.js?v=1.24.2" defer></script>
++<script src="./src/ui/idbImportPreview.js?v=1.24.3" defer></script>
++<script src="./src/domain/catalogData.js?v=1.24.3" defer></script>
++<script src="./src/domain/catalogSearch.js?v=1.24.3" defer></script>
++<script src="./src/domain/catalogSort.js?v=1.24.3" defer></script>
++<script src="./src/ui/catalogRows.js?v=1.24.3" defer></script>
++<script src="./src/ui/catalogResults.js?v=1.24.3" defer></script>
++<script src="./src/ui/catalogTab.js?v=1.24.3" defer></script>
++<script src="./src/data/manual/buffRules.manual.js?v=1.24.3" data-catalog-src="src/data/manual/buffRules.manual.js"></script>
++<script src="./src/main.js?v=1.24.3" defer></script>
++<script src="./src/ui/buildAnalysis.js?v=1.24.3" defer></script>
++<script src="./src/ui/showcaseSkillPlusTotals.js?v=1.24.3" defer></script>
++<script src="./src/ui/showcaseElementDamageTotals.js?v=1.24.3" defer></script>
++<script src="./src/ui/showcaseRecoveryTotals.js?v=1.24.3" defer></script>
++<script src="./src/ui/equipmentCatalogSearchCache.js?v=1.24.3" defer></script>
+ </body>
+ </html>
+diff --git a/src/main.js b/src/main.js
+index c756ea2..f00ca86 100644
+--- a/src/main.js
++++ b/src/main.js
+@@ -12,8 +12,8 @@
+   onclick属性から呼ばれる関数があるため、現時点では module ではなく通常scriptとして読み込みます。
+ */
+ 
+-const APP_VERSION = "v1.24.2";
+-const APP_VERSION_NOTE = "最適化のBuff固定状態を修正";
++const APP_VERSION = "v1.24.3";
++const APP_VERSION_NOTE = "最適化に攻撃ディレイ-60確保条件を追加";
+ 
+ /* 種族係数。攻撃力係数と魔力係数は別管理。 */
+ const RACE_COEFFS = {
+@@ -9936,6 +9936,7 @@ function integratedOptimizerSettings() {
+     secondaryObjective: byId("optimizerSecondaryObjective")?.value || "",
+     targetValueRaw: byId("optimizerTargetValue")?.value ?? "",
+     targetOverRaw: byId("optimizerTargetOver")?.value ?? "",
++    requireAttackDelay60: !!byId("optimizerRequireAttackDelay60")?.checked,
+     includeDisabledBuffs: byId("optimizerIncludeDisabledBuffs") ? !!byId("optimizerIncludeDisabledBuffs").checked : true,
+     fixCurrentBuffs: !!byId("optimizerFixCurrentBuffs")?.checked,
+     forceOtherBuffs: byId("optimizerForceOtherBuffs") ? !!byId("optimizerForceOtherBuffs").checked : true,
+@@ -10038,9 +10039,13 @@ function optimizerPrimaryTargetSettings(settings) {
+ 
+ function optimizerPrimaryTargetDescription(settings) {
+   const t = optimizerPrimaryTargetSettings(settings);
+-  if (!t) return "";
+-  const over = t.over === null ? "" : ` / 超過許容 +${fmt(t.over, 1)}`;
+-  return `${optimizerObjectiveLabel(t.objective)} 目標 ${fmt(t.target, 1)}${over}`;
++  const descriptions = [];
++  if (t) {
++    const over = t.over === null ? "" : ` / 超過許容 +${fmt(t.over, 1)}`;
++    descriptions.push(`${optimizerObjectiveLabel(t.objective)} 目標 ${fmt(t.target, 1)}${over}`);
++  }
++  if (settings?.requireAttackDelay60) descriptions.push("攻撃ディレイ -60以下");
++  return descriptions.join(" / ");
+ }
+ 
+ function optimizerEffectiveTotal(base, flat, pctValue) {
+@@ -10098,6 +10103,21 @@ function optimizerTargetOverViolations(m, settings) {
+     : [];
+ }
+ 
++function optimizerRequiredConditionViolations(m, settings) {
++  if (!settings?.requireAttackDelay60) return [];
++  const value = +(m?.extraStats?.extraAttackDelay || 0);
++  const eps = 0.000001;
++  return value <= -60 + eps
++    ? []
++    : [`攻撃ディレイ ${fmt(value, 2)}（-60以下が必要）`];
++}
++
++function optimizerFinalConstraintViolations(m, settings) {
++  return optimizerStatCapViolations(m, settings)
++    .concat(optimizerTargetOverViolations(m, settings))
++    .concat(optimizerRequiredConditionViolations(m, settings));
++}
++
+ function optimizerObjectiveList(settings) {
+   const list = [];
+   const primary = settings?.objective || "damage";
+@@ -10129,12 +10149,19 @@ function optimizerEvaluationFromMetrics(m, settings) {
+   if (violations.length) return {score: OPTIMIZER_INVALID_SCORE, rank: [OPTIMIZER_INVALID_SCORE], violations};
+ 
+   const objectives = optimizerObjectiveList(settings);
+-  let rank = [];
++  let rank = settings?.requireAttackDelay60
++    ? (() => {
++        const value = +(m?.extraStats?.extraAttackDelay || 0);
++        return value <= -60 + 0.000001
++          ? [1, 0]
++          : [0, -Math.abs(value + 60)];
++      })()
++    : [];
+   if (optimizerPrimaryTargetSettings(settings)) {
+     rank = rank.concat(optimizerTargetRankForPrimary(m, settings));
+     objectives.slice(1).forEach(obj => rank.push(optimizerMetricValue(m, obj)));
+   } else {
+-    rank = objectives.map(obj => optimizerMetricValue(m, obj));
++    rank = rank.concat(objectives.map(obj => optimizerMetricValue(m, obj)));
+   }
+   return {score: rank[0] ?? 0, rank, violations: []};
+ }
+@@ -10247,7 +10274,8 @@ function optimizerSelectionCacheKey(equipmentIdxs, compositeIdxs, settings) {
+     settings?.objective || "damage",
+     settings?.secondaryObjective || "",
+     settings?.targetValueRaw ?? "",
+-    settings?.targetOverRaw ?? ""
++    settings?.targetOverRaw ?? "",
++    settings?.requireAttackDelay60 ? "delay60" : ""
+   ].join("|");
+ }
+ 
+@@ -11097,8 +11125,7 @@ function optimizerReevaluateResultsOnMain(results, payload) {
+     );
+ 
+     const metrics = evaluated.metrics;
+-    const capViolations = optimizerStatCapViolations(metrics, settings)
+-      .concat(optimizerTargetOverViolations(metrics, settings))
++    const capViolations = optimizerFinalConstraintViolations(metrics, settings)
+       .concat(evaluated.violations || []);
+ 
+     return {
+diff --git a/src/optimizer/core.js b/src/optimizer/core.js
+index 83805f8..f4f4f02 100644
+--- a/src/optimizer/core.js
++++ b/src/optimizer/core.js
+@@ -77,7 +77,7 @@ function optimizerBuildCurrentConfigResult(inputs, settings) {
+   const ev = optimizerEvaluateBuffSelection(equipmentIdxs, compositeIdxs, inputs, settings);
+   const metrics = ev.metrics;
+   const reasons = [];
+-  const capViolations = optimizerStatCapViolations(metrics, settings).concat(optimizerTargetOverViolations(metrics, settings));
++  const capViolations = optimizerFinalConstraintViolations(metrics, settings);
+ 
+   if (metrics.slots.total > settings.maxSlots) {
+     reasons.push(`バフ枠超過 ${metrics.slots.total}/${settings.maxSlots}`);
+@@ -128,7 +128,7 @@ function optimizerBuildCurrentEquipmentBuffOptimizedResult(inputs, settings) {
+ 
+   const buff = optimizerSelectExternalBuffs(equipmentIdxs, inputs, settings);
+   const metrics = buff.metrics;
+-  const capViolations = optimizerStatCapViolations(metrics, settings).concat(optimizerTargetOverViolations(metrics, settings));
++  const capViolations = optimizerFinalConstraintViolations(metrics, settings);
+   const equipmentConflicts = optimizerEquipmentConflictNames(equipmentIdxs);
+   const reasons = [];
+ 
+@@ -370,7 +370,7 @@ function runOptimizerCore(payload, onProgress=null) {
+       rank: buff.rank,
+       equipmentSummary: optimizerEquipmentSummaryByIdx(equipmentIdxs, buff.metrics),
+       equipmentConflicts: optimizerEquipmentConflictNames(equipmentIdxs),
+-      capViolations: optimizerStatCapViolations(buff.metrics, settings).concat(optimizerTargetOverViolations(buff.metrics, settings)),
++      capViolations: optimizerFinalConstraintViolations(buff.metrics, settings),
+       prunedCount: buff.prunedCount || 0,
+       forceOtherBuffs: settings.forceOtherBuffs
+     };
+@@ -547,6 +547,9 @@ function runOptimizerCore(payload, onProgress=null) {
+   if (typeof baseSort === "function") {
+     global.optimizerSortByEvaluation = function optimizerSortByEvaluationSkillPlusV21(a, b) {
+       const settings = currentSettings || {};
++      if (settings.requireAttackDelay60) {
++        return baseSort.call(this, a, b);
++      }
+       if (skillPlusObjectiveEnabled(settings, settings.objective)) {
+         const c = compareSkillPlus(a, b, settings);
+         if (c) return c;
+@@ -564,6 +567,9 @@ function runOptimizerCore(payload, onProgress=null) {
+   if (typeof baseCompare === "function") {
+     global.optimizerCompareEvaluations = function optimizerCompareEvaluationsSkillPlusV21(a, b) {
+       const settings = currentSettings || {};
++      if (settings.requireAttackDelay60) {
++        return baseCompare.call(this, a, b);
++      }
+       if (skillPlusObjectiveEnabled(settings, settings.objective)) {
+         const c = compareSkillPlus(a, b, settings);
+         if (c) return c < 0 ? 1 : -1;
+diff --git a/src/optimizer/optimizer.worker.js b/src/optimizer/optimizer.worker.js
+index 69d0373..d6e0b0a 100644
+--- a/src/optimizer/optimizer.worker.js
++++ b/src/optimizer/optimizer.worker.js
+@@ -6,10 +6,10 @@
+ */
+ 
+ importScripts(
+-  "../domain/attackDpsState.js?v=1.24.2",
+-  "../main.js?v=1.24.2",
+-  "../calc/core.js?v=1.24.2",
+-  "./core.js?v=1.24.2"
++  "../domain/attackDpsState.js?v=1.24.3",
++  "../main.js?v=1.24.3",
++  "../calc/core.js?v=1.24.3",
++  "./core.js?v=1.24.3"
+ );
+ 
+ self.onmessage = event => {
+diff --git a/src/ui/combatLogTab.js b/src/ui/combatLogTab.js
+index b684253..b29f6f0 100644
+--- a/src/ui/combatLogTab.js
++++ b/src/ui/combatLogTab.js
+@@ -14,7 +14,7 @@
+     if (parserLoadPromise) return parserLoadPromise;
+     parserLoadPromise = new Promise((resolve, reject) => {
+       const script = document.createElement("script");
+-      script.src = "./src/domain/combatLogParser.js?v=1.24.2";
++      script.src = "./src/domain/combatLogParser.js?v=1.24.3";
+       script.dataset.combatLogParser = "1";
+       script.onload = () => global.MoeCombatLogParser
+         ? resolve(global.MoeCombatLogParser)
+diff --git a/tests/catalogBuffEffectFilter.test.cjs b/tests/catalogBuffEffectFilter.test.cjs
+index 44b99f2..53e6df8 100644
+--- a/tests/catalogBuffEffectFilter.test.cjs
++++ b/tests/catalogBuffEffectFilter.test.cjs
+@@ -91,7 +91,7 @@ assert.doesNotMatch(catalogTabSource, /スキル強化フィルタ/);
+ assert.doesNotMatch(catalogTabSource, /catalogSkillPlus/);
+ assert.match(mainTabsSource, /label:"装備カタログ"/);
+ assert.doesNotMatch(mainTabsSource, /装備カタログ α/);
+-assert.match(mainSource, /const APP_VERSION = "v1\.24\.2"/);
++assert.match(mainSource, /const APP_VERSION = "v1\.24\.3"/);
+ assert.doesNotMatch(indexSource, /\?v=1\.24\.[01]/);
+ assert.match(stylesSource, /@media \(max-width: 980px\)[\s\S]*?\.catalogBuffEffectFilterRow[\s\S]*?grid-template-columns:[^;]*1\.35fr[^;]*1fr/);
+ assert.match(stylesSource, /@media \(max-width: 420px\)[\s\S]*?\.catalogBuffEffectFilterRow[\s\S]*?grid-template-columns: 1fr/);
+diff --git a/tests/optimizerAttackDelay60.test.cjs b/tests/optimizerAttackDelay60.test.cjs
+new file mode 100644
+index 0000000..091176c
+--- /dev/null
++++ b/tests/optimizerAttackDelay60.test.cjs
+@@ -0,0 +1,68 @@
++const assert = require("node:assert/strict");
++const fs = require("node:fs");
++const path = require("node:path");
++const vm = require("node:vm");
++
++const root = path.resolve(__dirname, "..");
++const mainSource = fs.readFileSync(path.join(root, "src/main.js"), "utf8");
++const coreSource = fs.readFileSync(path.join(root, "src/optimizer/core.js"), "utf8");
++const indexSource = fs.readFileSync(path.join(root, "index.html"), "utf8");
++
++assert.match(indexSource, /id="optimizerRequireAttackDelay60"[^>]*type="checkbox"/);
++assert.match(indexSource, /攻撃ディレイ-60を確保する/);
++assert.match(mainSource, /requireAttackDelay60:\s*!!byId\("optimizerRequireAttackDelay60"\)\?\.checked/);
++assert.match(mainSource, /value <= -60 \+ eps/);
++assert.match(mainSource, /value <= -60 \+ 0\.000001\s*\? \[1, 0\]\s*: \[0, -Math\.abs\(value \+ 60\)\]/);
++assert.match(mainSource, /optimizerFinalConstraintViolations\(metrics, settings\)/);
++assert.equal(
++  (coreSource.match(/optimizerFinalConstraintViolations\([^)]*, settings\)/g) || []).length,
++  3,
++  "現在ON、現在装備Buff最適化、自動探索の最終結果へ条件を適用する"
++);
++assert.equal(
++  (coreSource.match(/if \(settings\.requireAttackDelay60\) \{\s*return base(?:Sort|Compare)\.call/g) || []).length,
++  2,
++  "スキル強化目的でも攻撃ディレイ条件を最優先する"
++);
++
++const helperStart = mainSource.indexOf("function optimizerRequiredConditionViolations");
++const helperEnd = mainSource.indexOf("function optimizerObjectiveList", helperStart);
++assert.ok(helperStart >= 0 && helperEnd > helperStart, "attack-delay constraint helper block");
++const context = {
++  fmt: value => String(value),
++  optimizerStatCapViolations: () => [],
++  optimizerTargetOverViolations: () => []
++};
++vm.createContext(context);
++vm.runInContext(mainSource.slice(helperStart, helperEnd), context);
++
++assert.deepEqual(
++  Array.from(context.optimizerRequiredConditionViolations(
++    {extraStats:{extraAttackDelay:-60}},
++    {requireAttackDelay60:true}
++  )),
++  []
++);
++assert.deepEqual(
++  Array.from(context.optimizerRequiredConditionViolations(
++    {extraStats:{extraAttackDelay:-65}},
++    {requireAttackDelay60:true}
++  )),
++  []
++);
++assert.equal(
++  context.optimizerRequiredConditionViolations(
++    {extraStats:{extraAttackDelay:-59}},
++    {requireAttackDelay60:true}
++  ).length,
++  1
++);
++assert.deepEqual(
++  Array.from(context.optimizerRequiredConditionViolations(
++    {extraStats:{extraAttackDelay:0}},
++    {requireAttackDelay60:false}
++  )),
++  []
++);
++
++console.log("optimizer attack-delay -60 tests: OK");

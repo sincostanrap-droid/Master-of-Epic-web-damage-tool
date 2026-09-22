@@ -1,6 +1,6 @@
 # Cloudflare Worker: MoE IDB Proxy
 
-このWorkerは `Master of Epic 物理ダメージ計算webツール` から公式DB個別アイテムページを取得するためのプロキシです。
+このWorkerは `Master of Epic 戦闘シミュレーター` から公式DB個別アイテムページを取得するためのプロキシです。
 
 ## 使い方
 

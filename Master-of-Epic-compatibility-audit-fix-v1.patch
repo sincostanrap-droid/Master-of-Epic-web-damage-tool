@@ -1,0 +1,3424 @@
+diff --git a/src/data/generated/damageBuffCompatibility.generated.js b/src/data/generated/damageBuffCompatibility.generated.js
+index 55a71a6..25a750f 100644
+--- a/src/data/generated/damageBuffCompatibility.generated.js
++++ b/src/data/generated/damageBuffCompatibility.generated.js
+@@ -5412,3 +5412,77 @@ window.MOE_DAMAGE_BUFF_COMPATIBILITY_GENERATED.push(...[
+     "reviewFlags": []
+   }
+ ]);
++
++// Existing Buff corrections audited against uploaded Wiki, 2026-09-22.
++window.MOE_DAMAGE_BUFF_COMPATIBILITY_GENERATED.push(...[
++  {
++    "id": "damageBuffWiki-audit-20260922:石魔人の力",
++    "sourcePage": "アイテム/追加効果/併用2",
++    "sourceUrl": "https://moeread.stars.ne.jp/?アイテム/追加効果/併用2",
++    "sectionName": "物理攻撃ダメージアップ(物理与ダメージ増加バフ)",
++    "effectCategory": "physicalDamage",
++    "effectKey": "physicalDmgPct",
++    "effectLabel": "物理与ダメ",
++    "element": "",
++    "buffName": "石魔人の力",
++    "value": 10,
++    "valueRaw": "+10%",
++    "valueUnit": "%",
++    "valueUncertain": false,
++    "conversionSource": "",
++    "autoApplyKind": "equipBuffDmgPct",
++    "physicalCalcRelevant": true,
++    "group": "A",
++    "groupRaw": "A？",
++    "groupUncertain": true,
++    "conflictGroup": "damage:physical:A",
++    "safeForValueAutoApply": true,
++    "safeForConflictAutoApply": true,
++    "note": "2026-09-22添付Wiki併用2の欠落を補完。未知の数値は計算へ加算しない。",
++    "sectionNote": "",
++    "noteNeedsReview": false,
++    "matched": true,
++    "matchedEquipmentCount": 0,
++    "matchedEquipmentNames": [],
++    "matchedTechnicIds": [
++      "13682"
++    ],
++    "reviewFlags": []
++  },
++  {
++    "id": "damageBuffWiki-audit-20260922:幻竜の加護",
++    "sourcePage": "アイテム/追加効果/併用2",
++    "sourceUrl": "https://moeread.stars.ne.jp/?アイテム/追加効果/併用2",
++    "sectionName": "水属性効果アップ(水属性ダメージアップ)",
++    "effectCategory": "elementDamage",
++    "effectKey": "waterDmgPct",
++    "effectLabel": "水属性ダメージ",
++    "element": "水属性",
++    "buffName": "幻竜の加護",
++    "value": 0,
++    "valueRaw": "+？%",
++    "valueUnit": "%",
++    "valueUncertain": true,
++    "conversionSource": "",
++    "autoApplyKind": "displayElement",
++    "physicalCalcRelevant": false,
++    "group": "I",
++    "groupRaw": "I？",
++    "groupUncertain": true,
++    "conflictGroup": "damage:element:water:I",
++    "safeForValueAutoApply": false,
++    "safeForConflictAutoApply": true,
++    "note": "2026-09-22添付Wiki併用2の欠落を補完。未知の数値は計算へ加算しない。",
++    "sectionNote": "",
++    "noteNeedsReview": true,
++    "matched": true,
++    "matchedEquipmentCount": 0,
++    "matchedEquipmentNames": [],
++    "matchedTechnicIds": [
++      "14404"
++    ],
++    "reviewFlags": [
++      "valueUncertain"
++    ]
++  }
++]);
+diff --git a/src/data/generated/skillBuffCompatibility.generated.js b/src/data/generated/skillBuffCompatibility.generated.js
+index 3214587..90ee3ce 100644
+--- a/src/data/generated/skillBuffCompatibility.generated.js
++++ b/src/data/generated/skillBuffCompatibility.generated.js
+@@ -3364,43 +3364,7 @@ window.MOE_SKILL_BUFF_COMPATIBILITY_GENERATED = [
+     "source": "xlsx+wiki",
+     "correctionReason": "Wiki table / likely spreadsheet typo for Single Blade Wig"
+   },
+-  {
+-    "id": "skillbuff:回復魔法:O:魔術師の極意",
+-    "skillName": "回復魔法",
+-    "skill": "回復魔法",
+-    "group": "O",
+-    "groupRaw": "O?",
+-    "groupUncertain": true,
+-    "groupTentative": true,
+-    "conflictGroup": "skillBuff:回復魔法:O",
+-    "safeForConflictAutoApply": true,
+-    "value": 10,
+-    "valueRaw": "10",
+-    "valueUncertain": false,
+-    "amount": "10",
+-    "buffName": "魔術師の極意",
+-    "name": "魔術師の極意",
+-    "canonicalBuffName": "錬金術の極意",
+-    "aliasOf": "錬金術の極意",
+-    "aliases": [
+-      "魔術師の極意"
+-    ],
+-    "items": [
+-      "シングルブレイドウィッグ"
+-    ],
+-    "notes": [
+-      "ALC系魔法+10/生産MG枠+2"
+-    ],
+-    "confidence": "tentative",
+-    "noteNeedsReview": true,
+-    "reviewFlags": [
+-      "groupTentative",
+-      "confidenceTentative",
+-      "aliasRow"
+-    ],
+-    "source": "xlsx+wiki",
+-    "correctionReason": "Wiki table / likely spreadsheet typo for Single Blade Wig"
+-  },
++
+   {
+     "id": "skillbuff:回復魔法:P:法力",
+     "skillName": "回復魔法",
+@@ -6086,14 +6050,14 @@ window.MOE_SKILL_BUFF_COMPATIBILITY_GENERATED = [
+     "correctionReason": ""
+   },
+   {
+-    "id": "skillbuff:死の魔法:F:闇の王",
++    "id": "skillbuff:死の魔法:W:闇の王",
+     "skillName": "死の魔法",
+     "skill": "死の魔法",
+-    "group": "F",
+-    "groupRaw": "F?",
++    "group": "W",
++    "groupRaw": "W?",
+     "groupUncertain": true,
+     "groupTentative": true,
+-    "conflictGroup": "skillBuff:死の魔法:F",
++    "conflictGroup": "skillBuff:死の魔法:W",
+     "safeForConflictAutoApply": true,
+     "value": 15,
+     "valueRaw": "15",
+@@ -6117,7 +6081,7 @@ window.MOE_SKILL_BUFF_COMPATIBILITY_GENERATED = [
+       "confidenceTentative"
+     ],
+     "source": "xlsx+wiki",
+-    "correctionReason": ""
++    "correctionReason": "2026-09-22添付Wiki常時発動3・併用との全件照合"
+   },
+   {
+     "id": "skillbuff:死の魔法:G:蠍の加護",
+@@ -7249,14 +7213,14 @@ window.MOE_SKILL_BUFF_COMPATIBILITY_GENERATED = [
+     "correctionReason": ""
+   },
+   {
+-    "id": "skillbuff:暗黒命令:A:闇の王",
++    "id": "skillbuff:暗黒命令:M:闇の王",
+     "skillName": "暗黒命令",
+     "skill": "暗黒命令",
+-    "group": "A",
+-    "groupRaw": "A?",
+-    "groupUncertain": true,
+-    "groupTentative": true,
+-    "conflictGroup": "skillBuff:暗黒命令:A",
++    "group": "M",
++    "groupRaw": "M",
++    "groupUncertain": false,
++    "groupTentative": false,
++    "conflictGroup": "skillBuff:暗黒命令:M",
+     "safeForConflictAutoApply": true,
+     "value": 15,
+     "valueRaw": "+15",
+@@ -7275,7 +7239,7 @@ window.MOE_SKILL_BUFF_COMPATIBILITY_GENERATED = [
+       "groupTentative"
+     ],
+     "source": "wiki-full-skill-effects",
+-    "correctionReason": ""
++    "correctionReason": "2026-09-22添付Wiki常時発動3・併用との全件照合"
+   },
+   {
+     "id": "skillbuff:暗黒命令:A:魔法のお姫様",
+@@ -7532,10 +7496,10 @@ window.MOE_SKILL_BUFF_COMPATIBILITY_GENERATED = [
+     "groupTentative": false,
+     "conflictGroup": "skillBuff:暗黒命令:J",
+     "safeForConflictAutoApply": true,
+-    "value": 10,
+-    "valueRaw": "+10",
++    "value": 20,
++    "valueRaw": "+20",
+     "valueUncertain": false,
+-    "amount": "+10",
++    "amount": "+20",
+     "buffName": "異形の力",
+     "name": "異形の力",
+     "canonicalBuffName": "異形の力",
+@@ -7547,7 +7511,7 @@ window.MOE_SKILL_BUFF_COMPATIBILITY_GENERATED = [
+     "noteNeedsReview": false,
+     "reviewFlags": [],
+     "source": "wiki-full-skill-effects",
+-    "correctionReason": ""
++    "correctionReason": "2026-09-22添付Wiki常時発動3・併用との全件照合"
+   },
+   {
+     "id": "skillbuff:暗黒命令:K:憑物",
+@@ -8949,3 +8913,65 @@ window.MOE_SKILL_BUFF_COMPATIBILITY_GENERATED.push(...[
+     "correctionReason": ""
+   }
+ ]);
++
++// Existing Buff corrections audited against uploaded Wiki, 2026-09-22.
++window.MOE_SKILL_BUFF_COMPATIBILITY_GENERATED.push(...[
++  {
++    "id": "skillbuff:自然調和:E:自然崇拝",
++    "skillName": "自然調和",
++    "skill": "自然調和",
++    "group": "E",
++    "groupRaw": "E？",
++    "groupUncertain": true,
++    "groupTentative": true,
++    "conflictGroup": "skillBuff:自然調和:E",
++    "safeForConflictAutoApply": true,
++    "value": 20,
++    "valueRaw": "+20",
++    "valueUncertain": false,
++    "amount": "+20",
++    "buffName": "自然崇拝",
++    "name": "自然崇拝",
++    "canonicalBuffName": "自然崇拝",
++    "aliasOf": "",
++    "aliases": [],
++    "items": [],
++    "notes": [
++      "2026-09-22添付Wiki。暫定グループはユーザー指定により？を除いて適用。"
++    ],
++    "confidence": "wiki",
++    "noteNeedsReview": false,
++    "reviewFlags": [],
++    "source": "wiki-upload-20260922",
++    "correctionReason": "既存Buffの欠落を添付Wikiで補完"
++  },
++  {
++    "id": "skillbuff:自然調和:F:アルテミスの加護",
++    "skillName": "自然調和",
++    "skill": "自然調和",
++    "group": "F",
++    "groupRaw": "F？",
++    "groupUncertain": true,
++    "groupTentative": true,
++    "conflictGroup": "skillBuff:自然調和:F",
++    "safeForConflictAutoApply": true,
++    "value": 20,
++    "valueRaw": "+20",
++    "valueUncertain": false,
++    "amount": "+20",
++    "buffName": "アルテミスの加護",
++    "name": "アルテミスの加護",
++    "canonicalBuffName": "アルテミスの加護",
++    "aliasOf": "",
++    "aliases": [],
++    "items": [],
++    "notes": [
++      "2026-09-22添付Wiki。暫定グループはユーザー指定により？を除いて適用。"
++    ],
++    "confidence": "wiki",
++    "noteNeedsReview": false,
++    "reviewFlags": [],
++    "source": "wiki-upload-20260922",
++    "correctionReason": "既存Buffの欠落を添付Wikiで補完"
++  }
++]);
+diff --git a/src/data/manual/buffRules.manual.js b/src/data/manual/buffRules.manual.js
+index 3538bca..091ef14 100644
+--- a/src/data/manual/buffRules.manual.js
++++ b/src/data/manual/buffRules.manual.js
+@@ -1174,8 +1174,8 @@ Object.assign(window.MOE_BUFF_RULES_MANUAL, {
+     conflictGroup: "technic-13876", stackRule: "same-technic",
+     stats: { attackPct: 3 },
+     conversions: { magicToSpeedPct: 5 },
+-    skillEffects: [{ name: "暗黒命令", value: 10 }],
+-    memo: "攻撃力+3%、魔力の5%を移動速度へ加算、暗黒命令スキル効果+10。WarAgeでは効果なし。"
++    skillEffects: [{ name: "暗黒命令", value: 20 }],
++    memo: "攻撃力+3%、魔力の5%を移動速度へ加算、暗黒命令スキル効果+20。WarAgeでは効果なし。"
+   },
+   "technic-14299": {
+     name: "魔法の靴", officialTechnicId: 14299,
+@@ -4240,3 +4240,102 @@ Object.assign(window.MOE_BUFF_RULES_MANUAL, {
+     ]
+   }
+ });
++
++// Confirmed corrections; established overrides (including critical:L) remain unchanged.
++Object.assign(window.MOE_BUFF_RULES_MANUAL, {
++  "technic-14426": {
++    "name": "アルテミスの加護",
++    "officialTechnicId": 14426,
++    "verified": true,
++    "applyDefault": true,
++    "reviewStatus": "implemented",
++    "reviewComplete": true,
++    "source": "manual-compat-audit-20260922",
++    "confidence": "wiki",
++    "conflictGroup": "technic-14426",
++    "stackRule": "same-technic",
++    "stats": {
++      "attackPct": 3,
++      "extraHitPct": 20
++    },
++    "authoritativeStats": [
++      "attackPct",
++      "extraHitPct"
++    ],
++    "skillEffects": [],
++    "customEffects": [
++      {
++        "name": "WarAgeでは効果なし",
++        "value": 0
++      }
++    ],
++    "memo": "2026-09-22添付Wiki常時発動3・併用・併用2を照合。スキル/属性効果とグループは併用表で補完。未知の数値は加算しない。",
++    "sourceUrls": [
++      "https://moeread.stars.ne.jp/?アイテム/追加効果/常時発動3"
++    ]
++  },
++  "technic-13682": {
++    "name": "石魔人の力",
++    "officialTechnicId": 13682,
++    "verified": true,
++    "applyDefault": true,
++    "reviewStatus": "implemented",
++    "reviewComplete": true,
++    "source": "manual-compat-audit-20260922",
++    "confidence": "wiki",
++    "conflictGroup": "technic-13682",
++    "stackRule": "same-technic",
++    "stats": {
++      "extraACPct": 10,
++      "dmgPct": 10
++    },
++    "authoritativeStats": [
++      "extraACPct",
++      "dmgPct"
++    ],
++    "skillEffects": [],
++    "customEffects": [
++      {
++        "name": "WarAgeでは効果なし",
++        "value": 0
++      }
++    ],
++    "memo": "2026-09-22添付Wiki常時発動3・併用・併用2を照合。スキル/属性効果とグループは併用表で補完。未知の数値は加算しない。",
++    "sourceUrls": [
++      "https://moeread.stars.ne.jp/?アイテム/追加効果/常時発動3"
++    ]
++  },
++  "technic-14404": {
++    "name": "幻竜の加護",
++    "officialTechnicId": 14404,
++    "verified": true,
++    "applyDefault": true,
++    "reviewStatus": "display-only",
++    "reviewComplete": true,
++    "source": "manual-compat-audit-20260922",
++    "confidence": "wiki",
++    "conflictGroup": "technic-14404",
++    "stackRule": "same-technic",
++    "stats": {},
++    "authoritativeStats": [],
++    "skillEffects": [],
++    "customEffects": [
++      {
++        "name": "水中呼吸可能",
++        "value": 0
++      },
++      {
++        "name": "水属性効果増加・水属性被効果軽減（数値未確認）",
++        "value": 0
++      },
++      {
++        "name": "WarAgeでは効果なし",
++        "value": 0
++      }
++    ],
++    "memo": "2026-09-22添付Wiki常時発動3・併用・併用2を照合。スキル/属性効果とグループは併用表で補完。未知の数値は加算しない。",
++    "sourceUrls": [
++      "https://moeread.stars.ne.jp/?アイテム/追加効果/常時発動3"
++    ]
++  }
++});
+diff --git a/src/main.js b/src/main.js
+index f36c8c5..bb3ab6d 100644
+--- a/src/main.js
++++ b/src/main.js
+@@ -6756,7 +6756,31 @@ function appendEquipmentBuffConflictGroups(row, groups, options={}) {
+   return row;
+ }
+ 
++// Correct only known imported mistakes. Never discard unrelated user groups/effects.
++function repairKnownEquipmentBuffCompatibility(row) {
++  if (!row) return row;
++  const id = String(row.equipBuffTechnicId || row.equipBuffCatalogId || "").replace(/^technic-/, "");
++  const name = equipmentBuffCompatNorm(row.equipBuffName);
++  const isBuff = (technic, buffName) => id ? id === technic : name === equipmentBuffCompatNorm(buffName);
++  const retired = isBuff("13685", "闇の王")
++    ? ["skillBuff:死の魔法:F", "skillBuff:暗黒命令:A"]
++    : isBuff("9201", "魔術師の極意") ? ["skillBuff:回復魔法:O"] : [];
++  const keep = group => !retired.some(old => old.toLowerCase() === group.toLowerCase());
++  if (retired.length) {
++    row.tags = splitTags(row.tags || "").filter(keep).join(",");
++    row.equipBuffConflictGroups = normalizeEquipmentBuffConflictGroupsInput(row.equipBuffConflictGroups).filter(keep).join(",");
++    if (!keep(String(row.equipBuffConflictGroup || ""))) row.equipBuffConflictGroup = "";
++  }
++  if (isBuff("13876", "異形の力") || isBuff("9201", "魔術師の極意")) {
++    const skill = isBuff("13876", "異形の力") ? "暗黒命令" : "回復魔法";
++    row.extraEffects = normalizeAdditionalEffects(row.extraEffects || []).filter(effect =>
++      !(effect.key === "skillPlus" && effect.name === skill && effect.value === 10));
++  }
++  return row;
++}
++
+ function restoreEquipmentBuffCompatibilityGroups(row, item=null) {
++  repairKnownEquipmentBuffCompatibility(row);
+   if (!row) return row;
+ 
+   const skillRules = skillBuffCompatibilityRulesForEquipmentBuff(row, item);
+@@ -13658,6 +13682,7 @@ ${a}`;
+ 
+ function applyEquipBuffRuleCandidateToEquipment(row, rule, opts={}) {
+   if (!row || !rule) return false;
++  repairKnownEquipmentBuffCompatibility(row);
+   // Drop only the retired placeholder for these reviewed imports; preserve user effects.
+   if (rule.source === "manual-wiki-20260922") {
+     row.extraEffects = normalizeAdditionalEffects(row.extraEffects || []).filter(e =>
+diff --git a/tests/equipmentBuffCompatibilityAudit.test.cjs b/tests/equipmentBuffCompatibilityAudit.test.cjs
+new file mode 100644
+index 0000000..8d1eec5
+--- /dev/null
++++ b/tests/equipmentBuffCompatibilityAudit.test.cjs
+@@ -0,0 +1,44 @@
++const assert=require('node:assert/strict');
++const {context,json,root}=require('../tools/benchmark-optimizer.cjs');
++const p=context(root,{catalog:true});
++const row=id=>p.catalogEquipmentToRow(p.equipmentCatalogItems().find(i=>i.buffRefs.includes('technic-'+id)));
++const group=(r,g)=>p.normalizeEquipmentBuffConflictGroupsInput(r.equipBuffConflictGroups).includes(g);
++let king=row(13685);assert.ok(group(king,'skillBuff:暗黒命令:M'));assert.ok(group(king,'skillBuff:死の魔法:W'));
++king.equipBuffConflictGroup='skillBuff:暗黒命令:A';king.equipBuffConflictGroups='skillBuff:暗黒命令:A,skillBuff:死の魔法:F,custom';king.tags='skillBuff:暗黒命令:A,skillBuff:死の魔法:F,custom';
++king=p.resolveEquipmentBuffRow(king);
++assert.ok(group(king,'skillBuff:暗黒命令:M'));assert.ok(group(king,'skillBuff:死の魔法:W'));assert.ok(group(king,'custom'));
++for(const key of ['tags','equipBuffConflictGroups','equipBuffConflictGroup']){assert.ok(!king[key].includes('skillBuff:暗黒命令:A'));assert.ok(!king[key].includes('skillBuff:死の魔法:F'));}
++assert.deepEqual(json(p.resolveEquipmentBuffRow(king)),json(king),'migration idempotent');
++const skill=(r,name)=>r.extraEffects.filter(e=>e.key==='skillPlus'&&e.name===name).reduce((s,e)=>s+e.value,0);
++const strange=row(13876);strange.extraEffects.push({key:'skillPlus',name:'暗黒命令',value:10,scope:'display'});
++assert.equal(skill(p.resolveEquipmentBuffRow(strange),'暗黒命令'),20);
++const mage=row(9201);mage.tags+=' ,skillBuff:回復魔法:O';mage.equipBuffConflictGroup='skillBuff:回復魔法:O';mage.extraEffects.push({key:'skillPlus',name:'回復魔法',value:10,scope:'display'});
++const repaired=p.resolveEquipmentBuffRow(mage);assert.equal(skill(repaired,'回復魔法'),0);assert.equal(skill(repaired,'破壊魔法'),10);assert.ok(!group(repaired,'skillBuff:回復魔法:O'));
++for(const [id,g] of [[13870,'E'],[14426,'F']]){const r=row(id);assert.equal(skill(r,'自然調和'),20);assert.ok(group(r,'skillBuff:自然調和:'+g));}
++const artemis=row(14426);assert.equal(artemis.equipBuffAttackPct,3);assert.equal(artemis.equipBuffExtraHitPct,20);
++const stone=row(13682);assert.equal(stone.equipBuffDmgPct,10);assert.equal(stone.equipBuffExtraACPct,10);assert.ok(group(stone,'damage:physical:A'));assert.ok(stone.extraEffects.some(e=>e.key==='elementDamagePct'&&e.name==='地属性'&&e.value===10));
++const phantom=row(14404);assert.ok(group(phantom,'damage:element:water:I'));assert.ok(!phantom.extraEffects.some(e=>e.key==='elementDamagePct'&&e.value));
++assert.equal(p.MOE_BUFF_RULES_MANUAL['technic-14427'].conflictGroup,'critical:L');
++assert.equal(skill(row(12763),'回復魔法'),15);assert.equal(skill(row(13240),'回復魔法'),10);
++// Catch all IDs, duplicate registrations and inconsistent normalized group keys.
++for(const [kind,rows] of [['skill',p.MOE_SKILL_BUFF_COMPATIBILITY_GENERATED],['damage',p.MOE_DAMAGE_BUFF_COMPATIBILITY_GENERATED]]){
++ const ids=new Set();for(const r of rows){assert.ok(!ids.has(r.id),r.id);ids.add(r.id);if(kind==='skill'&&r.buffName==='闇の王')assert.equal(r.conflictGroup,`skillBuff:${r.skillName}:${r.group}`);}
++}
++console.log('Compatibility audit: corrected values/groups, saved-row migration, preserved overrides OK');
++// Snapshot of every group row from the two user-provided Wiki tables.
++// Explicit exceptions are source disagreements or the user's established override.
++const fixture=require('./fixtures/compatibility-wiki-20260922.json');
++const norm=s=>String(s||'').replace(/[\s　]/g,'');
++for(const kind of ['skill','damage'])for(const expected of fixture[kind]){
++ if(expected.name==='薔薇の輝き')continue; // critical:L independent override tested above
++ const rows=(kind==='skill'?p.MOE_SKILL_BUFF_COMPATIBILITY_GENERATED:p.MOE_DAMAGE_BUFF_COMPATIBILITY_GENERATED).filter(r=>norm(r.skillName||r.sectionName)===norm(expected.section)&&norm(r.buffName)===norm(expected.name));
++ assert.ok(rows.length,`${kind}: ${expected.section}/${expected.name} missing`);
++ for(const actual of rows){
++  assert.equal(actual.group,expected.group,`${expected.section}/${expected.name} group`);
++  const match=expected.valueRaw.match(/^\+?(\d+(?:\.\d+)?)%?$/);
++  if(!match)continue;
++  if(expected.section==='回復魔法'&&['上級魔術師','魔法陣ブースト'].includes(expected.name))continue; // conflicting source values, preserved above
++  assert.equal(actual.value,Number(match[1]),`${expected.section}/${expected.name} value`);
++ }
++}
++console.log(`Wiki table snapshot: ${fixture.skill.length+fixture.damage.length} source rows audited`);
+diff --git a/tests/fixtures/compatibility-wiki-20260922.json b/tests/fixtures/compatibility-wiki-20260922.json
+new file mode 100644
+index 0000000..d28f302
+--- /dev/null
++++ b/tests/fixtures/compatibility-wiki-20260922.json
+@@ -0,0 +1,2928 @@
++{
++  "skill": [
++    {
++      "section": "筋力",
++      "groupRaw": "A",
++      "group": "A",
++      "valueRaw": "+？",
++      "name": "ガトリング アーム"
++    },
++    {
++      "section": "筋力",
++      "groupRaw": "A？",
++      "group": "A",
++      "valueRaw": "+20",
++      "name": "強化アーム"
++    },
++    {
++      "section": "筋力",
++      "groupRaw": "B？",
++      "group": "B",
++      "valueRaw": "+20",
++      "name": "マッスル パワー"
++    },
++    {
++      "section": "筋力",
++      "groupRaw": "C？",
++      "group": "C",
++      "valueRaw": "+20",
++      "name": "ノア リアクター"
++    },
++    {
++      "section": "筋力",
++      "groupRaw": "D？",
++      "group": "D",
++      "valueRaw": "+20",
++      "name": "ドラゴン ジーン"
++    },
++    {
++      "section": "牙",
++      "groupRaw": "A",
++      "group": "A",
++      "valueRaw": "+20",
++      "name": "吸血鬼の加護"
++    },
++    {
++      "section": "牙",
++      "groupRaw": "B",
++      "group": "B",
++      "valueRaw": "+15",
++      "name": "サメの力"
++    },
++    {
++      "section": "牙",
++      "groupRaw": "C？",
++      "group": "C",
++      "valueRaw": "+20",
++      "name": "真祖の吸血鬼"
++    },
++    {
++      "section": "戦闘技術",
++      "groupRaw": "A",
++      "group": "A",
++      "valueRaw": "+15",
++      "name": "学習装置"
++    },
++    {
++      "section": "戦闘技術",
++      "groupRaw": "A？",
++      "group": "A",
++      "valueRaw": "+15",
++      "name": "鬼人の力"
++    },
++    {
++      "section": "戦闘技術",
++      "groupRaw": "A？",
++      "group": "A",
++      "valueRaw": "+15",
++      "name": "斉天大聖"
++    },
++    {
++      "section": "戦闘技術",
++      "groupRaw": "B",
++      "group": "B",
++      "valueRaw": "+10",
++      "name": "獅子奮迅"
++    },
++    {
++      "section": "戦闘技術",
++      "groupRaw": "C",
++      "group": "C",
++      "valueRaw": "+10",
++      "name": "盗剣士"
++    },
++    {
++      "section": "戦闘技術",
++      "groupRaw": "D",
++      "group": "D",
++      "valueRaw": "+10",
++      "name": "熊猫流の極意"
++    },
++    {
++      "section": "戦闘技術",
++      "groupRaw": "E",
++      "group": "E",
++      "valueRaw": "+10",
++      "name": "ベルセルク"
++    },
++    {
++      "section": "戦闘技術",
++      "groupRaw": "F",
++      "group": "F",
++      "valueRaw": "+10",
++      "name": "竜王の力"
++    },
++    {
++      "section": "戦闘技術",
++      "groupRaw": "G",
++      "group": "G",
++      "valueRaw": "+20",
++      "name": "ミリタリーアーツ"
++    },
++    {
++      "section": "戦闘技術",
++      "groupRaw": "H",
++      "group": "H",
++      "valueRaw": "+10",
++      "name": "天職：剣士"
++    },
++    {
++      "section": "戦闘技術",
++      "groupRaw": "I？",
++      "group": "I",
++      "valueRaw": "+20",
++      "name": "武芸百般"
++    },
++    {
++      "section": "戦闘技術",
++      "groupRaw": "J？",
++      "group": "J",
++      "valueRaw": "+20",
++      "name": "タクティカルギア"
++    },
++    {
++      "section": "戦闘技術",
++      "groupRaw": "K？",
++      "group": "K",
++      "valueRaw": "+20",
++      "name": "戦翼の力"
++    },
++    {
++      "section": "戦闘技術",
++      "groupRaw": "L？",
++      "group": "L",
++      "valueRaw": "+20",
++      "name": "騎士の極意"
++    },
++    {
++      "section": "物まね",
++      "groupRaw": "A",
++      "group": "A",
++      "valueRaw": "+10",
++      "name": "隠密の極意"
++    },
++    {
++      "section": "物まね",
++      "groupRaw": "B？",
++      "group": "B",
++      "valueRaw": "+20",
++      "name": "影ノ者"
++    },
++    {
++      "section": "物まね",
++      "groupRaw": "C？",
++      "group": "C",
++      "valueRaw": "+10",
++      "name": "暗殺者"
++    },
++    {
++      "section": "物まね",
++      "groupRaw": "D？",
++      "group": "D",
++      "valueRaw": "+15",
++      "name": "暗器の鉤爪"
++    },
++    {
++      "section": "物まね",
++      "groupRaw": "E？",
++      "group": "E",
++      "valueRaw": "+？",
++      "name": "愚者のアルカナ"
++    },
++    {
++      "section": "物まね",
++      "groupRaw": "F？",
++      "group": "F",
++      "valueRaw": "+20",
++      "name": "怪盗の極意"
++    },
++    {
++      "section": "物まね",
++      "groupRaw": "G？",
++      "group": "G",
++      "valueRaw": "+？",
++      "name": "サイボーグ"
++    },
++    {
++      "section": "調教",
++      "groupRaw": "A",
++      "group": "A",
++      "valueRaw": "+10",
++      "name": "アニマル フレンズ"
++    },
++    {
++      "section": "調教",
++      "groupRaw": "B",
++      "group": "B",
++      "valueRaw": "+10",
++      "name": "アニマル ラヴァー"
++    },
++    {
++      "section": "調教",
++      "groupRaw": "B",
++      "group": "B",
++      "valueRaw": "+20",
++      "name": "アニマル トレーニング"
++    },
++    {
++      "section": "調教",
++      "groupRaw": "C",
++      "group": "C",
++      "valueRaw": "+10",
++      "name": "犬笛"
++    },
++    {
++      "section": "調教",
++      "groupRaw": "D",
++      "group": "D",
++      "valueRaw": "+20",
++      "name": "グルーミング"
++    },
++    {
++      "section": "調教",
++      "groupRaw": "E",
++      "group": "E",
++      "valueRaw": "+10",
++      "name": "☆USK☆"
++    },
++    {
++      "section": "調教",
++      "groupRaw": "F",
++      "group": "F",
++      "valueRaw": "+20",
++      "name": "調教師の心得"
++    },
++    {
++      "section": "調教",
++      "groupRaw": "G",
++      "group": "G",
++      "valueRaw": "+20",
++      "name": "使役の力"
++    },
++    {
++      "section": "調教",
++      "groupRaw": "H",
++      "group": "H",
++      "valueRaw": "+20",
++      "name": "獣人の加護"
++    },
++    {
++      "section": "調教",
++      "groupRaw": "I",
++      "group": "I",
++      "valueRaw": "+20",
++      "name": "アニマル セラピスト"
++    },
++    {
++      "section": "調教",
++      "groupRaw": "J",
++      "group": "J",
++      "valueRaw": "+20",
++      "name": "変成魔法"
++    },
++    {
++      "section": "調教",
++      "groupRaw": "K",
++      "group": "K",
++      "valueRaw": "+10",
++      "name": "ご褒美おやつ"
++    },
++    {
++      "section": "調教",
++      "groupRaw": "K？",
++      "group": "K",
++      "valueRaw": "+20",
++      "name": "散歩拒否"
++    },
++    {
++      "section": "調教",
++      "groupRaw": "L？",
++      "group": "L",
++      "valueRaw": "+20",
++      "name": "メダロッター"
++    },
++    {
++      "section": "破壊魔法",
++      "groupRaw": "A",
++      "group": "A",
++      "valueRaw": "+10",
++      "name": "魔術師の極意"
++    },
++    {
++      "section": "破壊魔法",
++      "groupRaw": "B",
++      "group": "B",
++      "valueRaw": "+10",
++      "name": "火神の力"
++    },
++    {
++      "section": "破壊魔法",
++      "groupRaw": "B",
++      "group": "B",
++      "valueRaw": "+15",
++      "name": "雪の女王"
++    },
++    {
++      "section": "破壊魔法",
++      "groupRaw": "C",
++      "group": "C",
++      "valueRaw": "+5",
++      "name": "太陽の力"
++    },
++    {
++      "section": "破壊魔法",
++      "groupRaw": "D",
++      "group": "D",
++      "valueRaw": "+10",
++      "name": "魔導の真髄"
++    },
++    {
++      "section": "破壊魔法",
++      "groupRaw": "E",
++      "group": "E",
++      "valueRaw": "+10",
++      "name": "鬼道の力"
++    },
++    {
++      "section": "破壊魔法",
++      "groupRaw": "E？",
++      "group": "E",
++      "valueRaw": "+5",
++      "name": "神獣青龍の加護"
++    },
++    {
++      "section": "破壊魔法",
++      "groupRaw": "F",
++      "group": "F",
++      "valueRaw": "+10",
++      "name": "レイヴン ファミリア"
++    },
++    {
++      "section": "破壊魔法",
++      "groupRaw": "F？",
++      "group": "F",
++      "valueRaw": "+10",
++      "name": "マギア フォース"
++    },
++    {
++      "section": "破壊魔法",
++      "groupRaw": "F？",
++      "group": "F",
++      "valueRaw": "+5",
++      "name": "マジック チャーム"
++    },
++    {
++      "section": "破壊魔法",
++      "groupRaw": "F？",
++      "group": "F",
++      "valueRaw": "+5",
++      "name": "神獣白虎の加護"
++    },
++    {
++      "section": "破壊魔法",
++      "groupRaw": "G",
++      "group": "G",
++      "valueRaw": "+10",
++      "name": "ラル・ファク神の加護"
++    },
++    {
++      "section": "破壊魔法",
++      "groupRaw": "H",
++      "group": "H",
++      "valueRaw": "+15",
++      "name": "雷光の巫女"
++    },
++    {
++      "section": "破壊魔法",
++      "groupRaw": "H？",
++      "group": "H",
++      "valueRaw": "+15",
++      "name": "上級魔術師"
++    },
++    {
++      "section": "破壊魔法",
++      "groupRaw": "H？",
++      "group": "H",
++      "valueRaw": "+10",
++      "name": "錬金術の極意"
++    },
++    {
++      "section": "破壊魔法",
++      "groupRaw": "I",
++      "group": "I",
++      "valueRaw": "+10",
++      "name": "鉱人道士"
++    },
++    {
++      "section": "破壊魔法",
++      "groupRaw": "I？",
++      "group": "I",
++      "valueRaw": "+10",
++      "name": "氷結の魔女"
++    },
++    {
++      "section": "破壊魔法",
++      "groupRaw": "J",
++      "group": "J",
++      "valueRaw": "+5",
++      "name": "大魔導士"
++    },
++    {
++      "section": "破壊魔法",
++      "groupRaw": "K",
++      "group": "K",
++      "valueRaw": "+15",
++      "name": "殲滅の魔術師"
++    },
++    {
++      "section": "破壊魔法",
++      "groupRaw": "L",
++      "group": "L",
++      "valueRaw": "+15",
++      "name": "破壊の紋章"
++    },
++    {
++      "section": "破壊魔法",
++      "groupRaw": "L？",
++      "group": "L",
++      "valueRaw": "+10",
++      "name": "英雄の翼"
++    },
++    {
++      "section": "破壊魔法",
++      "groupRaw": "M",
++      "group": "M",
++      "valueRaw": "+10",
++      "name": "魔法陣ブースト"
++    },
++    {
++      "section": "破壊魔法",
++      "groupRaw": "M？",
++      "group": "M",
++      "valueRaw": "+？",
++      "name": "シルフの加護"
++    },
++    {
++      "section": "破壊魔法",
++      "groupRaw": "M？",
++      "group": "M",
++      "valueRaw": "+15",
++      "name": "双極共鳴"
++    },
++    {
++      "section": "破壊魔法",
++      "groupRaw": "N",
++      "group": "N",
++      "valueRaw": "+10",
++      "name": "ウラエウスの力"
++    },
++    {
++      "section": "破壊魔法",
++      "groupRaw": "N?",
++      "group": "N",
++      "valueRaw": "+10",
++      "name": "女王の威厳"
++    },
++    {
++      "section": "破壊魔法",
++      "groupRaw": "O",
++      "group": "O",
++      "valueRaw": "+5",
++      "name": "神獣玄武の加護"
++    },
++    {
++      "section": "破壊魔法",
++      "groupRaw": "P",
++      "group": "P",
++      "valueRaw": "+5",
++      "name": "神獣朱雀の加護"
++    },
++    {
++      "section": "破壊魔法",
++      "groupRaw": "Q",
++      "group": "Q",
++      "valueRaw": "+10",
++      "name": "大賢者の知識"
++    },
++    {
++      "section": "破壊魔法",
++      "groupRaw": "Q？",
++      "group": "Q",
++      "valueRaw": "+15",
++      "name": "破壊の魔石"
++    },
++    {
++      "section": "破壊魔法",
++      "groupRaw": "R",
++      "group": "R",
++      "valueRaw": "+10",
++      "name": "レゾナンス ムーン"
++    },
++    {
++      "section": "破壊魔法",
++      "groupRaw": "S？",
++      "group": "S",
++      "valueRaw": "+10",
++      "name": "魔術師の怨念"
++    },
++    {
++      "section": "破壊魔法",
++      "groupRaw": "T？",
++      "group": "T",
++      "valueRaw": "+10",
++      "name": "バフォメットの力"
++    },
++    {
++      "section": "破壊魔法",
++      "groupRaw": "U？",
++      "group": "U",
++      "valueRaw": "+20%",
++      "name": "氷の魔術師"
++    },
++    {
++      "section": "破壊魔法",
++      "groupRaw": "V？",
++      "group": "V",
++      "valueRaw": "+10",
++      "name": "叡智の力"
++    },
++    {
++      "section": "回復魔法",
++      "groupRaw": "A",
++      "group": "A",
++      "valueRaw": "+20",
++      "name": "双天使の加護"
++    },
++    {
++      "section": "回復魔法",
++      "groupRaw": "A",
++      "group": "A",
++      "valueRaw": "+20",
++      "name": "ホーリー エンハンス"
++    },
++    {
++      "section": "回復魔法",
++      "groupRaw": "A",
++      "group": "A",
++      "valueRaw": "+20",
++      "name": "天空の滅竜魔導士"
++    },
++    {
++      "section": "回復魔法",
++      "groupRaw": "A",
++      "group": "A",
++      "valueRaw": "+20",
++      "name": "錬金サポート"
++    },
++    {
++      "section": "回復魔法",
++      "groupRaw": "B",
++      "group": "B",
++      "valueRaw": "+20",
++      "name": "光の精霊"
++    },
++    {
++      "section": "回復魔法",
++      "groupRaw": "B",
++      "group": "B",
++      "valueRaw": "+10",
++      "name": "プリンセス ハート"
++    },
++    {
++      "section": "回復魔法",
++      "groupRaw": "C",
++      "group": "C",
++      "valueRaw": "+10",
++      "name": "ホーリー メイデン"
++    },
++    {
++      "section": "回復魔法",
++      "groupRaw": "C",
++      "group": "C",
++      "valueRaw": "+10",
++      "name": "新人魔法少女"
++    },
++    {
++      "section": "回復魔法",
++      "groupRaw": "C",
++      "group": "C",
++      "valueRaw": "+10",
++      "name": "施療神官"
++    },
++    {
++      "section": "回復魔法",
++      "groupRaw": "D",
++      "group": "D",
++      "valueRaw": "+10",
++      "name": "風精霊の加護"
++    },
++    {
++      "section": "回復魔法",
++      "groupRaw": "D",
++      "group": "D",
++      "valueRaw": "+10",
++      "name": "慈愛の力"
++    },
++    {
++      "section": "回復魔法",
++      "groupRaw": "E",
++      "group": "E",
++      "valueRaw": "+10",
++      "name": "永遠の献身"
++    },
++    {
++      "section": "回復魔法",
++      "groupRaw": "F",
++      "group": "F",
++      "valueRaw": "+5",
++      "name": "月星の力"
++    },
++    {
++      "section": "回復魔法",
++      "groupRaw": "G",
++      "group": "G",
++      "valueRaw": "+10",
++      "name": "地母神の加護"
++    },
++    {
++      "section": "回復魔法",
++      "groupRaw": "H",
++      "group": "H",
++      "valueRaw": "+10",
++      "name": "大司教"
++    },
++    {
++      "section": "回復魔法",
++      "groupRaw": "I",
++      "group": "I",
++      "valueRaw": "+15",
++      "name": "聖母の微笑"
++    },
++    {
++      "section": "回復魔法",
++      "groupRaw": "J",
++      "group": "J",
++      "valueRaw": "+10",
++      "name": "神聖な力"
++    },
++    {
++      "section": "回復魔法",
++      "groupRaw": "K",
++      "group": "K",
++      "valueRaw": "+5",
++      "name": "大魔導士"
++    },
++    {
++      "section": "回復魔法",
++      "groupRaw": "K？",
++      "group": "K",
++      "valueRaw": "+15",
++      "name": "高貴な心"
++    },
++    {
++      "section": "回復魔法",
++      "groupRaw": "K？",
++      "group": "K",
++      "valueRaw": "+15",
++      "name": "戦乙女の力"
++    },
++    {
++      "section": "回復魔法",
++      "groupRaw": "L",
++      "group": "L",
++      "valueRaw": "+10",
++      "name": "白薔薇の加護"
++    },
++    {
++      "section": "回復魔法",
++      "groupRaw": "L?",
++      "group": "L",
++      "valueRaw": "+10",
++      "name": "大賢者の知識"
++    },
++    {
++      "section": "回復魔法",
++      "groupRaw": "M",
++      "group": "M",
++      "valueRaw": "+10",
++      "name": "オシリスの加護"
++    },
++    {
++      "section": "回復魔法",
++      "groupRaw": "M？",
++      "group": "M",
++      "valueRaw": "+10",
++      "name": "英雄の翼"
++    },
++    {
++      "section": "回復魔法",
++      "groupRaw": "M？",
++      "group": "M",
++      "valueRaw": "+15",
++      "name": "デボーテッド ラブ"
++    },
++    {
++      "section": "回復魔法",
++      "groupRaw": "N",
++      "group": "N",
++      "valueRaw": "+5",
++      "name": "マジック チャーム"
++    },
++    {
++      "section": "回復魔法",
++      "groupRaw": "O",
++      "group": "O",
++      "valueRaw": "+10",
++      "name": "上級魔術師"
++    },
++    {
++      "section": "回復魔法",
++      "groupRaw": "O？",
++      "group": "O",
++      "valueRaw": "+15",
++      "name": "双極共鳴"
++    },
++    {
++      "section": "回復魔法",
++      "groupRaw": "O？",
++      "group": "O",
++      "valueRaw": "+20",
++      "name": "森精の加護"
++    },
++    {
++      "section": "回復魔法",
++      "groupRaw": "P",
++      "group": "P",
++      "valueRaw": "+10",
++      "name": "法力"
++    },
++    {
++      "section": "回復魔法",
++      "groupRaw": "Q",
++      "group": "Q",
++      "valueRaw": "+10",
++      "name": "魔法陣ブースト"
++    },
++    {
++      "section": "回復魔法",
++      "groupRaw": "Q?",
++      "group": "Q",
++      "valueRaw": "+15",
++      "name": "魔法陣ブースト"
++    },
++    {
++      "section": "回復魔法",
++      "groupRaw": "R",
++      "group": "R",
++      "valueRaw": "+15",
++      "name": "天職：治癒師"
++    },
++    {
++      "section": "回復魔法",
++      "groupRaw": "S",
++      "group": "S",
++      "valueRaw": "+5",
++      "name": "天使の音色"
++    },
++    {
++      "section": "回復魔法",
++      "groupRaw": "S？",
++      "group": "S",
++      "valueRaw": "+10",
++      "name": "叡智の力"
++    },
++    {
++      "section": "回復魔法",
++      "groupRaw": "T",
++      "group": "T",
++      "valueRaw": "+10",
++      "name": "レゾナンス ムーン"
++    },
++    {
++      "section": "回復魔法",
++      "groupRaw": "U",
++      "group": "U",
++      "valueRaw": "+10",
++      "name": "女王の威厳"
++    },
++    {
++      "section": "回復魔法",
++      "groupRaw": "V？",
++      "group": "V",
++      "valueRaw": "+20",
++      "name": "回復の極意"
++    },
++    {
++      "section": "回復魔法",
++      "groupRaw": "V？",
++      "group": "V",
++      "valueRaw": "+15",
++      "name": "冥府の祝福"
++    },
++    {
++      "section": "強化魔法",
++      "groupRaw": "A",
++      "group": "A",
++      "valueRaw": "+10",
++      "name": "大地の加護"
++    },
++    {
++      "section": "強化魔法",
++      "groupRaw": "B",
++      "group": "B",
++      "valueRaw": "+20",
++      "name": "呪術師の極意"
++    },
++    {
++      "section": "強化魔法",
++      "groupRaw": "B",
++      "group": "B",
++      "valueRaw": "+20",
++      "name": "マジカル サポート"
++    },
++    {
++      "section": "強化魔法",
++      "groupRaw": "B",
++      "group": "B",
++      "valueRaw": "+15",
++      "name": "神に仕える者"
++    },
++    {
++      "section": "強化魔法",
++      "groupRaw": "C",
++      "group": "C",
++      "valueRaw": "+10",
++      "name": "悪魔の瞳"
++    },
++    {
++      "section": "強化魔法",
++      "groupRaw": "C？",
++      "group": "C",
++      "valueRaw": "+10",
++      "name": "強化の魔石"
++    },
++    {
++      "section": "強化魔法",
++      "groupRaw": "C？",
++      "group": "C",
++      "valueRaw": "+10",
++      "name": "英雄の翼"
++    },
++    {
++      "section": "強化魔法",
++      "groupRaw": "D",
++      "group": "D",
++      "valueRaw": "+10",
++      "name": "付与術師"
++    },
++    {
++      "section": "強化魔法",
++      "groupRaw": "D",
++      "group": "D",
++      "valueRaw": "+10",
++      "name": "魔法聖女"
++    },
++    {
++      "section": "強化魔法",
++      "groupRaw": "E",
++      "group": "E",
++      "valueRaw": "+10",
++      "name": "大司教"
++    },
++    {
++      "section": "強化魔法",
++      "groupRaw": "F",
++      "group": "F",
++      "valueRaw": "+15",
++      "name": "赤龍帝の加護"
++    },
++    {
++      "section": "強化魔法",
++      "groupRaw": "F",
++      "group": "F",
++      "valueRaw": "+15",
++      "name": "強化の刻印"
++    },
++    {
++      "section": "強化魔法",
++      "groupRaw": "G",
++      "group": "G",
++      "valueRaw": "+10",
++      "name": "マギア フォース"
++    },
++    {
++      "section": "強化魔法",
++      "groupRaw": "G？",
++      "group": "G",
++      "valueRaw": "+5",
++      "name": "マジック チャーム"
++    },
++    {
++      "section": "強化魔法",
++      "groupRaw": "H",
++      "group": "H",
++      "valueRaw": "+5",
++      "name": "大魔導士"
++    },
++    {
++      "section": "強化魔法",
++      "groupRaw": "H？",
++      "group": "H",
++      "valueRaw": "+15",
++      "name": "戦乙女の力"
++    },
++    {
++      "section": "強化魔法",
++      "groupRaw": "I",
++      "group": "I",
++      "valueRaw": "+10",
++      "name": "法力"
++    },
++    {
++      "section": "強化魔法",
++      "groupRaw": "J",
++      "group": "J",
++      "valueRaw": "+10",
++      "name": "魔法陣ブースト"
++    },
++    {
++      "section": "強化魔法",
++      "groupRaw": "J？",
++      "group": "J",
++      "valueRaw": "+20",
++      "name": "魔力回路"
++    },
++    {
++      "section": "強化魔法",
++      "groupRaw": "K",
++      "group": "K",
++      "valueRaw": "+10",
++      "name": "大賢者の知識"
++    },
++    {
++      "section": "強化魔法",
++      "groupRaw": "L",
++      "group": "L",
++      "valueRaw": "+10",
++      "name": "レゾナンス ムーン"
++    },
++    {
++      "section": "強化魔法",
++      "groupRaw": "M",
++      "group": "M",
++      "valueRaw": "+10",
++      "name": "女王の威厳"
++    },
++    {
++      "section": "強化魔法",
++      "groupRaw": "N",
++      "group": "N",
++      "valueRaw": "+10",
++      "name": "錬金術の極意"
++    },
++    {
++      "section": "強化魔法",
++      "groupRaw": "O？",
++      "group": "O",
++      "valueRaw": "+10",
++      "name": "叡智の力"
++    },
++    {
++      "section": "強化魔法",
++      "groupRaw": "P？",
++      "group": "P",
++      "valueRaw": "+15",
++      "name": "カスタム屋"
++    },
++    {
++      "section": "神秘魔法",
++      "groupRaw": "A",
++      "group": "A",
++      "valueRaw": "+10",
++      "name": "水神の力"
++    },
++    {
++      "section": "神秘魔法",
++      "groupRaw": "B",
++      "group": "B",
++      "valueRaw": "+20",
++      "name": "星屑の加護"
++    },
++    {
++      "section": "神秘魔法",
++      "groupRaw": "B",
++      "group": "B",
++      "valueRaw": "+20",
++      "name": "月の加護"
++    },
++    {
++      "section": "神秘魔法",
++      "groupRaw": "C",
++      "group": "C",
++      "valueRaw": "+10",
++      "name": "神秘のオーラ"
++    },
++    {
++      "section": "神秘魔法",
++      "groupRaw": "D",
++      "group": "D",
++      "valueRaw": "+10",
++      "name": "寿"
++    },
++    {
++      "section": "神秘魔法",
++      "groupRaw": "E",
++      "group": "E",
++      "valueRaw": "+10",
++      "name": "神祇官"
++    },
++    {
++      "section": "神秘魔法",
++      "groupRaw": "F",
++      "group": "F",
++      "valueRaw": "+10",
++      "name": "蝶の加護"
++    },
++    {
++      "section": "神秘魔法",
++      "groupRaw": "J",
++      "group": "J",
++      "valueRaw": "+10",
++      "name": "神聖な力"
++    },
++    {
++      "section": "神秘魔法",
++      "groupRaw": "H",
++      "group": "H",
++      "valueRaw": "+10",
++      "name": "月夜の煌き"
++    },
++    {
++      "section": "神秘魔法",
++      "groupRaw": "H？",
++      "group": "H",
++      "valueRaw": "+10",
++      "name": "七色の奇跡"
++    },
++    {
++      "section": "神秘魔法",
++      "groupRaw": "H？",
++      "group": "H",
++      "valueRaw": "+5",
++      "name": "マジック チャーム"
++    },
++    {
++      "section": "神秘魔法",
++      "groupRaw": "H？",
++      "group": "H",
++      "valueRaw": "+20",
++      "name": "白狐の力"
++    },
++    {
++      "section": "神秘魔法",
++      "groupRaw": "I",
++      "group": "I",
++      "valueRaw": "+5",
++      "name": "大魔導士"
++    },
++    {
++      "section": "神秘魔法",
++      "groupRaw": "I？",
++      "group": "I",
++      "valueRaw": "+15",
++      "name": "高貴な心"
++    },
++    {
++      "section": "神秘魔法",
++      "groupRaw": "I？",
++      "group": "I",
++      "valueRaw": "+15",
++      "name": "ダークな雰囲気"
++    },
++    {
++      "section": "神秘魔法",
++      "groupRaw": "J",
++      "group": "J",
++      "valueRaw": "+10",
++      "name": "神眼の力"
++    },
++    {
++      "section": "神秘魔法",
++      "groupRaw": "J？",
++      "group": "J",
++      "valueRaw": "+15",
++      "name": "星光"
++    },
++    {
++      "section": "神秘魔法",
++      "groupRaw": "J？",
++      "group": "J",
++      "valueRaw": "+15",
++      "name": "プラネット グレイス"
++    },
++    {
++      "section": "神秘魔法",
++      "groupRaw": "K",
++      "group": "K",
++      "valueRaw": "+10",
++      "name": "魔法陣ブースト"
++    },
++    {
++      "section": "神秘魔法",
++      "groupRaw": "L",
++      "group": "L",
++      "valueRaw": "+5",
++      "name": "ラッキーチャーム"
++    },
++    {
++      "section": "神秘魔法",
++      "groupRaw": "M",
++      "group": "M",
++      "valueRaw": "+15",
++      "name": "天職：治癒師"
++    },
++    {
++      "section": "神秘魔法",
++      "groupRaw": "N",
++      "group": "N",
++      "valueRaw": "+10",
++      "name": "英雄の翼"
++    },
++    {
++      "section": "神秘魔法",
++      "groupRaw": "N？",
++      "group": "N",
++      "valueRaw": "+10",
++      "name": "奇術師"
++    },
++    {
++      "section": "神秘魔法",
++      "groupRaw": "O",
++      "group": "O",
++      "valueRaw": "+10",
++      "name": "大賢者の知識"
++    },
++    {
++      "section": "神秘魔法",
++      "groupRaw": "P",
++      "group": "P",
++      "valueRaw": "+10",
++      "name": "レゾナンス ムーン"
++    },
++    {
++      "section": "神秘魔法",
++      "groupRaw": "Q",
++      "group": "Q",
++      "valueRaw": "+10",
++      "name": "女王の威厳"
++    },
++    {
++      "section": "神秘魔法",
++      "groupRaw": "R",
++      "group": "R",
++      "valueRaw": "+10",
++      "name": "錬金術の極意"
++    },
++    {
++      "section": "神秘魔法",
++      "groupRaw": "S？",
++      "group": "S",
++      "valueRaw": "+10",
++      "name": "叡智の力"
++    },
++    {
++      "section": "神秘魔法",
++      "groupRaw": "T？",
++      "group": "T",
++      "valueRaw": "+10",
++      "name": "神楽"
++    },
++    {
++      "section": "死の魔法",
++      "groupRaw": "A",
++      "group": "A",
++      "valueRaw": "+20",
++      "name": "深淵の闇"
++    },
++    {
++      "section": "死の魔法",
++      "groupRaw": "A",
++      "group": "A",
++      "valueRaw": "+20",
++      "name": "邪悪な力"
++    },
++    {
++      "section": "死の魔法",
++      "groupRaw": "B",
++      "group": "B",
++      "valueRaw": "+20",
++      "name": "バフォメットの刻印"
++    },
++    {
++      "section": "死の魔法",
++      "groupRaw": "B",
++      "group": "B",
++      "valueRaw": "+20",
++      "name": "魔界の支配者"
++    },
++    {
++      "section": "死の魔法",
++      "groupRaw": "B",
++      "group": "B",
++      "valueRaw": "+20",
++      "name": "ゴースト マリッジ"
++    },
++    {
++      "section": "死の魔法",
++      "groupRaw": "C",
++      "group": "C",
++      "valueRaw": "+10",
++      "name": "夜の王"
++    },
++    {
++      "section": "死の魔法",
++      "groupRaw": "C",
++      "group": "C",
++      "valueRaw": "+15",
++      "name": "スプーキー ソウル"
++    },
++    {
++      "section": "死の魔法",
++      "groupRaw": "D",
++      "group": "D",
++      "valueRaw": "+20",
++      "name": "死ノ象徴"
++    },
++    {
++      "section": "死の魔法",
++      "groupRaw": "D？",
++      "group": "D",
++      "valueRaw": "+10",
++      "name": "月夜の煌き"
++    },
++    {
++      "section": "死の魔法",
++      "groupRaw": "E",
++      "group": "E",
++      "valueRaw": "+10",
++      "name": "アヌビスの力"
++    },
++    {
++      "section": "死の魔法",
++      "groupRaw": "E？",
++      "group": "E",
++      "valueRaw": "+10",
++      "name": "バフォメットの力"
++    },
++    {
++      "section": "死の魔法",
++      "groupRaw": "F",
++      "group": "F",
++      "valueRaw": "+15",
++      "name": "紅髪の滅殺姫"
++    },
++    {
++      "section": "死の魔法",
++      "groupRaw": "F?",
++      "group": "F",
++      "valueRaw": "+15",
++      "name": "冥騎士の力"
++    },
++    {
++      "section": "死の魔法",
++      "groupRaw": "G",
++      "group": "G",
++      "valueRaw": "+10",
++      "name": "蠍の加護"
++    },
++    {
++      "section": "死の魔法",
++      "groupRaw": "H",
++      "group": "H",
++      "valueRaw": "+10",
++      "name": "漆黒の魔眼"
++    },
++    {
++      "section": "死の魔法",
++      "groupRaw": "I",
++      "group": "I",
++      "valueRaw": "+10",
++      "name": "オシリスの加護"
++    },
++    {
++      "section": "死の魔法",
++      "groupRaw": "I？",
++      "group": "I",
++      "valueRaw": "+15",
++      "name": "邪悪なオーラ"
++    },
++    {
++      "section": "死の魔法",
++      "groupRaw": "I？",
++      "group": "I",
++      "valueRaw": "+20",
++      "name": "闇の守護精霊"
++    },
++    {
++      "section": "死の魔法",
++      "groupRaw": "J",
++      "group": "J",
++      "valueRaw": "+10",
++      "name": "漆黒のベール"
++    },
++    {
++      "section": "死の魔法",
++      "groupRaw": "K",
++      "group": "K",
++      "valueRaw": "+10",
++      "name": "悪魔の力"
++    },
++    {
++      "section": "死の魔法",
++      "groupRaw": "L",
++      "group": "L",
++      "valueRaw": "+20",
++      "name": "月夜見の加護"
++    },
++    {
++      "section": "死の魔法",
++      "groupRaw": "L？",
++      "group": "L",
++      "valueRaw": "+15",
++      "name": "ダークな雰囲気"
++    },
++    {
++      "section": "死の魔法",
++      "groupRaw": "M",
++      "group": "M",
++      "valueRaw": "+15",
++      "name": "殲滅の魔術師"
++    },
++    {
++      "section": "死の魔法",
++      "groupRaw": "N",
++      "group": "N",
++      "valueRaw": "+15",
++      "name": "死神候補"
++    },
++    {
++      "section": "死の魔法",
++      "groupRaw": "O",
++      "group": "O",
++      "valueRaw": "+10",
++      "name": "大賢者の知識"
++    },
++    {
++      "section": "死の魔法",
++      "groupRaw": "O？",
++      "group": "O",
++      "valueRaw": "+20",
++      "name": "真祖の吸血鬼"
++    },
++    {
++      "section": "死の魔法",
++      "groupRaw": "O？",
++      "group": "O",
++      "valueRaw": "+？%",
++      "name": "堕天使の魔眼"
++    },
++    {
++      "section": "死の魔法",
++      "groupRaw": "P",
++      "group": "P",
++      "valueRaw": "+15",
++      "name": "小悪魔の翼"
++    },
++    {
++      "section": "死の魔法",
++      "groupRaw": "Q？",
++      "group": "Q",
++      "valueRaw": "+10",
++      "name": "魔術師の怨念"
++    },
++    {
++      "section": "死の魔法",
++      "groupRaw": "R？",
++      "group": "R",
++      "valueRaw": "+15",
++      "name": "闇の支配者"
++    },
++    {
++      "section": "死の魔法",
++      "groupRaw": "S？",
++      "group": "S",
++      "valueRaw": "+10",
++      "name": "叡智の力"
++    },
++    {
++      "section": "死の魔法",
++      "groupRaw": "T？",
++      "group": "T",
++      "valueRaw": "+10",
++      "name": "闇を纏いし者"
++    },
++    {
++      "section": "死の魔法",
++      "groupRaw": "U？",
++      "group": "U",
++      "valueRaw": "+10",
++      "name": "ヤミの力"
++    },
++    {
++      "section": "死の魔法",
++      "groupRaw": "V？",
++      "group": "V",
++      "valueRaw": "+15",
++      "name": "冥府の祝福"
++    },
++    {
++      "section": "死の魔法",
++      "groupRaw": "W?",
++      "group": "W",
++      "valueRaw": "+15",
++      "name": "闇の王"
++    },
++    {
++      "section": "召喚魔法",
++      "groupRaw": "A",
++      "group": "A",
++      "valueRaw": "+10",
++      "name": "黒魔術の書"
++    },
++    {
++      "section": "召喚魔法",
++      "groupRaw": "B",
++      "group": "B",
++      "valueRaw": "+10",
++      "name": "大賢者の知識"
++    },
++    {
++      "section": "召喚魔法",
++      "groupRaw": "C？",
++      "group": "C",
++      "valueRaw": "+10",
++      "name": "叡智の力"
++    },
++    {
++      "section": "魔法熟練",
++      "groupRaw": "A",
++      "group": "A",
++      "valueRaw": "+10",
++      "name": "エキスパート マジック"
++    },
++    {
++      "section": "魔法熟練",
++      "groupRaw": "B",
++      "group": "B",
++      "valueRaw": "+10",
++      "name": "白百合の加護"
++    },
++    {
++      "section": "魔法熟練",
++      "groupRaw": "C",
++      "group": "C",
++      "valueRaw": "+15",
++      "name": "妖狐の力"
++    },
++    {
++      "section": "魔法熟練",
++      "groupRaw": "D",
++      "group": "D",
++      "valueRaw": "+20",
++      "name": "自然崇拝"
++    },
++    {
++      "section": "魔法熟練",
++      "groupRaw": "E",
++      "group": "E",
++      "valueRaw": "+10",
++      "name": "奇術師"
++    },
++    {
++      "section": "魔法熟練",
++      "groupRaw": "F",
++      "group": "F",
++      "valueRaw": "+20",
++      "name": "陰陽術の極意"
++    },
++    {
++      "section": "自然調和",
++      "groupRaw": "A",
++      "group": "A",
++      "valueRaw": "+20",
++      "name": "仙術"
++    },
++    {
++      "section": "自然調和",
++      "groupRaw": "B",
++      "group": "B",
++      "valueRaw": "+20",
++      "name": "山紫水明"
++    },
++    {
++      "section": "自然調和",
++      "groupRaw": "C",
++      "group": "C",
++      "valueRaw": "+20",
++      "name": "ゴルファー"
++    },
++    {
++      "section": "自然調和",
++      "groupRaw": "D",
++      "group": "D",
++      "valueRaw": "+20",
++      "name": "闇纏"
++    },
++    {
++      "section": "自然調和",
++      "groupRaw": "E？",
++      "group": "E",
++      "valueRaw": "+20",
++      "name": "自然崇拝"
++    },
++    {
++      "section": "自然調和",
++      "groupRaw": "F？",
++      "group": "F",
++      "valueRaw": "+20",
++      "name": "アルテミスの加護"
++    },
++    {
++      "section": "自然調和",
++      "groupRaw": "G？",
++      "group": "G",
++      "valueRaw": "+20",
++      "name": "森精の加護"
++    },
++    {
++      "section": "暗黒命令",
++      "groupRaw": "A",
++      "group": "A",
++      "valueRaw": "+10",
++      "name": "魔法のお姫様"
++    },
++    {
++      "section": "暗黒命令",
++      "groupRaw": "A?",
++      "group": "A",
++      "valueRaw": "+15",
++      "name": "冥騎士の力"
++    },
++    {
++      "section": "暗黒命令",
++      "groupRaw": "B",
++      "group": "B",
++      "valueRaw": "+10",
++      "name": "闇を纏いし者"
++    },
++    {
++      "section": "暗黒命令",
++      "groupRaw": "C",
++      "group": "C",
++      "valueRaw": "+10",
++      "name": "漆黒の魔眼"
++    },
++    {
++      "section": "暗黒命令",
++      "groupRaw": "D",
++      "group": "D",
++      "valueRaw": "+10",
++      "name": "地雷系"
++    },
++    {
++      "section": "暗黒命令",
++      "groupRaw": "E",
++      "group": "E",
++      "valueRaw": "+10",
++      "name": "漆黒のベール"
++    },
++    {
++      "section": "暗黒命令",
++      "groupRaw": "F",
++      "group": "F",
++      "valueRaw": "+10",
++      "name": "悪魔の力"
++    },
++    {
++      "section": "暗黒命令",
++      "groupRaw": "G",
++      "group": "G",
++      "valueRaw": "+15",
++      "name": "スプーキー ソウル"
++    },
++    {
++      "section": "暗黒命令",
++      "groupRaw": "H",
++      "group": "H",
++      "valueRaw": "+15",
++      "name": "死神候補"
++    },
++    {
++      "section": "暗黒命令",
++      "groupRaw": "I",
++      "group": "I",
++      "valueRaw": "+20",
++      "name": "自然崇拝"
++    },
++    {
++      "section": "暗黒命令",
++      "groupRaw": "J",
++      "group": "J",
++      "valueRaw": "+20",
++      "name": "異形の力"
++    },
++    {
++      "section": "暗黒命令",
++      "groupRaw": "K",
++      "group": "K",
++      "valueRaw": "+5",
++      "name": "憑物"
++    },
++    {
++      "section": "暗黒命令",
++      "groupRaw": "L",
++      "group": "L",
++      "valueRaw": "+10",
++      "name": "ヤミの力"
++    },
++    {
++      "section": "暗黒命令",
++      "groupRaw": "M",
++      "group": "M",
++      "valueRaw": "+15",
++      "name": "闇の王"
++    },
++    {
++      "section": "暗黒命令",
++      "groupRaw": "N",
++      "group": "N",
++      "valueRaw": "+15",
++      "name": "あなたの後ろにいるの"
++    },
++    {
++      "section": "シャウト",
++      "groupRaw": "A",
++      "group": "A",
++      "valueRaw": "+10",
++      "name": "アーティスト"
++    },
++    {
++      "section": "シャウト",
++      "groupRaw": "B",
++      "group": "B",
++      "valueRaw": "+20",
++      "name": "オープン マイ ハート"
++    },
++    {
++      "section": "シャウト",
++      "groupRaw": "C",
++      "group": "C",
++      "valueRaw": "+20",
++      "name": "ハードコア・パンク"
++    },
++    {
++      "section": "シャウト",
++      "groupRaw": "D",
++      "group": "D",
++      "valueRaw": "+15",
++      "name": "ロックスター"
++    },
++    {
++      "section": "音楽",
++      "groupRaw": "A",
++      "group": "A",
++      "valueRaw": "+10",
++      "name": "マリアッチ"
++    },
++    {
++      "section": "音楽",
++      "groupRaw": "A",
++      "group": "A",
++      "valueRaw": "+20",
++      "name": "歌姫"
++    },
++    {
++      "section": "音楽",
++      "groupRaw": "A",
++      "group": "A",
++      "valueRaw": "+20",
++      "name": "ミュージカル"
++    },
++    {
++      "section": "音楽",
++      "groupRaw": "A",
++      "group": "A",
++      "valueRaw": "+20",
++      "name": "スーパースター"
++    },
++    {
++      "section": "音楽",
++      "groupRaw": "B",
++      "group": "B",
++      "valueRaw": "+10",
++      "name": "吹奏楽団"
++    },
++    {
++      "section": "音楽",
++      "groupRaw": "B",
++      "group": "B",
++      "valueRaw": "+10",
++      "name": "防音グッズ"
++    },
++    {
++      "section": "音楽",
++      "groupRaw": "C",
++      "group": "C",
++      "valueRaw": "+15",
++      "name": "伝説のギタリスト"
++    },
++    {
++      "section": "音楽",
++      "groupRaw": "C?",
++      "group": "C",
++      "valueRaw": "+10",
++      "name": "精霊の力"
++    },
++    {
++      "section": "音楽",
++      "groupRaw": "D",
++      "group": "D",
++      "valueRaw": "+10",
++      "name": "サラウンド"
++    },
++    {
++      "section": "音楽",
++      "groupRaw": "E",
++      "group": "E",
++      "valueRaw": "+10",
++      "name": "スターダム"
++    },
++    {
++      "section": "音楽",
++      "groupRaw": "F",
++      "group": "F",
++      "valueRaw": "+15",
++      "name": "永遠のアイドル"
++    },
++    {
++      "section": "音楽",
++      "groupRaw": "G",
++      "group": "G",
++      "valueRaw": "+10",
++      "name": "小鳥のさえずり"
++    },
++    {
++      "section": "音楽",
++      "groupRaw": "H",
++      "group": "H",
++      "valueRaw": "+10",
++      "name": "森の音楽家"
++    },
++    {
++      "section": "音楽",
++      "groupRaw": "I",
++      "group": "I",
++      "valueRaw": "+10",
++      "name": "アイドルの卵"
++    },
++    {
++      "section": "音楽",
++      "groupRaw": "J",
++      "group": "J",
++      "valueRaw": "+10",
++      "name": "アーティスト"
++    },
++    {
++      "section": "音楽",
++      "groupRaw": "K",
++      "group": "K",
++      "valueRaw": "+15",
++      "name": "妖艶な舞"
++    },
++    {
++      "section": "音楽",
++      "groupRaw": "L",
++      "group": "L",
++      "valueRaw": "+5",
++      "name": "天使の音色"
++    },
++    {
++      "section": "音楽",
++      "groupRaw": "M？",
++      "group": "M",
++      "valueRaw": "+10",
++      "name": "神楽"
++    },
++    {
++      "section": "ダンス",
++      "groupRaw": "A",
++      "group": "A",
++      "valueRaw": "+20",
++      "name": "赤い靴"
++    },
++    {
++      "section": "ダンス",
++      "groupRaw": "A",
++      "group": "A",
++      "valueRaw": "+20",
++      "name": "アラビアン ダンサー"
++    },
++    {
++      "section": "ダンス",
++      "groupRaw": "B",
++      "group": "B",
++      "valueRaw": "+10",
++      "name": "精霊の舞"
++    },
++    {
++      "section": "ダンス",
++      "groupRaw": "C",
++      "group": "C",
++      "valueRaw": "+15",
++      "name": "チアフリー"
++    },
++    {
++      "section": "ダンス",
++      "groupRaw": "D",
++      "group": "D",
++      "valueRaw": "+10",
++      "name": "スターダム"
++    },
++    {
++      "section": "ダンス",
++      "groupRaw": "E",
++      "group": "E",
++      "valueRaw": "+10",
++      "name": "アイドルの卵"
++    },
++    {
++      "section": "ダンス",
++      "groupRaw": "F",
++      "group": "F",
++      "valueRaw": "+15",
++      "name": "ロックスター"
++    },
++    {
++      "section": "ダンス",
++      "groupRaw": "F？",
++      "group": "F",
++      "valueRaw": "+15",
++      "name": "妖艶な舞"
++    },
++    {
++      "section": "ダンス",
++      "groupRaw": "G？",
++      "group": "G",
++      "valueRaw": "+20",
++      "name": "山の妖精"
++    },
++    {
++      "section": "ダンス",
++      "groupRaw": "H？",
++      "group": "H",
++      "valueRaw": "+10",
++      "name": "神楽"
++    }
++  ],
++  "damage": [
++    {
++      "section": "クリティカル率",
++      "groupRaw": "A1",
++      "group": "A1",
++      "valueRaw": "+15%",
++      "name": "魔弾の射手"
++    },
++    {
++      "section": "クリティカル率",
++      "groupRaw": "A1",
++      "group": "A1",
++      "valueRaw": "+10%",
++      "name": "クリティカル率UP A LV1"
++    },
++    {
++      "section": "クリティカル率",
++      "groupRaw": "A2",
++      "group": "A2",
++      "valueRaw": "+20%",
++      "name": "クリティカル率UP A LV3"
++    },
++    {
++      "section": "クリティカル率",
++      "groupRaw": "A2",
++      "group": "A2",
++      "valueRaw": "+20%",
++      "name": "軍神の力"
++    },
++    {
++      "section": "クリティカル率",
++      "groupRaw": "A2",
++      "group": "A2",
++      "valueRaw": "+20%",
++      "name": "栗の加護"
++    },
++    {
++      "section": "クリティカル率",
++      "groupRaw": "A2",
++      "group": "A2",
++      "valueRaw": "+15%",
++      "name": "クリティカル率UP A Lv2"
++    },
++    {
++      "section": "クリティカル率",
++      "groupRaw": "A2",
++      "group": "A2",
++      "valueRaw": "+15%",
++      "name": "サーチ ウィークネス"
++    },
++    {
++      "section": "クリティカル率",
++      "groupRaw": "B1",
++      "group": "B1",
++      "valueRaw": "+10%",
++      "name": "クリティカル率UP B LV1"
++    },
++    {
++      "section": "クリティカル率",
++      "groupRaw": "B1",
++      "group": "B1",
++      "valueRaw": "+10%",
++      "name": "解放の鍵"
++    },
++    {
++      "section": "クリティカル率",
++      "groupRaw": "B1",
++      "group": "B1",
++      "valueRaw": "+10%",
++      "name": "銃士の心得"
++    },
++    {
++      "section": "クリティカル率",
++      "groupRaw": "B2",
++      "group": "B2",
++      "valueRaw": "+20%",
++      "name": "クリティカル率UP B LV3"
++    },
++    {
++      "section": "クリティカル率",
++      "groupRaw": "B2",
++      "group": "B2",
++      "valueRaw": "+20%",
++      "name": "妖精女王"
++    },
++    {
++      "section": "クリティカル率",
++      "groupRaw": "B2",
++      "group": "B2",
++      "valueRaw": "+20%",
++      "name": "攻撃アシスト機能"
++    },
++    {
++      "section": "クリティカル率",
++      "groupRaw": "B2",
++      "group": "B2",
++      "valueRaw": "+20%",
++      "name": "シューの加護"
++    },
++    {
++      "section": "クリティカル率",
++      "groupRaw": "B2",
++      "group": "B2",
++      "valueRaw": "+15%",
++      "name": "クリティカル率UP B LV2"
++    },
++    {
++      "section": "クリティカル率",
++      "groupRaw": "B2",
++      "group": "B2",
++      "valueRaw": "+15%",
++      "name": "暗殺術"
++    },
++    {
++      "section": "クリティカル率",
++      "groupRaw": "C",
++      "group": "C",
++      "valueRaw": "+10%",
++      "name": "虹色の加護"
++    },
++    {
++      "section": "クリティカル率",
++      "groupRaw": "D",
++      "group": "D",
++      "valueRaw": "+15%",
++      "name": "暗殺者"
++    },
++    {
++      "section": "クリティカル率",
++      "groupRaw": "D",
++      "group": "D",
++      "valueRaw": "+15%",
++      "name": "狂獣の力"
++    },
++    {
++      "section": "クリティカル率",
++      "groupRaw": "D",
++      "group": "D",
++      "valueRaw": "+15%",
++      "name": "武神流の極意"
++    },
++    {
++      "section": "クリティカル率",
++      "groupRaw": "E",
++      "group": "E",
++      "valueRaw": "+15%",
++      "name": "キラークイーン"
++    },
++    {
++      "section": "クリティカル率",
++      "groupRaw": "E",
++      "group": "E",
++      "valueRaw": "+15%",
++      "name": "蠍の加護"
++    },
++    {
++      "section": "クリティカル率",
++      "groupRaw": "E",
++      "group": "E",
++      "valueRaw": "+15%",
++      "name": "小鬼を殺す者"
++    },
++    {
++      "section": "クリティカル率",
++      "groupRaw": "F",
++      "group": "F",
++      "valueRaw": "+15%",
++      "name": "騎心一槍"
++    },
++    {
++      "section": "クリティカル率",
++      "groupRaw": "G",
++      "group": "G",
++      "valueRaw": "+30%",
++      "name": "リスキー ベッド"
++    },
++    {
++      "section": "クリティカル率",
++      "groupRaw": "H",
++      "group": "H",
++      "valueRaw": "+5%",
++      "name": "ラッキーチャーム"
++    },
++    {
++      "section": "クリティカル率",
++      "groupRaw": "H？",
++      "group": "H",
++      "valueRaw": "+15%",
++      "name": "薔薇の輝き"
++    },
++    {
++      "section": "クリティカル率",
++      "groupRaw": "I",
++      "group": "I",
++      "valueRaw": "+10%",
++      "name": "竜王の腕"
++    },
++    {
++      "section": "クリティカル率",
++      "groupRaw": "J",
++      "group": "J",
++      "valueRaw": "+20%",
++      "name": "暗影の暗殺術"
++    },
++    {
++      "section": "クリティカル率",
++      "groupRaw": "K",
++      "group": "K",
++      "valueRaw": "+20%",
++      "name": "海賊の極意"
++    },
++    {
++      "section": "効果範囲",
++      "groupRaw": "A",
++      "group": "A",
++      "valueRaw": "+1.5",
++      "name": "王の威厳"
++    },
++    {
++      "section": "効果範囲",
++      "groupRaw": "B",
++      "group": "B",
++      "valueRaw": "+1.5",
++      "name": "翼の白杖"
++    },
++    {
++      "section": "効果範囲",
++      "groupRaw": "C",
++      "group": "C",
++      "valueRaw": "+1.0",
++      "name": "ロングロング"
++    },
++    {
++      "section": "効果範囲",
++      "groupRaw": "D",
++      "group": "D",
++      "valueRaw": "+1.5",
++      "name": "妖精王唱"
++    },
++    {
++      "section": "効果範囲",
++      "groupRaw": "D",
++      "group": "D",
++      "valueRaw": "+1.5",
++      "name": "魔力共鳴"
++    },
++    {
++      "section": "効果範囲",
++      "groupRaw": "E",
++      "group": "E",
++      "valueRaw": "+1.0",
++      "name": "堕天使の魔眼"
++    },
++    {
++      "section": "効果範囲",
++      "groupRaw": "F",
++      "group": "F",
++      "valueRaw": "+1.0",
++      "name": "スペル チャージ"
++    },
++    {
++      "section": "物理攻撃ダメージアップ(物理与ダメージ増加バフ)",
++      "groupRaw": "A",
++      "group": "A",
++      "valueRaw": "+10%",
++      "name": "巨人の籠手"
++    },
++    {
++      "section": "物理攻撃ダメージアップ(物理与ダメージ増加バフ)",
++      "groupRaw": "A？",
++      "group": "A",
++      "valueRaw": "+10%",
++      "name": "剛腕の呪印"
++    },
++    {
++      "section": "物理攻撃ダメージアップ(物理与ダメージ増加バフ)",
++      "groupRaw": "A？",
++      "group": "A",
++      "valueRaw": "+10%",
++      "name": "蒸気の力"
++    },
++    {
++      "section": "物理攻撃ダメージアップ(物理与ダメージ増加バフ)",
++      "groupRaw": "A？",
++      "group": "A",
++      "valueRaw": "+10%",
++      "name": "竜王の腕"
++    },
++    {
++      "section": "物理攻撃ダメージアップ(物理与ダメージ増加バフ)",
++      "groupRaw": "A？",
++      "group": "A",
++      "valueRaw": "+10%",
++      "name": "石魔人の力"
++    },
++    {
++      "section": "物理攻撃ダメージアップ(物理与ダメージ増加バフ)",
++      "groupRaw": "A？",
++      "group": "A",
++      "valueRaw": "+10%",
++      "name": "強化アーム"
++    },
++    {
++      "section": "物理攻撃ダメージアップ(物理与ダメージ増加バフ)",
++      "groupRaw": "B",
++      "group": "B",
++      "valueRaw": "+10%",
++      "name": "マッスル パワー"
++    },
++    {
++      "section": "物理攻撃ダメージアップ(物理与ダメージ増加バフ)",
++      "groupRaw": "B",
++      "group": "B",
++      "valueRaw": "+10%",
++      "name": "ワーカー ソウル"
++    },
++    {
++      "section": "物理攻撃ダメージアップ(物理与ダメージ増加バフ)",
++      "groupRaw": "B",
++      "group": "B",
++      "valueRaw": "+10%",
++      "name": "ミリタリーアーツ"
++    },
++    {
++      "section": "物理攻撃ダメージアップ(物理与ダメージ増加バフ)",
++      "groupRaw": "C",
++      "group": "C",
++      "valueRaw": "+5%",
++      "name": "三つの願い"
++    },
++    {
++      "section": "物理攻撃ダメージアップ(物理与ダメージ増加バフ)",
++      "groupRaw": "C？",
++      "group": "C",
++      "valueRaw": "+10%",
++      "name": "竜封力"
++    },
++    {
++      "section": "物理攻撃ダメージアップ(物理与ダメージ増加バフ)",
++      "groupRaw": "D",
++      "group": "D",
++      "valueRaw": "+5%",
++      "name": "悪鬼羅刹"
++    },
++    {
++      "section": "物理攻撃ダメージアップ(物理与ダメージ増加バフ)",
++      "groupRaw": "E",
++      "group": "E",
++      "valueRaw": "+10%",
++      "name": "夫婦剣"
++    },
++    {
++      "section": "物理攻撃ダメージアップ(物理与ダメージ増加バフ)",
++      "groupRaw": "E？",
++      "group": "E",
++      "valueRaw": "+10%",
++      "name": "戦翼の力"
++    },
++    {
++      "section": "物理攻撃ダメージアップ(物理与ダメージ増加バフ)",
++      "groupRaw": "F",
++      "group": "F",
++      "valueRaw": "+10%",
++      "name": "怒髪衝天"
++    },
++    {
++      "section": "物理攻撃ダメージアップ(物理与ダメージ増加バフ)",
++      "groupRaw": "G",
++      "group": "G",
++      "valueRaw": "+15%",
++      "name": "鋼の剛腕"
++    },
++    {
++      "section": "物理攻撃ダメージアップ(物理与ダメージ増加バフ)",
++      "groupRaw": "G",
++      "group": "G",
++      "valueRaw": "+15%",
++      "name": "剛剣の使い手"
++    },
++    {
++      "section": "物理攻撃ダメージアップ(物理与ダメージ増加バフ)",
++      "groupRaw": "H",
++      "group": "H",
++      "valueRaw": "+10%",
++      "name": "天職：占術師"
++    },
++    {
++      "section": "物理攻撃ダメージアップ(物理与ダメージ増加バフ)",
++      "groupRaw": "H",
++      "group": "H",
++      "valueRaw": "+10%",
++      "name": "サイボーグ"
++    },
++    {
++      "section": "物理攻撃ダメージアップ(物理与ダメージ増加バフ)",
++      "groupRaw": "I",
++      "group": "I",
++      "valueRaw": "+10%",
++      "name": "気炎万丈"
++    },
++    {
++      "section": "物理攻撃ダメージアップ(物理与ダメージ増加バフ)",
++      "groupRaw": "J?",
++      "group": "J",
++      "valueRaw": "+3%",
++      "name": "チョコっとラブ"
++    },
++    {
++      "section": "物理攻撃ダメージアップ(物理与ダメージ増加バフ)",
++      "groupRaw": "K?",
++      "group": "K",
++      "valueRaw": "+10%",
++      "name": "光のエンハンス"
++    },
++    {
++      "section": "物理攻撃ダメージアップ(物理与ダメージ増加バフ)",
++      "groupRaw": "K?",
++      "group": "K",
++      "valueRaw": "+10%",
++      "name": "黄金の呪い"
++    },
++    {
++      "section": "物理攻撃ダメージアップ(物理与ダメージ増加バフ)",
++      "groupRaw": "L?",
++      "group": "L",
++      "valueRaw": "+10%",
++      "name": "闘魂"
++    },
++    {
++      "section": "物理攻撃ダメージアップ(物理与ダメージ増加バフ)",
++      "groupRaw": "M？",
++      "group": "M",
++      "valueRaw": "+10%",
++      "name": "薔薇の輝き"
++    },
++    {
++      "section": "魔法攻撃ダメージアップ(魔法与ダメージ増加バフ)",
++      "groupRaw": "A",
++      "group": "A",
++      "valueRaw": "+10%",
++      "name": "幼龍の加護"
++    },
++    {
++      "section": "魔法攻撃ダメージアップ(魔法与ダメージ増加バフ)",
++      "groupRaw": "B",
++      "group": "B",
++      "valueRaw": "+10%",
++      "name": "妖精王唱"
++    },
++    {
++      "section": "魔法攻撃ダメージアップ(魔法与ダメージ増加バフ)",
++      "groupRaw": "B",
++      "group": "B",
++      "valueRaw": "+10%",
++      "name": "魔力共鳴"
++    },
++    {
++      "section": "魔法攻撃ダメージアップ(魔法与ダメージ増加バフ)",
++      "groupRaw": "C",
++      "group": "C",
++      "valueRaw": "+10%",
++      "name": "魔導の極み"
++    },
++    {
++      "section": "魔法攻撃ダメージアップ(魔法与ダメージ増加バフ)",
++      "groupRaw": "D",
++      "group": "D",
++      "valueRaw": "+5%",
++      "name": "悪鬼羅刹"
++    },
++    {
++      "section": "魔法攻撃ダメージアップ(魔法与ダメージ増加バフ)",
++      "groupRaw": "E",
++      "group": "E",
++      "valueRaw": "+10%",
++      "name": "竜王の加護"
++    },
++    {
++      "section": "魔法攻撃ダメージアップ(魔法与ダメージ増加バフ)",
++      "groupRaw": "F",
++      "group": "F",
++      "valueRaw": "+10%",
++      "name": "天職：神子"
++    },
++    {
++      "section": "魔法攻撃ダメージアップ(魔法与ダメージ増加バフ)",
++      "groupRaw": "F",
++      "group": "F",
++      "valueRaw": "+15%",
++      "name": "ツヴァイフォーム"
++    },
++    {
++      "section": "魔法攻撃ダメージアップ(魔法与ダメージ増加バフ)",
++      "groupRaw": "F",
++      "group": "F",
++      "valueRaw": "+？%",
++      "name": "悪の参謀"
++    },
++    {
++      "section": "魔法攻撃ダメージアップ(魔法与ダメージ増加バフ)",
++      "groupRaw": "G",
++      "group": "G",
++      "valueRaw": "+10%",
++      "name": "邪悪なオーラ"
++    },
++    {
++      "section": "魔法攻撃ダメージアップ(魔法与ダメージ増加バフ)",
++      "groupRaw": "H",
++      "group": "H",
++      "valueRaw": "+10%",
++      "name": "星空の加護"
++    },
++    {
++      "section": "魔法攻撃ダメージアップ(魔法与ダメージ増加バフ)",
++      "groupRaw": "I",
++      "group": "I",
++      "valueRaw": "+10%",
++      "name": "アリコーンの加護"
++    },
++    {
++      "section": "魔法攻撃ダメージアップ(魔法与ダメージ増加バフ)",
++      "groupRaw": "J?",
++      "group": "J",
++      "valueRaw": "+3%",
++      "name": "チョコっとラブ"
++    },
++    {
++      "section": "魔法攻撃ダメージアップ(魔法与ダメージ増加バフ)",
++      "groupRaw": "K？",
++      "group": "K",
++      "valueRaw": "+10%",
++      "name": "薔薇の輝き"
++    },
++    {
++      "section": "魔法攻撃ダメージアップ(魔法与ダメージ増加バフ)",
++      "groupRaw": "L？",
++      "group": "L",
++      "valueRaw": "+10%",
++      "name": "上位妖精の加護"
++    },
++    {
++      "section": "魔法攻撃ダメージアップ(魔法与ダメージ増加バフ)",
++      "groupRaw": "M？",
++      "group": "M",
++      "valueRaw": "+10%",
++      "name": "スペル チャージ"
++    },
++    {
++      "section": "火属性効果アップ(火属性ダメージアップ)",
++      "groupRaw": "A",
++      "group": "A",
++      "valueRaw": "+20%",
++      "name": "炎魔の加護"
++    },
++    {
++      "section": "火属性効果アップ(火属性ダメージアップ)",
++      "groupRaw": "A",
++      "group": "A",
++      "valueRaw": "+20%",
++      "name": "蒼炎の力"
++    },
++    {
++      "section": "火属性効果アップ(火属性ダメージアップ)",
++      "groupRaw": "B",
++      "group": "B",
++      "valueRaw": "+10%",
++      "name": "炎化創火"
++    },
++    {
++      "section": "火属性効果アップ(火属性ダメージアップ)",
++      "groupRaw": "C",
++      "group": "C",
++      "valueRaw": "+10%",
++      "name": "ラーの加護"
++    },
++    {
++      "section": "火属性効果アップ(火属性ダメージアップ)",
++      "groupRaw": "D",
++      "group": "D",
++      "valueRaw": "+10%",
++      "name": "熾天使の加護"
++    },
++    {
++      "section": "火属性効果アップ(火属性ダメージアップ)",
++      "groupRaw": "E",
++      "group": "E",
++      "valueRaw": "+10%",
++      "name": "ウラエウスの力"
++    },
++    {
++      "section": "火属性効果アップ(火属性ダメージアップ)",
++      "groupRaw": "F",
++      "group": "F",
++      "valueRaw": "+10%",
++      "name": "炎の魔剣"
++    },
++    {
++      "section": "火属性効果アップ(火属性ダメージアップ)",
++      "groupRaw": "G",
++      "group": "G",
++      "valueRaw": "+10%",
++      "name": "天職：守護者"
++    },
++    {
++      "section": "火属性効果アップ(火属性ダメージアップ)",
++      "groupRaw": "H",
++      "group": "H",
++      "valueRaw": "+10%",
++      "name": "気炎万丈"
++    },
++    {
++      "section": "火属性効果アップ(火属性ダメージアップ)",
++      "groupRaw": "I",
++      "group": "I",
++      "valueRaw": "+10%",
++      "name": "エレメント エンハンス"
++    },
++    {
++      "section": "火属性効果アップ(火属性ダメージアップ)",
++      "groupRaw": "J？",
++      "group": "J",
++      "valueRaw": "+10%",
++      "name": "料理人魂"
++    },
++    {
++      "section": "火属性効果アップ(火属性ダメージアップ)",
++      "groupRaw": "K？",
++      "group": "K",
++      "valueRaw": "+10%",
++      "name": "ファイブ エレメンツ"
++    },
++    {
++      "section": "火属性効果アップ(火属性ダメージアップ)",
++      "groupRaw": "L？",
++      "group": "L",
++      "valueRaw": "+10%",
++      "name": "プリズムパワー"
++    },
++    {
++      "section": "火属性効果アップ(火属性ダメージアップ)",
++      "groupRaw": "M？",
++      "group": "M",
++      "valueRaw": "+？%",
++      "name": "精霊石の力"
++    },
++    {
++      "section": "火属性効果アップ(火属性ダメージアップ)",
++      "groupRaw": "N？",
++      "group": "N",
++      "valueRaw": "+10%",
++      "name": "ちびドラの加護"
++    },
++    {
++      "section": "火属性効果アップ(火属性ダメージアップ)",
++      "groupRaw": "O？",
++      "group": "O",
++      "valueRaw": "+10%",
++      "name": "カーバンクルの加護"
++    },
++    {
++      "section": "水属性効果アップ(水属性ダメージアップ)",
++      "groupRaw": "A",
++      "group": "A",
++      "valueRaw": "+20%",
++      "name": "氷魔の力"
++    },
++    {
++      "section": "水属性効果アップ(水属性ダメージアップ)",
++      "groupRaw": "A",
++      "group": "A",
++      "valueRaw": "+20%",
++      "name": "水精の加護"
++    },
++    {
++      "section": "水属性効果アップ(水属性ダメージアップ)",
++      "groupRaw": "B",
++      "group": "B",
++      "valueRaw": "+10%",
++      "name": "雪妖精の加護"
++    },
++    {
++      "section": "水属性効果アップ(水属性ダメージアップ)",
++      "groupRaw": "C",
++      "group": "C",
++      "valueRaw": "+10%",
++      "name": "魅惑のマーメイド"
++    },
++    {
++      "section": "水属性効果アップ(水属性ダメージアップ)",
++      "groupRaw": "D",
++      "group": "D",
++      "valueRaw": "+10%",
++      "name": "氷結の魔女"
++    },
++    {
++      "section": "水属性効果アップ(水属性ダメージアップ)",
++      "groupRaw": "D？",
++      "group": "D",
++      "valueRaw": "+10%",
++      "name": "カーバンクルの加護"
++    },
++    {
++      "section": "水属性効果アップ(水属性ダメージアップ)",
++      "groupRaw": "E",
++      "group": "E",
++      "valueRaw": "+10%",
++      "name": "海人族"
++    },
++    {
++      "section": "水属性効果アップ(水属性ダメージアップ)",
++      "groupRaw": "F",
++      "group": "F",
++      "valueRaw": "+10%",
++      "name": "エレメント エンハンス"
++    },
++    {
++      "section": "水属性効果アップ(水属性ダメージアップ)",
++      "groupRaw": "G？",
++      "group": "G",
++      "valueRaw": "+10%",
++      "name": "ファイブ エレメンツ"
++    },
++    {
++      "section": "水属性効果アップ(水属性ダメージアップ)",
++      "groupRaw": "H？",
++      "group": "H",
++      "valueRaw": "+20%",
++      "name": "氷の魔術師"
++    },
++    {
++      "section": "水属性効果アップ(水属性ダメージアップ)",
++      "groupRaw": "I？",
++      "group": "I",
++      "valueRaw": "+10%",
++      "name": "プリズムパワー"
++    },
++    {
++      "section": "水属性効果アップ(水属性ダメージアップ)",
++      "groupRaw": "I？",
++      "group": "I",
++      "valueRaw": "+？%",
++      "name": "幻竜の加護"
++    },
++    {
++      "section": "水属性効果アップ(水属性ダメージアップ)",
++      "groupRaw": "J？",
++      "group": "J",
++      "valueRaw": "+？%",
++      "name": "精霊石の力"
++    },
++    {
++      "section": "風属性効果アップ(風属性ダメージアップ)",
++      "groupRaw": "A",
++      "group": "A",
++      "valueRaw": "+20%",
++      "name": "風翼の加護"
++    },
++    {
++      "section": "風属性効果アップ(風属性ダメージアップ)",
++      "groupRaw": "A？",
++      "group": "A",
++      "valueRaw": "+10%",
++      "name": "プリズムパワー"
++    },
++    {
++      "section": "風属性効果アップ(風属性ダメージアップ)",
++      "groupRaw": "B",
++      "group": "B",
++      "valueRaw": "+20%",
++      "name": "旋風の力"
++    },
++    {
++      "section": "風属性効果アップ(風属性ダメージアップ)",
++      "groupRaw": "C",
++      "group": "C",
++      "valueRaw": "+10%",
++      "name": "エルフの加護"
++    },
++    {
++      "section": "風属性効果アップ(風属性ダメージアップ)",
++      "groupRaw": "D",
++      "group": "D",
++      "valueRaw": "+10%",
++      "name": "天職：守護者"
++    },
++    {
++      "section": "風属性効果アップ(風属性ダメージアップ)",
++      "groupRaw": "E",
++      "group": "E",
++      "valueRaw": "+10%",
++      "name": "エレメント エンハンス"
++    },
++    {
++      "section": "風属性効果アップ(風属性ダメージアップ)",
++      "groupRaw": "F？",
++      "group": "F",
++      "valueRaw": "+10%",
++      "name": "ファイブ エレメンツ"
++    },
++    {
++      "section": "風属性効果アップ(風属性ダメージアップ)",
++      "groupRaw": "G？",
++      "group": "G",
++      "valueRaw": "+？",
++      "name": "シルフの加護"
++    },
++    {
++      "section": "風属性効果アップ(風属性ダメージアップ)",
++      "groupRaw": "H？",
++      "group": "H",
++      "valueRaw": "+？%",
++      "name": "精霊石の力"
++    },
++    {
++      "section": "風属性効果アップ(風属性ダメージアップ)",
++      "groupRaw": "I？",
++      "group": "I",
++      "valueRaw": "+20%",
++      "name": "エレクトリカル チャージ"
++    },
++    {
++      "section": "風属性効果アップ(風属性ダメージアップ)",
++      "groupRaw": "J？",
++      "group": "J",
++      "valueRaw": "+10%",
++      "name": "カーバンクルの加護"
++    },
++    {
++      "section": "地属性効果アップ(地属性ダメージアップ)",
++      "groupRaw": "A",
++      "group": "A",
++      "valueRaw": "+20%",
++      "name": "黄龍の加護"
++    },
++    {
++      "section": "地属性効果アップ(地属性ダメージアップ)",
++      "groupRaw": "B",
++      "group": "B",
++      "valueRaw": "+10%",
++      "name": "石魔人の力"
++    },
++    {
++      "section": "地属性効果アップ(地属性ダメージアップ)",
++      "groupRaw": "C",
++      "group": "C",
++      "valueRaw": "+10%",
++      "name": "エレメント エンハンス"
++    },
++    {
++      "section": "地属性効果アップ(地属性ダメージアップ)",
++      "groupRaw": "D",
++      "group": "D",
++      "valueRaw": "+10%",
++      "name": "星空の加護"
++    },
++    {
++      "section": "地属性効果アップ(地属性ダメージアップ)",
++      "groupRaw": "E？",
++      "group": "E",
++      "valueRaw": "+10%",
++      "name": "ファイブ エレメンツ"
++    },
++    {
++      "section": "地属性効果アップ(地属性ダメージアップ)",
++      "groupRaw": "F？",
++      "group": "F",
++      "valueRaw": "+10%",
++      "name": "プリズムパワー"
++    },
++    {
++      "section": "地属性効果アップ(地属性ダメージアップ)",
++      "groupRaw": "G？",
++      "group": "G",
++      "valueRaw": "+？%",
++      "name": "毒リンゴ"
++    },
++    {
++      "section": "地属性効果アップ(地属性ダメージアップ)",
++      "groupRaw": "H？",
++      "group": "H",
++      "valueRaw": "+？%",
++      "name": "精霊石の力"
++    },
++    {
++      "section": "地属性効果アップ(地属性ダメージアップ)",
++      "groupRaw": "I？",
++      "group": "I",
++      "valueRaw": "+15%",
++      "name": "プラネット グレイス"
++    },
++    {
++      "section": "地属性効果アップ(地属性ダメージアップ)",
++      "groupRaw": "J？",
++      "group": "J",
++      "valueRaw": "+10%",
++      "name": "カーバンクルの加護"
++    },
++    {
++      "section": "無属性効果アップ(無属性ダメージアップ)",
++      "groupRaw": "A",
++      "group": "A",
++      "valueRaw": "+20%",
++      "name": "栄光の輝き"
++    },
++    {
++      "section": "無属性効果アップ(無属性ダメージアップ)",
++      "groupRaw": "B",
++      "group": "B",
++      "valueRaw": "+15%",
++      "name": "高貴な心"
++    },
++    {
++      "section": "無属性効果アップ(無属性ダメージアップ)",
++      "groupRaw": "C？",
++      "group": "C",
++      "valueRaw": "+10%",
++      "name": "ファイブ エレメンツ"
++    },
++    {
++      "section": "無属性効果アップ(無属性ダメージアップ)",
++      "groupRaw": "D？",
++      "group": "D",
++      "valueRaw": "+15%",
++      "name": "闇の支配者"
++    },
++    {
++      "section": "無属性効果アップ(無属性ダメージアップ)",
++      "groupRaw": "E？",
++      "group": "E",
++      "valueRaw": "+10%",
++      "name": "プリズムパワー"
++    },
++    {
++      "section": "無属性効果アップ(無属性ダメージアップ)",
++      "groupRaw": "F？",
++      "group": "F",
++      "valueRaw": "+？%",
++      "name": "精霊石の力"
++    },
++    {
++      "section": "無属性効果アップ(無属性ダメージアップ)",
++      "groupRaw": "G？",
++      "group": "G",
++      "valueRaw": "+20%",
++      "name": "双極共鳴"
++    },
++    {
++      "section": "攻撃力変換",
++      "groupRaw": "A",
++      "group": "A",
++      "valueRaw": "魔力x5%",
++      "name": "魔攻変換"
++    },
++    {
++      "section": "攻撃力変換",
++      "groupRaw": "A？",
++      "group": "A",
++      "valueRaw": "魔力x10%",
++      "name": "魔力回路"
++    },
++    {
++      "section": "攻撃力変換",
++      "groupRaw": "B",
++      "group": "B",
++      "valueRaw": "魔力x5%",
++      "name": "半神の戦乙女"
++    },
++    {
++      "section": "攻撃力変換",
++      "groupRaw": "B？",
++      "group": "B",
++      "valueRaw": "魔力x5%",
++      "name": "魔法の簪"
++    },
++    {
++      "section": "攻撃力変換",
++      "groupRaw": "C",
++      "group": "C",
++      "valueRaw": "移動速度x10%",
++      "name": "疾風奮迅"
++    },
++    {
++      "section": "攻撃力変換",
++      "groupRaw": "D",
++      "group": "D",
++      "valueRaw": "魔力x10%",
++      "name": "サモンズ ソード"
++    },
++    {
++      "section": "攻撃力変換",
++      "groupRaw": "E",
++      "group": "E",
++      "valueRaw": "魔力x10%",
++      "name": "ノア リアクター"
++    },
++    {
++      "section": "攻撃力変換",
++      "groupRaw": "F",
++      "group": "F",
++      "valueRaw": "魔力x30%",
++      "name": "マナ フォース(蒼)"
++    },
++    {
++      "section": "攻撃力変換",
++      "groupRaw": "F？G?",
++      "group": "FG",
++      "valueRaw": "魔力x35%",
++      "name": "邪竜の力"
++    },
++    {
++      "section": "攻撃力変換",
++      "groupRaw": "G",
++      "group": "G",
++      "valueRaw": "魔力x20%",
++      "name": "纏雷"
++    },
++    {
++      "section": "攻撃力変換",
++      "groupRaw": "H",
++      "group": "H",
++      "valueRaw": "魔力x10%",
++      "name": "クラスカード・アーチャー"
++    },
++    {
++      "section": "攻撃力変換",
++      "groupRaw": "I？",
++      "group": "I",
++      "valueRaw": "魔力x10%",
++      "name": "戦乙女の力"
++    }
++  ],
++  "sources": [
++    {
++      "file": "MoE Wiki (main) - アイテム_追加効果_併用(3).htm",
++      "sha256": "40ddcb0bd60ea06c0c2932f722a07c682b31012f2df41954bca146aee2b465be"
++    },
++    {
++      "file": "MoE Wiki (main) - アイテム_追加効果_併用2(1).htm",
++      "sha256": "96d90a2001370d8e38061d92d167bc5337ba5a13071ecc9e164443a44179257b"
++    }
++  ]
++}

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Master of Epic 物理ダメージ計算webツール
+ * Master of Epic 戦闘シミュレーター
  * data/manual/buffRules.manual.input.tsv から src/data/manual/buffRules.manual.js を生成する。
  *
  * 使い方:

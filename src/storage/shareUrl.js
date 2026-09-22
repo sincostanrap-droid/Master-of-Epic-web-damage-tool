@@ -230,7 +230,7 @@ async function generateShowcaseShareUrl() {
     syncSelectedWeaponToHiddenInputs();
     const payload = {
       v: 1,
-      app: "Master of Epic 物理ダメージ計算webツール",
+      app: "Master of Epic 戦闘シミュレーター",
       savedAt: new Date().toISOString(),
       config: collectShowcaseShareConfig()
     };
