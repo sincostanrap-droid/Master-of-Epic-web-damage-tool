@@ -1,0 +1,606 @@
+{
+  "generatedAt": "2026-09-21T14:29:36.131Z",
+  "scope": "new IDs above baseline maximum plus explicitly selected missing IDs; existing items retained, not fully recrawled",
+  "coverage": [
+    {
+      "category": "weapons",
+      "baselineCount": 1840,
+      "baselineUniqueCount": 1840,
+      "officialTotal": 1843,
+      "cutoffId": 23377,
+      "pages": 1,
+      "lowestFetchedId": 23376
+    },
+    {
+      "category": "defences",
+      "baselineCount": 9553,
+      "baselineUniqueCount": 9548,
+      "officialTotal": 9590,
+      "cutoffId": 23394,
+      "pages": 9,
+      "lowestFetchedId": 23388
+    },
+    {
+      "category": "shields",
+      "baselineCount": 399,
+      "baselineUniqueCount": 334,
+      "officialTotal": 334,
+      "cutoffId": 23334,
+      "pages": 1,
+      "lowestFetchedId": 23170
+    }
+  ],
+  "included": [
+    "defences:23393",
+    "defences:23384"
+  ],
+  "addedEquipment": [
+    "official-weapon-23492",
+    "official-weapon-23463",
+    "official-weapon-23462",
+    "official-defense-23491",
+    "official-defense-23490",
+    "official-defense-23489",
+    "official-defense-23487",
+    "official-defense-23484",
+    "official-defense-23483",
+    "official-defense-23482",
+    "official-defense-23481",
+    "official-defense-23478",
+    "official-defense-23477",
+    "official-defense-23476",
+    "official-defense-23475",
+    "official-defense-23474",
+    "official-defense-23473",
+    "official-defense-23472",
+    "official-defense-23458",
+    "official-defense-23457",
+    "official-defense-23448",
+    "official-defense-23447",
+    "official-defense-23446",
+    "official-defense-23445",
+    "official-defense-23419",
+    "official-defense-23417",
+    "official-defense-23416",
+    "official-defense-23415",
+    "official-defense-23414",
+    "official-defense-23413",
+    "official-defense-23412",
+    "official-defense-23410",
+    "official-defense-23409",
+    "official-defense-23408",
+    "official-defense-23407",
+    "official-defense-23406",
+    "official-defense-23405",
+    "official-defense-23400",
+    "official-defense-23399",
+    "official-defense-23398",
+    "official-defense-23397",
+    "official-defense-23396",
+    "official-defense-23395",
+    "official-defense-23393",
+    "official-defense-23384"
+  ],
+  "newBuffs": [
+    "technic-14635",
+    "technic-14634",
+    "technic-14633",
+    "technic-14632",
+    "technic-14618",
+    "technic-14611",
+    "technic-14610",
+    "technic-14581",
+    "technic-14580",
+    "technic-14578",
+    "technic-14577",
+    "technic-14543",
+    "technic-14540",
+    "technic-14538",
+    "technic-14539",
+    "technic-14481",
+    "technic-14486",
+    "technic-14485",
+    "technic-14484",
+    "technic-14483",
+    "technic-14482",
+    "technic-14431",
+    "technic-14430",
+    "technic-14429",
+    "technic-14576"
+  ],
+  "changedBuffDescriptions": [],
+  "items": [
+    {
+      "category": "weapons",
+      "id": 23492,
+      "name": "神楽鈴",
+      "technic": {
+        "id": 14635,
+        "name": "神楽",
+        "info": "神秘魔法、音楽、ダンスの効果が10上昇する\n※WarAgeでは効果がない",
+        "created_at": "2026-09-15T04:47:06.000000Z",
+        "updated_at": "2026-09-15T04:47:06.000000Z"
+      }
+    },
+    {
+      "category": "weapons",
+      "id": 23463,
+      "name": "メカニカル チェイン ソー",
+      "technic": null
+    },
+    {
+      "category": "weapons",
+      "id": 23462,
+      "name": "メカニカル チェイン ソード",
+      "technic": null
+    },
+    {
+      "category": "defences",
+      "id": 23491,
+      "name": "とんがり帽子",
+      "technic": {
+        "id": 12762,
+        "name": "魔導の極み",
+        "info": "魔法の威力とMPの自然回復量が増加する\n※WarAgeでは効果がない",
+        "created_at": "2026-09-15T04:47:06.000000Z",
+        "updated_at": "2026-09-15T04:47:06.000000Z"
+      }
+    },
+    {
+      "category": "defences",
+      "id": 23490,
+      "name": "背後のメリーさん",
+      "technic": {
+        "id": 14634,
+        "name": "あなたの後ろにいるの",
+        "info": "暗黒命令スキルの効果が15上昇して、移動速度が15%上昇する\n※WarAgeでは効果がない",
+        "created_at": "2026-09-15T04:47:06.000000Z",
+        "updated_at": "2026-09-15T04:47:06.000000Z"
+      }
+    },
+    {
+      "category": "defences",
+      "id": 23489,
+      "name": "ドライアド クレスト ウィッグ",
+      "technic": {
+        "id": 14633,
+        "name": "森精の加護",
+        "info": "回復魔法と自然調和スキルの効果が20上昇して、HP / MP / ST の自然回復速度が大幅に上昇する\n※WarAgeでは効果がない",
+        "created_at": "2026-09-15T04:47:06.000000Z",
+        "updated_at": "2026-09-15T04:47:06.000000Z"
+      }
+    },
+    {
+      "category": "defences",
+      "id": 23487,
+      "name": "コビトカバのペンダント",
+      "technic": {
+        "id": 14632,
+        "name": "コビトカバ フォーム",
+        "info": "コビトカバに変身できる",
+        "created_at": "2026-09-15T04:47:06.000000Z",
+        "updated_at": "2026-09-15T04:47:06.000000Z"
+      }
+    },
+    {
+      "category": "defences",
+      "id": 23484,
+      "name": "リムレス メガネ",
+      "technic": {
+        "id": 2578,
+        "name": "サーチアイ",
+        "info": "魔法が届く範囲が広がり、見えないものが見えてくる\n※WarAgeでは効果が無い",
+        "created_at": "2026-09-15T04:47:06.000000Z",
+        "updated_at": "2026-09-15T04:47:06.000000Z"
+      }
+    },
+    {
+      "category": "defences",
+      "id": 23483,
+      "name": "口裂けマスク",
+      "technic": {
+        "id": 14618,
+        "name": "マルカジリ",
+        "info": "牙スキルの威力と命中が上昇して、与えたダメージの10％分のHPを回復する\n※WarAgeでは効果がない",
+        "created_at": "2026-09-15T04:47:06.000000Z",
+        "updated_at": "2026-09-15T04:47:06.000000Z"
+      }
+    },
+    {
+      "category": "defences",
+      "id": 23482,
+      "name": "シャドウ ブリンカー",
+      "technic": {
+        "id": 13685,
+        "name": "闇の王",
+        "info": "死の魔法と暗黒命令の効果が15上昇し、HPとMPの自然回復速度が上昇する\n※WarAgeでは効果がない",
+        "created_at": "2026-09-15T04:47:06.000000Z",
+        "updated_at": "2026-09-15T04:47:06.000000Z"
+      }
+    },
+    {
+      "category": "defences",
+      "id": 23481,
+      "name": "カーバンクル ジェム",
+      "technic": {
+        "id": 14611,
+        "name": "カーバンクルの加護",
+        "info": "火・水・風・地属性の効果を上昇させて、一定確率で敵の魔法を無効化する\n※WarAgeでは効果がない",
+        "created_at": "2026-09-15T04:47:06.000000Z",
+        "updated_at": "2026-09-15T04:47:06.000000Z"
+      }
+    },
+    {
+      "category": "defences",
+      "id": 23478,
+      "name": "マジック チャージ ストーン",
+      "technic": {
+        "id": 14610,
+        "name": "スペル チャージ",
+        "info": "魔法を一時的にチャージして、魔法の威力と範囲を増加させる\n※WarAgeでは効果がない",
+        "created_at": "2026-09-15T04:47:06.000000Z",
+        "updated_at": "2026-09-15T04:47:06.000000Z"
+      }
+    },
+    {
+      "category": "defences",
+      "id": 23477,
+      "name": "プラグ テール",
+      "technic": {
+        "id": 14581,
+        "name": "エレクトリカル チャージ",
+        "info": "自然回復量が大幅に上昇して、風属性の効果が増加する\n※WarAgeでは効果がない",
+        "created_at": "2026-09-15T04:47:06.000000Z",
+        "updated_at": "2026-09-15T04:47:06.000000Z"
+      }
+    },
+    {
+      "category": "defences",
+      "id": 23476,
+      "name": "メカニカル ラウンデッド アーム",
+      "technic": {
+        "id": 14580,
+        "name": "強化アーム",
+        "info": "攻撃力依存のダメージが増加、筋力スキルの効果が20上昇して、所持可能重量が30増加する\n※WarAgeでは効果がない",
+        "created_at": "2026-09-15T04:47:06.000000Z",
+        "updated_at": "2026-09-15T04:47:06.000000Z"
+      }
+    },
+    {
+      "category": "defences",
+      "id": 23475,
+      "name": "レザー スニーカー",
+      "technic": null
+    },
+    {
+      "category": "defences",
+      "id": 23474,
+      "name": "人体模型スーツ",
+      "technic": null
+    },
+    {
+      "category": "defences",
+      "id": 23473,
+      "name": "アーマード ショルダー クローク",
+      "technic": {
+        "id": 14578,
+        "name": "堅守の防壁",
+        "info": "20以下のダメージを無効化する\n※WarAgeでは効果がない ",
+        "created_at": "2026-09-15T04:47:06.000000Z",
+        "updated_at": "2026-09-15T04:47:06.000000Z"
+      }
+    },
+    {
+      "category": "defences",
+      "id": 23472,
+      "name": "竜封じのチョーカー",
+      "technic": {
+        "id": 14577,
+        "name": "竜封力",
+        "info": "攻撃力依存の物理ダメージとドラゴン系へのダメージが増加して、HPの自然回復速度が大幅に上昇する\n※WarAgeでは効果がない",
+        "created_at": "2026-09-15T04:47:06.000000Z",
+        "updated_at": "2026-09-15T04:47:06.000000Z"
+      }
+    },
+    {
+      "category": "defences",
+      "id": 23458,
+      "name": "カブトムシのペンダント",
+      "technic": {
+        "id": 14543,
+        "name": "カブトムシ フォーム",
+        "info": "カブトムシに変身出来る",
+        "created_at": "2026-09-15T04:47:06.000000Z",
+        "updated_at": "2026-09-15T04:47:06.000000Z"
+      }
+    },
+    {
+      "category": "defences",
+      "id": 23457,
+      "name": "ボタンの目",
+      "technic": null
+    },
+    {
+      "category": "defences",
+      "id": 23448,
+      "name": "サングラス付きシャツ",
+      "technic": null
+    },
+    {
+      "category": "defences",
+      "id": 23447,
+      "name": "バエル リング",
+      "technic": {
+        "id": 14540,
+        "name": "バエルの瞳",
+        "info": "普段見えないものが見えるようになり、ダメージを受けた際に一定確率で「 ミニ バエル 」を召喚する\n※WarAgeでは効果がない",
+        "created_at": "2026-09-15T04:47:06.000000Z",
+        "updated_at": "2026-09-15T04:47:06.000000Z"
+      }
+    },
+    {
+      "category": "defences",
+      "id": 23446,
+      "name": "シャドウ スピリット",
+      "technic": {
+        "id": 14538,
+        "name": "闇の守護精霊",
+        "info": "魔力が3%と死の魔法の効果が20上昇して、魔法ダメージを25%軽減する\n※WarAgeでは効果がない",
+        "created_at": "2026-09-15T04:47:06.000000Z",
+        "updated_at": "2026-09-15T04:47:06.000000Z"
+      }
+    },
+    {
+      "category": "defences",
+      "id": 23445,
+      "name": "メカニカル ワーム テイル",
+      "technic": {
+        "id": 14539,
+        "name": "ドレイン ワーム",
+        "info": "攻撃力が3%上昇、与えたダメージ10%分のHPを回復して、受けたダメージ10％分のSTを回復する\n※WarAgeでは効果がない",
+        "created_at": "2026-09-15T04:47:06.000000Z",
+        "updated_at": "2026-09-15T04:47:06.000000Z"
+      }
+    },
+    {
+      "category": "defences",
+      "id": 23419,
+      "name": "ちびヒーロー（ギャンブラー）のペンダント",
+      "technic": {
+        "id": 14481,
+        "name": "ちびヒーロー（ギャンブラー）フォーム",
+        "info": "ヒーロースクワッドのギャンブラーに変身できる",
+        "created_at": "2026-09-15T04:47:06.000000Z",
+        "updated_at": "2026-09-15T04:47:06.000000Z"
+      }
+    },
+    {
+      "category": "defences",
+      "id": 23417,
+      "name": "イルカのリュックサック",
+      "technic": null
+    },
+    {
+      "category": "defences",
+      "id": 23416,
+      "name": "ドラゴニック スパイン",
+      "technic": {
+        "id": 14486,
+        "name": "ドラゴン ジーン",
+        "info": "攻撃力と防御力が上昇して、筋力スキルの効果と所持可能重量が増加する\n竜の脊椎に残された因子と共鳴して、専用技",
+        "created_at": "2026-09-15T04:47:06.000000Z",
+        "updated_at": "2026-09-15T04:47:06.000000Z"
+      }
+    },
+    {
+      "category": "defences",
+      "id": 23415,
+      "name": "セレスティアル オービット",
+      "technic": {
+        "id": 14485,
+        "name": "プラネット グレイス",
+        "info": "神秘魔法の効果と地属性の効果が15上昇する\n※WarAgeでは効果ばない",
+        "created_at": "2026-09-15T04:47:06.000000Z",
+        "updated_at": "2026-09-15T04:47:06.000000Z"
+      }
+    },
+    {
+      "category": "defences",
+      "id": 23414,
+      "name": "双極の籠手",
+      "technic": {
+        "id": 14484,
+        "name": "双極共鳴",
+        "info": "回復魔法と破壊魔法の効果が15上昇して、無属性魔法のダメージが20%増加する\n※WarAgeでは効果がない",
+        "created_at": "2026-09-15T04:47:06.000000Z",
+        "updated_at": "2026-09-15T04:47:06.000000Z"
+      }
+    },
+    {
+      "category": "defences",
+      "id": 23413,
+      "name": "シースルー サマーウェア",
+      "technic": {
+        "id": 14483,
+        "name": "サマーバケーション",
+        "info": "自然回復速度が上昇して、スタミナの消費と火属性のダメージを軽減する\n※WarAgeでは効果ばない",
+        "created_at": "2026-09-15T04:47:06.000000Z",
+        "updated_at": "2026-09-15T04:47:06.000000Z"
+      }
+    },
+    {
+      "category": "defences",
+      "id": 23412,
+      "name": "冥騎士の兜",
+      "technic": {
+        "id": 14482,
+        "name": "冥騎士の力",
+        "info": "死の魔法と暗黒命令の効果が15上昇して、BUFF点灯中に即死ダメージを受けてもギリギリで耐えることができる\n※効果発動時にBUFFが消えるが、一定時間で再点灯する\n※装備を付け替えた場合は約8秒間点灯しない\n※WarAgeでは効果がない",
+        "created_at": "2026-09-15T04:47:06.000000Z",
+        "updated_at": "2026-09-15T04:47:06.000000Z"
+      }
+    },
+    {
+      "category": "defences",
+      "id": 23410,
+      "name": "あびにゃん サマーナイト パンツ",
+      "technic": {
+        "id": 10390,
+        "name": "リラックス タイム",
+        "info": "リラックスすることで消費スタミナを軽減し、スタミナの自然回復量が上昇する\n※WarAgeでは効果がない",
+        "created_at": "2026-09-15T04:47:06.000000Z",
+        "updated_at": "2026-09-15T04:47:06.000000Z"
+      }
+    },
+    {
+      "category": "defences",
+      "id": 23409,
+      "name": "あびにゃん サマーナイト ウェア",
+      "technic": {
+        "id": 10390,
+        "name": "リラックス タイム",
+        "info": "リラックスすることで消費スタミナを軽減し、スタミナの自然回復量が上昇する\n※WarAgeでは効果がない",
+        "created_at": "2026-09-15T04:47:06.000000Z",
+        "updated_at": "2026-09-15T04:47:06.000000Z"
+      }
+    },
+    {
+      "category": "defences",
+      "id": 23408,
+      "name": "ウォーター スプラッシュ シューズ",
+      "technic": {
+        "id": 12772,
+        "name": "水精の加護",
+        "info": "水属性のダメージが上昇して、水属性のダメージを軽減する\n※WarAgeでは効果がない",
+        "created_at": "2026-09-15T04:47:06.000000Z",
+        "updated_at": "2026-09-15T04:47:06.000000Z"
+      }
+    },
+    {
+      "category": "defences",
+      "id": 23407,
+      "name": "パンキッシュ スカート",
+      "technic": {
+        "id": 7824,
+        "name": "ロック魂",
+        "info": "魂の叫びにより、シャウトのディレイが短縮されて、技の効果範囲が増加する",
+        "created_at": "2026-09-15T04:47:06.000000Z",
+        "updated_at": "2026-09-15T04:47:06.000000Z"
+      }
+    },
+    {
+      "category": "defences",
+      "id": 23406,
+      "name": "スリットスリーブ ジャケット",
+      "technic": {
+        "id": 13997,
+        "name": "インフィニット エンハンス",
+        "info": "攻撃力、魔力、防御力、移動速度、最大所持可能重量を5%上昇させる\n※WarAgeでは効果がない",
+        "created_at": "2026-09-15T04:47:06.000000Z",
+        "updated_at": "2026-09-15T04:47:06.000000Z"
+      }
+    },
+    {
+      "category": "defences",
+      "id": 23405,
+      "name": "ノアストーン アームガード",
+      "technic": {
+        "id": 13722,
+        "name": "魔力供給",
+        "info": "魔力と自然回復量が大幅に増加する\n※WarAgeでは効果がない",
+        "created_at": "2026-09-15T04:47:06.000000Z",
+        "updated_at": "2026-09-15T04:47:06.000000Z"
+      }
+    },
+    {
+      "category": "defences",
+      "id": 23400,
+      "name": "プライバシー サングラス",
+      "technic": null
+    },
+    {
+      "category": "defences",
+      "id": 23399,
+      "name": "クラゲのベレー帽",
+      "technic": {
+        "id": 13688,
+        "name": "クラゲエフェクト",
+        "info": "周囲にクラゲのエフェクトが舞い、水属性のダメージを25%軽減する\n※WarAgeでは効果がない",
+        "created_at": "2026-09-15T04:47:06.000000Z",
+        "updated_at": "2026-09-15T04:47:06.000000Z"
+      }
+    },
+    {
+      "category": "defences",
+      "id": 23398,
+      "name": "ダーク ヴェール",
+      "technic": {
+        "id": 14431,
+        "name": "冥府の祝福",
+        "info": "冥府の力に祝福され、死の魔法と回復魔法の効果が15上昇する\n※WarAgeでは効果がない",
+        "created_at": "2026-09-15T04:47:06.000000Z",
+        "updated_at": "2026-09-15T04:47:06.000000Z"
+      }
+    },
+    {
+      "category": "defences",
+      "id": 23397,
+      "name": "隠密のマント",
+      "technic": {
+        "id": 10935,
+        "name": "スニーキング",
+        "info": "獣の臭いで敵を欺き襲われにくくなり、自然回復量が上昇する\n※WarAgeでは効果がない",
+        "created_at": "2026-09-15T04:47:06.000000Z",
+        "updated_at": "2026-09-15T04:47:06.000000Z"
+      }
+    },
+    {
+      "category": "defences",
+      "id": 23396,
+      "name": "上位妖精のローブ",
+      "technic": {
+        "id": 14430,
+        "name": "上位妖精の加護",
+        "info": "魔法の威力が増加して、魔法ダメージを25%軽減する\n※WarAgeでは効果がない",
+        "created_at": "2026-09-15T04:47:06.000000Z",
+        "updated_at": "2026-09-15T04:47:06.000000Z"
+      }
+    },
+    {
+      "category": "defences",
+      "id": 23395,
+      "name": "ハイエルフ ウィッグ",
+      "technic": {
+        "id": 14429,
+        "name": "エルフの叡智",
+        "info": "魔力が5%、最大MPが10%上昇して、専用魔法『 アルス・マグナ 』が使用可能になる\n※WarAgeでは効果がない",
+        "created_at": "2026-09-15T04:47:06.000000Z",
+        "updated_at": "2026-09-15T04:47:06.000000Z"
+      }
+    },
+    {
+      "category": "defences",
+      "id": 23393,
+      "name": "緊箍児",
+      "technic": {
+        "id": 14576,
+        "name": "斉天大聖",
+        "info": "攻撃力と回避が5%上昇して、戦闘技術の効果が増加するが、魔法の詠唱ができなくなる\n※WarAgeでは効果がない",
+        "created_at": "2026-09-15T04:47:06.000000Z",
+        "updated_at": "2026-09-15T04:47:06.000000Z"
+      }
+    },
+    {
+      "category": "defences",
+      "id": 23384,
+      "name": "カラコンメガネ",
+      "technic": {
+        "id": 2578,
+        "name": "サーチアイ",
+        "info": "魔法が届く範囲が広がり、見えないものが見えてくる\n※WarAgeでは効果が無い",
+        "created_at": "2026-09-15T04:47:06.000000Z",
+        "updated_at": "2026-09-15T04:47:06.000000Z"
+      }
+    }
+  ]
+}

@@ -15,6 +15,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
+import { pathToFileURL } from 'node:url';
 
 const GENERATOR_VERSION = 'v1.23.11';
 const DEFAULT_SPREADSHEET_ID = '10nHr68XojjuxxJrpLBENrDWUB4TywMGy8CTe9lzclSE';
@@ -524,7 +525,7 @@ function jsonForJs(value) {
   return JSON.stringify(value, null, 2).replace(/<\/script/gi, '<\\/script');
 }
 
-function toCatalog(items, addStatuses, equipBuffs) {
+export function toCatalog(items, addStatuses, equipBuffs) {
   const statusMap = new Map();
   for (const st of addStatuses) {
     const cat = categoryKey(st.category);
@@ -694,7 +695,7 @@ async function main() {
   }
 }
 
-main().catch(err => {
+if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) main().catch(err => {
   console.error(err);
   process.exit(1);
 });
