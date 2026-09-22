@@ -90,11 +90,7 @@
   }
 
   function currentSkillPlusTotals() {
-    const out = {};
-    activeRowsForSkillPlusTotals().forEach(row => {
-      Object.entries(rowSkillPlusTotals(row)).forEach(([skill, value]) => addTotal(out, skill, value));
-    });
-    return out;
+    return skillPlusTotalsFromResolvedState(showcaseResolvedBuffState());
   }
 
   function formatValue(value) {

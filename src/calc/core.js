@@ -19,6 +19,7 @@ function computeMetrics(st, inputs) {
   const normalizedEquipment = normalizeEquipmentRows(st.equipment);
   st = expandEquipmentBuffState(st, normalizedEquipment);
   st = applyBuffGroupRules(st);
+  const skillPlusTotals = skillPlusTotalsFromResolvedState(st);
   st = expandCompositeState(st);
   const raceCoeff = RACE_COEFFS[inputs.raceSelect] ?? parseFloat(inputs.raceCoeff) ?? 0.20;
   const spirit = parseFloat(inputs.spirit) || 0;
@@ -186,6 +187,7 @@ function computeMetrics(st, inputs) {
   const slots = buffSlotCountForState(st);
 
   return {
+    skillPlusTotals,
     stats, pctStats, conv, pctAtkCalc, spirit, magicCoeff, baseMagicFromSpirit, flatStatRaw, equipmentRaw, extraStats,
     racialAtk, weaponAtk, weaponDamage, weaponWeight, selectedWeapon, selectedAmmo, effectiveWeapon, skillModInfo, baseNaturalAtk, conversionAtk, baseAtk, flatAtkRaw, extraRawBeforePct, cappedAddRawBeforePct, cappedAddBeforePct, atkBeforePct, atkPctMode, atkBuffRaw, atkCap, atkBuffCapped, atk,
     attackMultiplier, dmgMultiplier, defenseFactor, critAvg, basePostMultiplier, npcDamageTakenMultiplier, postMultiplier, baseNoTech,

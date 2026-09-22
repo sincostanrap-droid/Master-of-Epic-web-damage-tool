@@ -12,8 +12,8 @@
   onclick属性から呼ばれる関数があるため、現時点では module ではなく通常scriptとして読み込みます。
 */
 
-const APP_VERSION = "v1.24.11";
-const APP_VERSION_NOTE = "新規Buff22件の効果・併用を反映";
+const APP_VERSION = "v1.24.12";
+const APP_VERSION_NOTE = "最適化UI整理・スキル強化の評価を修正";
 
 /* 種族係数。攻撃力係数と魔力係数は別管理。 */
 const RACE_COEFFS = {
@@ -6756,7 +6756,31 @@ function appendEquipmentBuffConflictGroups(row, groups, options={}) {
   return row;
 }
 
+// Correct only known imported mistakes. Never discard unrelated user groups/effects.
+function repairKnownEquipmentBuffCompatibility(row) {
+  if (!row) return row;
+  const id = String(row.equipBuffTechnicId || row.equipBuffCatalogId || "").replace(/^technic-/, "");
+  const name = equipmentBuffCompatNorm(row.equipBuffName);
+  const isBuff = (technic, buffName) => id ? id === technic : name === equipmentBuffCompatNorm(buffName);
+  const retired = isBuff("13685", "闇の王")
+    ? ["skillBuff:死の魔法:F", "skillBuff:暗黒命令:A"]
+    : isBuff("9201", "魔術師の極意") ? ["skillBuff:回復魔法:O"] : [];
+  const keep = group => !retired.some(old => old.toLowerCase() === group.toLowerCase());
+  if (retired.length) {
+    row.tags = splitTags(row.tags || "").filter(keep).join(",");
+    row.equipBuffConflictGroups = normalizeEquipmentBuffConflictGroupsInput(row.equipBuffConflictGroups).filter(keep).join(",");
+    if (!keep(String(row.equipBuffConflictGroup || ""))) row.equipBuffConflictGroup = "";
+  }
+  if (isBuff("13876", "異形の力") || isBuff("9201", "魔術師の極意")) {
+    const skill = isBuff("13876", "異形の力") ? "暗黒命令" : "回復魔法";
+    row.extraEffects = normalizeAdditionalEffects(row.extraEffects || []).filter(effect =>
+      !(effect.key === "skillPlus" && effect.name === skill && effect.value === 10));
+  }
+  return row;
+}
+
 function restoreEquipmentBuffCompatibilityGroups(row, item=null) {
+  repairKnownEquipmentBuffCompatibility(row);
   if (!row) return row;
 
   const skillRules = skillBuffCompatibilityRulesForEquipmentBuff(row, item);
@@ -9997,6 +10021,8 @@ function integratedOptimizerSettings() {
     buffBeamWidth: Math.max(20, parseInt(byId("optimizerBuffBeamWidth")?.value, 10) || 120),
     localPasses: Math.max(1, parseInt(byId("optimizerLocalPasses")?.value, 10) || 8),
     objective: byId("optimizerObjective")?.value || "damage",
+    skillPlusTargetSkill: byId("optimizerSkillPlusTargetSkill")?.value || "",
+    skillPlusFilters: globalThis.MOESkillPlusV21?.readFilterRows("optimizerSkillPlusFilter", 4) || [],
     mainWeaponSkill: optimizerResolvedMainWeaponSkill(byId("optimizerMainWeaponSkill")?.value || ""),
     secondaryObjective: byId("optimizerSecondaryObjective")?.value || "",
     targetValueRaw: byId("optimizerTargetValue")?.value ?? "",
@@ -10045,6 +10071,36 @@ const OPTIMIZER_MINIMIZE_OBJECTIVES = Object.freeze(new Set([
   "extraReplicationGaugeSlip",
   "extraBeautyGaugeSlip"
 ]));
+
+// Sum only active, conflict-resolved Buff effects. skillPlus remains display/search data.
+function skillPlusTotalsFromResolvedState(st) {
+  const totals = {};
+  normalizeCompositeRows(st?.composite).filter(row => row.enabled && !row.excluded).forEach(row => {
+    normalizeAdditionalEffects(row.extraEffects).forEach(effect => {
+      if (effect.key !== "skillPlus" || !effect.name || !Number.isFinite(effect.value)) return;
+      totals[effect.name] = (totals[effect.name] || 0) + effect.value;
+    });
+  });
+  return totals;
+}
+
+function optimizerSkillFilterDistance(metrics, settings) {
+  let distance = 0;
+  const helper = globalThis.MOESkillPlusV21;
+  for (const filter of settings?.skillPlusFilters || []) {
+    if (!filter.skill || !helper) continue;
+    const value = helper.totalForSkill(metrics.skillPlusTotals || {}, filter.skill);
+    const target = Number(filter.valueRaw || 0);
+    const op = filter.op || "gte";
+    if (op === "exists") distance += value !== 0 ? 0 : 1;
+    else if (op === "gte") distance += Math.max(0, target - value);
+    else if (op === "gt") distance += value > target ? 0 : target - value + 0.000001;
+    else if (op === "lte") distance += Math.max(0, value - target);
+    else if (op === "lt") distance += value < target ? 0 : value - target + 0.000001;
+    else if (op === "eq") distance += Math.abs(value - target) < 1e-9 ? 0 : Math.abs(value - target);
+  }
+  return distance;
+}
 
 function optimizerObjectiveRawValue(m, objective) {
   if (objective === "skillPlus") return +(m.skillPlusScore || 0);
@@ -10193,7 +10249,8 @@ function optimizerRequiredConditionViolations(m, settings) {
 function optimizerFinalConstraintViolations(m, settings) {
   return optimizerStatCapViolations(m, settings)
     .concat(optimizerTargetOverViolations(m, settings))
-    .concat(optimizerRequiredConditionViolations(m, settings));
+    .concat(optimizerRequiredConditionViolations(m, settings))
+    .concat(globalThis.MOEOptimizerSkillPlusFixV1?.filterViolations(m, settings) || []);
 }
 
 function optimizerObjectiveList(settings) {
@@ -10235,6 +10292,10 @@ function optimizerEvaluationFromMetrics(m, settings) {
           : [0, -Math.abs(value + 60)];
       })()
     : [];
+  if (settings?.skillPlusFilters?.some(filter => filter.skill)) {
+    const distance = optimizerSkillFilterDistance(m, settings);
+    rank = rank.concat([distance === 0 ? 1 : 0, -distance]);
+  }
   if (optimizerPrimaryTargetSettings(settings)) {
     rank = rank.concat(optimizerTargetRankForPrimary(m, settings));
     objectives.slice(1).forEach(obj => rank.push(optimizerMetricValueForSettings(m, obj, settings)));
@@ -10806,12 +10867,9 @@ function optimizerBuildEquipmentBeams(inputs, settings) {
           globalThis.MOEOptimizerSkillPlusFixV1.attachMetrics(m, equipmentIdxs, requiredBuffIdxs, settings);
         }
         const ev = optimizerEvaluationFromMetrics(m, settings);
-        const skillPlusViolations = globalThis.MOEOptimizerSkillPlusFixV1
-          ? globalThis.MOEOptimizerSkillPlusFixV1.filterViolations(m, settings)
-          : [];
         next.push({
           equipmentIdxs,
-          score: skillPlusViolations.length ? OPTIMIZER_INVALID_SCORE : ev.score,
+          score: ev.score,
           rank: ev.rank,
           metrics: m
         });
@@ -10867,7 +10925,7 @@ function optimizerEvaluateBuffSelection(equipmentIdxs, compositeIdxs, inputs, se
   const result = {
     metrics,
     violations: ev.violations.concat(skillPlusViolations),
-    score: skillPlusViolations.length ? OPTIMIZER_INVALID_SCORE : ev.score,
+    score: ev.score,
     rank: ev.rank
   };
 
@@ -11415,7 +11473,7 @@ function runIntegratedOptimizer() {
   optimizerRunSeq++;
   const runId = optimizerRunSeq;
 
-  if (status) status.textContent = "検索を開始しました...";
+  if (status) { status.textContent = "検索を開始しました..."; const details = status.closest("details"); if (details) details.open = true; }
   if (resultEl) resultEl.innerHTML = "";
   if (progress) {
     progress.value = 0;
@@ -11553,7 +11611,10 @@ function renderIntegratedOptimizerResults() {
   const el = byId("optimizerResults");
   if (!el) return;
 
-  const diagnostics = optimizerApproximationDiagnosticsHtml();
+  const diagnostics = `<details class="optimizerSearchDetails"><summary>結果の診断・探索範囲</summary>${optimizerApproximationDiagnosticsHtml()}</details>`;
+  const resultSettings = optimizerLastPayload?.settings || {};
+  const showSkillPlus = resultSettings.objective === "skillPlus" || resultSettings.secondaryObjective === "skillPlus" || resultSettings.skillPlusFilters?.length;
+  const skillHeading = resultSettings.skillPlusTargetSkill ? `${resultSettings.skillPlusTargetSkill}強化` : "スキル強化合計";
 
   if (!integratedOptimizerResults.length) {
     el.innerHTML = `${diagnostics}<p class="small">条件内に収まる結果がありません。バフ枠上限、各ステータス上限、競合グループ、装備同士の競合、候補の使用状況を見直してください。</p>`;
@@ -11577,6 +11638,7 @@ function renderIntegratedOptimizerResults() {
     return `<tr class="${rowClass}${invalidClass}">
       <td class="optimizerRank">${escapeHtml(rankText)}</td>
       <td class="optimizerSourceCell">${escapeHtml(label)}${sourceNote}</td>
+      ${showSkillPlus ? `<td class="num" title="${escapeHtml(globalThis.MOESkillPlusV21?.summary(m.skillPlusTotals || {}) || "")}">${fmt(m.skillPlusScore || 0, 2)}</td>` : ""}
       <td class="num">${fmt(Math.floor(m.finalDamage),0)}</td>
       <td class="num">${fmt(m.atk)}</td>
       <td class="num">${fmt(m.stats.magic)}</td>
@@ -11589,7 +11651,7 @@ function renderIntegratedOptimizerResults() {
   }).join("");
 
   el.innerHTML = `${diagnostics}<table>
-    <thead><tr><th>順位</th><th>種別</th><th>ダメージ</th><th>攻撃力</th><th>魔力</th><th>枠</th><th>追加ステータス</th><th>装備</th><th>装備以外Buff</th><th>適用</th></tr></thead>
+    <thead><tr><th>順位</th><th>種別</th>${showSkillPlus ? `<th>${escapeHtml(skillHeading)}</th>` : ""}<th>ダメージ</th><th>攻撃力</th><th>魔力</th><th>枠</th><th>追加ステータス</th><th>装備</th><th>装備以外Buff</th><th>適用</th></tr></thead>
     <tbody>${body}</tbody>
   </table>`;
 }
@@ -13658,6 +13720,7 @@ ${a}`;
 
 function applyEquipBuffRuleCandidateToEquipment(row, rule, opts={}) {
   if (!row || !rule) return false;
+  repairKnownEquipmentBuffCompatibility(row);
   // Drop only the retired placeholder for these reviewed imports; preserve user effects.
   if (rule.source === "manual-wiki-20260922") {
     row.extraEffects = normalizeAdditionalEffects(row.extraEffects || []).filter(e =>
@@ -14695,7 +14758,7 @@ function ensureOptimizerCoreLoaded() {
 
   optimizerCoreLoadPromise = new Promise((resolve, reject) => {
     const script = document.createElement("script");
-    script.src = "./src/optimizer/core.js?v=1.24.8";
+    script.src = "./src/optimizer/core.js?v=1.24.12";
     script.dataset.optimizerCore = "1";
     script.onload = () => {
       if (typeof runOptimizerCore === "function") resolve();
@@ -15366,11 +15429,29 @@ if (typeof document !== "undefined") {
     // SkillPlus APIはフィルターの効果抽出とOptimizerで引き続き利用する。
   }
 
+  function updateOptimizerSkillTarget() {
+    const primary = document.getElementById("optimizerObjective")?.value;
+    const secondary = document.getElementById("optimizerSecondaryObjective")?.value;
+    const visible = primary === "skillPlus" || secondary === "skillPlus";
+    const row = document.getElementById("optimizerSkillPlusTargetSkill")?.closest("label");
+    if (row) row.hidden = !visible;
+    const hint = document.getElementById("optimizerSkillPlusHint");
+    if (hint) hint.hidden = !visible;
+  }
+
   global.__MOE_INITIALIZE_OPTIMIZER_SKILL_PLUS_V21__ = root => {
     spInstallWorkerBridge();
     if (root) {
       spFillSelects(root);
       spInstallEvents(root);
+      ["optimizerObjective", "optimizerSecondaryObjective"].forEach(id => {
+        const select = document.getElementById(id);
+        if (select && !select.dataset.skillTargetBound) {
+          select.addEventListener("change", updateOptimizerSkillTarget);
+          select.dataset.skillTargetBound = "1";
+        }
+      });
+      updateOptimizerSkillTarget();
     }
   };
 
@@ -15599,7 +15680,7 @@ if (typeof document !== "undefined") {
 
     let panel = byId("optimizerEquipmentContributionPanel");
     if (!panel) {
-      panel = document.createElement("section");
+      panel = document.createElement("details");
       panel.id = "optimizerEquipmentContributionPanel";
       panel.className = "optimizerEquipmentContributionPanel";
       resultHost.insertAdjacentElement("afterend", panel);
@@ -15609,13 +15690,13 @@ if (typeof document !== "undefined") {
       const analysis = analyzeTopOptimizerEquipmentContribution();
 
       if (!analysis || !analysis.contributions.length) {
-        panel.innerHTML = `<div class="small mutedText">装備寄与分析を表示できる最適化結果がありません。</div>`;
+        panel.innerHTML = `<summary>装備更新の目安</summary><div class="small mutedText">装備寄与分析を表示できる最適化結果がありません。</div>`;
         return;
       }
 
       const shown = analysis.contributions.slice(0, 3);
 
-      panel.innerHTML = `
+      panel.innerHTML = `<summary>装備更新の目安</summary>
         <div class="optimizerContributionHeader">
           <div>
             <h3>装備更新の目安</h3>
@@ -15636,7 +15717,7 @@ if (typeof document !== "undefined") {
           現在の主目的で交換候補を探すための目安です。
         </div>`;
     } catch (error) {
-      panel.innerHTML = `
+      panel.innerHTML = `<summary>装備更新の目安</summary>
         <div class="small badText">
           装備寄与分析エラー: ${escapeHtml(error?.message || String(error))}
         </div>`;
@@ -15894,7 +15975,7 @@ if (typeof document !== "undefined") {
 
     let panel = byId("optimizerBuffContributionPanel");
     if (!panel) {
-      panel = document.createElement("section");
+      panel = document.createElement("details");
       panel.id = "optimizerBuffContributionPanel";
       panel.className = "optimizerEquipmentContributionPanel optimizerBuffContributionPanel";
       anchor.insertAdjacentElement("afterend", panel);
@@ -15904,13 +15985,13 @@ if (typeof document !== "undefined") {
       const analysis = analyzeTopOptimizerBuffContribution();
 
       if (!analysis || !analysis.contributions.length) {
-        panel.innerHTML = `<div class="small mutedText">Buff寄与分析を表示できる最適化結果がありません。</div>`;
+        panel.innerHTML = `<summary>Buff更新の目安</summary><div class="small mutedText">Buff寄与分析を表示できる最適化結果がありません。</div>`;
         return;
       }
 
       const shown = analysis.contributions.slice(0, 3);
 
-      panel.innerHTML = `
+      panel.innerHTML = `<summary>Buff更新の目安</summary>
         <div class="optimizerContributionHeader">
           <div>
             <h3>Buff見直しの目安</h3>
@@ -15931,7 +16012,7 @@ if (typeof document !== "undefined") {
           現在の採用構成内での単体寄与を見るための目安です。
         </div>`;
     } catch (error) {
-      panel.innerHTML = `
+      panel.innerHTML = `<summary>Buff更新の目安</summary>
         <div class="small badText">
           Buff寄与分析エラー: ${escapeHtml(error?.message || String(error))}
         </div>`;
@@ -16408,11 +16489,13 @@ if (typeof document !== "undefined") {
   }
 
   function totalsForSelection(equipmentIdxs, compositeIdxs, settings) {
-    return totalsForRows(selectedRows(equipmentIdxs, compositeIdxs, settings));
+    let selected = optimizerStateForSelection(equipmentIdxs, compositeIdxs, settings);
+    selected = applyBuffGroupRules(expandEquipmentBuffState(selected));
+    return skillPlusTotalsFromResolvedState(selected);
   }
 
   function attachMetrics(metrics, equipmentIdxs, compositeIdxs, settings) {
-    const totals = totalsForSelection(equipmentIdxs, compositeIdxs, settings);
+    const totals = metrics.skillPlusTotals || totalsForSelection(equipmentIdxs, compositeIdxs, settings);
     const target = settings?.skillPlusTargetSkill || "";
     metrics.skillPlusTotals = totals;
     metrics.skillPlusScore = target

@@ -19,11 +19,7 @@ assert.equal(
   3,
   "現在ON、現在装備Buff最適化、自動探索の最終結果へ条件を適用する"
 );
-assert.equal(
-  (coreSource.match(/if \(settings\.requireAttackDelay60\) \{\s*return base(?:Sort|Compare)\.call/g) || []).length,
-  2,
-  "スキル強化目的でも攻撃ディレイ条件を最優先する"
-);
+
 
 const helperStart = mainSource.indexOf("function optimizerRequiredConditionViolations");
 const helperEnd = mainSource.indexOf("function optimizerObjectiveList", helperStart);

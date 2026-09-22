@@ -470,23 +470,10 @@ function runOptimizerCore(payload, onProgress=null) {
   function totalsForResult(result, settings=currentSettings) {
     const helper = api();
     if (!helper || !result) return {};
-    if (result.skillPlusTotals && typeof result.skillPlusTotals === "object") return result.skillPlusTotals;
-    let rows = [];
-    try {
-      const equipmentRows = typeof optimizerEquipmentRows === "function" ? optimizerEquipmentRows(settings || {}) : [];
-      (result.equipmentIdxs || []).forEach(idx => {
-        const row = equipmentRows[idx];
-        if (row) rows.push(row);
-      });
-    } catch {}
-    try {
-      const compositeRows = typeof optimizerCompositeRows === "function" ? optimizerCompositeRows(settings || {}) : [];
-      (result.compositeIdxs || []).forEach(idx => {
-        const row = compositeRows[idx];
-        if (row) rows.push(row);
-      });
-    } catch {}
-    return helper.totalsForRows(rows);
+    if (result.metrics?.skillPlusTotals) return result.metrics.skillPlusTotals;
+    if (result.skillPlusTotals) return result.skillPlusTotals;
+    return global.MOEOptimizerSkillPlusFixV1?.totalsForSelection(
+      result.equipmentIdxs || [], result.compositeIdxs || [], settings || {}) || {};
   }
 
   function skillPlusObjectiveEnabled(settings=currentSettings, objective=null) {
@@ -556,46 +543,8 @@ function runOptimizerCore(payload, onProgress=null) {
     };
   }
 
-  const baseSort = global.optimizerSortByEvaluation;
-  if (typeof baseSort === "function") {
-    global.optimizerSortByEvaluation = function optimizerSortByEvaluationSkillPlusV21(a, b) {
-      const settings = currentSettings || {};
-      if (settings.requireAttackDelay60) {
-        return baseSort.call(this, a, b);
-      }
-      if (skillPlusObjectiveEnabled(settings, settings.objective)) {
-        const c = compareSkillPlus(a, b, settings);
-        if (c) return c;
-      }
-      const primary = baseSort.call(this, a, b);
-      if (primary) return primary;
-      if (skillPlusObjectiveEnabled(settings, settings.secondaryObjective)) {
-        return compareSkillPlus(a, b, settings);
-      }
-      return 0;
-    };
-  }
-
-  const baseCompare = global.optimizerCompareEvaluations;
-  if (typeof baseCompare === "function") {
-    global.optimizerCompareEvaluations = function optimizerCompareEvaluationsSkillPlusV21(a, b) {
-      const settings = currentSettings || {};
-      if (settings.requireAttackDelay60) {
-        return baseCompare.call(this, a, b);
-      }
-      if (skillPlusObjectiveEnabled(settings, settings.objective)) {
-        const c = compareSkillPlus(a, b, settings);
-        if (c) return c < 0 ? 1 : -1;
-      }
-      const primary = baseCompare.call(this, a, b);
-      if (primary) return primary;
-      if (skillPlusObjectiveEnabled(settings, settings.secondaryObjective)) {
-        const c = compareSkillPlus(a, b, settings);
-        return c < 0 ? 1 : c > 0 ? -1 : 0;
-      }
-      return 0;
-    };
-  }
+  // Comparisons use the shared rank (constraints, target distance, primary,
+  // secondary). Do not sort raw skill totals ahead of those priorities.
 
   const baseLabel = global.optimizerObjectiveLabel;
   if (typeof baseLabel === "function") {
@@ -625,9 +574,8 @@ function runOptimizerCore(payload, onProgress=null) {
       const helper = api();
       if (!helper) return text;
       try {
-        const rows = typeof optimizerEquipmentRows === "function" ? optimizerEquipmentRows(currentSettings || {}) : [];
-        const picked = (equipmentIdxs || []).map(idx => rows[idx]).filter(Boolean);
-        const summary = helper.summary(helper.totalsForRows(picked));
+        const totals = metrics?.skillPlusTotals || global.MOEOptimizerSkillPlusFixV1?.totalsForSelection(equipmentIdxs || [], [], currentSettings || {}) || {};
+        const summary = helper.summary(totals);
         if (!summary || text.includes("スキル強化:")) return text;
         return text ? `${text} / スキル強化: ${summary}` : `スキル強化: ${summary}`;
       } catch {

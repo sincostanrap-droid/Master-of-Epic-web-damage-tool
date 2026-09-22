@@ -59,13 +59,13 @@ MoE固有の主な仮定:
 - localStorageの保存キーを変えると、旧保存データは自動復元されなくなります。
 -->
 
-<link rel="stylesheet" href="./styles/main.css">
+<link rel="stylesheet" href="./styles/main.css?v=1.24.12">
 
   <!-- __MOE_SKILL_UI_FINAL_COMPOUND_SHIP_CLEANUP_V6__: skill knowledge panel hidden; compound ship button lives in toolbar -->
 </head>
 <body>
 <h1>Master of Epic 物理ダメージ計算webツール</h1>
-<p id="appBuildStamp" class="small appBuildStamp">v1.24.11 / 新規Buff22件の効果・併用を反映</p>
+<p id="appBuildStamp" class="small appBuildStamp">v1.24.12 / 最適化UI整理・スキル強化の評価を修正</p>
 <section class="heroCard">
   <div>
     <div class="heroBadge">MoE / Physical Damage Calculator</div>
@@ -1062,109 +1062,13 @@ MoE固有の主な仮定:
     <div class="optimizerBody">
       <p class="small optimizerIntro">
         登録済みの装備候補とBuff候補から、目的に合う構成を探します。
-        候補を段階的に絞りながら探すため、0から一発で終わらせるより、良い結果を適用してから再検索すると詰めやすいです。
+
       </p>
 
-      <div class="optimizerGuide">
-        <h3>最適化計算の使い方</h3>
-
-        <div class="optimizerGuideGrid">
-          <div class="optimizerGuideCard">
-            <h4>1. 候補を用意する</h4>
-            <p>
-              装備は「装備登録」タブ、Buffは「Buff登録」タブに登録します。
-              候補の追加は、先に「装備登録」「Buff登録」で行ってください。ここでは登録済み候補の組み合わせを探します。
-            </p>
-          </div>
-
-          <div class="optimizerGuideCard">
-            <h4>2. 現在構成を決める</h4>
-            <p>
-              各行の「使用」は現在ONの構成です。
-              手動で強そうな構成をONにしておくと、その構成を基準にして比較できます。
-              0から探す場合は、装備登録/Buff登録の「使用を全解除」ボタンで一度空にすると見通しがよくなります。
-            </p>
-          </div>
-
-          <div class="optimizerGuideCard">
-            <h4>3. 固定・除外を使う</h4>
-            <p>
-              絶対に使いたい装備は、装備登録タブで「固定」をONにします。
-              探索に入れたくない装備は「除外」をONにします。
-              「使用」と「固定」は別物です。使用は「今の構成」、固定は「検索するときに必ず使う指定」です。
-            </p>
-          </div>
-
-          <div class="optimizerGuideCard">
-            <h4>4. 目的を選んで検索する</h4>
-            <p>
-              目的で「最大ダメージ」「最大攻撃力」「最大クリ率」などを選びます。
-              目標値を入れると、単に最大値を狙うのではなく、目標に届いたうえで近い構成を優先します。
-            </p>
-          </div>
-        </div>
-
-        <details class="optimizerGuideDetails" open>
-          <summary>おすすめの探し方</summary>
-          <ol>
-            <li><b>0から探す:</b> 装備とBuffの使用を全解除してから検索します。</li>
-            <li><b>良さそうな結果が出たら:</b> 結果の「適用」を押して現在構成にします。</li>
-            <li><b>もう一度検索:</b> 適用した構成を基準にして再検索します。「現在の装備でBuffだけ組み直す」がONなら、その装備のままBuffだけ詰め直します。</li>
-            <li><b>さらに詰める:</b> 必ず使いたい装備を「固定」、使わない候補を「除外」にして、検索精度を「精度重視」にします。</li>
-          </ol>
-          <p class="small">
-            体感として、0から一発で終わらせるより、<b>検索 → 良い結果を適用 → もう一度検索</b> を数回回すほうが良い結果に近づきやすいです。
-            一度見つけた良い構成を基準にすると、さらに良い組み合わせを見つけやすくなります。
-          </p>
-        </details>
-
-        <details class="optimizerGuideDetails">
-          <summary>結果の見方</summary>
-          <ul>
-            <li><b>自動探索:</b> 最適化が自動で見つけた候補です。</li>
-            <li><b>現在ON:</b> 手動でONにしている現在構成です。比較用の基準です。</li>
-            <li><b>現在ON装備 + 最適Buff:</b> 装備は現在ONのまま、Buffだけ詰め直した候補です。</li>
-            <li><b>現在ONより良い結果だけ表示:</b> 現在構成を超えた候補だけ見たい時に使います。基準だけ表示される場合は、その条件では改善候補が見つかっていません。</li>
-          </ul>
-        </details>
-
-        <details class="optimizerGuideDetails">
-          <summary>検索がうまくいかない時</summary>
-          <ul>
-            <li>結果が出ない場合は、バフ枠上限、ステータス上限、目標値、競合グループを確認してください。</li>
-            <li>候補が少なすぎる場合は、装備やBuffの「除外」がONになっていないか確認してください。</li>
-            <li>強い手動構成がある場合は、それを「使用」ONにしてから検索すると比較しやすくなります。</li>
-            <li>探索が弱そうな場合は、検索精度を「精度重視」、Buff探索モードを「深掘り」にすると重い代わりに拾いやすくなります。</li>
-          </ul>
-        </details>
-      </div>
-
-      <p class="small optimizerControlHint">
-        迷ったら、最初は初期値のままでOKです。結果が弱そうな時だけ「検索精度」を上げたり、「Buffの探し方」を深掘りにしてください。
-      </p>
-      <div class="optimizerControls">
-        <label>バフ枠上限<input id="optimizerMaxSlots" type="number" min="0" step="1" value="24"></label>
-        <label>上位表示件数<input id="optimizerTopN" type="number" min="1" step="1" value="10"></label>
-        <label>検索精度
-          <select id="optimizerAccuracyPreset">
-            <option value="fast">高速</option>
-            <option value="balanced" selected>標準</option>
-            <option value="accurate">精度重視</option>
-          </select>
-        </label>
-        <label>検索の広さ<input id="optimizerBeamWidth" type="number" min="10" step="10" value="100"></label>
-        <label>装備候補の確認数<input id="optimizerEquipmentEvalLimit" type="number" min="1" step="1" value="50"></label>
-        <label>装備を全通り試す上限<input id="optimizerExactEquipmentLimit" type="number" min="0" step="100" value="3000"></label>
-        <label>Buffの探し方
-          <select id="optimizerBuffMode">
-            <option value="local" selected>標準（バランス）</option>
-            <option value="fast">高速（軽め）</option>
-            <option value="beam">深掘り（時間がかかる）</option>
-          </select>
-        </label>
-        <label>深掘りの広さ<input id="optimizerBuffBeamWidth" type="number" min="20" step="10" value="120"></label>
-        <label>仕上げ回数<input id="optimizerLocalPasses" type="number" min="1" step="1" value="8"></label>
-        <label>優先する結果
+      <section class="optimizerSetupPanel" aria-labelledby="optimizerGoalHeading">
+        <h3 id="optimizerGoalHeading">1. 目的と対象</h3>
+<div class="optimizerControls">
+<label>優先する結果
           <select id="optimizerObjective">
             <option value="damage">最大ダメージ</option>
             <option value="attack">最大攻撃力</option>
@@ -1175,40 +1079,34 @@ MoE固有の主な仮定:
             <option value="extraST">最大ST</option>
             <option value="extraHit">最大命中</option>
             <option value="extraAvoid">最大回避</option>
-            <option value="extraAttackDelay">最大攻撃ディレイ</option>
-            <option value="extraMagicDelay">最大魔法ディレイ</option>
+            <option value="extraAttackDelay">攻撃ディレイ最小</option>
+            <option value="extraMagicDelay">魔法ディレイ最小</option>
             <option value="extraDamageReducePct">最大被ダメ軽減</option>
             <option value="extraCritRatePct">最大クリ率</option>
             <option value="skillPlus">スキル強化最大</option>
           </select>
         </label>
-        <label>同点時に優先
-          <select id="optimizerSecondaryObjective">
-            <option value="">なし</option>
-            <option value="damage">最大ダメージ</option>
-            <option value="attack">最大攻撃力</option>
-            <option value="magic">最大魔力</option>
-            <option value="slotsMin">枠数最小</option>
-            <option value="extraAC">最大AC</option>
-            <option value="extraHP">最大HP</option>
-            <option value="extraST">最大ST</option>
-            <option value="extraHit">最大命中</option>
-            <option value="extraAvoid">最大回避</option>
-            <option value="extraAttackDelay">最大攻撃ディレイ</option>
-            <option value="extraMagicDelay">最大魔法ディレイ</option>
-            <option value="extraDamageReducePct">最大被ダメ軽減</option>
-            <option value="extraCritRatePct">最大クリ率</option>
-            <option value="skillPlus">スキル強化最大</option>
-          </select>
-        </label>
-        <label>狙いたい値<input id="optimizerTargetValue" type="number" step="0.1" placeholder="任意 / クリ率は空欄で100"></label>
-        <label>超えてよい幅<input id="optimizerTargetOver" type="number" min="0" step="0.1" placeholder="例: 5"></label>
-        <label class="optimizerSkillPlusTargetRow">スキル強化最大化対象
+<label class="optimizerSkillPlusTargetRow">対象スキル
           <select id="optimizerSkillPlusTargetSkill" data-skill-plus-objective-select data-empty-label="合計最大（全スキル）">
             <option value="">合計最大（全スキル）</option>
           </select>
         </label>
-        <details class="optimizerSkillPlusFilters">
+<label>検索精度
+          <select id="optimizerAccuracyPreset">
+            <option value="fast">高速</option>
+            <option value="balanced" selected>標準</option>
+            <option value="accurate">精度重視</option>
+          </select>
+        </label>
+</div>
+<p class="small" id="optimizerSkillPlusHint" hidden>選んだスキルの強化合計を比較します。実際のスキル値・成功率・装備要件は変わりません。</p>
+</section>
+<section class="optimizerSetupPanel" aria-labelledby="optimizerConditionsHeading">
+<h3 id="optimizerConditionsHeading">2. 必須条件</h3>
+<div class="optimizerControls">
+<label>バフ枠上限<input id="optimizerMaxSlots" type="number" min="0" step="1" value="24"></label>
+</div>
+<div class="optimizerChecks"><label title="装備・装備Buff・Buffの攻撃ディレイ短縮合計が-60以下になる構成だけを結果に残し、-60からの超過が少ない順に優先します。"><input id="optimizerRequireAttackDelay60" type="checkbox"> 攻撃ディレイ-60を確保する</label></div><details class="optimizerSkillPlusFilters">
           <summary>スキル強化条件（最大4条件・すべて満たす）</summary>
           <div class="small mutedText optimizerSkillPlusHelp">〇スキル強化を最適化条件として使います。ステータス/成功率/必要スキルには加算しません。</div>
           <div class="optimizerSkillPlusFilterRows">
@@ -1233,17 +1131,58 @@ MoE固有の主な仮定:
               <label>値 <input id="optimizerSkillPlusFilterValue4" data-skill-plus-filter-input type="number" step="0.1" placeholder="例: 20"></label>
             </div>
           </div>
-        </details>
-      </div>
-      <div class="optimizerChecks">
-        <label title="装備・装備Buff・Buffの攻撃ディレイ短縮合計が-60以下になる構成だけを結果に残し、-60からの超過が少ない順に優先します。"><input id="optimizerRequireAttackDelay60" type="checkbox"> 攻撃ディレイ-60を確保する</label>
-        <label><input id="optimizerIncludeDisabledBuffs" type="checkbox" checked> OFFのBuffも候補として試す</label>
-        <label><input id="optimizerFixCurrentBuffs" type="checkbox"> 現在ONのBuffは必ず使う</label>
-        <label><input id="optimizerForceOtherBuffs" type="checkbox" checked> その他バフは現在のON/OFFをそのまま使う</label>
-        <label title="手動でONにしている現在構成を、探索結果とは別に必ず比較行として表示します。"><input id="optimizerIncludeCurrentConfig" type="checkbox" checked> 現在ON構成を結果に含める</label>
-        <label title="現在ON構成を基準にして、それより評価が高い候補だけを表示します。"><input id="optimizerOnlyBetterThanCurrent" type="checkbox" checked> 現在ONより良い結果だけ表示</label>
-        <label title="手動でONにしている装備セットを必ず1回評価し、その装備のままBuffだけ最適化した候補も探索に混ぜます。"><input id="optimizerEvaluateCurrentEquipment" type="checkbox" checked> 現在の装備でBuffだけ組み直す</label>
-      </div>
+        </details></section>
+<details class="optimizerAdvanced">
+<summary>詳細設定 <span class="summaryNote">目標値・Buffの扱い・検索範囲</span></summary>
+<h4>目標値と同点時の優先</h4>
+<div class="optimizerControls">
+<label>狙いたい値<input id="optimizerTargetValue" type="number" step="0.1" placeholder="任意 / クリ率は空欄で100"></label>
+<label>超えてよい幅<input id="optimizerTargetOver" type="number" min="0" step="0.1" placeholder="例: 5"></label>
+<label>同点時に優先
+          <select id="optimizerSecondaryObjective">
+            <option value="">なし</option>
+            <option value="damage">最大ダメージ</option>
+            <option value="attack">最大攻撃力</option>
+            <option value="magic">最大魔力</option>
+            <option value="slotsMin">枠数最小</option>
+            <option value="extraAC">最大AC</option>
+            <option value="extraHP">最大HP</option>
+            <option value="extraST">最大ST</option>
+            <option value="extraHit">最大命中</option>
+            <option value="extraAvoid">最大回避</option>
+            <option value="extraAttackDelay">攻撃ディレイ最小</option>
+            <option value="extraMagicDelay">魔法ディレイ最小</option>
+            <option value="extraDamageReducePct">最大被ダメ軽減</option>
+            <option value="extraCritRatePct">最大クリ率</option>
+            <option value="skillPlus">スキル強化最大</option>
+          </select>
+        </label>
+</div>
+<h4>Buffと現在の構成</h4><div class="optimizerChecks">
+<label><input id="optimizerIncludeDisabledBuffs" type="checkbox" checked> OFFのBuffも候補として試す</label><label><input id="optimizerFixCurrentBuffs" type="checkbox"> 現在ONのBuffは必ず使う</label><label><input id="optimizerForceOtherBuffs" type="checkbox" checked> その他バフは現在のON/OFFをそのまま使う</label><label title="手動でONにしている現在構成を、探索結果とは別に必ず比較行として表示します。"><input id="optimizerIncludeCurrentConfig" type="checkbox" checked> 現在ON構成を結果に含める</label><label title="現在ON構成を基準にして、それより評価が高い候補だけを表示します。"><input id="optimizerOnlyBetterThanCurrent" type="checkbox" checked> 現在ONより良い結果だけ表示</label><label title="手動でONにしている装備セットを必ず1回評価し、その装備のままBuffだけ最適化した候補も探索に混ぜます。"><input id="optimizerEvaluateCurrentEquipment" type="checkbox" checked> 現在の装備でBuffだけ組み直す</label></div><h4>検索範囲と結果件数</h4>
+<div class="optimizerControls">
+<label>上位表示件数<input id="optimizerTopN" type="number" min="1" step="1" value="10"></label>
+<label>Buffの探し方
+          <select id="optimizerBuffMode">
+            <option value="local" selected>標準（バランス）</option>
+            <option value="fast">高速（軽め）</option>
+            <option value="beam">深掘り（時間がかかる）</option>
+          </select>
+        </label>
+<label>検索の広さ<input id="optimizerBeamWidth" type="number" min="10" step="10" value="100"></label>
+<label>装備候補の確認数<input id="optimizerEquipmentEvalLimit" type="number" min="1" step="1" value="50"></label>
+<label>装備を全通り試す上限<input id="optimizerExactEquipmentLimit" type="number" min="0" step="100" value="3000"></label>
+<label>深掘りの広さ<input id="optimizerBuffBeamWidth" type="number" min="20" step="10" value="120"></label>
+<label>仕上げ回数<input id="optimizerLocalPasses" type="number" min="1" step="1" value="8"></label>
+</div>
+</details>
+<details class="optimizerGuide optimizerCompactGuide">
+<summary>使い方・結果が出ないとき</summary>
+<ol><li>装備登録・Buff登録で候補を用意します。必ず使うものは「固定」、使わないものは「除外」にします。</li>
+<li>目的と条件を選んで検索し、結果の「適用」で構成を切り替えます。</li>
+<li>候補が出ないときは、条件・固定・除外と「現在ONより良い結果だけ表示」を確認してください。</li></ol>
+<p class="small">検索は登録済み候補から行います。精度を上げると探索時間が長くなります。</p>
+</details>
       <div class="optimizerButtons">
         <button class="primaryButton" onclick="runIntegratedOptimizer()">最適化する</button>
         <button type="button" onclick="cancelIntegratedOptimizer()">キャンセル</button>
@@ -1251,7 +1190,7 @@ MoE固有の主な仮定:
       <div class="optimizerResultPanel">
         <h3>最適化結果</h3>
         <progress id="optimizerProgress" value="0" max="100"></progress>
-        <div id="optimizerStatus" class="small">まだ検索していません。</div>
+        <details class="optimizerSearchDetails"><summary>検索状況・診断</summary><div id="optimizerStatus" class="small" role="status">まだ検索していません。</div></details>
         <div id="optimizerResults" class="scrollX"></div>
       </div>
     </div>
@@ -1314,20 +1253,20 @@ MoE固有の主な仮定:
 <script src="./src/ui/showcase.js?v=1.24.9" defer></script>
 <script src="./src/storage/shareUrl.js?v=1.22.4" defer></script>
 <script src="./src/storage/importExport.js?v=1.22.4" defer></script>
-<script src="./src/calc/core.js?v=1.24.5" defer></script>
+<script src="./src/calc/core.js?v=1.24.12" defer></script>
 <script src="./src/data/skillSimKnowledge.js?v=1.22.4" defer></script>
 <script src="src/data/manual/reviewedBuffCatalog.manual.js"></script>
 <script src="./src/ui/idbImportPreview.js?v=1.24.4" defer></script>
-<script src="./src/domain/catalogData.js?v=1.24.11" defer></script>
+<script src="./src/domain/catalogData.js?v=1.24.12" defer></script>
 <script src="./src/domain/catalogSearch.js?v=1.24.8" defer></script>
 <script src="./src/domain/catalogSort.js?v=1.24.4" defer></script>
 <script src="./src/ui/catalogRows.js?v=1.24.4" defer></script>
 <script src="./src/ui/catalogResults.js?v=1.24.4" defer></script>
 <script src="./src/ui/catalogTab.js?v=1.24.4" defer></script>
-<script src="./src/data/manual/buffRules.manual.js?v=1.24.11" data-catalog-src="src/data/manual/buffRules.manual.js"></script>
-<script src="./src/main.js?v=1.24.11" defer></script>
+<script src="./src/data/manual/buffRules.manual.js?v=1.24.12" data-catalog-src="src/data/manual/buffRules.manual.js"></script>
+<script src="./src/main.js?v=1.24.12" defer></script>
 <script src="./src/ui/buildAnalysis.js?v=1.24.4" defer></script>
-<script src="./src/ui/showcaseSkillPlusTotals.js?v=1.24.9" defer></script>
+<script src="./src/ui/showcaseSkillPlusTotals.js?v=1.24.12" defer></script>
 <script src="./src/ui/showcaseElementDamageTotals.js?v=1.24.9" defer></script>
 <script src="./src/ui/showcaseRecoveryTotals.js?v=1.24.9" defer></script>
 <script src="./src/ui/equipmentCatalogSearchCache.js?v=1.24.4" defer></script>
