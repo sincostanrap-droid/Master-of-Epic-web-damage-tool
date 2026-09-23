@@ -26,7 +26,9 @@ for(const [kind,rows] of [['skill',p.MOE_SKILL_BUFF_COMPATIBILITY_GENERATED],['d
 }
 console.log('Compatibility audit: corrected values/groups, saved-row migration, preserved overrides OK');
 // Snapshot of every group row from the two user-provided Wiki tables.
-// Explicit exceptions are source disagreements or the user's established override.
+// User-confirmed recovery values take precedence over conflicting Wiki table entries.
+// Confirmed in conversation: 上級魔術師 +15, 魔法陣ブースト +10 (2026-09-23 recorded).
+const confirmedRecoveryValues=new Map([['上級魔術師',15],['魔法陣ブースト',10]]);
 const fixture=require('./fixtures/compatibility-wiki-20260922.json');
 const norm=s=>String(s||'').replace(/[\s　]/g,'');
 for(const kind of ['skill','damage'])for(const expected of fixture[kind]){
@@ -37,8 +39,8 @@ for(const kind of ['skill','damage'])for(const expected of fixture[kind]){
   assert.equal(actual.group,expected.group,`${expected.section}/${expected.name} group`);
   const match=expected.valueRaw.match(/^\+?(\d+(?:\.\d+)?)%?$/);
   if(!match)continue;
-  if(expected.section==='回復魔法'&&['上級魔術師','魔法陣ブースト'].includes(expected.name))continue; // conflicting source values, preserved above
-  assert.equal(actual.value,Number(match[1]),`${expected.section}/${expected.name} value`);
+  const confirmed=kind==='skill'&&expected.section==='回復魔法' ? confirmedRecoveryValues.get(expected.name) : undefined;
+  assert.equal(actual.value,confirmed ?? Number(match[1]),`${expected.section}/${expected.name} value`);
  }
 }
 console.log(`Wiki table snapshot: ${fixture.skill.length+fixture.damage.length} source rows audited`);
