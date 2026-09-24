@@ -5153,14 +5153,24 @@ button[onclick*="applySkillSimToCalc"],
   margin-bottom: 12px;
 }
 
-.npcEffectInputRow label {
+.npcEffectInputRow > label {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  min-width: 0;
+  align-items: stretch;
   gap: 4px;
+  margin: 0;
+}
+
+.npcEffectInputRow > button {
+  min-width: 0;
+  margin: 0;
 }
 
 .npcEffectInputRow input,
 .npcEffectInputRow select {
   width: 100%;
+  min-width: 0;
   box-sizing: border-box;
 }
 
@@ -5228,4 +5238,17 @@ button[onclick*="applySkillSimToCalc"],
 @media(max-width: 700px) {
   .optimizerBody .optimizerSkillPlusFilterRows { grid-template-columns: 1fr; }
   .optimizerSetupPanel, .optimizerAdvanced, .optimizerCompactGuide { padding: 12px; }
+}
+
+/* Small numeric limits do not need a full-width input. */
+.optimizerBody .optimizerControls > label:has(#optimizerMaxSlots) {
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+}
+.optimizerBody .optimizerControls #optimizerMaxSlots {
+  flex: 0 0 6rem;
+  width: 6rem;
+  max-width: 100%;
 }

@@ -26,11 +26,21 @@ for(const worker of [false,true]){
  assert.ok(out.results.length);assert.equal(out.results[0].metrics.skillPlusTotals['回復魔法'],30);
  out=p.runOptimizerCore({state,inputs,settings:{...settings,skillPlusFilters:[{skill:'回復魔法',op:'gte',valueRaw:'100'}]}});
  assert.equal(out.results.length,0,'impossible condition must not appear as success');
- // Delay requirement stays ahead of skillPlus, including the overshoot preference.
+ // Require delay -60 first, then maximize skillPlus; excess delay only breaks ties.
  state.composite=[buff('exact',10,{enabled:false,extraAttackDelay:-60,tags:'delay'}),buff('excess',50,{enabled:false,extraAttackDelay:-70,tags:'delay'})];
  out=p.runOptimizerCore({state,inputs,settings:{...settings,requireAttackDelay60:true}});
- assert.ok(out.results.length);assert.equal(out.results[0].metrics.extraStats.extraAttackDelay,-60);
- assert.equal(out.results[0].metrics.skillPlusTotals['回復魔法'],10);
+ assert.ok(out.results.length);assert.equal(out.results[0].metrics.extraStats.extraAttackDelay,-70);
+ assert.equal(out.results[0].metrics.skillPlusTotals['回復魔法'],50);
+ // An unmet candidate cannot win even with a larger skill bonus.
+ state.composite.push(buff('unmet',100,{enabled:false,extraAttackDelay:-59,tags:'delay'}));
+ out=p.runOptimizerCore({state,inputs,settings:{...settings,requireAttackDelay60:true}});
+ assert.equal(out.results[0].metrics.extraStats.extraAttackDelay,-70);
+ assert.equal(out.results[0].metrics.skillPlusTotals['回復魔法'],50);
+ // Equal objective values prefer the smaller overshoot.
+ state.composite[0].extraEffects=[effect(50)];
+ out=p.runOptimizerCore({state,inputs,settings:{...settings,requireAttackDelay60:true}});
+ assert.equal(out.results[0].metrics.extraStats.extraAttackDelay,-60);
+ assert.equal(out.results[0].metrics.skillPlusTotals['回復魔法'],50);
  state.composite=[buff('first',10,{enabled:false}),buff('second',20,{enabled:false})];
  // Explicitly fixed OFF stays OFF; constraint not silently bypassed.
  state.composite[1].fixed=true;

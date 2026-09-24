@@ -11,7 +11,7 @@ const indexSource = fs.readFileSync(path.join(root, "index.html"), "utf8");
 assert.match(indexSource, /id="optimizerRequireAttackDelay60"[^>]*type="checkbox"/);
 assert.match(indexSource, /攻撃ディレイ-60を確保する/);
 assert.match(mainSource, /requireAttackDelay60:\s*!!byId\("optimizerRequireAttackDelay60"\)\?\.checked/);
-assert.match(mainSource, /value <= -60 \+ eps/);
+assert.match(mainSource, /value > -60 \+ eps/);
 assert.match(mainSource, /optimizerFinalConstraintViolations\(metrics, settings\)/);
 assert.match(mainSource, /return Math\.min\(60, -\(\+m\?\.extraStats\?\.extraAttackDelay \|\| 0\)\)/);
 assert.equal(

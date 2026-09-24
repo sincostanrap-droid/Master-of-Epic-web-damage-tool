@@ -8158,21 +8158,29 @@ function makeCompositeExtraDetailRow(row) {
   return detailTr;
 }
 
-function compositeExtraCell(row, detailTr) {
+function ensureCompositeDetailEditors(row, detailTr, button, summary) {
+  const holder = detailTr.querySelector(".compositeExtraEditor");
+  if (!holder || holder.dataset.editorsReady === "1") return;
+  holder.appendChild(makeCompactCompositePrimaryEditor(row, summary, button));
+  holder.appendChild(makeQuickEffectAdder(row, "composite", button));
+  holder.appendChild(makeExtraStatsEditor(row, "入力済みの追加ステータス", "buff", () => updateCompositeExtraStatus(button, row)));
+  holder.dataset.editorsReady = "1";
+}
+
+function compositeExtraCell(row, detailTr, summary) {
   const td = makeCell("td");
   td.className = "compositeExtraCell";
   const button = makeCell("button", {type:"button", class:"equipBuffToggle compositeExtraToggle"});
   updateCompositeExtraStatus(button, row);
   button.onclick = () => {
     row._compositeExtraOpen = !row._compositeExtraOpen;
+    if (row._compositeExtraOpen) ensureCompositeDetailEditors(row, detailTr, button, summary);
     detailTr.style.display = row._compositeExtraOpen ? "" : "none";
     button.classList.toggle("open", !!row._compositeExtraOpen);
   };
   td.appendChild(button);
 
-  const holder = detailTr.querySelector(".compositeExtraEditor");
-  holder.appendChild(makeQuickEffectAdder(row, "composite", button));
-  holder.appendChild(makeExtraStatsEditor(row, "入力済みの追加ステータス", "buff", () => updateCompositeExtraStatus(button, row)));
+  if (row._compositeExtraOpen) ensureCompositeDetailEditors(row, detailTr, button, summary);
 
   return td;
 }
@@ -8650,7 +8658,6 @@ function compactCompositeRefreshSummary(row, summaryElement, statusButton=null) 
   if (summaryElement) summaryElement.textContent = compositeEffectText(row);
   if (statusButton) updateCompositeExtraStatus(statusButton, row);
   renderTagLinkSummary();
-  renderShowcaseTab();
   calc();
 }
 
@@ -8744,7 +8751,7 @@ function renderCompositeTable() {
     const summary = document.createElement("div");
     summary.className = "compactCompositeEffectSummary";
     summary.textContent = compositeEffectText(row);
-    name.oninput = () => { row.name = name.value; renderTagLinkSummary(); renderShowcaseTab(); calc(); };
+    name.oninput = () => { row.name = name.value; renderTagLinkSummary(); calc(); };
     summaryCell.appendChild(nameLine);
     summaryCell.appendChild(summary);
     tr.appendChild(summaryCell);
@@ -8752,10 +8759,7 @@ function renderCompositeTable() {
     const detailTr = makeCompositeExtraDetailRow(row);
     if (row.excluded) detailTr.classList.add("excludedRow");
     if (row.fixed) detailTr.classList.add("fixedRow");
-    const extraCell = compositeExtraCell(row, detailTr);
-    const statusButton = extraCell.querySelector(".compositeExtraToggle");
-    const holder = detailTr.querySelector(".compositeExtraEditor");
-    if (holder) holder.insertBefore(makeCompactCompositePrimaryEditor(row, summary, statusButton), holder.firstChild);
+    const extraCell = compositeExtraCell(row, detailTr, summary);
     tr.appendChild(extraCell);
 
     const noteCell = makeCell("td");
@@ -9378,6 +9382,7 @@ function makeEquipmentBuffButtonCell(row, detailTr) {
   updateEquipBuffStatus(button, row);
   button.onclick = () => {
     row._equipBuffOpen = !row._equipBuffOpen;
+    if (row._equipBuffOpen) ensureEquipmentBuffDetailEditor(detailTr, row, button);
     detailTr.style.display = row._equipBuffOpen ? "" : "none";
     button.classList.toggle("open", !!row._equipBuffOpen);
   };
@@ -9386,7 +9391,13 @@ function makeEquipmentBuffButtonCell(row, detailTr) {
   return td;
 }
 
-function makeEquipmentBuffDetailRow(row, includeSlot, statusButton) {
+function ensureEquipmentBuffDetailEditor(detailTr, row, statusButton) {
+  const td = detailTr.querySelector(".equipBuffDetailCell");
+  if (!td || td.querySelector(".equipBuffGrid")) return;
+  td.appendChild(makeEquipmentBuffEditor(row, statusButton));
+}
+
+function makeEquipmentBuffDetailRow(row, includeSlot) {
   const detailTr = document.createElement("tr");
   detailTr.className = "equipBuffDetailRow";
   detailTr.style.display = row._equipBuffOpen ? "" : "none";
@@ -9400,7 +9411,6 @@ function makeEquipmentBuffDetailRow(row, includeSlot, statusButton) {
   const slotLabel = (row.slot || "").replace(/^武器: /, "").replace(/^防具: /, "").replace(/^装飾: /, "");
   title.textContent = `${slotLabel}${row.name ? ` / ${row.name}` : ""} の詳細`;
   td.appendChild(title);
-  td.appendChild(makeEquipmentBuffEditor(row, statusButton));
   detailTr.appendChild(td);
   return detailTr;
 }
@@ -9571,11 +9581,11 @@ function makeEquipmentInputRow(row, includeSlot=true, idx=0) {
   tr.appendChild(makeCell("td")).appendChild(name);
 
 
-  const dummyButton = makeCell("button", {type:"button", class:"equipBuffToggle"});
-  const detailTr = makeEquipmentBuffDetailRow(row, includeSlot, dummyButton);
+  const detailTr = makeEquipmentBuffDetailRow(row, includeSlot);
   const buffCell = makeEquipmentBuffButtonCell(row, detailTr);
   const realButton = buffCell.querySelector("button");
-  detailTr.querySelector(".equipBuffGrid").replaceWith(makeEquipmentBuffEditor(row, realButton));
+  // Hidden candidates need no editor DOM. Keep an opened editor across toggles.
+  if (row._equipBuffOpen) ensureEquipmentBuffDetailEditor(detailTr, row, realButton);
   tr.appendChild(buffCell);
 
   tr.appendChild(tagInputCell(row, "equipTag tagInput"));
@@ -10028,6 +10038,7 @@ function integratedOptimizerSettings() {
     targetValueRaw: byId("optimizerTargetValue")?.value ?? "",
     targetOverRaw: byId("optimizerTargetOver")?.value ?? "",
     requireAttackDelay60: !!byId("optimizerRequireAttackDelay60")?.checked,
+    requireCritRate100: !!byId("optimizerRequireCritRate100")?.checked,
     includeDisabledBuffs: byId("optimizerIncludeDisabledBuffs") ? !!byId("optimizerIncludeDisabledBuffs").checked : true,
     fixCurrentBuffs: !!byId("optimizerFixCurrentBuffs")?.checked,
     forceOtherBuffs: byId("optimizerForceOtherBuffs") ? !!byId("optimizerForceOtherBuffs").checked : true,
@@ -10178,7 +10189,8 @@ function optimizerPrimaryTargetDescription(settings) {
     const over = t.over === null ? "" : ` / 超過許容 +${fmt(t.over, 1)}`;
     descriptions.push(`${optimizerObjectiveLabel(t.objective)} 目標 ${fmt(t.target, 1)}${over}`);
   }
-  if (settings?.requireAttackDelay60) descriptions.push("攻撃ディレイ -60以下（超過最小を優先）");
+  if (settings?.requireAttackDelay60) descriptions.push("攻撃ディレイ -60以下（達成後は選択した目的を優先）");
+  if (settings?.requireCritRate100) descriptions.push("クリ率上昇量100%以上（超過可）");
   return descriptions.join(" / ");
 }
 
@@ -10191,6 +10203,7 @@ function optimizerEffectiveIncrease(base, flat, pctValue) {
 }
 
 function optimizerCritRateCap(settings) {
+  if (settings?.requireCritRate100) return Infinity;
   const t = optimizerPrimaryTargetSettings(settings);
   if (t && t.objective === "extraCritRatePct" && t.over !== null) {
     return t.target + t.over;
@@ -10229,6 +10242,7 @@ function optimizerStatCapViolations(m, settings=null) {
 
 function optimizerTargetOverViolations(m, settings) {
   const t = optimizerPrimaryTargetSettings(settings);
+  if (settings?.requireCritRate100 && t?.objective === "extraCritRatePct") return [];
   if (!t || t.over === null) return [];
   const value = optimizerObjectiveRawValue(m, t.objective);
   const eps = 0.000001;
@@ -10238,12 +10252,17 @@ function optimizerTargetOverViolations(m, settings) {
 }
 
 function optimizerRequiredConditionViolations(m, settings) {
-  if (!settings?.requireAttackDelay60) return [];
-  const value = +(m?.extraStats?.extraAttackDelay || 0);
+  const violations = [];
   const eps = 0.000001;
-  return value <= -60 + eps
-    ? []
-    : [`攻撃ディレイ ${fmt(value, 2)}（-60以下が必要）`];
+  if (settings?.requireAttackDelay60) {
+    const value = +(m?.extraStats?.extraAttackDelay || 0);
+    if (value > -60 + eps) violations.push(`攻撃ディレイ ${fmt(value, 2)}（-60以下が必要）`);
+  }
+  if (settings?.requireCritRate100) {
+    const value = +(m?.extraStats?.extraCritRatePct || 0);
+    if (value < 100 - eps) violations.push(`クリ率上昇量 ${fmt(value, 2)}%（100%以上が必要）`);
+  }
+  return violations;
 }
 
 function optimizerFinalConstraintViolations(m, settings) {
@@ -10288,10 +10307,18 @@ function optimizerEvaluationFromMetrics(m, settings) {
     ? (() => {
         const value = +(m?.extraStats?.extraAttackDelay || 0);
         return value <= -60 + 0.000001
-          ? [1, -optimizerAttackDelay60Excess(m)]
+          ? [1, 0]
           : [0, -Math.abs(value + 60)];
       })()
     : [];
+  if (settings?.requireCritRate100) {
+    const critMissing = Math.max(0, 100 - (+m?.extraStats?.extraCritRatePct || 0));
+    const delayMissing = settings.requireAttackDelay60
+      ? Math.max(0, (+m?.extraStats?.extraAttackDelay || 0) + 60) : 0;
+    const missing = critMissing + delayMissing;
+    // Keep incomplete combinations searchable; enforce the requirement at the end.
+    rank = [missing <= 0.000001 ? 1 : 0, -missing].concat(rank);
+  }
   if (settings?.skillPlusFilters?.some(filter => filter.skill)) {
     const distance = optimizerSkillFilterDistance(m, settings);
     rank = rank.concat([distance === 0 ? 1 : 0, -distance]);
@@ -10302,6 +10329,7 @@ function optimizerEvaluationFromMetrics(m, settings) {
   } else {
     rank = rank.concat(objectives.map(obj => optimizerMetricValueForSettings(m, obj, settings)));
   }
+  if (settings?.requireAttackDelay60) rank.push(-optimizerAttackDelay60Excess(m));
   return {score: rank[0] ?? 0, rank, violations: []};
 }
 
@@ -11345,7 +11373,7 @@ function ensureOptimizerWorker() {
   }
 
   try {
-    optimizerWorker = new Worker(`./src/optimizer/optimizer.worker.js?v=${encodeURIComponent(APP_VERSION)}`);
+    optimizerWorker = new Worker(`./src/optimizer/optimizer.worker.js?v=${encodeURIComponent(APP_VERSION)}-delay-objective`);
   } catch (e) {
     optimizerWorker = null;
     const status = byId("optimizerStatus");

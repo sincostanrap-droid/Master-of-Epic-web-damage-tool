@@ -13,7 +13,7 @@ importScripts(
   "../domain/attackDpsState.js?v=1.24.5",
   "../domain/catalogData.js?v=1.24.5",
   "../domain/catalogSearch.js?v=1.24.7",
-  "../main.js?v=1.24.12",
+  "../main.js?v=1.24.12-delay-objective",
   "../calc/core.js?v=1.24.12",
   "./core.js?v=1.24.12"
 );

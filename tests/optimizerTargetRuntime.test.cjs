@@ -13,8 +13,8 @@ for(const selected of [-1,0,1,2]){
  const st=json(base.state);st.equipment.forEach((r,i)=>r.enabled=i===selected);
  const m=json(p.computeMetrics(st,base.inputs));if(m.extraStats.extraAttackDelay<=-60)oracle.push({index:selected,delay:m.extraStats.extraAttackDelay,damage:m.finalDamage});
 }
-oracle.sort((a,b)=>(-a.delay-60)-(-b.delay-60)||b.damage-a.damage);
-assert.deepEqual(oracle.map(x=>x.delay),[-60,-61,-65]);
+oracle.sort((a,b)=>b.damage-a.damage||(-a.delay-60)-(-b.delay-60));
+assert.equal(oracle.length,3);
 let searches=0;
 for(const buffMode of ['fast','local','beam'])for(const exact of [true,false]) {
  const data=payload(p);Object.assign(data.settings,{buffMode,exactEquipmentLimit:exact?3000:1,buffBeamWidth:8,localPasses:2});
@@ -34,9 +34,9 @@ for(const buffMode of ['fast','local','beam'])for(const exact of [true,false]) {
  searches+=3;
 }
 // A narrow equipment-stage limit must still rank with required Buffs included.
-for(const exactEquipmentLimit of [3000,1]){const data=payload(p);Object.assign(data.settings,{equipmentEvalLimit:1,beamWidth:1,exactEquipmentLimit});assert.equal(run(data).results[0].metrics.extraStats.extraAttackDelay,-60);}
-// No exact target available: smallest excess wins. Unreachable target: no result.
-const near=payload(p);near.state.equipment[0].optimizerExcluded=true;assert.equal(run(near).results[0].metrics.extraStats.extraAttackDelay,-61);
+for(const exactEquipmentLimit of [3000,1]){const data=payload(p);Object.assign(data.settings,{equipmentEvalLimit:1,beamWidth:1,exactEquipmentLimit});assert.equal(run(data).results[0].metrics.extraStats.extraAttackDelay,oracle[0].delay);}
+// Highest damage among feasible candidates wins. Unreachable target: no result.
+const near=payload(p);near.state.equipment[0].optimizerExcluded=true;assert.equal(run(near).results[0].metrics.extraStats.extraAttackDelay,oracle.filter(r=>r.index!==0)[0].delay);
 const unreachable=payload(p);unreachable.state.composite[0].extraAttackDelay=-50;assert.equal(run(unreachable).results.length,0);
 const off=payload(p);off.settings.requireAttackDelay60=false;assert.ok(run(off).results[0].equipmentIdxs.includes(1),'without constraint damage wins');
 // Fixed Buff ON/OFF and fixed empty slot are valid explicit constraints.

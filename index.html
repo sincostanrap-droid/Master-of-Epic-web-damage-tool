@@ -1106,7 +1106,7 @@ MoE固有の主な仮定:
 <div class="optimizerControls">
 <label>バフ枠上限<input id="optimizerMaxSlots" type="number" min="0" step="1" value="24"></label>
 </div>
-<div class="optimizerChecks"><label title="装備・装備Buff・Buffの攻撃ディレイ短縮合計が-60以下になる構成だけを結果に残し、-60からの超過が少ない順に優先します。"><input id="optimizerRequireAttackDelay60" type="checkbox"> 攻撃ディレイ-60を確保する</label></div><details class="optimizerSkillPlusFilters">
+<div class="optimizerChecks"><label title="装備・装備Buff・Buffの攻撃ディレイ短縮合計が-60以下になる構成だけを結果に残し、達成後は選択した目的を優先します。同じ評価なら-60からの超過が少ない構成を優先します。"><input id="optimizerRequireAttackDelay60" type="checkbox"> 攻撃ディレイ-60を確保する</label></div><div class="optimizerChecks"><label title="競合解決後の装備・Buffによるクリ率上昇量が100%以上の構成を探します。素のクリ率は含みません。ON時はクリ率の上限・目標超過許容による除外を行いません。"><input id="optimizerRequireCritRate100" type="checkbox"> クリティカル率上昇量100%以上を確保する</label></div><details class="optimizerSkillPlusFilters">
           <summary>スキル強化条件（最大4条件・すべて満たす）</summary>
           <div class="small mutedText optimizerSkillPlusHelp">〇スキル強化を最適化条件として使います。ステータス/成功率/必要スキルには加算しません。</div>
           <div class="optimizerSkillPlusFilterRows">
@@ -1264,7 +1264,7 @@ MoE固有の主な仮定:
 <script src="./src/ui/catalogResults.js?v=1.24.4" defer></script>
 <script src="./src/ui/catalogTab.js?v=1.24.4" defer></script>
 <script src="./src/data/manual/buffRules.manual.js?v=1.24.12" data-catalog-src="src/data/manual/buffRules.manual.js"></script>
-<script src="./src/main.js?v=1.24.12" defer></script>
+<script src="./src/main.js?v=1.24.12-delay-objective" defer></script>
 <script src="./src/ui/buildAnalysis.js?v=1.24.4" defer></script>
 <script src="./src/ui/showcaseSkillPlusTotals.js?v=1.24.12" defer></script>
 <script src="./src/ui/showcaseElementDamageTotals.js?v=1.24.9" defer></script>
