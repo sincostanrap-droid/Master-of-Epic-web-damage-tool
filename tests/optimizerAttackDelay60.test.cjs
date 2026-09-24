@@ -16,8 +16,8 @@ assert.match(mainSource, /optimizerFinalConstraintViolations\(metrics, settings\
 assert.match(mainSource, /return Math\.min\(60, -\(\+m\?\.extraStats\?\.extraAttackDelay \|\| 0\)\)/);
 assert.equal(
   (coreSource.match(/optimizerFinalConstraintViolations\([^)]*, settings\)/g) || []).length,
-  3,
-  "現在ON、現在装備Buff最適化、自動探索の最終結果へ条件を適用する"
+  4,
+  "現在ON、現在装備Buff最適化、自動探索、装備再評価の最終結果へ条件を適用する"
 );
 
 

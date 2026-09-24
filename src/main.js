@@ -10429,7 +10429,11 @@ function optimizerCanonicalEquipmentIdxs(equipmentIdxs, settings=null) {
 }
 
 function optimizerEquipmentSelectionKey(equipmentIdxs, settings=null) {
-  return optimizerCanonicalEquipmentIdxs(equipmentIdxs, settings).join(",");
+  const rows = optimizerEquipmentRows(settings);
+  // Virtual/ordinary empty rows and an omitted slot describe the same equipment.
+  // Keep explicit fixed empty slots, which are real constraints.
+  return optimizerCanonicalEquipmentIdxs(equipmentIdxs, settings)
+    .filter(idx => rows[idx] && equipmentCandidateHasData(rows[idx])).join(",");
 }
 
 function optimizerCompositeSelectionKey(compositeIdxs) {
@@ -11373,7 +11377,7 @@ function ensureOptimizerWorker() {
   }
 
   try {
-    optimizerWorker = new Worker(`./src/optimizer/optimizer.worker.js?v=${encodeURIComponent(APP_VERSION)}-delay-objective`);
+    optimizerWorker = new Worker(`./src/optimizer/optimizer.worker.js?v=${encodeURIComponent(APP_VERSION)}-equipment-refine`);
   } catch (e) {
     optimizerWorker = null;
     const status = byId("optimizerStatus");
@@ -14786,7 +14790,7 @@ function ensureOptimizerCoreLoaded() {
 
   optimizerCoreLoadPromise = new Promise((resolve, reject) => {
     const script = document.createElement("script");
-    script.src = "./src/optimizer/core.js?v=1.24.12";
+    script.src = "./src/optimizer/core.js?v=1.24.12-equipment-refine";
     script.dataset.optimizerCore = "1";
     script.onload = () => {
       if (typeof runOptimizerCore === "function") resolve();

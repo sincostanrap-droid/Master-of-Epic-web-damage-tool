@@ -42,7 +42,7 @@ function makeOptimizerStatusText({settings, equipmentBeams, buffEvalBeams, resul
   const objectiveText = `${optimizerObjectiveLabel(settings.objective)}${settings.secondaryObjective ? " > " + optimizerObjectiveLabel(settings.secondaryObjective) : ""}`;
   const targetText = optimizerPrimaryTargetDescription(settings);
 
-  return `検索完了: 精度 ${accuracyText} / 目標 ${objectiveText}${targetText ? " / " + targetText : ""} / 装備候補 ${equipCount}件${optimizerFixedText}${optimizerExcludeText} / 装備以外Buff候補 ${buffCount}件 / ${equipmentModeText} / Buff検索 ${buffModeText} / その他固定枠 ${otherMode}${conflictSkipText}${pruneText}${capText}${duplicateText}${cacheText}${currentText}${betterOnlyText}${currentEquipSeedText} / 装備組み合わせ ${equipmentBeams.length}件中 ${buffEvalBeams.length}件確認 / 表示 ${results.length}件 / ${elapsed}ms`;
+  return `検索完了: 精度 ${accuracyText} / 目標 ${objectiveText}${targetText ? " / " + targetText : ""} / 装備候補 ${equipCount}件${optimizerFixedText}${optimizerExcludeText} / 装備以外Buff候補 ${buffCount}件 / ${equipmentModeText} / Buff検索 ${buffModeText} / その他固定枠 ${otherMode}${conflictSkipText}${pruneText}${capText}${duplicateText}${cacheText}${currentText}${betterOnlyText}${currentEquipSeedText} / 装備追加・交換確認 ${settings.optimizerEquipmentRefinementChecks || 0}件・改善 ${settings.optimizerEquipmentRefinementImprovements || 0}回 / 装備組み合わせ ${equipmentBeams.length}件中 ${buffEvalBeams.length}件確認 / 表示 ${results.length}件 / ${elapsed}ms`;
 }
 
 function optimizerCurrentSelectionKey(result, settings=null) {
@@ -348,6 +348,90 @@ function makeOptimizerExplorationDiagnostic({settings, equipmentBeams, buffEvalB
   };
 }
 
+// Revisit complete configurations with Buffs included. Equipment-only beam ranking
+// can discard a useful path before an external Buff satisfies its requirements.
+function optimizerRefineEquipmentResults(results, inputs, settings, onProgress) {
+  settings.optimizerEquipmentRefinementChecks = 0;
+  settings.optimizerEquipmentRefinementImprovements = 0;
+  // Exact mode already evaluated every equipment combination with Buffs.
+  if (settings.optimizerEquipmentSearchMode === "exact") return [];
+  const rows = optimizerEquipmentRows(settings);
+  const groups = optimizerEquipmentGroups(settings);
+  const seeds = optimizerDedupeResultsByEquipment(results, settings)
+    .sort(optimizerSortByEvaluation).slice(0, Math.max(1, settings.topN || 10));
+  // Always revisit the current-equipment seed, even if it fell outside top N.
+  results.filter(r => r.currentEquipmentSeed).forEach(r => {
+    if (!seeds.includes(r)) seeds.push(r);
+  });
+  const searchedBuffs = new Map();
+  const out = [];
+  function validEquipment(indices) {
+    if (!optimizerSelectionHasMainWeapon(indices, settings)) return false;
+    for (const group of groups) {
+      const selected = indices.filter(i => rows[i]?.slot === group.slot);
+      if (selected.length > 1) return false;
+      const others = indices.filter(i => rows[i]?.slot !== group.slot);
+      const allowed = optimizerEquipmentCandidatesForSelection(group, others, settings);
+      if (selected.length ? !allowed.some(c => c.idx === selected[0])
+          : !allowed.some(c => !equipmentCandidateHasData(c.row))) return false;
+    }
+    return !indices.some(i => optimizerEquipmentWouldConflict(indices.filter(j => j !== i), i, settings));
+  }
+  function resultFor(indices, selection, evaluated) {
+    return {
+      equipmentIdxs: indices, compositeIdxs: selection,
+      metrics: evaluated.metrics, score: evaluated.score, rank: evaluated.rank,
+      equipmentSummary: optimizerEquipmentSummaryByIdx(indices, evaluated.metrics),
+      equipmentConflicts: optimizerEquipmentConflictNames(indices),
+      capViolations: optimizerFinalConstraintViolations(evaluated.metrics, settings),
+      forceOtherBuffs: settings.forceOtherBuffs,
+      sourceLabel: "装備追加・交換 + 最適Buff"
+    };
+  }
+  seeds.forEach((seed, seedIndex) => {
+    let best = seed;
+    let changed = true;
+    while (changed) {
+      changed = false;
+      for (const group of groups) {
+        const others = best.equipmentIdxs.filter(i => rows[i] && rows[i].slot !== group.slot && equipmentCandidateHasData(rows[i]));
+        for (const candidate of optimizerEquipmentCandidatesForSelection(group, others, settings)) {
+          const indices = optimizerCanonicalEquipmentIdxs(others.concat(
+            equipmentCandidateHasData(candidate.row) ? [candidate.idx] : []), settings);
+          const key = optimizerEquipmentSelectionKey(indices, settings);
+          if (key === optimizerEquipmentSelectionKey(best.equipmentIdxs, settings) || !validEquipment(indices)) continue;
+          settings.optimizerEquipmentRefinementChecks++;
+          // Keep the incumbent Buff selection as well: heuristic Buff search must
+          // not hide a straightforward improvement that works with those Buffs.
+          const inherited = resultFor(indices, best.compositeIdxs,
+            optimizerEvaluateBuffSelection(indices, best.compositeIdxs, inputs, settings));
+          if (optimizerResultPassesDisplayFilters(inherited, settings) && optimizerCompareEvaluations(inherited, best) > 0) {
+            best = inherited;
+            changed = true;
+            settings.optimizerEquipmentRefinementImprovements++;
+          }
+        }
+      }
+      // Re-optimize Buffs only for an improved complete configuration. Searching
+      // Buff combinations for every neighbor multiplies search time needlessly.
+      if (changed) {
+        const key = optimizerEquipmentSelectionKey(best.equipmentIdxs, settings);
+        if (!searchedBuffs.has(key)) {
+          const buff = optimizerSelectExternalBuffs(best.equipmentIdxs, inputs, settings);
+          const selection = optimizerCompositeSelectionKey(buff.compositeIdxs).split(",").filter(Boolean).map(Number);
+          searchedBuffs.set(key, resultFor(best.equipmentIdxs, selection, buff));
+        }
+        const trial = searchedBuffs.get(key);
+        if (optimizerResultPassesDisplayFilters(trial, settings) && optimizerCompareEvaluations(trial, best) > 0) best = trial;
+      }
+    }
+    if (best !== seed) out.push(best);
+    if (onProgress) onProgress({current:seedIndex + 1, total:seeds.length,
+      phase:"equipment-refine", message:`装備追加・交換を再確認: ${seedIndex + 1}/${seeds.length}`});
+  });
+  return out;
+}
+
 function runOptimizerCore(payload, onProgress=null) {
   const inputs = {...(payload?.inputs || {})};
   const settings = {...(payload?.settings || {})};
@@ -412,6 +496,7 @@ function runOptimizerCore(payload, onProgress=null) {
   const diagnosticCurrentResult = currentResult || optimizerBuildCurrentConfigResult(inputs, settings);
 
   const searchResultsWithSeeds = optimizerMergeSeedResults(rawResults, seedResults, settings);
+  searchResultsWithSeeds.push(...optimizerRefineEquipmentResults(searchResultsWithSeeds, inputs, settings, onProgress));
 
   const dedupedSortedResults = optimizerDedupeResultsByEquipment(searchResultsWithSeeds, settings)
     .sort(optimizerSortByEvaluation);
