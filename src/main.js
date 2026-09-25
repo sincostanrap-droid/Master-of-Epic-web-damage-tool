@@ -572,6 +572,9 @@ function extraStatsSummary(extra, options={}) {
 
 
 const QUICK_EFFECT_DEFS = [
+  {key:"hpRegenPerMinute", label:"HP自然回復量上昇", valueLabel:"増加量/分", unit:"/分", scopes:["equipBuff","buff"], category:"自然回復"},
+  {key:"mpRegenPerMinute", label:"MP自然回復量上昇", valueLabel:"増加量/分", unit:"/分", scopes:["equipBuff","buff"], category:"自然回復"},
+  {key:"stRegenPerMinute", label:"ST自然回復量上昇", valueLabel:"増加量/分", unit:"/分", scopes:["equipBuff","buff"], category:"自然回復"},
   {key:"attackFlat", label:"攻撃力+", valueLabel:"値", unit:"", scopes:["base","equipBuff","buff"], category:"基本ステータス"},
   {key:"magicFlat", label:"魔力+", valueLabel:"値", unit:"", scopes:["base","equipBuff","buff"], category:"基本ステータス"},
   {key:"speedFlat", label:"速度+", valueLabel:"値", unit:"", scopes:["base","equipBuff","buff"], category:"基本ステータス"},
@@ -642,6 +645,7 @@ const QUICK_EFFECT_DEFS = [
   {key:"earthResPct", category:"追加ステータス%", label:"耐地属性%", valueLabel:"%", unit:"%", scopes:["equipBuff","buff"]},
   {key:"windResPct", category:"追加ステータス%", label:"耐風属性%", valueLabel:"%", unit:"%", scopes:["equipBuff","buff"]},
   {key:"neutralResPct", category:"追加ステータス%", label:"耐無属性%", valueLabel:"%", unit:"%", scopes:["equipBuff","buff"]},
+  {key:"attackDelayB", category:"戦闘・回復", label:"スキル短縮・アタック短縮", valueLabel:"短縮率（正数）", unit:"%", scopes:["equipBuff","buff"], targetKind:"text", placeholder:"全武器 または 銃器・刀剣など"},
   {key:"attackDelayPct", category:"追加ステータス%", label:"攻撃ディレイ%", valueLabel:"%", unit:"%", scopes:["equipBuff","buff"]},
   {key:"magicDelayPct", category:"追加ステータス%", label:"魔法ディレイ%", valueLabel:"%", unit:"%", scopes:["equipBuff","buff"]},
   {key:"damageReducePct", category:"追加ステータス%", label:"被ダメ軽減%", valueLabel:"%", unit:"%", scopes:["equipBuff","buff"]},
@@ -831,6 +835,9 @@ function quickEffectTargetName(def, targetValue) {
 }
 
 const QUICK_EFFECT_EXTRA_STAT_MAP = Object.freeze({
+  hpRegenPerMinute:"hpRegenPerMinute",
+  mpRegenPerMinute:"mpRegenPerMinute",
+  stRegenPerMinute:"stRegenPerMinute",
   utilBreath:"extraBreath",
   utilHearing:"extraHearing",
   utilSeeing:"extraSeeing",
@@ -885,6 +892,16 @@ function applyQuickEffectToRow(row, context, key, value, name="", scope="auto") 
     return false;
   }
   const def = quickEffectDef(key);
+  if (key === "attackDelayB") {
+    const target = String(name || "全武器").trim();
+    if (!(v > 0 && v < 100) || !["全武器", ...OPTIMIZER_MAIN_WEAPON_SKILLS].includes(target)) {
+      alert("短縮率は0より大きく100未満の正数、対象は全武器または武器スキル名で入力してください。");
+      return false;
+    }
+    pushDisplayEffect(row, key, v, target, "%", "display");
+    if (context !== "composite") row.equipBuffEnabled = true;
+    return true;
+  }
   const displayOnly = ["skillPlus", "elementDamagePct", "custom"].includes(key);
   if (displayOnly) {
     pushDisplayEffect(row, key, v, quickEffectTargetName(def, name), def.unit || "", "display");
@@ -1046,6 +1063,8 @@ function makeQuickEffectAdder(row, context, statusButton=null) {
     targetWrap.innerHTML = "";
     targetInput = null;
     value.placeholder = def.valueLabel || "値";
+    value.step = quickEffectExtraStatDef(def.key)?.step || "0.1";
+    value.setAttribute("aria-label", `${def.label}：${def.valueLabel || "値"}`);
 
     if (def.targetKind === "skill") {
       targetInput = makeCell("select");
@@ -1093,7 +1112,9 @@ function makeQuickEffectAdder(row, context, statusButton=null) {
       renderEquipmentTable();
     } else {
       row._compositeExtraOpen = true;
-      renderCompositeTable();
+      refreshCompositeTableRow(row);
+      scheduleCompositeCalculation();
+      return;
     }
     renderTagLinkSummary();
     renderShowcaseTab();
@@ -1278,7 +1299,8 @@ function extraStatNumberInput(row, def, mode="base", onUpdate=null) {
   input.oninput = () => {
     row[prop] = parseFloat(input.value) || 0;
     if (onUpdate) onUpdate();
-    calc();
+    if (mode === "buff") scheduleCompositeCalculation();
+    else calc();
   };
   wrap.appendChild(input);
   return wrap;
@@ -1422,6 +1444,7 @@ function normalizeEquipmentCandidate(row, fallbackSlot) {
     magic: +(row?.magic || 0),
     speed: +(row?.speed || 0),
     delay: +(row?.delay || 0),
+    catalogQuality: row?.catalogQuality === "HG_MG" ? "HG_MG" : "raw",
     weaponDamage: +(row?.weaponDamage || 0),
     weaponWeight: +(row?.weaponWeight || 0),
     weaponAttackInterval: +(row?.weaponAttackInterval || row?.attackInterval || 0),
@@ -7162,6 +7185,8 @@ function compositeGroupScore(r) {
 
 function buffGroupResolveScore(row, order=0, type="composite") {
   const rule = String(row?.stackRule || "").toLowerCase();
+  const food = /^food:([a-f])([1-4]?)$/.exec(rule);
+  if (food) return 1000000000 + (/[cd]/.test(food[1]) ? Number(food[2] || 0) * 1000000 : 0) + order;
   // same-technic/latest 系は、同一テクニックIDや手動競合グループ内で「後から来たものだけ有効」にする。
   // 自動technic_idグループは内部処理専用で、競合グループ画面には表示しない。
   if (/same-technic|latest|newest|最新/.test(rule)) return 1000000000 + order;
@@ -8264,22 +8289,29 @@ function reviewedBuffCatalogDefaultRow() {
 function reviewedBuffCatalogEffectSummary(effect) {
   const parts = [];
   if (+effect.attackPct) parts.push(`攻撃力${effect.attackPct > 0 ? "+" : ""}${fmt(effect.attackPct, 3)}%`);
-  if (+effect.flatAttack) parts.push(`攻撃力+${fmt(effect.flatAttack, 3)}`);
+  if (+effect.flatAttack) parts.push(`攻撃力${effect.flatAttack > 0 ? "+" : ""}${fmt(effect.flatAttack, 3)}`);
   if (+effect.extraAC) parts.push(`AC${effect.extraAC > 0 ? "+" : ""}${fmt(effect.extraAC, 3)}`);
   if (+effect.extraACPct) parts.push(`AC${effect.extraACPct > 0 ? "+" : ""}${fmt(effect.extraACPct, 3)}%`);
-  if (+effect.extraHP) parts.push(`最大HP+${fmt(effect.extraHP, 3)}`);
-  if (+effect.extraMP) parts.push(`最大MP+${fmt(effect.extraMP, 3)}`);
-  if (+effect.extraHit) parts.push(`命中+${fmt(effect.extraHit, 3)}`);
-  if (+effect.extraAvoid) parts.push(`回避+${fmt(effect.extraAvoid, 3)}`);
-  if (+effect.flatSpeed) parts.push(`速度+${fmt(effect.flatSpeed, 3)}`);
+  if (+effect.extraHP) parts.push(`最大HP${effect.extraHP > 0 ? "+" : ""}${fmt(effect.extraHP, 3)}`);
+  if (+effect.extraMP) parts.push(`最大MP${effect.extraMP > 0 ? "+" : ""}${fmt(effect.extraMP, 3)}`);
+  if (+effect.extraHit) parts.push(`命中${effect.extraHit > 0 ? "+" : ""}${fmt(effect.extraHit, 3)}`);
+  if (+effect.extraAvoid) parts.push(`回避${effect.extraAvoid > 0 ? "+" : ""}${fmt(effect.extraAvoid, 3)}`);
+  if (+effect.flatSpeed) parts.push(`速度${effect.flatSpeed > 0 ? "+" : ""}${fmt(effect.flatSpeed, 3)}`);
   if (+effect.extraAttackDelay) parts.push(`攻撃ディレイ${effect.extraAttackDelay > 0 ? "+" : ""}${fmt(effect.extraAttackDelay, 3)}`);
   if (+effect.extraAttackDelayPct) parts.push(`攻撃ディレイ${effect.extraAttackDelayPct > 0 ? "+" : ""}${fmt(effect.extraAttackDelayPct, 3)}%`);
-  if (+effect.extraCritRatePct) parts.push(`クリ率+${fmt(effect.extraCritRatePct, 3)}%`);
+  if (+effect.extraCritRatePct) parts.push(`クリ率${effect.extraCritRatePct > 0 ? "+" : ""}${fmt(effect.extraCritRatePct, 3)}%`);
   if (+effect.durationSeconds) parts.push(`持続${fmt(effect.durationSeconds, 1)}秒`);
   // __MOE_REVIEWED_BUFF_SKILLPLUS_PREVIEW_V1__
   normalizeAdditionalEffects(effect?.extraEffects || []).forEach(extra => {
-    if (extra?.key === "skillPlus") parts.push(additionalEffectLabel(extra));
+    if (["skillPlus", "attackDelayB", "custom"].includes(extra?.key)) parts.push(additionalEffectLabel(extra));
   });
+  for (const [key, label, unit] of [
+    ["flatMagic", "魔力", ""], ["extraST", "最大ST", ""], ["extraMaxWeight", "最大重量", ""],
+    ["extraFireRes", "火耐性", ""], ["extraWaterRes", "水耐性", ""], ["extraWindRes", "風耐性", ""],
+    ["extraEarthRes", "地耐性", ""], ["extraNeutralRes", "無耐性", ""],
+    ["stRegenPerMinute", "ST自然回復", "/分"],
+    ["hpRegenPerMinute", "HP自然回復", "/分"], ["mpRegenPerMinute", "MP自然回復", "/分"]
+  ]) if (+effect[key]) parts.push(`${label}${effect[key] > 0 ? "+" : ""}${fmt(effect[key], 3)}${unit}`);
   return parts.join(" / ") || "計算効果なし";
 }
 
@@ -8293,9 +8325,13 @@ function reviewedBuffCatalogInputs() {
 // __MOE_BUFF_CATALOG_SCALABLE_UI_V1__
 let reviewedBuffCatalogSelectedId = REVIEWED_BUFF_CATALOG_PHASE1[0]?.id || "";
 
+let reviewedBuffCatalogKind = "technic";
+function reviewedBuffCatalogRulesForKind(kind=reviewedBuffCatalogKind) {
+  return REVIEWED_BUFF_CATALOG_PHASE1.filter(rule => (rule.category === "食べ物Buff") === (kind === "food"));
+}
 function reviewedBuffCatalogCategories() {
   return Array.from(new Set(
-    REVIEWED_BUFF_CATALOG_PHASE1.map(rule => rule.category || "その他")
+    reviewedBuffCatalogRulesForKind().map(rule => rule.category || "その他")
   )).sort((a, b) => a.localeCompare(b, "ja"));
 }
 
@@ -8316,7 +8352,7 @@ function reviewedBuffCatalogFilterState() {
 
 function reviewedBuffCatalogFilteredRules() {
   const filter = reviewedBuffCatalogFilterState();
-  return REVIEWED_BUFF_CATALOG_PHASE1.filter(rule => {
+  return reviewedBuffCatalogRulesForKind().filter(rule => {
     if (filter.category !== "all" && (rule.category || "その他") !== filter.category) return false;
     if (filter.inputKind !== "all") {
       const kind = rule.inputKind === "none" ? "fixed" : "formula";
@@ -8331,7 +8367,7 @@ function reviewedBuffCatalogFilteredRules() {
         reviewedBuffCatalogInputTypeLabel(rule)
       ].filter(Boolean).join(" ").toLowerCase();
       const terms = filter.text.split(/\s+/).filter(Boolean);
-      if (!terms.every(term => hay.includes(term))) return false;
+      if (!terms.every(term => hay.includes(term) || hay.replace(/\s+/g, "").includes(term))) return false;
     }
     return true;
   });
@@ -8457,8 +8493,10 @@ function addReviewedBuffCatalogSelection() {
   closeReviewedBuffCatalog();
 }
 
-function openReviewedBuffCatalog() {
+function openReviewedBuffCatalog(kind="technic") {
   closeReviewedBuffCatalog();
+  reviewedBuffCatalogKind = kind === "food" ? "food" : "technic";
+  reviewedBuffCatalogSelectedId = reviewedBuffCatalogRulesForKind()[0]?.id || "";
 
   if (!reviewedBuffCatalogSelectedId) {
     reviewedBuffCatalogSelectedId = REVIEWED_BUFF_CATALOG_PHASE1[0]?.id || "";
@@ -8471,8 +8509,8 @@ function openReviewedBuffCatalog() {
     <div class="reviewedBuffCatalogDialog reviewedBuffCatalogDialogScalable" role="dialog" aria-modal="true">
       <div class="reviewedBuffCatalogHeader">
         <div>
-          <h3>Buffカタログから追加</h3>
-          <div class="small mutedText">自己Buff・外部Buffを問わず、使用者側の値を手入力します。</div>
+          <h3>${reviewedBuffCatalogKind === "food" ? "飲食Buff" : "魔法・テクニックBuff"}カタログ</h3>
+          <div class="small mutedText">${reviewedBuffCatalogKind === "food" ? "食べ物・飲み物を選んで追加します。同じ飲食グループの競合も反映されます。" : "自己Buff・外部Buffを選んで追加します。スキル・魔力は使用者側の値を入力してください。"}</div>
         </div>
         <button type="button" id="reviewedBuffCatalogClose">閉じる</button>
       </div>
@@ -8596,10 +8634,20 @@ function ensureReviewedBuffCatalogButton() {
   button.type = "button";
   button.id = "reviewedBuffCatalogOpen";
   button.className = "buffCatalogPrimaryButton";
-  button.innerHTML = `<span class="buffCatalogPrimaryIcon">＋</span><span><b>カタログから選ぶ</b><small>レビュー済みBuffを検索して追加</small></span>`;
-  button.onclick = openReviewedBuffCatalog;
+  button.innerHTML = `<span class="buffCatalogPrimaryIcon">＋</span><span><b>魔法・テクニックBuff</b><small>魔法・技の効果を検索して追加</small></span>`;
+  button.onclick = () => openReviewedBuffCatalog("technic");
 
   toolbar.appendChild(button);
+  const foodButton = document.createElement("button");
+  foodButton.type = "button";
+  foodButton.id = "foodBuffCatalogOpen";
+  foodButton.className = "buffCatalogPrimaryButton";
+  foodButton.innerHTML = `<span class="buffCatalogPrimaryIcon">＋</span><span><b>飲食Buff</b><small>食べ物・飲み物の効果を検索して追加</small></span>`;
+  foodButton.onclick = () => openReviewedBuffCatalog("food");
+  toolbar.appendChild(foodButton);
+  toolbar.style.display = "flex";
+  toolbar.style.flexWrap = "wrap";
+  toolbar.style.gap = "8px";
 
   if (host) {
     host.appendChild(toolbar);
@@ -8657,8 +8705,7 @@ function installCompactCompositeRowStyles() {
 function compactCompositeRefreshSummary(row, summaryElement, statusButton=null) {
   if (summaryElement) summaryElement.textContent = compositeEffectText(row);
   if (statusButton) updateCompositeExtraStatus(statusButton, row);
-  renderTagLinkSummary();
-  calc();
+  scheduleCompositeCalculation();
 }
 
 function makeCompactCompositePrimaryEditor(row, summaryElement, statusButton=null) {
@@ -8724,7 +8771,11 @@ function renderCompositeTable() {
     return;
   }
 
-  state.composite.forEach((row, idx) => {
+  state.composite.forEach((row, idx) => tbody.appendChild(makeCompositeTableRow(row, idx)));
+}
+
+const compositeRowElements = new WeakMap();
+function makeCompositeTableRow(row, idx) {
     const frag = document.createDocumentFragment();
     const tr = document.createElement("tr");
     tr.className = "compactCompositeMainRow";
@@ -8751,7 +8802,7 @@ function renderCompositeTable() {
     const summary = document.createElement("div");
     summary.className = "compactCompositeEffectSummary";
     summary.textContent = compositeEffectText(row);
-    name.oninput = () => { row.name = name.value; renderTagLinkSummary(); calc(); };
+    name.oninput = () => { row.name = name.value; scheduleCompositeCalculation(); };
     summaryCell.appendChild(nameLine);
     summaryCell.appendChild(summary);
     tr.appendChild(summaryCell);
@@ -8772,8 +8823,23 @@ function renderCompositeTable() {
 
     frag.appendChild(tr);
     frag.appendChild(detailTr);
-    tbody.appendChild(frag);
-  });
+    compositeRowElements.set(row, {main:tr, detail:detailTr});
+    return frag;
+}
+
+function refreshCompositeTableRow(row) {
+  const elements = compositeRowElements.get(row);
+  const idx = state.composite.indexOf(row);
+  if (!elements?.main?.parentNode || idx < 0) { renderCompositeTable(); return; }
+  elements.main.replaceWith(makeCompositeTableRow(row, idx));
+  elements.detail.remove();
+}
+
+let compositeCalcTimer = null;
+function scheduleCompositeCalculation() {
+  if (compositeCalcTimer !== null) clearTimeout(compositeCalcTimer);
+  // Let the newly added input render before recalculating the other panels.
+  compositeCalcTimer = setTimeout(() => { compositeCalcTimer = null; calc(); }, 100);
 }
 
 function addCompositeRow(kind="blank") {
@@ -8786,9 +8852,18 @@ function addCompositeRow(kind="blank") {
     ...extraDefaultFields("buff"),
     note:""
   };
-  state.composite.push(row);
-  renderCompositeTable();
-  calc();
+  const normalized = normalizeCompositeRows([row])[0];
+  const tbody = document.querySelector("#compositeBuffTable tbody");
+  const canAppend = tbody && tbody.querySelectorAll(".compactCompositeMainRow").length === state.composite.length;
+  const wasEmpty = state.composite.length === 0;
+  state.composite.push(normalized);
+  if (canAppend) {
+    if (wasEmpty) tbody.innerHTML = "";
+    tbody.appendChild(makeCompositeTableRow(normalized, state.composite.length - 1));
+  } else renderCompositeTable();
+  const added = state.composite[state.composite.length - 1];
+  compositeRowElements.get(added)?.main.querySelector("input:not([type=checkbox])")?.focus();
+  scheduleCompositeCalculation();
 }
 
 /* 旧項目: 割合ステータスBuff表を描画する。 */
@@ -10039,6 +10114,8 @@ function integratedOptimizerSettings() {
     targetOverRaw: byId("optimizerTargetOver")?.value ?? "",
     requireAttackDelay60: !!byId("optimizerRequireAttackDelay60")?.checked,
     requireCritRate100: !!byId("optimizerRequireCritRate100")?.checked,
+    requireAttackDelayB: !!byId("optimizerRequireAttackDelayB")?.checked,
+    attackDelayBMinimumPct: Number(byId("optimizerAttackDelayBMinimumPct")?.value) || 20,
     includeDisabledBuffs: byId("optimizerIncludeDisabledBuffs") ? !!byId("optimizerIncludeDisabledBuffs").checked : true,
     fixCurrentBuffs: !!byId("optimizerFixCurrentBuffs")?.checked,
     forceOtherBuffs: byId("optimizerForceOtherBuffs") ? !!byId("optimizerForceOtherBuffs").checked : true,
@@ -10191,6 +10268,7 @@ function optimizerPrimaryTargetDescription(settings) {
   }
   if (settings?.requireAttackDelay60) descriptions.push("攻撃ディレイ -60以下（達成後は選択した目的を優先）");
   if (settings?.requireCritRate100) descriptions.push("クリ率上昇量100%以上（超過可）");
+  if (settings?.requireAttackDelayB) descriptions.push(`スキル短縮・アタック短縮${optimizerAttackDelayBRequirement(settings)}%以上（対象：${settings.mainWeaponSkill || "主武器"}）`);
   return descriptions.join(" / ");
 }
 
@@ -10251,6 +10329,61 @@ function optimizerTargetOverViolations(m, settings) {
     : [];
 }
 
+// Sources are collected after ordinary Buff conflicts are resolved. B effects
+// themselves never add: optimization assumes the chosen source is applied last.
+function attackDelayBSourcesFromResolvedState(st) {
+  const sources = [];
+  const skills = ["素手", "刀剣", "こんぼう", "槍", "弓", "銃器", "投げ"];
+  for (const row of st.composite || []) {
+    if (!row.enabled || row.excluded) continue;
+    const add = (percent, skill, excludeUnarmed=false) => {
+      if (Number.isFinite(percent) && percent > 0 && percent < 100 && (skill === "全武器" || skills.includes(skill))) {
+        sources.push({name:row.name || "短縮Buff", percent, skill, kind:skill === "全武器" ? "attack" : "skill", excludeUnarmed:excludeUnarmed || skill === "全武器"});
+      }
+    };
+    for (const effect of row.extraEffects || []) {
+      if (effect.key === "attackDelayB") add(Number(effect.value), String(effect.name || "全武器").trim());
+      // Exact structured, numeric weapon-specific effects already restored in
+      // the manual catalog. Descriptions and approximate values are not parsed.
+      if (effect.key === "custom" && effect.unit === "%") {
+        const match = String(effect.name || "").match(/^(素手|刀剣|こんぼう|槍|弓|銃器|投げ)(?:スキル|攻撃)?ディレイ$/);
+        if (match) add(-Number(effect.value), match[1]);
+      }
+    }
+    // Existing reviewed Berserk uses the legacy percentage field. Do not turn
+    // arbitrary percentage fields into B effects or apply Berserk to unarmed.
+    if (["バーサーク", "バーサーク オール"].includes(String(row.name || "").trim())) {
+      add(-Number(row.extraAttackDelayPct), "全武器", true);
+    }
+  }
+  return sources;
+}
+
+function optimizerAttackDelayBRequirement(settings) {
+  const value = Number(settings?.attackDelayBMinimumPct);
+  return Number.isFinite(value) && value > 0 && value < 100 ? value : 20;
+}
+
+function optimizerAttackDelayBSelection(m, settings) {
+  const skill = settings?.mainWeaponSkill || m?.equippedWeaponSkill || "";
+  const applicable = (m?.attackDelayBSources || [])
+    .filter(source => (source.skill === "全武器" || source.skill === skill) &&
+      (!source.excludeUnarmed || (skill && skill !== "素手")));
+  // Attack-shortening takes precedence even when skill-shortening is stronger.
+  // Within each category the reported source must be applied last.
+  const attacks = applicable.filter(source => source.kind === "attack");
+  const candidates = attacks.length ? attacks : applicable.filter(source => source.kind === "skill");
+  return candidates.reduce((best, source) => !best || source.percent > best.percent ? source : best, null);
+}
+
+function optimizerAttackDelayBResultText(m, settings) {
+  if (!settings?.requireAttackDelayB) return "";
+  const selected = optimizerAttackDelayBSelection(m, settings);
+  return selected
+    ? `${selected.kind === "attack" ? "アタック短縮" : `${selected.skill}スキル短縮`} ${fmt(selected.percent, 1)}%（同種で最後に付与：${selected.name}）`
+    : "スキル短縮・アタック短縮：未達";
+}
+
 function optimizerRequiredConditionViolations(m, settings) {
   const violations = [];
   const eps = 0.000001;
@@ -10261,6 +10394,11 @@ function optimizerRequiredConditionViolations(m, settings) {
   if (settings?.requireCritRate100) {
     const value = +(m?.extraStats?.extraCritRatePct || 0);
     if (value < 100 - eps) violations.push(`クリ率上昇量 ${fmt(value, 2)}%（100%以上が必要）`);
+  }
+  if (settings?.requireAttackDelayB) {
+    const required = optimizerAttackDelayBRequirement(settings);
+    const actual = optimizerAttackDelayBSelection(m, settings)?.percent || 0;
+    if (actual < required - eps) violations.push(`スキル短縮・アタック短縮 ${fmt(actual, 1)}%（${required}%以上が必要）`);
   }
   return violations;
 }
@@ -10317,6 +10455,13 @@ function optimizerEvaluationFromMetrics(m, settings) {
       ? Math.max(0, (+m?.extraStats?.extraAttackDelay || 0) + 60) : 0;
     const missing = critMissing + delayMissing;
     // Keep incomplete combinations searchable; enforce the requirement at the end.
+    rank = [missing <= 0.000001 ? 1 : 0, -missing].concat(rank);
+  }
+  if (settings?.requireAttackDelayB) {
+    const missingB = Math.max(0, optimizerAttackDelayBRequirement(settings) - (optimizerAttackDelayBSelection(m, settings)?.percent || 0));
+    const missingCrit = settings.requireCritRate100 ? Math.max(0, 100 - (+m?.extraStats?.extraCritRatePct || 0)) : 0;
+    const missingDelay = settings.requireAttackDelay60 ? Math.max(0, (+m?.extraStats?.extraAttackDelay || 0) + 60) : 0;
+    const missing = missingB + missingCrit + missingDelay;
     rank = [missing <= 0.000001 ? 1 : 0, -missing].concat(rank);
   }
   if (settings?.skillPlusFilters?.some(filter => filter.skill)) {
@@ -10804,7 +10949,7 @@ function optimizerEquipmentGroupProduct(groups) {
 
 function optimizerBuildEquipmentExact(inputs, settings) {
   const groups = optimizerEquipmentGroups(settings);
-  const requiredBuffIdxs = settings.requireAttackDelay60
+  const requiredBuffIdxs = (settings.requireAttackDelay60 || settings.requireCritRate100 || settings.requireAttackDelayB)
     ? optimizerFixedCompositeCandidates(settings).map(candidate => candidate.idx) : [];
   const roughTotal = optimizerEquipmentGroupProduct(groups);
 
@@ -10875,7 +11020,7 @@ function optimizerBuildEquipmentCandidates(inputs, settings) {
 
 function optimizerBuildEquipmentBeams(inputs, settings) {
   const groups = optimizerEquipmentGroups(settings);
-  const requiredBuffIdxs = settings.requireAttackDelay60
+  const requiredBuffIdxs = (settings.requireAttackDelay60 || settings.requireCritRate100 || settings.requireAttackDelayB)
     ? optimizerFixedCompositeCandidates(settings).map(candidate => candidate.idx) : [];
   settings.equipmentConflictSkipped = 0;
   settings.optimizerEquipmentSearchMode = "beam";
@@ -11377,7 +11522,7 @@ function ensureOptimizerWorker() {
   }
 
   try {
-    optimizerWorker = new Worker(`./src/optimizer/optimizer.worker.js?v=${encodeURIComponent(APP_VERSION)}-equipment-refine`);
+    optimizerWorker = new Worker(`./src/optimizer/optimizer.worker.js?v=${encodeURIComponent(APP_VERSION)}-buff-append`);
   } catch (e) {
     optimizerWorker = null;
     const status = byId("optimizerStatus");
@@ -11675,7 +11820,7 @@ function renderIntegratedOptimizerResults() {
       <td class="num">${fmt(m.atk)}</td>
       <td class="num">${fmt(m.stats.magic)}</td>
       <td class="num">${m.slots.total}/24</td>
-      <td class="optimizerList">${escapeHtml(extraStatsSummary(m.extraStats || {}).join(" / ") || "-")}</td>
+      <td class="optimizerList">${escapeHtml(extraStatsSummary(m.extraStats || {}).concat(optimizerAttackDelayBResultText(m, resultSettings)).filter(Boolean).join(" / ") || "-")}</td>
       <td class="optimizerList">${escapeHtml(optimizerEquipmentSummaryByIdx(r.equipmentIdxs, m))}</td>
       <td class="optimizerList">${escapeHtml(optimizerBuffSummaryByIdx(r.compositeIdxs))}</td>
       <td><button class="optimizerApplyButton" onclick="applyIntegratedOptimizerResult(${i})">適用</button></td>
@@ -14790,7 +14935,7 @@ function ensureOptimizerCoreLoaded() {
 
   optimizerCoreLoadPromise = new Promise((resolve, reject) => {
     const script = document.createElement("script");
-    script.src = "./src/optimizer/core.js?v=1.24.12-equipment-refine";
+    script.src = "./src/optimizer/core.js?v=1.24.12-buff-append";
     script.dataset.optimizerCore = "1";
     script.onload = () => {
       if (typeof runOptimizerCore === "function") resolve();
@@ -16898,3 +17043,16 @@ if (typeof document !== "undefined") {
   }
 })(window);
 /* __MOE_NPC_EFFECT_AC_V1__ */
+
+// Catalog quality is explicit: source data has no reliable production/grade marker.
+// Preserve the base values so switching/reapplying quality never compounds the multiplier.
+function catalogItemWithQuality(item, quality="raw") {
+  const weaponDamage = +(item._catalogBaseWeaponDamage ?? item.weaponDamage ?? 0);
+  const armorClass = +(item._catalogBaseArmorClass ?? item.armorClass ?? 0);
+  const high = quality === "HG_MG";
+  const scaled = value => Math.round(value * 1.1 * 1e8) / 1e8;
+  return {...item, catalogQuality:high ? "HG_MG" : "raw",
+    _catalogBaseWeaponDamage:weaponDamage, _catalogBaseArmorClass:armorClass,
+    weaponDamage:item.category === "weapon" && high ? scaled(weaponDamage) : weaponDamage,
+    armorClass:item.category !== "weapon" && high ? scaled(armorClass) : armorClass};
+}

@@ -20,6 +20,7 @@ function computeMetrics(st, inputs) {
   st = expandEquipmentBuffState(st, normalizedEquipment);
   st = applyBuffGroupRules(st);
   const skillPlusTotals = skillPlusTotalsFromResolvedState(st);
+  const attackDelayBSources = attackDelayBSourcesFromResolvedState(st);
   st = expandCompositeState(st);
   const raceCoeff = RACE_COEFFS[inputs.raceSelect] ?? parseFloat(inputs.raceCoeff) ?? 0.20;
   const spirit = parseFloat(inputs.spirit) || 0;
@@ -35,7 +36,7 @@ function computeMetrics(st, inputs) {
   };
   const extraStats = emptyExtraStats();
   equipmentRows.forEach(r => addExtraStatsInto(extraStats, r, "base"));
-  normalizeCompositeRows(st.composite).filter(r => r.enabled).forEach(r => addExtraStatsInto(extraStats, r, "buff"));
+  normalizeCompositeRows(st.composite).filter(r => r.enabled && !r.excluded).forEach(r => addExtraStatsInto(extraStats, r, "buff"));
 
   // 実数加算。魔力/速度は%Buffや変換より前、攻撃力は上限対象側に入る。
   const flatRows = normalizeFlatRows(st).filter(r => r.enabled);
@@ -187,7 +188,7 @@ function computeMetrics(st, inputs) {
   const slots = buffSlotCountForState(st);
 
   return {
-    skillPlusTotals,
+    skillPlusTotals, attackDelayBSources,
     stats, pctStats, conv, pctAtkCalc, spirit, magicCoeff, baseMagicFromSpirit, flatStatRaw, equipmentRaw, extraStats,
     racialAtk, weaponAtk, weaponDamage, weaponWeight, selectedWeapon, selectedAmmo, effectiveWeapon, skillModInfo, baseNaturalAtk, conversionAtk, baseAtk, flatAtkRaw, extraRawBeforePct, cappedAddRawBeforePct, cappedAddBeforePct, atkBeforePct, atkPctMode, atkBuffRaw, atkCap, atkBuffCapped, atk,
     attackMultiplier, dmgMultiplier, defenseFactor, critAvg, basePostMultiplier, npcDamageTakenMultiplier, postMultiplier, baseNoTech,

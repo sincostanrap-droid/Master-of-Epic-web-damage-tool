@@ -44,6 +44,9 @@ function catalogResultRowHtml(item, already) {
     <td>${escapeHtml(catalogStatusSummary(item))}</td>
     <td class="catalogBuffCell">${escapeHtml(buff)}</td>
     <td>${url}</td>
-    <td><button type="button" class="miniBtn" data-catalog-add="${id}" ${already ? "disabled" : ""}>${already ? "追加済" : "装備登録へ追加"}</button></td>
+    <td>${(+item.weaponDamage || +item.armorClass) ? `<label class="small">品質 <select data-catalog-quality="${id}" aria-label="${escapeAttr(item.name || "装備")}の品質" title="NG基準の生産品だけHG/MGを選択。HG/MG補正済みの数値はデータ通りを選択してください。">
+      <option value="raw" ${item.catalogQuality !== "HG_MG" ? "selected" : ""}>データ通り</option>
+      <option value="HG_MG" ${item.catalogQuality === "HG_MG" ? "selected" : ""}>HG/MG（生産品×1.1）</option>
+    </select></label>` : ""}<button type="button" class="miniBtn" data-catalog-add="${id}" ${already ? "disabled" : ""}>${already ? "追加済" : "装備登録へ追加"}</button></td>
   </tr>`;
 }

@@ -22,15 +22,15 @@
     page: 0
   };
 
-  function applySearch(resetPage=true) {
+  function applySearch(resetPage=true, keepFilter=false) {
     if (cache.applying) return;
     cache.applying = true;
 
     try {
       const items = typeof global.equipmentCatalogItems === "function"
-        ? global.equipmentCatalogItems()
+        ? global.equipmentCatalogItems().map(item => global.catalogItemWithQuality(item, global.catalogSelectedQuality(item)))
         : [];
-      const filter = typeof global.catalogFilterState === "function"
+      const filter = keepFilter && cache.filter ? cache.filter : typeof global.catalogFilterState === "function"
         ? (global.catalogFilterState() || {})
         : {};
       const matched = items.filter(item =>
@@ -129,7 +129,7 @@
       ? shown.map(item =>
           global.catalogResultRowHtml(
             item,
-            already.has(String(item.catalogId || item.id || ""))
+            already.has(global.catalogRegistrationKey(item.catalogId || item.id || "", item.catalogQuality))
           )
         ).join("")
       : `<tr><td colspan="10" class="small mutedText">該当する装備がありません。</td></tr>`;
@@ -148,6 +148,12 @@
       limit
     );
 
+    body.querySelectorAll("[data-catalog-quality]").forEach(select => {
+      select.onchange = () => {
+        global.catalogSetSelectedQuality(select.dataset.catalogQuality, select.value);
+        applySearch(false, true);
+      };
+    });
     body.querySelectorAll("[data-catalog-add]").forEach(btn => {
       btn.onclick = () => {
         if (typeof global.addCatalogEquipmentToRegistered === "function") {

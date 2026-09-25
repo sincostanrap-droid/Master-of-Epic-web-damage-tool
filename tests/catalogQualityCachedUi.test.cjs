@@ -1,0 +1,11 @@
+const assert=require('node:assert/strict'),vm=require('node:vm'),fs=require('node:fs');
+const {context,root}=require('../tools/benchmark-optimizer.cjs');const p=context(undefined,{catalog:true});
+const item={catalogId:'test',name:'weapon',category:'weapon',weaponDamage:65};let shown,registered;
+const select={dataset:{catalogQuality:'test'},value:'HG_MG'},add={dataset:{catalogAdd:'test'}};
+const body={querySelectorAll:s=>s==='[data-catalog-quality]'?[select]:s==='[data-catalog-add]'?[add]:[]};
+p.equipmentCatalogItems=()=>[item];p.catalogFilterState=()=>({limit:25});p.catalogItemMatches=()=>true;p.sortCatalogItems=x=>x;p.registeredCatalogIds=()=>new Set();p.catalogResultRowHtml=x=>{shown=x;return '';};p.addCatalogEquipmentToRegistered=()=>{registered=p.catalogEquipmentToRow(item,p.catalogSelectedQuality(item));};p.byId=id=>id==='catalogResultsBody'?body:id==='catalogSummary'?{}:null;
+vm.runInContext(fs.readFileSync(root+'/src/ui/equipmentCatalogSearchCache.js','utf8'),p);
+p.document={getElementById:()=>null};p.applyCatalogSearch();assert.equal(shown.weaponDamage,65);
+select.onchange();assert.equal(shown.weaponDamage,71.5);add.onclick();assert.equal(registered.weaponDamage,71.5);
+select.value='raw';select.onchange();assert.equal(shown.weaponDamage,65);assert.equal(item.weaponDamage,65);
+console.log('cached catalog UI: quality change updates display and registration, restores raw without mutating source OK');

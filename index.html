@@ -59,7 +59,7 @@ MoE固有の主な仮定:
 - localStorageの保存キーを変えると、旧保存データは自動復元されなくなります。
 -->
 
-<link rel="stylesheet" href="./styles/main.css?v=1.24.12">
+<link rel="stylesheet" href="./styles/main.css?v=1.24.12-buff-append">
 
   <!-- __MOE_SKILL_UI_FINAL_COMPOUND_SHIP_CLEANUP_V6__: skill knowledge panel hidden; compound ship button lives in toolbar -->
 </head>
@@ -1106,7 +1106,13 @@ MoE固有の主な仮定:
 <div class="optimizerControls">
 <label>バフ枠上限<input id="optimizerMaxSlots" type="number" min="0" step="1" value="24"></label>
 </div>
-<div class="optimizerChecks"><label title="装備・装備Buff・Buffの攻撃ディレイ短縮合計が-60以下になる構成だけを結果に残し、達成後は選択した目的を優先します。同じ評価なら-60からの超過が少ない構成を優先します。"><input id="optimizerRequireAttackDelay60" type="checkbox"> 攻撃ディレイ-60を確保する</label></div><div class="optimizerChecks"><label title="競合解決後の装備・Buffによるクリ率上昇量が100%以上の構成を探します。素のクリ率は含みません。ON時はクリ率の上限・目標超過許容による除外を行いません。"><input id="optimizerRequireCritRate100" type="checkbox"> クリティカル率上昇量100%以上を確保する</label></div><details class="optimizerSkillPlusFilters">
+<div class="optimizerChecks"><label title="装備・装備Buff・Buffの攻撃ディレイ短縮合計が-60以下になる構成だけを結果に残し、達成後は選択した目的を優先します。同じ評価なら-60からの超過が少ない構成を優先します。"><input id="optimizerRequireAttackDelay60" type="checkbox"> 攻撃ディレイ-60を確保する</label></div><div class="optimizerChecks"><label title="競合解決後の装備・Buffによるクリ率上昇量が100%以上の構成を探します。素のクリ率は含みません。ON時はクリ率の上限・目標超過許容による除外を行いません。"><input id="optimizerRequireCritRate100" type="checkbox"> クリティカル率上昇量100%以上を確保する</label></div><div class="optimizerDelayBRequirement">
+<label><input id="optimizerRequireAttackDelayB" type="checkbox"> スキル短縮・アタック短縮を確保</label>
+<label><input id="optimizerAttackDelayBMinimumPct" type="number" min="1" max="99" step="1" value="20" aria-label="スキル短縮・アタック短縮の最低率"> %以上</label>
+<span class="small">レモンかき氷などの食べ物はBuffカタログから追加できます。</span>
+<small>対象スキルはメイン武器種を自動参照します。攻撃ディレイ−60とは別判定で、短縮率は合算しません。アタック短縮はスキル短縮より優先します。結果の効果を同種の中で最後に付与してください。</small>
+
+</div><details class="optimizerSkillPlusFilters">
           <summary>スキル強化条件（最大4条件・すべて満たす）</summary>
           <div class="small mutedText optimizerSkillPlusHelp">〇スキル強化を最適化条件として使います。ステータス/成功率/必要スキルには加算しません。</div>
           <div class="optimizerSkillPlusFilterRows">
@@ -1253,22 +1259,23 @@ MoE固有の主な仮定:
 <script src="./src/ui/showcase.js?v=1.24.9" defer></script>
 <script src="./src/storage/shareUrl.js?v=1.22.4" defer></script>
 <script src="./src/storage/importExport.js?v=1.22.4" defer></script>
-<script src="./src/calc/core.js?v=1.24.12" defer></script>
+<script src="./src/calc/core.js?v=1.24.12-buff-append" defer></script>
 <script src="./src/data/skillSimKnowledge.js?v=1.22.4" defer></script>
 <script src="src/data/manual/reviewedBuffCatalog.manual.js"></script>
+<script src="src/data/manual/foodBuffCatalog.manual.js"></script>
 <script src="./src/ui/idbImportPreview.js?v=1.24.4" defer></script>
 <script src="./src/domain/catalogData.js?v=1.24.12" defer></script>
 <script src="./src/domain/catalogSearch.js?v=1.24.8" defer></script>
 <script src="./src/domain/catalogSort.js?v=1.24.4" defer></script>
-<script src="./src/ui/catalogRows.js?v=1.24.4" defer></script>
-<script src="./src/ui/catalogResults.js?v=1.24.4" defer></script>
+<script src="./src/ui/catalogRows.js?v=1.24.12-buff-append" defer></script>
+<script src="./src/ui/catalogResults.js?v=1.24.12-quality-ui" defer></script>
 <script src="./src/ui/catalogTab.js?v=1.24.4" defer></script>
 <script src="./src/data/manual/buffRules.manual.js?v=1.24.12" data-catalog-src="src/data/manual/buffRules.manual.js"></script>
-<script src="./src/main.js?v=1.24.12-equipment-refine" defer></script>
+<script src="./src/main.js?v=1.24.12-buff-catalog-split" defer></script>
 <script src="./src/ui/buildAnalysis.js?v=1.24.4" defer></script>
 <script src="./src/ui/showcaseSkillPlusTotals.js?v=1.24.12" defer></script>
 <script src="./src/ui/showcaseElementDamageTotals.js?v=1.24.9" defer></script>
 <script src="./src/ui/showcaseRecoveryTotals.js?v=1.24.9" defer></script>
-<script src="./src/ui/equipmentCatalogSearchCache.js?v=1.24.4" defer></script>
+<script src="./src/ui/equipmentCatalogSearchCache.js?v=1.24.12-quality-ui" defer></script>
 </body>
 </html>

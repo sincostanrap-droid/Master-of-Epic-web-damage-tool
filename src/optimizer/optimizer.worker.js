@@ -13,9 +13,9 @@ importScripts(
   "../domain/attackDpsState.js?v=1.24.5",
   "../domain/catalogData.js?v=1.24.5",
   "../domain/catalogSearch.js?v=1.24.7",
-  "../main.js?v=1.24.12-equipment-refine",
-  "../calc/core.js?v=1.24.12",
-  "./core.js?v=1.24.12-equipment-refine"
+  "../main.js?v=1.24.12-buff-append",
+  "../calc/core.js?v=1.24.12-buff-append",
+  "./core.js?v=1.24.12-buff-append"
 );
 
 self.onmessage = event => {
