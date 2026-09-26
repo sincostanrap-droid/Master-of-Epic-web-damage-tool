@@ -46,6 +46,7 @@ function renderAttackDpsResult(metrics=null) {
 
   el.innerHTML = `
     ${warnHtml}
+    <div class="attackDpsOk">${r.delaySec <= r.motionLockSec ? `モーション上限に到達（約${fmt(r.attacksPerMinute, 2)}回／分）。追加のディレイ短縮によるDPS上昇なし。` : `現在はディレイが攻撃周期を制限しています。モーション上限は約${fmt(60 / r.motionLockSec, 2)}回／分です。`}</div>
     <div class="attackDpsResultGrid">${cards}</div>
     <details class="attackDpsFormula" open>
       <summary>計算内訳</summary>
