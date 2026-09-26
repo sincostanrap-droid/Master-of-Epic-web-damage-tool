@@ -5,8 +5,21 @@
   通常画面とOptimizer Workerの両方から利用するため、DOMには依存させません。
 */
 
+// 実測の連続攻撃周期。初撃の発生時間や描画FPSとは独立。
+const ATTACK_DPS_REMOTE_MOTIONS = Object.freeze({
+  tackleGun: Object.freeze({label:"片手銃：タックル", seconds:0.944}),
+  nekomataGun: Object.freeze({label:"両手銃：猫又", seconds:0.800}),
+  nekomataBow: Object.freeze({label:"弓：猫又", seconds:46.10 / 60})
+});
+function attackDpsWeaponMotionKey(weapon) {
+  const names = (weapon?.weaponReq || []).map(row => row.name || "").join(" ");
+  if (names.includes("銃器")) return weapon.weaponTwoHanded === "○" ? "nekomataGun" : "tackleGun";
+  if (names.includes("弓")) return "nekomataBow";
+  return "";
+}
 function defaultAttackDpsState() {
   return {
+    motionProfile: "auto",
     damageSource: "current",
     manualDamage: 100,
     weaponDelaySource: "currentWeapon",
@@ -29,6 +42,7 @@ function normalizeAttackDpsState(raw) {
   const d = defaultAttackDpsState();
   const src = raw && typeof raw === "object" ? raw : {};
   const out = {...d, ...src};
+  out.motionProfile = Object.prototype.hasOwnProperty.call(ATTACK_DPS_REMOTE_MOTIONS, out.motionProfile) ? out.motionProfile : "auto";
   out.damageSource = out.damageSource === "manual" ? "manual" : "current";
   out.weaponDelaySource = out.weaponDelaySource === "manual" ? "manual" : "currentWeapon";
   out.equipmentBuffDelaySource = out.equipmentBuffDelaySource === "manual" ? "manual" : "auto";
@@ -134,30 +148,28 @@ function calculateAttackDps({
   // つまり 実秒 ≒ ディレイ値 * 0.01658。
   const ATTACK_DPS_DELAY_SECONDS_PER_POINT = 0.01658;
   const delaySec = shortenedDelay * ATTACK_DPS_DELAY_SECONDS_PER_POINT;
-  const fps = Math.max(1, +cfg.fps || 60);
-  const damageFrame = Math.max(0, +cfg.damageFrame || 0);
-  const nonCancelFrames = Math.max(0, +cfg.nonCancelMotionFrames || 0);
-  const damageFrameSec = damageFrame / fps;
-  const motionLockSec = cfg.criticalCancel
-    ? damageFrameSec
-    : Math.max(damageFrameSec, nonCancelFrames / fps);
-
-  if (!(damageFrame > 0)) warnings.push("ダメージ発生フレームが0です。モーション差の比較には手入力が必要です。");
-  if (!cfg.criticalCancel && !(nonCancelFrames > 0)) warnings.push("非キャンセル計算では行動不能フレームを入れてください。");
-
-  const periodSec = Math.max(delaySec, motionLockSec);
-  if (!(periodSec > 0)) warnings.push("アタック周期が0です。武器ディレイまたはモーションフレームを入力してください。");
+  const weaponMotionKey = attackDpsWeaponMotionKey(weapon);
+  const motionKey = cfg.motionProfile === "auto" ? weaponMotionKey : cfg.motionProfile;
+  const motion = ATTACK_DPS_REMOTE_MOTIONS[motionKey];
+  const supported = !!motion && cfg.criticalCancel &&
+    (cfg.weaponDelaySource === "manual" || weaponMotionKey === motionKey);
+  if (!motion || (cfg.weaponDelaySource !== "manual" && weaponMotionKey !== motionKey))
+    warnings.push("現在の武器は選択したモーションの対象外、または武器種が未確認です。遠隔3種類以外の周期は未検証です。");
+  if (!cfg.criticalCancel) warnings.push("今回の試作はクリキャン時の実測周期のみ対応しています。");
+  const fps = cfg.fps;
+  const damageFrame = null;
+  const damageFrameSec = null;
+  const motionLockSec = supported ? motion.seconds : NaN;
+  const periodSec = supported ? Math.max(delaySec, motionLockSec) : NaN;
 
   const simSeconds = Math.max(1, +cfg.simSeconds || 30);
   const hitRate = Math.max(0, Math.min(1, (+cfg.hitRatePct || 0) / 100));
-  const firstHitSec = damageFrameSec > 0 ? damageFrameSec : periodSec;
-  const hitCount = periodSec > 0 && firstHitSec > 0 && firstHitSec <= simSeconds
-    ? Math.floor((simSeconds - firstHitSec) / periodSec + 1 + 1e-9)
-    : 0;
+  // 初撃の発生時刻は未測定。時間窓の値は定常周期による期待値。
+  const hitCount = periodSec > 0 ? simSeconds / periodSec : NaN;
   const expectedTotalDamage = damage * hitRate * hitCount;
 
   return {
-    cfg, weapon, damage, currentDamage, weaponDelay, currentWeaponDelay,
+    cfg, weapon, motion, supported, damage, currentDamage, weaponDelay, currentWeaponDelay,
     equipBuffRaw, equipBuffCapped, delayAuto, attackDelayBuff, stBonus, manualBonus,
     delayMultiplier, shortenedDelay, delaySec, fps, damageFrame, damageFrameSec,
     motionLockSec, periodSec, simSeconds, hitRate, hitCount, expectedTotalDamage,
