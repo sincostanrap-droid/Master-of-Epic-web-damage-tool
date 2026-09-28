@@ -124,10 +124,11 @@ function renderCatalogResults() {
   const already = registeredCatalogIds();
   body.innerHTML = shown.length
     ? shown.map(item => catalogResultRowHtml(item, already.has(catalogRegistrationKey(item.catalogId || item.id || "", item.catalogQuality)))).join("")
-    : `<tr><td colspan="10" class="small mutedText">該当する装備がありません。カタログJSが未生成の場合は tools/build-equipment-catalog-from-google-sheet.mjs を実行してください。</td></tr>`;
+    : `<tr><td colspan="5" class="small mutedText">該当する装備がありません。カタログJSが未生成の場合は tools/build-equipment-catalog-from-google-sheet.mjs を実行してください。</td></tr>`;
   const statFilterText = catalogStatFiltersDescription(filter);
   summary.textContent = `カタログ ${items.length}件 / 該当 ${filtered.length}件 / 表示 ${shown.length}件${statFilterText ? ` / ${statFilterText}` : ""}`;
   renderCatalogPageControls(filtered.length, catalogPageIndex, pageCount, limit);
+  if (typeof catalogWorkspaceRefresh === "function") catalogWorkspaceRefresh(shown, filter, renderCatalogResults);
   body.querySelectorAll("[data-catalog-quality]").forEach(select => {
     select.onchange = () => {
       catalogQualitySelections.set(select.dataset.catalogQuality, select.value);

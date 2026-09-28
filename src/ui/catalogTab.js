@@ -91,20 +91,22 @@ function createCatalogTab(panel) {
         <option value="hp">HP</option><option value="mp">MP</option><option value="st">ST</option><option value="maxWeight">最大重量</option><option value="hit">命中</option><option value="avoid">回避</option><option value="attackDelay">攻撃ディレイ</option>
       </select></label>
       <label>順序 <select id="catalogSortDir"><option value="asc">昇順</option><option value="desc">降順</option></select></label>
-      <label>1ページ <select id="catalogLimit"><option value="50">50件</option><option value="100">100件</option><option value="200" selected>200件</option><option value="500">500件</option><option value="1000">1000件</option></select></label>
+      <label>1ページ <select id="catalogLimit"><option value="25" selected>25件</option><option value="50">50件</option><option value="100">100件</option><option value="200">200件</option><option value="500">500件</option><option value="1000">1000件</option></select></label>
       <button type="button" id="catalogReloadBtn">再読み込み</button>
     </div>
     <div class="catalogSummaryLine"><div id="catalogSummary" class="small mutedText">カタログを確認中...</div><div id="catalogPageControls" class="catalogPageControls"></div></div>
     <div class="catalogTableWrap">
       <table class="catalogTable compactTable">
-        <thead><tr><th>名称</th><th>種別</th><th>部位</th><th>条件/変動</th><th>AC</th><th>武器性能</th><th>追加効果</th><th>装備Buff</th><th>参照</th><th>操作</th></tr></thead>
-        <tbody id="catalogResultsBody"><tr><td colspan="10" class="small mutedText">読み込み中...</td></tr></tbody>
+        <thead><tr><th>装備名</th><th>部位</th><th>性能</th><th>装備Buff</th><th>登録</th></tr></thead>
+        <tbody id="catalogResultsBody"><tr><td colspan="5" class="small mutedText">読み込み中...</td></tr></tbody>
       </table>
     </div>
     <details class="catalogHelp"><summary>カタログ生成メモ</summary>
       <div class="small mutedText">Googleスプレッドシートから生成する場合は、リポジトリ直下で <code>node tools/build-equipment-catalog-from-google-sheet.mjs</code> を実行し、生成された <code>src/data/generated/*.generated.js</code> をGitに追加してください。取り込み時は <code>addStatuses</code> と <code>extraStats</code> の二重適用を避け、追加効果が2倍にならないようにしています。</div>
     </details>
   `;
+
+  mountCatalogWorkspace(panel);
 
   ["catalogSearch", "catalogCategory", "catalogSlot", "catalogStat1", "catalogStatOp1", "catalogStatValue1", "catalogStat2", "catalogStatOp2", "catalogStatValue2", "catalogStat3", "catalogStatOp3", "catalogStatValue3", "catalogStat4", "catalogStatOp4", "catalogStatValue4", "catalogBuffEffect1", "catalogBuffEffectTarget1", "catalogBuffEffectOp1", "catalogBuffEffectValue1", "catalogBuffEffect2", "catalogBuffEffectTarget2", "catalogBuffEffectOp2", "catalogBuffEffectValue2", "catalogBuffEffect3", "catalogBuffEffectTarget3", "catalogBuffEffectOp3", "catalogBuffEffectValue3", "catalogBuffEffect4", "catalogBuffEffectTarget4", "catalogBuffEffectOp4", "catalogBuffEffectValue4", "catalogBuffMode", "catalogSort", "catalogSortDir", "catalogLimit"].forEach(id => {
     const el = byId(id);

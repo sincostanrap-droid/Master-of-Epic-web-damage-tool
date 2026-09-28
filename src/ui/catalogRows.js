@@ -32,21 +32,13 @@ function catalogBuffSummary(item) {
 
 function catalogResultRowHtml(item, already) {
   const id = escapeAttr(item.catalogId || item.id || "");
-  const url = item.sourceUrl ? `<a href="${escapeAttr(item.sourceUrl)}" target="_blank" rel="noopener">公式DB</a>` : "-";
-  const buff = catalogBuffSummary(item);
+  const performance = item.category === "weapon" ? catalogWeaponSummary(item) : catalogArmorSummary(item);
   return `<tr>
-    <td>${escapeHtml(item.name || "-")}</td>
-    <td>${escapeHtml(catalogCategoryLabel(item.category))}</td>
-    <td>${escapeHtml(item.slot || "-")}</td>
-    <td class="catalogNeedCell">${escapeHtml(catalogRequirementAndPerformanceSummary(item))}</td>
-    <td>${escapeHtml(catalogArmorSummary(item))}</td>
-    <td>${escapeHtml(catalogWeaponSummary(item))}</td>
-    <td>${escapeHtml(catalogStatusSummary(item))}</td>
-    <td class="catalogBuffCell">${escapeHtml(buff)}</td>
-    <td>${url}</td>
-    <td>${(+item.weaponDamage || +item.armorClass) ? `<label class="small">品質 <select data-catalog-quality="${id}" aria-label="${escapeAttr(item.name || "装備")}の品質" title="NG基準の生産品だけHG/MGを選択。HG/MG補正済みの数値はデータ通りを選択してください。">
-      <option value="raw" ${item.catalogQuality !== "HG_MG" ? "selected" : ""}>データ通り</option>
-      <option value="HG_MG" ${item.catalogQuality === "HG_MG" ? "selected" : ""}>HG/MG（生産品×1.1）</option>
-    </select></label>` : ""}<button type="button" class="miniBtn" data-catalog-add="${id}" ${already ? "disabled" : ""}>${already ? "追加済" : "装備登録へ追加"}</button></td>
+    <td><button type="button" class="catalogNameButton" data-catalog-open="${id}" aria-pressed="false">${escapeHtml(item.name || "-")}</button>
+      <div class="catalogRowSub">${escapeHtml(catalogCategoryLabel(item.category))}${item.catalogQuality === "HG_MG" ? " · HG/MG" : ""}</div></td>
+    <td>${escapeHtml((item.slot || "-").replace(/^(武器|防具|装飾):\s*/, ""))}</td>
+    <td><div class="catalogRowSummary">${escapeHtml(performance)}</div><div class="catalogRowSummary catalogRowSub">${escapeHtml(catalogStatusSummary(item))}</div></td>
+    <td><div class="catalogRowSummary">${escapeHtml(catalogBuffSummary(item))}</div></td>
+    <td><button type="button" class="miniBtn" data-catalog-add="${id}" ${already ? "disabled" : ""}>${already ? "登録済み" : "＋ 登録"}</button></td>
   </tr>`;
 }

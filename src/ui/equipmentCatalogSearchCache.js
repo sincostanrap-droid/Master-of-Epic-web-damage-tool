@@ -132,7 +132,7 @@
             already.has(global.catalogRegistrationKey(item.catalogId || item.id || "", item.catalogQuality))
           )
         ).join("")
-      : `<tr><td colspan="10" class="small mutedText">該当する装備がありません。</td></tr>`;
+      : `<tr><td colspan="5" class="small mutedText">該当する装備がありません。</td></tr>`;
 
     const statText = typeof global.catalogStatFiltersDescription === "function"
       ? global.catalogStatFiltersDescription(filter)
@@ -147,6 +147,8 @@
       pageCount,
       limit
     );
+
+    if (typeof global.catalogWorkspaceRefresh === "function") global.catalogWorkspaceRefresh(shown, filter, () => applySearch(false, true));
 
     body.querySelectorAll("[data-catalog-quality]").forEach(select => {
       select.onchange = () => {
