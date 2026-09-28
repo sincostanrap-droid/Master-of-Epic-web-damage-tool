@@ -5,19 +5,26 @@
 */
 
 const MAIN_TABS = [
-  {id:"calc", label:"計算", hint:"基本設定、サマリー、分析、実測差分、最適化計算をここにまとめています。"},
+  {id:"calc", label:"計算", hint:"基本設定、サマリー、分析、最適化計算をここにまとめています。"},
   {id:"attackDps", label:"アタックDPS α", hint:"通常アタックのクリティカルキャンセル前提DPSを参考値として計算します。単発ダメージ、ディレイ短縮、モーション発生フレームを分けて扱います。"},
   {id:"skill", label:"スキルシミュレータ", hint:"スキル合計850、残りポイント、種族別の簡易ステータスを確認します。計算タブへは常時自動反映します。"},
   {id:"equipment", label:"装備登録", hint:"武器・防具・装飾候補、装備Buff、AC/HP/命中などの追加ステータスを部位ごとのカテゴリで登録します。候補追加はここで行います。"},
   {id:"catalog", label:"装備カタログ", hint:"Git上の生成カタログから装備を検索し、必要なものだけ装備登録へ追加します。カタログ上にあるだけでは計算対象になりません。"},
   {id:"combatLog", label:"戦闘ログ解析 α", hint:"MoEの戦闘ログをブラウザ内だけで解析し、与ダメージ、クリティカル、ミス、DPMを集計します。"},
-  {id:"buffs", label:"Buff登録", hint:"装備以外のBuff、外枠補正、その他バフを登録します。"},
+  {id:"buffs", label:"Buff登録", hint:"装備以外のBuff、外枠補正を登録します。"},
   {id:"groups", label:"競合グループ", hint:"同一グループで重複しないBuffを確認します。"},
   {id:"showcase", label:"見せびらかし", hint:"現在構成のダメージ、ステータス、装備、Buffを一覧表示します。"},
   {id:"save", label:"保存・読込", hint:"JSON/TSV/プリセットを扱います。これまでのJSON/TSV形式はそのまま読み込めます。"}
 ];
 
 function activateMainTab(id) {
+  const scrollX = window.scrollX, scrollY = window.scrollY;
+  const panels = byId("mainTabPanels");
+  if (panels) {
+    // Avoid browser scroll clamping when the next panel is shorter.
+    const top = panels.getBoundingClientRect().top + scrollY;
+    panels.style.minHeight = Math.max(0, scrollY + window.innerHeight - top) + "px";
+  }
   const valid = MAIN_TABS.some(t => t.id === id) ? id : "calc";
   document.querySelectorAll(".mainTabButton").forEach(btn => {
     const active = btn.dataset.tabId === valid;
@@ -33,6 +40,10 @@ function activateMainTab(id) {
   }));
   if (valid === "catalog") renderCatalogTab();
   if (valid === "combatLog") renderCombatLogTab();
+  window.scrollTo({left:scrollX, top:scrollY, behavior:"instant"});
+  requestAnimationFrame(() => {
+    if (byId("mainTabPanels") === panels) window.scrollTo({left:scrollX, top:scrollY, behavior:"instant"});
+  });
 }
 
 function setupTabLayout() {

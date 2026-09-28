@@ -7296,6 +7296,7 @@ function collectActiveBuffConflictCandidates(st) {
 
 function resolveAllBuffRowsForGroups(st) {
   const out = clone(st || {});
+  out.other = []; // Retired legacy rows stay in saved state, not in active calculations.
   const byGroup = new Map();
 
   // Resolve all declared groups. Pick higher-priority Buffs first so a Buff
@@ -7361,7 +7362,7 @@ function updateBuffHeaderStats() {
 
   const composite = normalizeCompositeRows(state?.composite || []);
   const post = Array.isArray(state?.post) ? state.post : [];
-  const other = Array.isArray(state?.other) ? state.other : [];
+  const other = [];
   const allRows = [...composite, ...post, ...other];
 
   const registered = allRows.length;
@@ -7529,7 +7530,7 @@ function buildConflictMonitorGroups() {
     });
   });
 
-  (state.other || []).forEach((row, idx) => {
+  [].forEach((row, idx) => {
     if (row.enabled || row.excluded) return;
     splitTags(row.tags).forEach(group => {
       const rec = ensure(group);
@@ -7748,6 +7749,11 @@ function effectiveAvoidValue(d, m) {
   return totalStatValue(d?.avoid || 0, e.extraAvoid, e.extraAvoidPct);
 }
 
+// Fixed basic settings apply equally to saved configurations and worker inputs.
+function standardCalculationInputs(inputs) {
+  return {...(inputs || {}), speed:"100", atkPctMode:"afterAdds", finalCap:"0",
+    atkCap:Number(inputs?.atkCap) === 2500 ? "2500" : "500"};
+}
 function collectInputs() {
   const ids = [
     "raceSelect","raceCoeff","str","spirit","magic","weaponSkill","requiredSkill","weaponReqMode","weaponDamage","weaponWeight",
@@ -7760,11 +7766,11 @@ function collectInputs() {
     if (!el) return;
     inputs[id] = el.type === "checkbox" ? el.checked : el.value;
   });
-  return inputs;
+  return standardCalculationInputs(inputs);
 }
 /* 保存データやプリセットから基本設定フォームへ値を戻す。 */
 function setInputs(inputs) {
-  const src = {...(inputs || {})};
+  const src = standardCalculationInputs(inputs);
   if ((src.spirit === undefined || src.spirit === null || src.spirit === "") && src.magic !== undefined) {
     const race = src.raceSelect || byId("raceSelect").value || "newtar";
     const coeff = RACE_MAGIC_COEFFS[race] ?? 1.00;
@@ -10117,8 +10123,8 @@ function integratedOptimizerSettings() {
     requireAttackDelayB: !!byId("optimizerRequireAttackDelayB")?.checked,
     attackDelayBMinimumPct: Number(byId("optimizerAttackDelayBMinimumPct")?.value) || 20,
     includeDisabledBuffs: byId("optimizerIncludeDisabledBuffs") ? !!byId("optimizerIncludeDisabledBuffs").checked : true,
-    fixCurrentBuffs: !!byId("optimizerFixCurrentBuffs")?.checked,
-    forceOtherBuffs: byId("optimizerForceOtherBuffs") ? !!byId("optimizerForceOtherBuffs").checked : true,
+    fixCurrentBuffs: false,
+    forceOtherBuffs: false,
     includeCurrentConfig: byId("optimizerIncludeCurrentConfig") ? !!byId("optimizerIncludeCurrentConfig").checked : true,
     onlyBetterThanCurrent: byId("optimizerOnlyBetterThanCurrent") ? !!byId("optimizerOnlyBetterThanCurrent").checked : true,
     evaluateCurrentEquipment: byId("optimizerEvaluateCurrentEquipment") ? !!byId("optimizerEvaluateCurrentEquipment").checked : true
@@ -11861,9 +11867,6 @@ function applyIntegratedOptimizerResult(index) {
     enabled: buffSet.has(idx)
   }));
 
-  if (r.forceOtherBuffs === false) {
-    state.other = (state.other || []).map(row => ({...row, enabled:false}));
-  }
 
   renderAll();
   calc();
@@ -14072,6 +14075,8 @@ function syncAttackTypeUI() {
   const type = byId("attackType").value;
   const isAttack = type === "attack";
   const isHeavy = type === "heavy";
+  const manualRow = byId("manualTechniqueMultiplierRow");
+  if (manualRow) manualRow.hidden = type !== "manual";
   byId("heavyFields").style.display = isHeavy ? "" : "none";
   byId("critFields").classList.toggle("muted", !isAttack);
 
@@ -14785,6 +14790,7 @@ function requiredHeavyMultiplier(actualDamage, atkForReverse, inputs, m) {
 }
 /* 実測ダメージ/実測攻撃力と現在予測の差分・逆算値を表示する。 */
 function renderActualDiff() {
+  if (!byId("actualDiffResult")) return;
   const actualDamage = parseFloat(byId("actualDamage").value) || 0;
   const actualAtk = parseFloat(byId("actualAtk").value) || 0;
   if (!actualDamage && !actualAtk) {

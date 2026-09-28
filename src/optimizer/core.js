@@ -16,8 +16,6 @@ function makeOptimizerStatusText({settings, equipmentBeams, buffEvalBeams, resul
   const equipExcludedCount = equipmentRowsForStatus.filter(r => r.optimizerExcluded && equipmentCandidateHasData(r)).length;
   const equipFixedCount = equipmentRowsForStatus.filter(r => r.optimizerFixed && equipmentCandidateHasData(r)).length;
   const buffCount = optimizerCompositeCandidates(settings).length;
-  const fixedOtherSlots = settings.forceOtherBuffs ? (state.other || []).filter(r => r.enabled).length : 0;
-  const otherMode = settings.forceOtherBuffs ? `${fixedOtherSlots}件` : "無視";
   const optimizerFixedText = equipFixedCount ? ` / 固定装備 ${equipFixedCount}件` : "";
   const optimizerExcludeText = equipExcludedCount ? ` / 検索除外装備 ${equipExcludedCount}件` : "";
   const conflictSkipText = settings.equipmentConflictSkipped ? ` / 競合装備除外 ${settings.equipmentConflictSkipped}件` : "";
@@ -42,7 +40,7 @@ function makeOptimizerStatusText({settings, equipmentBeams, buffEvalBeams, resul
   const objectiveText = `${optimizerObjectiveLabel(settings.objective)}${settings.secondaryObjective ? " > " + optimizerObjectiveLabel(settings.secondaryObjective) : ""}`;
   const targetText = optimizerPrimaryTargetDescription(settings);
 
-  return `検索完了: 精度 ${accuracyText} / 目標 ${objectiveText}${targetText ? " / " + targetText : ""} / 装備候補 ${equipCount}件${optimizerFixedText}${optimizerExcludeText} / 装備以外Buff候補 ${buffCount}件 / ${equipmentModeText} / Buff検索 ${buffModeText} / その他固定枠 ${otherMode}${conflictSkipText}${pruneText}${capText}${duplicateText}${cacheText}${currentText}${betterOnlyText}${currentEquipSeedText} / 装備追加・交換確認 ${settings.optimizerEquipmentRefinementChecks || 0}件・改善 ${settings.optimizerEquipmentRefinementImprovements || 0}回 / 装備組み合わせ ${equipmentBeams.length}件中 ${buffEvalBeams.length}件確認 / 表示 ${results.length}件 / ${elapsed}ms`;
+  return `検索完了: 精度 ${accuracyText} / 目標 ${objectiveText}${targetText ? " / " + targetText : ""} / 装備候補 ${equipCount}件${optimizerFixedText}${optimizerExcludeText} / 装備以外Buff候補 ${buffCount}件 / ${equipmentModeText} / Buff検索 ${buffModeText}${conflictSkipText}${pruneText}${capText}${duplicateText}${cacheText}${currentText}${betterOnlyText}${currentEquipSeedText} / 装備追加・交換確認 ${settings.optimizerEquipmentRefinementChecks || 0}件・改善 ${settings.optimizerEquipmentRefinementImprovements || 0}回 / 装備組み合わせ ${equipmentBeams.length}件中 ${buffEvalBeams.length}件確認 / 表示 ${results.length}件 / ${elapsed}ms`;
 }
 
 function optimizerCurrentSelectionKey(result, settings=null) {

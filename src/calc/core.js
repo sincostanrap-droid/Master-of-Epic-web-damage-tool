@@ -15,6 +15,7 @@ function totalStatValue(base, flat=0, pct=0) {
 }
 
 function computeMetrics(st, inputs) {
+  inputs = standardCalculationInputs(inputs);
   // 装備行に内蔵されたBuffを計算用の装備以外Buffへ展開し、競合グループで重複しないよう代表だけ採用してから既存カテゴリへ展開する。
   const normalizedEquipment = normalizeEquipmentRows(st.equipment);
   st = expandEquipmentBuffState(st, normalizedEquipment);
@@ -214,8 +215,7 @@ function buffSlotCountForState(st) {
     ["変換", (st.conv || []).filter(r => r.enabled && !r.excluded && r.slot).map(r => slotRowName(r, "ステータス変換"))],
     ["与ダメ", (st.dmg || []).filter(r => r.enabled && !r.excluded && r.slot).map(r => slotRowName(r, "与ダメBuff"))],
     ["特攻", (st.special || []).filter(r => r.enabled && !r.excluded && r.slot).map(r => slotRowName(r, "特攻"))],
-    ["外枠", (st.post || []).filter(r => r.enabled && !r.excluded && r.slot).map(r => slotRowName(r, "外枠補正"))],
-    ["その他", (st.other || []).filter(r => r.enabled && !r.excluded).map(r => slotRowName(r, "その他バフ"))]
+    ["外枠", (st.post || []).filter(r => r.enabled && !r.excluded && r.slot).map(r => slotRowName(r, "外枠補正"))]
   ];
   const groups = details.map(([name, items]) => [name, items.length]);
   return {total: groups.reduce((s, [,n]) => s+n, 0), groups, details};

@@ -35,7 +35,8 @@ const ar=p.catalogEquipmentToRow(armor,'HG_MG');assert.equal(ar.extraAC,27,'only
 const projected=p.catalogItemWithQuality(knife,'HG_MG');
 assert.match(p.catalogWeaponSummary(projected),/2.42/);assert.equal(p.catalogItemSortValue(projected,'weaponDamage'),2.42);
 assert.equal(p.catalogItemSortValue(p.catalogItemWithQuality(armor,'HG_MG'),'ac'),22);
-assert.match(p.catalogResultRowHtml(projected,false),/data-catalog-quality/);
+assert.match(p.catalogResultRowHtml(projected,false),/data-catalog-open/);
+assert.match(p.catalogResultRowHtml(projected,false),/HG\/MG/);
 assert.notEqual(p.catalogRegistrationKey('same','raw'),p.catalogRegistrationKey('same','HG_MG'),'quality variants can coexist');
 const s=json(vm.runInContext('DEFAULT_STATE()',p));s.skillSim.skills['刀剣']=100;s.composite=[];s.equipment=json([p.catalogEquipmentToRow({...knife,weaponDamage:65}),p.catalogEquipmentToRow({...knife,weaponDamage:65},"HG_MG")]);
 const out=p.runOptimizerCore({state:s,inputs,settings:{objective:'damage',mainWeaponSkill:'刀剣',maxSlots:24,topN:3,exactEquipmentLimit:100,buffMode:'local',includeDisabledBuffs:true}});

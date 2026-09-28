@@ -63,6 +63,7 @@ MoE固有の主な仮定:
 
   <!-- __MOE_SKILL_UI_FINAL_COMPOUND_SHIP_CLEANUP_V6__: skill knowledge panel hidden; compound ship button lives in toolbar -->
 <link rel="stylesheet" href="./styles/catalogWorkspace.css?v=20260928">
+<link rel="stylesheet" href="./styles/settingsCompact.css?v=20260928">
 </head>
 <body>
 <h1>Master of Epic 戦闘シミュレーター</h1>
@@ -88,7 +89,7 @@ MoE固有の主な仮定:
 
 <!--
 <p class="small">
-  アタック/ヘビー クラッシュ/手入力テク、バフ24枠、予想攻撃力、割合ステータスBuff、ステータス変換、その他バフ枠に対応。
+  アタック/ヘビー クラッシュ/手入力テク、バフ24枠、予想攻撃力、割合ステータスBuff、ステータス変換に対応。
   さらに「構成A/B比較」「Buff寄与率」「実測との差分・逆算」「AC別表」「種族特攻/特攻倍率」を追加。攻撃力%Buffは実測寄せで「加算後攻撃力に乗算」を初期値にしています。魔力は種族と精神力から自動計算。魔力 / 攻撃力 / 速度の実数加算は1つの欄に統合済み。旧20倍壁は見ません。
 </p>
 -->
@@ -104,11 +105,11 @@ MoE固有の主な仮定:
       <input id="spirit" type="hidden" value="0">
       <input id="magic" type="hidden" value="0">
       <p class="small selectHelp">種族・筋力・精神力は「スキル」タブで設定できます。設定した値はここへ自動で反映されます。</p>
-      <label>移動速度<input id="speed" type="number" step="0.1" value="100"></label>
+      <input id="speed" type="hidden" value="100">
       <label>酩酊度<input id="drunk" type="number" step="0.1" value="0"></label>
     </div>
 
-    <div class="inputPanel weaponInputPanel weaponInputPanelMoved">
+    <div class="weaponInputPanelMoved" hidden>
       <h3>武器</h3>
       <input id="weaponSkill" type="hidden" value="0">
       <input id="requiredSkill" type="hidden" value="0">
@@ -142,7 +143,7 @@ MoE固有の主な仮定:
         <label>ヘビクラ倍率上書き<input id="heavyManualMultiplier" type="number" step="0.0001" value="0"></label>
         <p class="small selectHelp">0なら上の式で自動計算。実測合わせしたい場合だけ逆算値を入れてください。</p>
       </div>
-      <label>攻撃/テク倍率<input id="techMultiplier" type="number" step="0.0001" value="1.0000"></label>
+      <label id="manualTechniqueMultiplierRow" hidden>テクニック倍率<input id="techMultiplier" type="number" step="0.0001" value="1.0000"></label>
       <label>対象AC<input id="targetAC" type="number" step="0.1" value="0"></label>
       <label>対象回避<input id="targetEvasion" type="number" step="0.1" value="0"></label>
 
@@ -157,19 +158,10 @@ MoE固有の主な仮定:
     </div>
 
     <div class="inputPanel">
-      <h3>上限・計算方法</h3>
-      <label>攻撃力加算上限<input id="atkCap" type="number" step="1" value="500"></label>
-      <label class="stackControl">攻撃力%Buffの基準
-        <select id="atkPctMode">
-          <option value="afterAdds" selected>おすすめ（加算後の攻撃力に%Buff）</option>
-          <option value="baseCappedAdd">比較用（基礎攻撃力への%増分）</option>
-        </select>
-      </label>
-      <p class="small selectHelp">通常は「おすすめ」のままでOKです。攻撃力を足した後に%Buffを掛けて、増えた分を上限判定に入れます。</p>
-      <label>最終表示上限<input id="finalCap" type="number" step="1" value="0"></label>
-      <p class="small">
-        0なら最終ダメージ上限なしで表示します。
-      </p>
+      <h3>戦闘エリア</h3>
+      <label>エリア<select id="atkCap"><option value="500">通常（+500）</option><option value="2500">タイタン（+2500）</option></select></label>
+      <input id="atkPctMode" type="hidden" value="afterAdds">
+      <input id="finalCap" type="hidden" value="0">
     </div>
   </div>
 </section>
@@ -235,7 +227,7 @@ MoE固有の主な仮定:
       </div>
       <div class="slotTooltip" id="slotTooltip">-</div>
       <div id="slotWarning" style="margin-top:8px;"></div>
-      <p class="small">「使用ON + 枠ON」の行だけ24枠にカウント。その他バフは使用ONだけで枠カウントします。</p>
+      <p class="small">「使用ON + 枠ON」の行だけ24枠にカウント。</p>
     </div>
 
 
@@ -248,7 +240,7 @@ MoE固有の主な仮定:
   <div class="analysisDetailsBody">
   <p class="analysisIntro small">
     現在の構成をもう少し詳しく見たい時に使う補助機能です。
-    構成の比較、ゲーム内ダメージとの差、ACごとのダメージ、種族差、どのBuffが効いているかを確認できます。
+    構成の比較、ACごとのダメージ、種族差、どのBuffが効いているかを確認できます。
   </p>
   <div class="analysisGrid">
     <div class="analysisPanel">
@@ -268,16 +260,6 @@ MoE固有の主な仮定:
         </div>
       </div>
       <div id="compareResult" class="scrollX"></div>
-    </div>
-
-    <div class="analysisPanel">
-      <h3>ゲーム内ダメージとの差を確認</h3>
-      <div class="compactControls">
-        <label>実測ダメージ<input id="actualDamage" type="number" step="1" value="0"></label>
-        <label>ゲーム内攻撃力<input id="actualAtk" type="number" step="0.1" value="0"></label>
-      </div>
-      <button onclick="renderActualDiff()">実測差分を更新</button>
-      <div id="actualDiffResult" class="scrollX"></div>
     </div>
 
     <div class="analysisPanel">
@@ -980,15 +962,7 @@ MoE固有の主な仮定:
   <button onclick="addRow('post')">外枠行を追加</button>
 </section>
 
-<section class="card wide" data-tab-target="buffs">
-  <h2>その他バフ（枠だけ数える）</h2>
-  <p class="small">ダメージには影響しないけれど、24枠には入るBuffを登録します。</p>
-  <table id="otherBuffTable" class="compactTable">
-    <thead><tr><th class="checkCol">使用</th><th class="checkCol">固定</th><th class="checkCol">除外</th><th>名称</th><th>競合グループ</th><th>メモ / ソース</th><th>削除</th></tr></thead>
-    <tbody></tbody>
-  </table>
-  <button onclick="addOtherRow()">その他バフ行を追加</button>
-</section>
+
 
 
 <section id="npcEffectSlotsPanel" class="card wide" data-tab-target="buffs">
@@ -1043,7 +1017,7 @@ MoE固有の主な仮定:
 <section class="card wide" data-tab-target="buffs">
   <h2>Buffだけインポート / エクスポート</h2>
   <p class="small">
-    Buff登録、外枠補正、その他バフだけを出し入れできます。読み込みは現在のBuff登録を置き換えます。
+    Buff登録と外枠補正だけを出し入れできます。読み込みは現在のBuff登録を置き換えます。
     表計算ソフトで編集したい場合は「テンプレート」を使ってください。
     テンプレート内にスキル+や属性ダメージ%の書き方サンプルも入っています。
   </p>
@@ -1067,9 +1041,9 @@ MoE固有の主な仮定:
       </p>
 
       <section class="optimizerSetupPanel" aria-labelledby="optimizerGoalHeading">
-        <h3 id="optimizerGoalHeading">1. 目的と対象</h3>
+        <h3 id="optimizerGoalHeading">1. 最大化・最小化するもの</h3>
 <div class="optimizerControls">
-<label>優先する結果
+<label>最適化の目的
           <select id="optimizerObjective">
             <option value="damage">最大ダメージ</option>
             <option value="attack">最大攻撃力</option>
@@ -1092,18 +1066,16 @@ MoE固有の主な仮定:
             <option value="">合計最大（全スキル）</option>
           </select>
         </label>
-<label>検索精度
-          <select id="optimizerAccuracyPreset">
-            <option value="fast">高速</option>
-            <option value="balanced" selected>標準</option>
-            <option value="accurate">精度重視</option>
-          </select>
-        </label>
+
 </div>
 <p class="small" id="optimizerSkillPlusHint" hidden>選んだスキルの強化合計を比較します。実際のスキル値・成功率・装備要件は変わりません。</p>
 </section>
+<section class="optimizerSetupPanel optimizerFixedGuide" aria-labelledby="optimizerFixedHeading">
+<h3 id="optimizerFixedHeading">2. 変更しない装備・Buff</h3>
+<p class="small">「装備登録」「Buff登録」で固定にチェックした候補は必ず使用します。使用しない候補は除外にチェックしてください。</p>
+</section>
 <section class="optimizerSetupPanel" aria-labelledby="optimizerConditionsHeading">
-<h3 id="optimizerConditionsHeading">2. 必須条件</h3>
+<h3 id="optimizerConditionsHeading">3. 必ず満たす条件</h3>
 <div class="optimizerControls">
 <label>バフ枠上限<input id="optimizerMaxSlots" type="number" min="0" step="1" value="24"></label>
 </div>
@@ -1114,7 +1086,7 @@ MoE固有の主な仮定:
 <small>対象スキルはメイン武器種を自動参照します。攻撃ディレイ−60とは別判定で、短縮率は合算しません。アタック短縮はスキル短縮より優先します。結果の効果を同種の中で最後に付与してください。</small>
 
 </div><details class="optimizerSkillPlusFilters">
-          <summary>スキル強化条件（最大4条件・すべて満たす）</summary>
+          <summary>スキル強化の条件</summary>
           <div class="small mutedText optimizerSkillPlusHelp">〇スキル強化を最適化条件として使います。ステータス/成功率/必要スキルには加算しません。</div>
           <div class="optimizerSkillPlusFilterRows">
             <div class="optimizerSkillPlusFilterRow">
@@ -1140,7 +1112,7 @@ MoE固有の主な仮定:
           </div>
         </details></section>
 <details class="optimizerAdvanced">
-<summary>詳細設定 <span class="summaryNote">目標値・Buffの扱い・検索範囲</span></summary>
+<summary>詳細設定：目標値・比較方法</summary>
 <h4>目標値と同点時の優先</h4>
 <div class="optimizerControls">
 <label>狙いたい値<input id="optimizerTargetValue" type="number" step="0.1" placeholder="任意 / クリ率は空欄で100"></label>
@@ -1166,7 +1138,13 @@ MoE固有の主な仮定:
         </label>
 </div>
 <h4>Buffと現在の構成</h4><div class="optimizerChecks">
-<label><input id="optimizerIncludeDisabledBuffs" type="checkbox" checked> OFFのBuffも候補として試す</label><label><input id="optimizerFixCurrentBuffs" type="checkbox"> 現在ONのBuffは必ず使う</label><label><input id="optimizerForceOtherBuffs" type="checkbox" checked> その他バフは現在のON/OFFをそのまま使う</label><label title="手動でONにしている現在構成を、探索結果とは別に必ず比較行として表示します。"><input id="optimizerIncludeCurrentConfig" type="checkbox" checked> 現在ON構成を結果に含める</label><label title="現在ON構成を基準にして、それより評価が高い候補だけを表示します。"><input id="optimizerOnlyBetterThanCurrent" type="checkbox" checked> 現在ONより良い結果だけ表示</label><label title="手動でONにしている装備セットを必ず1回評価し、その装備のままBuffだけ最適化した候補も探索に混ぜます。"><input id="optimizerEvaluateCurrentEquipment" type="checkbox" checked> 現在の装備でBuffだけ組み直す</label></div><h4>検索範囲と結果件数</h4>
+<label><input id="optimizerIncludeDisabledBuffs" type="checkbox" checked> OFFのBuffも候補として試す</label><label title="手動でONにしている現在構成を、探索結果とは別に必ず比較行として表示します。"><input id="optimizerIncludeCurrentConfig" type="checkbox" checked> 現在ON構成を結果に含める</label><label title="現在ON構成を基準にして、それより評価が高い候補だけを表示します。"><input id="optimizerOnlyBetterThanCurrent" type="checkbox" checked> 現在ONより良い結果だけ表示</label><label title="手動でONにしている装備セットを必ず1回評価し、その装備のままBuffだけ最適化した候補も探索に混ぜます。"><input id="optimizerEvaluateCurrentEquipment" type="checkbox" checked> 現在の装備でBuffだけ組み直す</label></div><details class="optimizerSearchOptions"><summary>検索オプション：精度・探索範囲・結果件数</summary><div class="optimizerControls"><label>検索精度
+          <select id="optimizerAccuracyPreset">
+            <option value="fast">高速</option>
+            <option value="balanced" selected>標準</option>
+            <option value="accurate">精度重視</option>
+          </select>
+        </label></div>
 <div class="optimizerControls">
 <label>上位表示件数<input id="optimizerTopN" type="number" min="1" step="1" value="10"></label>
 <label>Buffの探し方
@@ -1182,7 +1160,7 @@ MoE固有の主な仮定:
 <label>深掘りの広さ<input id="optimizerBuffBeamWidth" type="number" min="20" step="10" value="120"></label>
 <label>仕上げ回数<input id="optimizerLocalPasses" type="number" min="1" step="1" value="8"></label>
 </div>
-</details>
+</details></details>
 <details class="optimizerGuide optimizerCompactGuide">
 <summary>使い方・結果が出ないとき</summary>
 <ol><li>装備登録・Buff登録で候補を用意します。必ず使うものは「固定」、使わないものは「除外」にします。</li>
@@ -1255,12 +1233,12 @@ MoE固有の主な仮定:
 <script src="./src/ui/attackDpsResult.js?v=1.24.4" defer></script>
 <script src="./src/ui/attackDpsControls.js?v=1.24.4" defer></script>
 <script src="./src/ui/appVersionBadge.js?v=1.24.4" defer></script>
-<script src="./src/ui/mainTabs.js?v=1.24.4" defer></script>
+<script src="./src/ui/mainTabs.js?v=20260928-settings" defer></script>
 <script src="./src/ui/combatLogTab.js?v=1.24.4" defer></script>
 <script src="./src/ui/showcase.js?v=1.24.9" defer></script>
 <script src="./src/storage/shareUrl.js?v=1.22.4" defer></script>
 <script src="./src/storage/importExport.js?v=1.22.4" defer></script>
-<script src="./src/calc/core.js?v=1.24.12-buff-append" defer></script>
+<script src="./src/calc/core.js?v=20260928-settings" defer></script>
 <script src="./src/data/skillSimKnowledge.js?v=1.22.4" defer></script>
 <script src="src/data/manual/reviewedBuffCatalog.manual.js"></script>
 <script src="src/data/manual/foodBuffCatalog.manual.js"></script>
@@ -1273,7 +1251,8 @@ MoE固有の主な仮定:
 <script src="./src/ui/catalogWorkspace.js?v=20260928" defer></script>
 <script src="./src/ui/catalogTab.js?v=20260928" defer></script>
 <script src="./src/data/manual/buffRules.manual.js?v=1.24.12" data-catalog-src="src/data/manual/buffRules.manual.js"></script>
-<script src="./src/main.js?v=1.24.12-buff-catalog-split" defer></script>
+<script src="./src/ui/settingsCompact.js?v=20260928" defer></script>
+<script src="./src/main.js?v=20260928-settings" defer></script>
 <script src="./src/ui/buildAnalysis.js?v=1.24.4" defer></script>
 <script src="./src/ui/showcaseSkillPlusTotals.js?v=1.24.12" defer></script>
 <script src="./src/ui/showcaseElementDamageTotals.js?v=1.24.9" defer></script>

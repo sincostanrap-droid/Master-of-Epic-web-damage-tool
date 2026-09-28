@@ -1,0 +1,24 @@
+#mainTabPanels {overflow-anchor:none}
+#manualTechniqueMultiplierRow[hidden], .weaponInputPanelMoved[hidden] {display:none!important}
+#manualTechniqueMultiplierRow {grid-template-columns:minmax(0,1fr) 120px}
+.optimizerFixedGuide p {margin:8px 0;line-height:1.7}
+.optimizerSkillPlusFilterRows {display:flex!important;flex-direction:column;gap:8px}
+.optimizerSkillPlusFilters .optimizerSkillPlusFilterRow {display:grid!important;grid-template-columns:minmax(150px,1fr) 105px 100px auto;gap:8px;align-items:end;padding:10px;border:1px solid #dce3ef;border-radius:8px;background:#f8faff}
+.optimizerSkillPlusFilters .optimizerSkillPlusFilterRow[hidden] {display:none!important}
+.optimizerSkillPlusFilterRow label {display:flex!important;flex-direction:column;align-items:stretch;gap:4px;min-width:0!important;margin:0;font-size:12px}
+.optimizerSkillPlusFilterRow select,.optimizerSkillPlusFilterRow input {width:100%!important;min-width:0!important;max-width:100%;box-sizing:border-box}
+.optimizerSkillPlusFilterRow button {margin:0;padding:7px 10px;font-size:12px}
+.optimizerAddCondition {font-size:13px;margin-top:10px}
+.optimizerSearchOptions {margin-top:14px;padding:12px;border:1px solid #dce3ef;border-radius:8px}
+.optimizerSearchOptions summary {cursor:pointer;font-weight:600}
+.optimizerSearchOptions .optimizerControls {margin-top:12px}
+@media(max-width:650px) {
+ .optimizerSkillPlusFilters .optimizerSkillPlusFilterRow {grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto}
+ .optimizerSkillPlusFilterRow label:first-child {grid-column:1/-1}
+ .optimizerSetupPanel .optimizerControls {grid-template-columns:minmax(0,1fr)}
+}
+.mainTabPanel {min-width:0;grid-template-columns:minmax(0,1fr)}
+.mainTabPanel > * {min-width:0;max-width:100%;box-sizing:border-box}
+@media(max-width:650px) {
+ .metricCard::after {right:0;bottom:0}
+}
