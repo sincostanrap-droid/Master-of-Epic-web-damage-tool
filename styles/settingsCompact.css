@@ -22,3 +22,9 @@
 @media(max-width:650px) {
  .metricCard::after {right:0;bottom:0}
 }
+
+#equipmentSummary {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px 14px;overflow-wrap:anywhere}
+#equipmentSummary > div:has(> b) {grid-column:1/-1;margin-top:6px}
+@media(max-width:650px) {
+ #equipmentSummary {grid-template-columns:minmax(0,1fr)}
+}
