@@ -1,0 +1,24 @@
+const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
+const {completionRuntime,slotOrder,choiceOrder,observation}=require('./optimizer-v2-magic-completion-runtime.cjs');
+const checkpointB=require('./optimizer-v2-magic-ordering-runtime.cjs').runtime({sourceCode:require('node:child_process').execFileSync('git',['show','878cfe8:src/optimizer-v2/branchAndBound.js'],{encoding:'utf8'})}).B;
+const {p,B}=completionRuntime(),json=x=>JSON.parse(JSON.stringify(x)),base=vm.runInContext('DEFAULT_STATE()',p),items=p.equipmentCatalogItems();
+items.forEach(i=>p.MOEEquipmentEffectFacetCatalog.project(i));
+const context=p.MOEEquipmentSearchSpecification.toContext(p.MOEEquipmentSearchSpecification.create([{key:'stat:magic'}],{topK:20}),{baseState:base});
+const t=performance.now(),prep=p.MOEOptimizerV2FacetSearch.prepare(items,context),r=prep.reduction,prepareMs=performance.now()-t,m=B.orderingMeasures(r),slots=slotOrder(m,'potential',context.slots);
+assert.equal(r.contextEquivalentClasses.length,859);
+const coupled=B.inspectMagicCoupled(r,[],slots),old=B.completionInspector(r);
+const data={checkpoint:'878cfe802ef6765f268da060d5813a4c9da50172',classes:859,prepareMs,slots,frontierPrepareMs:coupled.prepareMs,frontiers:coupled.frontiers,runs:[]};
+const output='docs/optimizer-v2-phase4B-4-benchmark.json',save=()=>fs.writeFileSync(output,JSON.stringify(data,null,2));
+if(process.argv.includes('--append')){const previous=JSON.parse(fs.readFileSync(output));assert.deepEqual(previous.slots,json(slots));data.runs=process.argv.includes('--refresh-new')?previous.runs.filter(x=>x.mode==='old'):process.argv.includes('--refresh-production')?previous.runs.filter(x=>x.mode!=='production'):previous.runs;data.prepareMs=previous.prepareMs;data.productionPrepareMs=prepareMs;}
+function run(mode,seconds=120){const a=observation(),signal={aborted:false},start=performance.now(),strong={calls:0,totalMs:0,prunes:0},samples=[];
+ const ctrl=(mode==='old'?checkpointB:B).run(r,{cooperative:true,signal,fixedSlotOrder:mode==='production'?undefined:slots,diagnosticChoiceOrder:mode==='production'?undefined:choiceOrder(m,'completion'),orderObservation:a,magicCoupledBound:mode!=='old',magicCandidatePrepared:mode!=='old',
+ strongCompletion:mode==='strong'?(ids,rem,ub,kth)=>{if(rem.length<2||ub-kth>10)return null;const t=performance.now(),j=old.jointPrepared(ids,rem,2);strong.calls++;strong.totalMs+=performance.now()-t;if(j.upper<kth)strong.prunes++;return j.upper;}:undefined,
+ completionAudit:x=>{if(samples.filter(s=>s.depth===x.depth).length<3)samples.push({...x,ids:x.ids.slice(),slots:undefined});}});
+ let result,last=0,snapshot;try{while(true){const q=ctrl.step(),ms=performance.now()-start;if(q.done){result=q.value;break;}snapshot=q.value;if(ms-last>=15000){last=ms;console.log(`${mode} ${Math.round(ms/1000)}s nodes=${snapshot.searchNodes} kth=${a.kth}`);}if(ms>=seconds*1000)signal.aborted=true;}}finally{ctrl.close();}
+ const elapsedMs=performance.now()-start;
+ for(const x of result.results){const evaluation=p.MOEOptimizerV2SearchContext.evaluate(context,x.candidateIds.map(id=>p.MOEOptimizerV2MetricCandidateReducer.resolveCandidate(r,id)),prep.snapshot.sources);assert.equal(evaluation.score,x.score);}
+ const record={mode,formalTopParity:true,elapsedMs,verificationMs:performance.now()-start-elapsedMs,diagnostics:json(result.diagnostics),observation:a,strong,currentDepth:snapshot?.currentDepth,samples,top:json(result.results.map(x=>({score:x.score,key:x.performanceKey,ids:x.candidateIds.slice().sort(),candidateIds:x.candidateIds.slice()})))};data.runs.push(record);save();return record;
+}
+const modes=process.argv.slice(2).filter(x=>!x.startsWith('--'));for(const mode of modes.length?modes:['old','coupled','production']){const first=run(mode);if(first.diagnostics.exact&&mode!=='old'){const second=run(mode);assert.deepEqual(first.top,second.top);for(const f of ['searchNodes','completeConfigurationsEvaluated','boundPrunedNodes','tiePrunedNodes','exact'])assert.equal(first.diagnostics[f],second.diagnostics[f]);for(const stage of ['magicRectangleBound','magicCoupledBound','magicUpperBound'])for(const key of ['calls','prunes'])assert.equal(first.diagnostics[stage][key],second.diagnostics[stage][key]);for(const key of ['nodesByDepth','boundPrunesByDepth'])assert.deepEqual(first.diagnostics[key],second.diagnostics[key]);data.repeatParity=true;save();}}
+const completed=data.runs.filter(x=>x.diagnostics.exact),identity=top=>top.map(({score,key,ids})=>({score,key,ids}));for(const x of completed)assert.deepEqual(identity(x.top),identity(completed[0].top));
+data.completed=true;save();console.log(JSON.stringify(data.runs.map(x=>({mode:x.mode,exact:x.diagnostics.exact,nodes:x.diagnostics.searchNodes,best:x.top[0]?.score,kth:x.top.at(-1)?.score,old:x.diagnostics.magicUpperBound,coupled:x.diagnostics.magicCoupledBound}))));

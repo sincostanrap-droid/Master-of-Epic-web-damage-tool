@@ -63,3 +63,94 @@
 .catalogWorkspacePanel {grid-template-columns:minmax(0,1fr)}
 .catalogWorkspacePanel .catalogWorkspaceTop,.catalogWorkspacePanel .catalogWorkspaceGrid {min-width:0;width:100%;max-width:100%;box-sizing:border-box}
 .catalogWorkspacePanel .catalogWorkspaceSearch {min-width:0;max-width:100%;box-sizing:border-box}
+/* Specialized candidate comparison keeps the existing catalog workspace. */
+.catalogSpecialPanel { border:1px solid var(--border, #bbb); border-radius:6px; padding:10px; }
+.catalogSpecialPanel summary { font-weight:600; cursor:pointer; }
+.catalogSpecialAxis { display:grid; gap:6px; margin:10px 0; }
+.catalogSpecialAxis label { min-width:0; }
+.catalogSpecialAxis select, .catalogSpecialAxis input[type="number"] { width:100%; box-sizing:border-box; }
+.catalogSpecialPanel .small { line-height:1.5; }
+/* Dedicated specialization tab: visible steps and horizontal comparison. */
+[data-tab-panel="specialization"] {padding:16px;}
+[data-tab-panel="specialization"] .catalogSpecialPanel {display:block;max-width:none;}
+[data-tab-panel="specialization"] .catalogSpecialAxis {display:inline-grid;vertical-align:top;min-width:240px;margin:8px;padding:12px;border:1px solid var(--border,#ccc);}
+[data-tab-panel="specialization"] progress {display:block;width:min(100%,600px);height:18px;margin:8px 0;}
+.specialSearchActions {margin:16px 0;padding:12px;border:1px solid var(--border,#ccc);}
+.specialSearchActions label {display:inline-block;margin:8px;}
+[data-tab-panel="specialization"] .catalogSelectedDetail {position:static;margin-top:16px;max-height:none;}
+[data-tab-panel="specialization"]:not([hidden]) {display:block;}
+[data-tab-panel="specialization"] .catalogSpecialAxis {width:260px;max-width:calc(100% - 42px);}
+[data-tab-panel="specialization"] .catalogSpecialAxis label {display:flex;flex-direction:column;gap:6px;white-space:normal;}
+[data-tab-panel="specialization"] .catalogSpecialAxis label:has(input[type="checkbox"]) {flex-direction:row;align-items:center;}
+[data-tab-panel="specialization"] .catalogSpecialAxis select {min-width:0;}
+[data-tab-panel="specialization"] #catalogSpecialPreset {display:block;width:min(100%,450px);margin:12px 0;}
+.catalogSearchModes {display:flex;gap:10px;margin:14px 0;}
+.catalogSearchModes [aria-pressed="true"] {background:#4167a0;color:white;}
+#catalogSpecialMode .catalogSpecialPanel {display:block;max-width:none;}
+#catalogSpecialMode .catalogSpecialAxis {display:inline-grid;width:260px;max-width:calc(100% - 42px);vertical-align:top;margin:8px;padding:12px;}
+#catalogSpecialMode .catalogSpecialAxis label {display:flex;flex-direction:column;gap:6px;}
+#catalogSpecialMode .catalogSpecialAxis label:has(input[type="checkbox"]) {flex-direction:row;}
+#catalogSpecialMode progress {display:block;width:min(100%,600px);margin:8px 0;}
+#catalogSpecialMode #catalogSpecialPreset {display:block;width:min(100%,450px);margin:12px 0;}
+#specialOptimizerResults pre {white-space:pre-wrap;overflow-wrap:anywhere;max-height:250px;overflow:auto;}
+#catalogSpecialMode[hidden],.catalogWorkspaceFilters[hidden],.catalogWorkspaceSearch[hidden],.catalogWorkspaceSort[hidden] {display:none!important;}
+
+[data-catalog-policy][aria-pressed="true"] { background: #dceeff; border-color: #3873a9; font-weight: 700; }
+/* Specialization workspace follows the catalog's card and action styles. */
+#catalogSpecialMode {display:grid;grid-template-columns:minmax(0,1.4fr) minmax(300px,1fr);gap:18px;margin:18px 0;color:#24354c}
+.catalogSpecialIntro {grid-column:1/-1}
+.catalogSpecialIntro h2 {margin:0 0 6px;font-size:21px}
+.catalogSpecialIntro p {margin:0;color:#65748b}
+#catalogSpecialMode .catalogSpecialPanel,.catalogPolicyPanel,.specialSearchActions {background:#fff;border:1px solid #dce5f0;border-radius:14px;padding:20px;box-shadow:0 3px 14px #24354c06;min-width:0}
+#catalogSpecialMode h3 {margin:0 0 12px;font-size:16px}
+#catalogSpecialMode p {font-size:13px;line-height:1.75}
+#catalogSpecialMode input[type="search"],#catalogSpecialMode input[type="number"],#catalogSpecialMode select {border:1px solid #cbd7e6;border-radius:8px;background:#fbfdff;padding:9px 10px;min-width:0;max-width:100%;color:#24354c;font:inherit;box-sizing:border-box}
+#catalogSpecialMode label {font-size:12px;color:#52647c;gap:6px}
+#catalogSpecialMode .catalogSpecialAxis {display:grid;width:auto;max-width:none;grid-template-columns:minmax(0,1fr) 125px;margin:12px 0;padding:12px;background:#f4f7fc;border-radius:10px;gap:10px}
+#catalogSpecialMode .catalogSpecialAxis label:has(input[type="checkbox"]) {grid-column:1/-1;align-items:center}
+#catalogSpecialMode button {border:1px solid #cbd7e6;border-radius:8px;background:#f8faff;color:#315f98;padding:8px 12px;font-size:12px;cursor:pointer}
+#catalogSpecialMode button:hover:not(:disabled) {background:#eaf2ff;border-color:#8cb1df}
+#catalogSpecialMode button.primary,#catalogSpecialMode #specialOptimizeButton {background:#2563b7;border-color:#2563b7;color:#fff}
+#catalogSpecialMode [data-catalog-policy][aria-pressed="true"] {background:#e3edff;border-color:#2563b7;color:#174b90}
+#catalogSpecialMode [data-policy="excluded"][aria-pressed="true"] {background:#fff0ec;border-color:#e4a18e;color:#9b432e}
+.catalogPolicyFinderLabel {display:flex;flex-direction:column;margin:14px 0 8px}
+.catalogPolicyList,#specialPolicyItems {list-style:none;padding:0;display:grid;gap:8px;max-height:320px;overflow:auto}
+.catalogPolicyList li,#specialPolicyItems li {display:flex;align-items:center;justify-content:space-between;gap:12px;background:#f5f8fc;padding:10px;border-radius:8px;font-size:13px;flex-wrap:wrap}
+.catalogPolicySlot {display:block;font-size:11px;color:#6b7b91;margin-top:3px}
+.catalogPolicyHelp {margin:12px 0;color:#65748b;font-size:12px}
+.catalogPolicyHelp summary {cursor:pointer;font-weight:600}
+.specialSearchActions {grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:end;gap:12px}
+.specialSearchActions>h3,.specialSearchActions>p,#specialOptimizerResults {flex-basis:100%;margin:0}
+.specialSearchActions>label {display:flex;flex-direction:column;min-width:160px}
+.catalogSearchStatus {background:#eef5ff;border-radius:8px;padding:12px;box-sizing:border-box;color:#315f98}
+#specialOptimizerResults {display:grid;gap:10px}
+.catalogOptimizerCard {border:1px solid #dce5f0;border-radius:12px;overflow:hidden;background:#fff}
+.catalogOptimizerCard>summary {background:#f3f7fd;padding:14px 16px;cursor:pointer;font-weight:700;font-size:14px}
+.catalogOptimizerCard>p,.catalogOptimizerCard>details {margin:12px 16px}
+.catalogOptimizerCard>ul {list-style:none;padding:0 16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:10px}
+.catalogOptimizerCard li {border:1px solid #e1e8f2;border-radius:9px;padding:12px;font-size:12px;line-height:1.7;min-width:0}
+.catalogOptimizerCard li strong {display:block;font-size:13px;margin-bottom:8px}
+.catalogOptimizerCard li details {margin-top:10px;border-top:1px solid #e5ebf3;padding-top:8px}
+.catalogOptimizerCard li details p {overflow-wrap:anywhere;white-space:pre-line}
+@media(max-width:900px){#catalogSpecialMode{grid-template-columns:minmax(0,1fr)}.catalogSpecialIntro,.specialSearchActions{grid-column:1}.catalogPolicyPanel{order:0}}
+@media(max-width:500px){#catalogSpecialMode .catalogSpecialAxis{grid-template-columns:1fr}#catalogSpecialMode .catalogSpecialPanel,.catalogPolicyPanel,.specialSearchActions{padding:14px}.catalogOptimizerCard>ul{grid-template-columns:1fr}.specialSearchActions>label{width:100%}}
+#catalogSpecialMode label {text-align:left;justify-content:flex-start}
+#catalogSpecialMode .catalogSpecialAxis>label {align-items:stretch}
+#catalogSpecialMode .catalogPolicyFinderLabel {align-items:stretch;width:100%}
+#catalogSpecialMode .catalogPolicyFinderLabel input {width:100%}
+#catalogSpecialMode #catalogSpecialProgress[hidden] {display:none!important}
+#catalogSpecialMode #specialShowExcluded {margin-right:8px}
+.catalogOptionalAxis {margin:12px 0;border:1px solid #dce5f0;border-radius:9px;background:#fafcff}
+.catalogOptionalAxis>summary {padding:12px;cursor:pointer;font-size:13px;font-weight:600}
+#catalogSpecialMode .catalogOptionalAxis .catalogSpecialAxis {margin:0}
+#catalogSpecialMode .catalogSpecialAxis input[type="number"]::placeholder {font-size:11px}
+.catalogWorkspacePanel[data-catalog-mode="special"] .catalogWorkspaceGrid {grid-template-columns:minmax(0,1fr) 300px;align-items:start}
+.catalogWorkspacePanel[data-catalog-mode="special"] .catalogWorkspaceResults {min-width:0}
+.catalogWorkspacePanel[data-catalog-mode="special"] .catalogTableWrap {overflow-x:auto}
+.catalogWorkspacePanel[data-catalog-mode="special"] .catalogTable {min-width:760px}
+.catalogWorkspacePanel[data-catalog-mode="special"] .catalogTable th {width:auto!important;white-space:nowrap}
+.catalogWorkspacePanel[data-catalog-mode="special"] .catalogTable td {overflow-wrap:normal;word-break:normal}
+@media(max-width:1100px){.catalogWorkspacePanel[data-catalog-mode="special"] .catalogWorkspaceGrid{grid-template-columns:minmax(0,1fr)}.catalogWorkspacePanel[data-catalog-mode="special"] .catalogSelectedDetail{grid-column:1;position:static;max-height:none}}
+.catalogWorkspacePanel .catalogTable [data-catalog-policy] {background:#f8faff;color:#315f98;border:1px solid #cbd7e6;border-radius:7px;padding:7px 10px;font-size:12px;white-space:nowrap}
+.catalogPolicyBulkActions {display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+#catalogSpecialMode #specialPolicyBulkExclude:not(:disabled) {background:#fff2ed;color:#98402a;border-color:#e4b6a8}

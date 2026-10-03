@@ -30,7 +30,7 @@ function loadCatalogScriptsOnce() {
   catalogScriptsPromise = Promise.all(CATALOG_SCRIPT_URLS.map(src => new Promise(resolve => {
     if (document.querySelector(`script[data-catalog-src="${src}"]`)) return resolve();
     const script = document.createElement("script");
-    script.src = `${src}?v=1.24.12`;
+    script.src = `${src}?v=1.24.12-pet-20261003`;
     script.async = false;
     script.dataset.catalogSrc = src;
     script.onload = () => resolve();
@@ -146,4 +146,72 @@ function equipBuffRuleCandidateItems() {
   equipBuffRuleCandidateSourceRefs = sourceRefs;
   equipBuffRuleCandidateItemsCache = out;
   return equipBuffRuleCandidateItemsCache;
+}
+
+// Shared catalog-to-equipment conversion. No DOM access; used by registration and v2.
+function catalogFindBuffById(id) {
+  const key = String(id || "");
+  if (!key) return null;
+  return buffCatalogItems().find(b => String(b.id || "") === key || String(b.officialTechnicId || "") === key || String(b.catalogId || "") === key) || null;
+}
+
+function catalogEquipmentToRow(item, quality=null) {
+  if (quality !== null) item = catalogItemWithQuality(item, quality);
+  const slot = item.slot || idbMapSlot(`${item.equip || ""} ${item.name || ""}`) || "防具: 頭";
+  const row = defaultEquipmentCandidate(slot, false);
+  row.enabled = false;
+  row.name = (item.name || "カタログ装備") + (item.catalogQuality === "HG_MG" ? "（HG/MG）" : "");
+  row.catalogQuality = item.catalogQuality === "HG_MG" ? "HG_MG" : "raw";
+  row.importSource = "catalog";
+  row.importedFromCatalog = true;
+  row.catalogId = item.catalogId || item.id || "";
+  row.officialId = item.officialId || "";
+  row.importUrl = item.sourceUrl || "";
+  row.note = [item.info, item.sourceUrl ? `公式DB: ${item.sourceUrl}` : "", item.verified === false ? "未検証カタログ候補" : ""].filter(Boolean).join("\n");
+
+  if (row.catalogQuality === "HG_MG") row.note += "\n品質補正 HG/MG：NG基準の武器ダメージ・防具本体ACを1.1倍（追加効果は補正しない）";
+
+  if (item.category === "weapon") {
+    row.weaponDamage = +item.weaponDamage || 0;
+    row.weaponAttackInterval = +item.weaponAttackInterval || 0;
+    row.weaponRange = +item.weaponRange || 0;
+    row.weaponDurability = +item.weaponDurability || 0;
+    row.weaponTwoHanded = /2HAND|両手/i.test(item.weaponHand || item.equip || "") ? "○" : "×";
+    if (Array.isArray(item.weaponReq)) row.weaponReq = item.weaponReq;
+    else if (item.requiredSkill || item.needLevel) row.weaponReq = idbWeaponReqsFromText(String(item.requiredSkill || ""), +item.needLevel || 0);
+  }
+
+  const structuredStatuses = Array.isArray(item.addStatuses) ? item.addStatuses : [];
+  if (structuredStatuses.length) {
+    structuredStatuses.forEach(st => idbApplyStructuredStatus(row, st.name, st.value, st.statKey));
+  } else if (item.extraStats && typeof item.extraStats === "object") {
+    // generated catalog normally contains both addStatuses and normalized extraStats for the same official add_status rows.
+    // Applying both doubles imported equipment effects, so extraStats is only a fallback when structured addStatuses are absent.
+    Object.entries(item.extraStats).forEach(([prop, value]) => {
+      if (prop in row) row[prop] = +(row[prop] || 0) + (+value || 0);
+    });
+  }
+  if (item.category !== "weapon" && +item.armorClass) row.extraAC = +(row.extraAC || 0) + (+item.armorClass || 0);
+  if (item.category !== "weapon") {
+    row.armorBaseAC = +item.armorClass || 0;
+    row.armorRequirements = item.requirements || idbWeaponReqsFromText(item.requiredSkill || "", +item.needLevel || 0);
+  }
+
+  const buff = item.equipBuff?.name ? item.equipBuff : (item.buffRefs || []).map(catalogFindBuffById).find(Boolean);
+  if (buff?.name) {
+    idbSetEquipmentBuff(row, buff.name, buff.info || buff.note || "");
+    row.equipBuffCatalogId = buff.catalogId || buff.id || "";
+    row.equipBuffTechnicId = buff.officialTechnicId || item.technicId || "";
+    row.equipBuffConflictGroup = "";
+    row.equipBuffStackRule = "same-technic";
+    const candidate = findEquipBuffRuleCandidate(buff, item);
+    if (candidate) applyEquipBuffRuleCandidateToEquipment(row, candidate);
+    applySkillBuffCompatibilityToEquipment(row, buff, item);
+    applyDamageBuffCompatibilityToEquipment(row, buff, item);
+    if (!row.equipBuffWikiText && (buff.info || buff.note)) row.equipBuffWikiText = buff.info || buff.note || "";
+  }
+
+  restoreEquipmentBuffCompatibilityGroups(row, item);
+  sanitizeGenericAttackConversionConflict(row);
+  return normalizeEquipmentCandidate(row);
 }

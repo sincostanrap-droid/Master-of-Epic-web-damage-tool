@@ -216,7 +216,7 @@ function runAudit() {
 
     if (rule.reviewStatus) {
       statusCounts[rule.reviewStatus] = (statusCounts[rule.reviewStatus] || 0) + 1;
-      if (!["implemented", "display-only", "unverified"].includes(rule.reviewStatus)) {
+      if (!["implemented", "display-only", "unverified", "partial"].includes(rule.reviewStatus)) {
         errors.push(`${label}: unknown reviewStatus ${rule.reviewStatus}`);
       }
     }
@@ -231,7 +231,7 @@ function runAudit() {
       errors.push(`${label}: noncanonical target race ${target}`);
     }
     for (const key of rule.authoritativeStats || []) {
-      if (!rule.verified || !runtimeStats.has(key)
+      if ((!rule.verified && rule.reviewStatus !== "partial") || !runtimeStats.has(key)
           || !Object.prototype.hasOwnProperty.call(rule.stats || {}, key)
           || !Number.isFinite(Number(rule.stats[key]))) {
         errors.push(`${label}: invalid authoritative stat ${key}`);

@@ -1,0 +1,30 @@
+const assert=require('node:assert/strict');
+const vm=require('node:vm');
+const {candidateContext}=require('../tools/inspect-optimizer-v2-candidates.cjs');
+const {json}=require('../tools/benchmark-optimizer.cjs');
+const p=candidateContext(), api=p.MOEOptimizerV2Candidates;
+vm.runInContext('state=DEFAULT_STATE(); state.equipment=[{name:"must never become a candidate",slot:"防具: 頭"}];',p);
+const stateBefore=vm.runInContext('JSON.stringify(state)',p);
+const items=p.equipmentCatalogItems(), sourceBefore=JSON.stringify(items);
+const output=api.generate(), d=output.diagnostics;
+assert.ok(items.length>11000 && items.some(x=>x.ammoKind),'full catalog includes ammo');
+assert.equal(d.sourceCatalogCount,items.length);
+assert.equal(d.candidateCount,items.length);
+assert.equal(d.excludedCount,0);assert.equal(d.conversionFailedCount,0);
+assert.equal(d.attemptedCandidateCount,d.candidateCount+d.excludedCount+d.conversionFailedCount);
+for(const counts of [d.bySlot,d.byWeaponType,d.byQuality]) assert.equal(Object.values(counts).reduce((a,b)=>a+b,0),d.candidateCount);
+assert.equal(new Set(output.candidates.map(c=>c.candidateId)).size,d.candidateCount);
+assert.equal(vm.runInContext('JSON.stringify(state)',p),stateBefore);
+assert.equal(JSON.stringify(items),sourceBefore);
+assert.ok(!output.candidates.some(c=>c.name==='must never become a candidate'));
+let sparseBytes=0, fullBytes=0;
+for(let i=0;i<items.length;i++) {
+  const candidate=output.candidates[i], legacy=p.catalogEquipmentToRow(items[i],'raw');
+  assert.deepEqual(json(api.toEquipmentRow(candidate,{enabled:false})),json(legacy),candidate.candidateId);
+  sparseBytes+=JSON.stringify(candidate.evaluationFields).length;
+  fullBytes+=JSON.stringify(legacy).length;
+}
+assert.ok(sparseBytes<fullBytes*0.5,'sparse row storage avoids default field replication');
+p.MOE_AMMO_CATALOG_GENERATED=undefined;
+assert.throws(()=>api.generate(),/Load the equipment and ammo catalogs/,'unloaded data is not an empty success');
+console.log(`v2 full catalog: ${d.candidateCount} candidates, no exclusions/failures, every row round-trips; sparse/full characters ${sparseBytes}/${fullBytes}`);

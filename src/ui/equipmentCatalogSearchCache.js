@@ -22,6 +22,12 @@
     page: 0
   };
 
+  const modeCaches=new Map();
+  global.restoreCatalogSearchMode=mode=>{
+    if(cache.ready)modeCaches.set(cache.filter?.specialization?.enabled?'special':'normal',{...cache});
+    const saved=modeCaches.get(mode);
+    if(saved){Object.assign(cache,saved);renderPage();updateDirtyHint(false);}else applySearch(true);
+  };
   function applySearch(resetPage=true, keepFilter=false) {
     if (cache.applying) return;
     cache.applying = true;
@@ -37,7 +43,12 @@
         typeof global.catalogItemMatches !== "function"
           || global.catalogItemMatches(item, filter)
       );
-      const filtered = typeof global.sortCatalogItems === "function"
+      const spec = filter.specialization;
+      const specialized = spec?.enabled && typeof global.catalogEffectProjection === "function";
+      const filtered = specialized
+        ? matched.filter(item => (spec.showExcluded || catalogCandidatePolicy.get(item)!=='excluded') && global.MOEEquipmentEffectFacets.matches(global.catalogEffectProjection(item), spec.axes))
+          .sort((a,b) => global.MOEEquipmentEffectFacets.compare(a,b,spec.axes,spec.sort,global.catalogEffectProjection))
+        : typeof global.sortCatalogItems === "function"
         ? global.sortCatalogItems(matched, filter)
         : matched;
 
@@ -124,15 +135,18 @@
     const already = typeof global.registeredCatalogIds === "function"
       ? global.registeredCatalogIds()
       : new Set();
+    if (typeof global.catalogSpecialHeader === "function") global.catalogSpecialHeader(filter);
 
     body.innerHTML = shown.length
       ? shown.map(item =>
-          global.catalogResultRowHtml(
+          (filter.specialization?.enabled && typeof global.catalogSpecialRowHtml === "function"
+            ? (item, already) => global.catalogSpecialRowHtml(item, already, filter.specialization)
+            : global.catalogResultRowHtml)(
             item,
             already.has(global.catalogRegistrationKey(item.catalogId || item.id || "", item.catalogQuality))
           )
         ).join("")
-      : `<tr><td colspan="5" class="small mutedText">該当する装備がありません。</td></tr>`;
+      : `<tr><td colspan="${filter.specialization?.enabled ? 9 : 5}" class="small mutedText">${filter.specialization?.enabled && !filter.specialization.axes[0].key ? 'メイン効果を選んで検索してください。' : '該当する装備がありません。'}</td></tr>`;
 
     const statText = typeof global.catalogStatFiltersDescription === "function"
       ? global.catalogStatFiltersDescription(filter)
@@ -141,6 +155,7 @@
     summary.textContent =
       `カタログ ${cache.total}件 / 該当 ${filtered.length}件 / 表示 ${shown.length}件` +
       (statText ? ` / ${statText}` : "");
+    if (filter.specialization?.enabled) summary.textContent += " / 特化検索 α・候補効果（競合前）";
 
     renderCachedPageControls(
       filtered.length,
@@ -184,6 +199,8 @@
   }
 
   function clearDraftControls() {
+    const specialEnabled = document.getElementById("catalogSpecialEnabled");
+    if (specialEnabled) specialEnabled.checked = false;
     const direct = {
       catalogSearch: "",
       catalogCategory: "",
@@ -292,6 +309,7 @@
       "[data-catalog-stat-filter-select]",
       "[data-catalog-buff-effect-input]",
       "[data-catalog-buff-effect-select]"
+      ,"[data-catalog-special]"
     ].join(",");
 
     document.querySelectorAll(draftSelector).forEach(el => {

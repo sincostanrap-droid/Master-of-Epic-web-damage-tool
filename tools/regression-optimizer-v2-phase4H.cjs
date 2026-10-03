@@ -1,0 +1,8 @@
+const fs=require('node:fs'),cp=require('node:child_process');
+const names=['BranchAndBound','GenericSkillPlusFastPath','SkillPlusPotential','SkillPlusGroups','Lexicographic','SkillPlusAvoidFastPath','SkillPlusAvoidBoundaries','MagicFastPath','MagicNumericBound','MagicCoupled','MagicCompletionAudit','AvoidFastPath','EvaluationSession','CandidateSessionCache','CancellablePreparation','MagicResistanceFastPath','AvoidResistanceFastPath'];
+const selected=process.argv.slice(2),output=selected.length?'docs/optimizer-v2-phase4H-regression-retry.json':'docs/optimizer-v2-phase4H-regression.json',data=selected.length&&fs.existsSync(output)?JSON.parse(fs.readFileSync(output,'utf8')):{tests:[],passed:0,failed:0},save=()=>fs.writeFileSync(output,JSON.stringify(data,null,2));
+const timeout=Number(process.env.PHASE4H_TEST_TIMEOUT_MS)||300000;
+for(const name of selected.length?selected:names){const start=performance.now(),file=`tests/optimizerV2${name}.test.cjs`,r=cp.spawnSync(process.execPath,[file],{encoding:'utf8',timeout,maxBuffer:2*1024*1024});const row={file,exitCode:r.status,elapsedMs:performance.now()-start,output:r.stdout,stderr:r.stderr,error:r.error?.message};data.tests.push(row);if(r.status===0)data.passed++;else data.failed++;
+ const latest=[...new Map(data.tests.map(t=>[t.file,t])).values()];data.passed=latest.filter(t=>t.exitCode===0).length;data.failed=latest.filter(t=>t.exitCode!==0).length;
+ fs.writeFileSync(`docs/optimizer-v2-phase4H-regression-${name}.json`,JSON.stringify(row,null,2));save();console.log(JSON.stringify({file,status:r.status,ms:row.elapsedMs}));}
+process.exitCode=data.failed?1:0;

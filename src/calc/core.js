@@ -14,12 +14,19 @@ function totalStatValue(base, flat=0, pct=0) {
   return ((+base || 0) + (+flat || 0)) * (1 + ((+pct || 0) / 100));
 }
 
-function computeMetrics(st, inputs) {
+function computeMetrics(st, inputs, resolvedCapture=null, preparedEvaluation=null) {
   inputs = standardCalculationInputs(inputs);
   // 装備行に内蔵されたBuffを計算用の装備以外Buffへ展開し、競合グループで重複しないよう代表だけ採用してから既存カテゴリへ展開する。
-  const normalizedEquipment = normalizeEquipmentRows(st.equipment);
-  st = expandEquipmentBuffState(st, normalizedEquipment);
+  const normalizedEquipment = preparedEvaluation?.normalizedEquipment || normalizeEquipmentRows(st.equipment);
+  st = expandEquipmentBuffState(st, normalizedEquipment, preparedEvaluation?.buffRow,
+    preparedEvaluation?.equipmentBuffCompositeOnly === true);
   st = applyBuffGroupRules(st);
+  // Optional same-evaluation handoff for callers that also need the resolved
+  // equipment/Buff state. The calculator keeps its normal path and result.
+  if (resolvedCapture) {
+    resolvedCapture.normalizedEquipment = normalizedEquipment;
+    resolvedCapture.resolvedBuffState = st;
+  }
   const skillPlusTotals = skillPlusTotalsFromResolvedState(st);
   const attackDelayBSources = attackDelayBSourcesFromResolvedState(st);
   st = expandCompositeState(st);
@@ -37,7 +44,15 @@ function computeMetrics(st, inputs) {
   };
   const extraStats = emptyExtraStats();
   equipmentRows.forEach(r => addExtraStatsInto(extraStats, r, "base"));
+  const armorRows = equipmentRows.map(row => equipmentArmorAC(row, st.skillSim));
+  const armorAC = {base:armorACContext(st.skillSim).base,
+    raw:armorRows.reduce((s,r)=>s+r.raw,0),effective:armorRows.reduce((s,r)=>s+r.effective,0),
+    additions:armorRows.reduce((s,r)=>s+r.addition,0)};
+  extraStats.extraAC = armorAC.effective + armorAC.additions;
   normalizeCompositeRows(st.composite).filter(r => r.enabled && !r.excluded).forEach(r => addExtraStatsInto(extraStats, r, "buff"));
+  armorAC.buff = extraStats.extraAC - armorAC.effective - armorAC.additions;
+  armorAC.percentage = extraStats.extraACPct;
+  const defense = totalStatValue(armorAC.base,extraStats.extraAC,extraStats.extraACPct);
 
   // 実数加算。魔力/速度は%Buffや変換より前、攻撃力は上限対象側に入る。
   const flatRows = normalizeFlatRows(st).filter(r => r.enabled);
@@ -64,7 +79,8 @@ function computeMetrics(st, inputs) {
   const weaponWeight = selectedWeapon ? effectiveWeapon.weight : (parseFloat(inputs.weaponWeight) || 0);
   if (selectedWeapon) inputs.weaponRange = effectiveWeapon.range;
   const weaponInputs = {...inputs, weaponDamage, weaponWeight};
-  const skillModInfo = calcWeaponSkillMod(st, weaponInputs);
+  const skillModInfo = calcWeaponSkillMod(st, weaponInputs,
+    preparedEvaluation?.normalizedEquipment || null);
   const skillMod = skillModInfo.mod;
   const baseTargetAC = parseFloat(inputs.targetAC) || 0;
   const baseTargetEvasion = parseFloat(inputs.targetEvasion) || 0;
@@ -190,7 +206,7 @@ function computeMetrics(st, inputs) {
 
   return {
     skillPlusTotals, attackDelayBSources,
-    stats, pctStats, conv, pctAtkCalc, spirit, magicCoeff, baseMagicFromSpirit, flatStatRaw, equipmentRaw, extraStats,
+    stats, pctStats, conv, pctAtkCalc, spirit, magicCoeff, baseMagicFromSpirit, flatStatRaw, equipmentRaw, extraStats, armorAC, defense,
     racialAtk, weaponAtk, weaponDamage, weaponWeight, selectedWeapon, selectedAmmo, effectiveWeapon, skillModInfo, baseNaturalAtk, conversionAtk, baseAtk, flatAtkRaw, extraRawBeforePct, cappedAddRawBeforePct, cappedAddBeforePct, atkBeforePct, atkPctMode, atkBuffRaw, atkCap, atkBuffCapped, atk,
     attackMultiplier, dmgMultiplier, defenseFactor, critAvg, basePostMultiplier, npcDamageTakenMultiplier, postMultiplier, baseNoTech,
     rawDamage, finalDamage, slots, specialMultiplier,

@@ -1,0 +1,16 @@
+const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
+const p=require('../tools/inspect-optimizer-v2-context.cjs').contextRuntime();
+for(const n of ['equipmentEffectFacets','equipmentEffectFacetCatalog'])vm.runInContext(fs.readFileSync(`src/domain/${n}.js`,'utf8'),p);
+vm.runInContext(fs.readFileSync('src/optimizer-v2/facetSearch.js','utf8'),p);
+const C=p.MOEOptimizerV2SearchContext,B=p.MOEOptimizerV2BranchAndBound,slot='防具: 頭',base=vm.runInContext('DEFAULT_STATE()',p);
+base.composite=[{enabled:true,name:'fixed score',extraEffects:[{key:'skillPlus',name:'キック',value:10}]}];
+const context=C.create({objective:{metric:'skillPlus',skillName:'キック'},secondary:{metric:'magic'},baseState:base,slots:[slot],topK:1});
+const items=[{catalogId:'body-magic',name:'body-magic',category:'defense',slot,magic:10},{catalogId:'body-magic2',name:'body-magic2',category:'defense',slot,magic:20}],prep=p.MOEOptimizerV2FacetSearch.prepare(items,context),r=prep.reduction;
+const snapshot=p.MOEOptimizerV2Candidates.generate({items}),conflict=C.evaluate(context,snapshot.candidates,snapshot.sources);assert.equal(conflict.feasible,false);assert.ok(conflict.violations.includes('duplicate-slot'));
+const sync=B.run(r),legacy=B.run(r,{primaryStrataFastPath:false});assert.deepEqual(JSON.parse(JSON.stringify(sync.results)),JSON.parse(JSON.stringify(legacy.results)));assert.equal(sync.diagnostics.primaryStrata.primaryMaximum,10);assert.equal(sync.diagnostics.exact,true);
+const secondaryDisabled=B.run(r,{lexicographicMagicBound:false});assert.deepEqual(JSON.parse(JSON.stringify(sync.results)),JSON.parse(JSON.stringify(secondaryDisabled.results)));assert.equal(secondaryDisabled.diagnostics.exact,true);
+const controller=B.run(r,{cooperative:true});let coop;for(;;){const q=controller.step();if(q.done){coop=q.value;break;}}controller.close();assert.deepEqual(JSON.parse(JSON.stringify(sync.results)),JSON.parse(JSON.stringify(coop.results)));
+assert.throws(()=>controller.step(),/finished/);
+const signal={aborted:false},abort=B.run(r,{cooperative:true,signal});assert.equal(abort.step().done,false);signal.aborted=true;let stopped;for(;;){const q=abort.step();if(q.done){stopped=q.value;break;}}abort.close();assert.equal(stopped.diagnostics.exact,false);assert.equal(stopped.diagnostics.primaryStrata.primaryMaximumExact,false);
+const untouched=B.run(r,{cooperative:true});untouched.close();assert.throws(()=>untouched.step(),/finished/);
+const report={syncCooperativeParity:true,legacyParity:true,abortExactFalse:true,closeBeforeStart:true,sameSlotFormalConflict:true,completed:true};fs.writeFileSync('docs/optimizer-v2-phase4H-control.json',JSON.stringify(report,null,2));console.log(JSON.stringify(report));

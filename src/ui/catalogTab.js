@@ -1,4 +1,7 @@
 function catalogFilterState() {
+  if(typeof catalogSearchMode!=="undefined" && catalogSearchMode==='special')return {
+    query:byId('specialName')?.value||'',slot:byId('specialSlot')?.value||'',category:'',statFilters:[],buffEffectFilters:[],buffMode:'',sort:'name',sortDir:'asc',limit:25,specialization:catalogSpecializationState()
+  };
   const statFilters = [];
   const buffEffectFilters = [];
   for (let i = 1; i <= 4; i++) {
@@ -29,6 +32,7 @@ function catalogFilterState() {
   const firstStat = statFilters[0] || null;
   return {
     query: byId("catalogSearch")?.value || "",
+    specialization: null,
     category: byId("catalogCategory")?.value || "",
     slot: byId("catalogSlot")?.value || "",
     statFilters,
@@ -52,6 +56,7 @@ function createCatalogTab(panel) {
       <label>検索 <input id="catalogSearch" type="search" placeholder="装備名・効果・Buff名・必要スキル" autocomplete="off"></label>
       <label>カテゴリ <select id="catalogCategory"><option value="">すべて</option><option value="weapon">武器</option><option value="defense">防具/装飾</option><option value="shield">盾</option></select></label>
       <label>部位 <select id="catalogSlot"><option value="">すべて</option></select></label>
+
       <div id="catalogSearchApplyActions" class="catalogSearchApplyActions catalogSearchApplyActionsTop">
         <button type="button" id="catalogApplySearch" class="primary">検索</button>
         <button type="button" id="catalogClearSearch">条件クリア</button>
@@ -107,6 +112,9 @@ function createCatalogTab(panel) {
   `;
 
   mountCatalogWorkspace(panel);
+  mountCatalogSpecialization(panel);
+
+
 
   ["catalogSearch", "catalogCategory", "catalogSlot", "catalogStat1", "catalogStatOp1", "catalogStatValue1", "catalogStat2", "catalogStatOp2", "catalogStatValue2", "catalogStat3", "catalogStatOp3", "catalogStatValue3", "catalogStat4", "catalogStatOp4", "catalogStatValue4", "catalogBuffEffect1", "catalogBuffEffectTarget1", "catalogBuffEffectOp1", "catalogBuffEffectValue1", "catalogBuffEffect2", "catalogBuffEffectTarget2", "catalogBuffEffectOp2", "catalogBuffEffectValue2", "catalogBuffEffect3", "catalogBuffEffectTarget3", "catalogBuffEffectOp3", "catalogBuffEffectValue3", "catalogBuffEffect4", "catalogBuffEffectTarget4", "catalogBuffEffectOp4", "catalogBuffEffectValue4", "catalogBuffMode", "catalogSort", "catalogSortDir", "catalogLimit"].forEach(id => {
     const el = byId(id);
@@ -125,6 +133,7 @@ function createCatalogTab(panel) {
   });
   const reload = byId("catalogReloadBtn");
   if (reload) reload.onclick = () => {
+    if (typeof invalidateCatalogEffectFacets === "function") invalidateCatalogEffectFacets();
     catalogScriptsPromise = null;
     catalogResetPage();
     loadCatalogScriptsOnce().then(() => setupCatalogFilterOptions(true));

@@ -6861,22 +6861,26 @@ function equipmentBuffStackKey(r) {
   return name ? `name:${name}` : "";
 }
 
-function resolveEquipmentBuffRowsForSameTechnic(rows, normalizedRows=null) {
-  const eligible = (normalizedRows || normalizeEquipmentRows(rows))
-    .filter(r => r.enabled !== false && r.equipBuffEnabled)
-    .map(resolveEquipmentBuffRow)
-    .filter(equipmentBuffHasEffect);
+function resolveEquipmentBuffRowsForSameTechnic(rows, normalizedRows=null, preparedRow=null, returnPrepared=false) {
+  const activeRows = (normalizedRows || normalizeEquipmentRows(rows))
+    .filter(r => r.enabled !== false && r.equipBuffEnabled);
+  const eligible = preparedRow
+    ? activeRows.map(preparedRow).filter(item => item.hasEffect)
+    : activeRows.map(resolveEquipmentBuffRow).filter(equipmentBuffHasEffect);
+  const keyFor = preparedRow
+    ? item => item.stackKey
+    : equipmentBuffStackKey;
 
   const latestOrderByKey = new Map();
-  eligible.forEach((r, order) => {
-    const key = equipmentBuffStackKey(r);
+  eligible.forEach((item, order) => {
+    const key = keyFor(item);
     if (key) latestOrderByKey.set(key, order);
   });
 
-  return eligible.filter((r, order) => {
-    const key = equipmentBuffStackKey(r);
+  return eligible.filter((item, order) => {
+    const key = keyFor(item);
     return !key || latestOrderByKey.get(key) === order;
-  });
+  }).map(item => returnPrepared ? item : preparedRow ? item.resolved : item);
 }
 
 function equipmentBuffCompositeTags(r) {
@@ -6985,12 +6989,22 @@ function equipmentBuffToCompositeRow(r) {
 }
 
 /* 装備行に内蔵されたBuffを、計算時だけ装備以外Buffへ展開する。 */
-function expandEquipmentBuffState(st, normalizedEquipment=null) {
-  const out = clone(st || {});
+function expandEquipmentBuffState(st, normalizedEquipment=null, preparedRow=null, copyCompositeOnly=false) {
+  // Optimizer's isolated prepared state only appends composite rows here.
+  // The following official group resolver still deep-clones the whole state.
+  // Normal callers retain the original clone/ownership behavior.
+  const out = copyCompositeOnly && preparedRow && normalizedEquipment
+    ? {...(st || {}), composite:Array.isArray(st?.composite) ? st.composite.slice() : []}
+    : clone(st || {});
   out.composite = Array.isArray(out.composite) ? out.composite : [];
-  resolveEquipmentBuffRowsForSameTechnic((st || {}).equipment, normalizedEquipment)
-    .map(r => restoreEquipmentBuffCompatibilityGroups(r))
-    .forEach(r => out.composite.push(equipmentBuffToCompositeRow(r)));
+  if (preparedRow) {
+    resolveEquipmentBuffRowsForSameTechnic((st || {}).equipment, normalizedEquipment, preparedRow, true)
+      .forEach(item => out.composite.push(item.copyComposite()));
+  } else {
+    resolveEquipmentBuffRowsForSameTechnic((st || {}).equipment, normalizedEquipment)
+      .map(r => restoreEquipmentBuffCompatibilityGroups(r))
+      .forEach(r => out.composite.push(equipmentBuffToCompositeRow(r)));
+  }
   return out;
 }
 
@@ -8014,8 +8028,8 @@ function selectedWeaponRowForEdit() {
     || null;
 }
 
-function weaponReqRowsForCalc(st, inputs={}) {
-  const selected = selectedWeaponForCalc(st);
+function weaponReqRowsForCalc(st, inputs={}, normalizedEquipment=null) {
+  const selected = selectedWeaponForCalc(st, normalizedEquipment);
   if (selected) return weaponReqRowsWithSkillSimCurrent(selected.weaponReq);
   return normalizeWeaponReqRows(st?.weaponReq, inputs);
 }
@@ -8049,6 +8063,12 @@ function normalizeWeaponReqRows(rows, inputs={}) {
  * 使用条件1行分の補正を計算する。
  * 8割未満は0、必要値以上は1、その間は current/required。
  */
+function skillRequirementGateMet(current, required) {
+  const threshold = required * 0.8;
+  // Decimal UI values such as 56.8/71 are exactly on the intended gate.
+  const tolerance = Number.EPSILON * 4 * Math.max(1, Math.abs(current), Math.abs(threshold));
+  return current >= threshold || Math.abs(current - threshold) <= tolerance;
+}
 function skillRequirementRatio(current, required) {
   current = parseFloat(current) || 0;
   required = Math.max(0.000001, parseFloat(required) || 0);
@@ -8056,7 +8076,7 @@ function skillRequirementRatio(current, required) {
   // 最新補正式:
   // 8割未満は0、8割以上〜必要値未満は current/required、必要値以上は1
   if (current >= required) return {ratio: 1, denom: required};
-  if (current < required * 0.8) return {ratio: 0, denom: required};
+  if (!skillRequirementGateMet(current, required)) return {ratio: 0, denom: required};
   return {ratio: current / required, denom: required};
 }
 
@@ -8068,8 +8088,13 @@ function skillRequirementRatio(current, required) {
  *   - 全条件が8割以上なら、sum(min(current, required)) / sum(required)。
  *   - required超過分で他条件の不足を補填しないため、currentはrequiredで上限をかける。
  */
-function calcWeaponSkillMod(st, inputs={}) {
-  const rows = weaponReqRowsForCalc(st, inputs);
+function calcWeaponSkillMod(st, inputs={}, normalizedEquipment=null) {
+  const rows = weaponReqRowsForCalc(st, inputs, normalizedEquipment);
+  return calcRequiredSkillsMod(rows);
+}
+
+// Body requirements shared by weapons and armor; callers provide raw skills.
+function calcRequiredSkillsMod(rows) {
   const active = rows.filter(r => (parseFloat(r.required) || 0) > 0);
   const mode = "official";
   if (!active.length) return {mod: 1, rows, evaluated: [], limiting: null, mode, gateFailed: null, totalCurrent: 0, totalRequired: 0};
@@ -8078,7 +8103,7 @@ function calcWeaponSkillMod(st, inputs={}) {
     const current = parseFloat(r.current) || 0;
     const required = Math.max(0.000001, parseFloat(r.required) || 0);
     const evalResult = skillRequirementRatio(current, required);
-    const meetsGate = current >= required * 0.8;
+    const meetsGate = skillRequirementGateMet(current, required);
     const cappedCurrent = Math.min(current, required);
     return {...r, current, required, cappedCurrent, denom: evalResult.denom, ratio: evalResult.ratio, meetsGate};
   });
@@ -8095,6 +8120,36 @@ function calcWeaponSkillMod(st, inputs={}) {
   const limiting = gateFailed || evaluated.reduce((a, b) => b.ratio < a.ratio ? b : a, evaluated[0]);
 
   return {mod, rows, evaluated, limiting, mode, gateFailed, totalCurrent, totalRequired, overallRatio};
+}
+
+// Sole formal body-armor calculation. extraAC retains its editable raw total;
+// provenance separates armor_class from unattenuated add_status AC.
+function equipmentArmorAC(row, skillSim) {
+  const sim = normalizeSkillSim(skillSim);
+  let raw = row.armorBaseAC, requirements = row.armorRequirements;
+  if (raw === undefined && row.catalogId) {
+    const item = equipmentCatalogItems().find(i => String(i.catalogId || i.id) === String(row.catalogId));
+    if (item && item.category !== "weapon") {
+      raw = +catalogItemWithQuality(item, row.catalogQuality || "raw").armorClass || 0;
+      requirements = item.requirements || idbWeaponReqsFromText(item.requiredSkill || "", +item.needLevel || 0);
+    }
+  }
+  // An unproven manual combined field remains a flat bonus. Its body portion
+  // must be supplied explicitly; do not guess provenance or game requirements.
+  raw = +(raw || 0);
+  const rows = normalizeWeaponReqRowsForEquipment(requirements || []).map(r =>
+    ({...r,current:+(sim.skills[r.name] || 0)}));
+  const performance = calcRequiredSkillsMod(rows);
+  const multiplier = (+(sim.skills["着こなし"] || 0) + 300) / 350;
+  const effective = raw * performance.mod * multiplier;
+  const addition = (+row.extraAC || 0) - raw;
+  return {raw, effective, addition, total:effective + addition, multiplier, performance};
+}
+
+function armorACContext(skillSim) {
+  const sim = normalizeSkillSim(skillSim);
+  return {base:skillSimStat(sim.race,"def",sim.skills["着こなし"]),
+    clothing:sim.skills["着こなし"],race:sim.race};
 }
 
 /* 武器使用条件テーブルをstate.weaponReqから描画する。 */

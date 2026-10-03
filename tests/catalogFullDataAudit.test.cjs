@@ -1,0 +1,17 @@
+const assert=require('node:assert/strict'),fs=require('node:fs'),crypto=require('node:crypto');
+const {textClaims,sumStatuses,classifyWikiEffect}=require('../tools/audit-catalog-full-data.cjs');
+const claims=textClaims('魔力 +2.0 回避+10% 移動速度 -100 攻撃力+1.25 最大HP＋１');
+assert.deepEqual(claims.map(x=>[x.field,x.value]),[['magic',2],['extraAvoidPct',10],['speed',-100],['attack',1.25],['extraHP',1]]);
+assert.equal(claims.some(x=>x.field==='extraAvoid'&&x.value===1),false,'no percent-prefix false flat');
+const keys=new Set(['magic','extraAvoid','extraHP','extraAC','extraKickHit']);
+const sums=sumStatuses({category:'defense',armorClass:10,addStatuses:[{name:'魔力',value:2,statKey:'magic'},{name:'魔力',value:-1,statKey:'magic'},{name:'キック命中率補正',value:3,statKey:'extraHit'},{name:'未対応',value:4}],extraStats:{magic:999}},{魔力:'magic',キック命中率補正:'extraKickHit'},keys);
+assert.equal(sums.expected.magic,1);assert.equal(sums.expected.extraAC,10);assert.equal(sums.expected.extraKickHit,3);assert.equal(sums.unsupported.length,1);
+assert.equal(sumStatuses({extraStats:{magic:2}},{},keys).expected.magic,2);
+assert.equal(classifyWikiEffect({info:'回避+10%'},{raw:'回避+1',unit:''}),'snapshot-parser-numeric-fragment');
+assert.equal(classifyWikiEffect({info:'水属性ダメージを25%軽減'},{key:'elementDamagePct'}),'snapshot-parser-effect-scope');
+const report=JSON.parse(fs.readFileSync('docs/catalog-full-data-audit.json','utf8'));
+assert.equal(report.equipment.length,report.summary.equipment);assert.equal(report.buffs.length,report.summary.buffs);assert.equal(report.wiki.length,report.summary.wikiRecords);assert.equal(report.summary.importedWithoutError,report.summary.equipment);
+for(const [file,hash]of Object.entries(report.sourceHashes))assert.equal(crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex'),hash,'audit stale: '+file);
+const missing=report.findings.filter(f=>f.kind==='confirmed-ammo-structured-omission');assert.equal(missing.length,0,'four ammo omissions repaired');assert.equal(report.findings.filter(f=>f.kind==='text-value-represented-direct'&&f.itemId.startsWith('wiki-ammo')).length,4);
+assert.equal(report.findings.some(f=>f.name==='バインディング アロー'&&f.kind==='confirmed-ammo-structured-omission'),false,'enemy debuff not counted as player omission');
+console.log('full local audit inventory/hash integrity, signed values/percent handling, structured aggregation/fallback, specialized status, source artifact and enemy-effect distinction passed');

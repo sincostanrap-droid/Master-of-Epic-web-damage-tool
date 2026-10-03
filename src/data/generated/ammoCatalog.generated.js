@@ -1,3 +1,4 @@
+// Reviewed structured ammo additions: 2026-10-03; see ammoStructuredAdditions.test.cjs.
 window.MOE_AMMO_CATALOG_GENERATED = [
   {
     "catalogId": "wiki-ammo-arrow-1",
@@ -574,6 +575,10 @@ window.MOE_AMMO_CATALOG_GENERATED = [
       }
     ],
     "equip": "矢/弾",
+    "addStatuses": [
+      { "name": "攻撃力", "value": 2, "statKey": "attack" }
+    ],
+    "extraStats": { "attack": 2 },
     "info": "攻撃力 +2.0 モニコンの呪い",
     "note": "MoE Wiki 武器一覧から生成",
     "verified": true,
@@ -777,6 +782,10 @@ window.MOE_AMMO_CATALOG_GENERATED = [
       }
     ],
     "equip": "矢/弾",
+    "addStatuses": [
+      { "name": "命中", "value": 5, "statKey": "extraHit" }
+    ],
+    "extraStats": { "extraHit": 5 },
     "info": "命中 +5.0 衝撃変換 (無属性の魔法追加ダメージ) ※CS/AL/LO",
     "note": "MoE Wiki 武器一覧から生成",
     "verified": true,
@@ -835,6 +844,10 @@ window.MOE_AMMO_CATALOG_GENERATED = [
       }
     ],
     "equip": "矢/弾",
+    "addStatuses": [
+      { "name": "魔力", "value": 2, "statKey": "magic" }
+    ],
+    "extraStats": { "magic": 2 },
     "info": "魔力 +2.0 モニコンの呪い",
     "note": "MoE Wiki 武器一覧から生成",
     "verified": true,
@@ -1009,6 +1022,10 @@ window.MOE_AMMO_CATALOG_GENERATED = [
       }
     ],
     "equip": "矢/弾",
+    "addStatuses": [
+      { "name": "最大HP", "value": 1, "statKey": "extraHP" }
+    ],
+    "extraStats": { "extraHP": 1 },
     "info": "最大HP +1.0",
     "note": "MoE Wiki 弓（武器）から生成",
     "verified": true,

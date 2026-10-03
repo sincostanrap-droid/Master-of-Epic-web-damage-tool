@@ -1,0 +1,15 @@
+const assert=require('node:assert/strict'),vm=require('node:vm');
+const {completionRuntime}=require('../tools/optimizer-v2-magic-completion-runtime.cjs'),{p,B}=completionRuntime(),C=p.MOEOptimizerV2SearchContext;
+const slot='防具: 頭';
+const base=vm.runInContext('DEFAULT_STATE()',p);
+base.flat=[1,1,-1e16].map(value=>({enabled:true,target:'magic',value}));
+base.pct=[{enabled:true,target:'magic',percent:1e102}];
+const context=C.create({objective:'magic',slots:[slot],topK:1,baseState:base,inputs:{spirit:1e16}});
+const prep=p.MOEOptimizerV2FacetSearch.prepare([],context,{magicReduction:false}),formal=C.evaluate(context,[],prep.snapshot.sources);
+assert.ok(formal.score>1e100);assert.ok(B.inspectMagicCoupled(prep.reduction).upper>=formal.score);assert.ok(B.inspectMagic(prep.reduction).upper>=formal.score);
+const extreme=vm.runInContext('DEFAULT_STATE()',p);extreme.pct=[{enabled:true,target:'magic',percent:50}];
+const extremeContext=C.create({objective:'magic',slots:[slot],topK:1,baseState:extreme,inputs:{spirit:1e308}});
+const extremePrep=p.MOEOptimizerV2FacetSearch.prepare([],extremeContext,{magicReduction:false});
+assert.equal(B.inspectMagic(extremePrep.reduction).upper,null);
+assert.equal(B.inspectMagicCoupled(extremePrep.reduction).upper,null);
+console.log('Cancellation residue amplified by percent: safe; percentage multiplication overflow: unknown, retain branch');

@@ -25,7 +25,7 @@ function activateMainTab(id) {
     const top = panels.getBoundingClientRect().top + scrollY;
     panels.style.minHeight = Math.max(0, scrollY + window.innerHeight - top) + "px";
   }
-  const valid = MAIN_TABS.some(t => t.id === id) ? id : "calc";
+  const valid = id === "specialization" ? "catalog" : MAIN_TABS.some(t => t.id === id) ? id : "calc";
   document.querySelectorAll(".mainTabButton").forEach(btn => {
     const active = btn.dataset.tabId === valid;
     btn.classList.toggle("active", active);
@@ -39,6 +39,7 @@ function activateMainTab(id) {
     detail: {id: valid}
   }));
   if (valid === "catalog") renderCatalogTab();
+  if (valid === "specialization") renderSpecializationTab();
   if (valid === "combatLog") renderCombatLogTab();
   window.scrollTo({left:scrollX, top:scrollY, behavior:"instant"});
   requestAnimationFrame(() => {

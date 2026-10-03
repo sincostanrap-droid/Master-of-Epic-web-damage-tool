@@ -1,0 +1,40 @@
+// Read-only production audit. Historical source is loaded from Git into VMs,
+// without checkout, index writes or modifications to implementation files.
+const fs=require('node:fs'),path=require('node:path'),cp=require('node:child_process'),vm=require('node:vm'),crypto=require('node:crypto'),assert=require('node:assert/strict');
+const {contextRuntime}=require('./inspect-optimizer-v2-context.cjs');
+const root=path.resolve(__dirname,'..'),json=x=>JSON.parse(JSON.stringify(x));
+const canonical=x=>Array.isArray(x)?x.map(canonical):x&&typeof x==='object'?Object.fromEntries(Object.keys(x).sort().map(k=>[k,canonical(x[k])])):x;
+const hash=x=>crypto.createHash('sha256').update(typeof x==='string'?x:JSON.stringify(canonical(x))).digest('hex');
+function runtime(ref=null){const original=fs.readFileSync,cache=new Map();
+ if(ref)fs.readFileSync=function(file,encoding){const rel=path.relative(root,path.resolve(file)).replaceAll('\\','/'),selected=typeof ref==='string'?ref:rel.startsWith('src/data/')?ref.data:null;if(selected&&rel.startsWith('src/')){if(!cache.has(rel))cache.set(rel,cp.execFileSync('git',['show',`${selected}:${rel}`],{encoding:'utf8',maxBuffer:64*1024*1024}));return encoding?cache.get(rel):Buffer.from(cache.get(rel));}return original.apply(this,arguments);};
+ try{const p=contextRuntime();for(const n of ['equipmentEffectFacets','equipmentEffectFacetCatalog','equipmentSearchSpecification'])vm.runInContext(fs.readFileSync(path.join(root,`src/domain/${n}.js`),'utf8'),p);vm.runInContext(fs.readFileSync(path.join(root,'src/optimizer-v2/facetSearch.js'),'utf8'),p);return p;}finally{fs.readFileSync=original;}
+}
+function context(p){const base=vm.runInContext('DEFAULT_STATE()',p),S=p.MOEEquipmentSearchSpecification;return S.toContext(S.create([{key:'skillPlus:破壊魔法'},{key:'stat:magic'}],{secondary:true,topK:20}),{baseState:base});}
+function summarizeContext(c){return {signatureSha256:hash(c),signatureBytes:JSON.stringify(canonical(c)).length,skillSim:json(c.skillSim),race:c.race,external:json(Object.fromEntries(['composite','pct','flat','conv','dmg','post','special','other'].map(k=>[k,c.baseState[k]]))),fixed:c.fixedCandidateIds,excluded:c.excludedCandidateIds,constraints:c.constraints,K:c.topK,inputs:c.inputs,runtimeHash:hash(c.runtime),baseStateHash:hash(c.baseState)};}
+const top=r=>json(r.results.map((x,i)=>({rank:i+1,primary:x.score,secondary:x.secondaryScore,key:x.performanceKey,ids:x.candidateIds.slice().sort()})));
+function run(p,r,options={}){const signal={aborted:false},t=performance.now(),ctl=p.MOEOptimizerV2BranchAndBound.run(r,{...options,signal,cooperative:true});let result;
+ try{for(;;){if(performance.now()-t>45000)signal.aborted=true;const q=ctl.step();if(q.done){result=q.value;break;}}}finally{ctl.close();}
+ assert.equal(result.diagnostics.exact,true,'45-second bounded audit must complete');return {elapsedMs:performance.now()-t,top:top(result),exact:result.diagnostics.exact,diagnostics:json(result.diagnostics)};
+}
+function classRows(r){return r.contextEquivalentClasses.map(c=>({id:c.representativeCandidateId,ids:c.equivalentCandidateIds,slot:c.representativeCandidate.slot,name:c.representativeCandidate.name,key:c.equivalenceKey,row:json(r.candidatePreparation?r.candidatePreparation.readRow(c.representativeCandidate):null)}));}
+function evaluateIds(p,ctx,prep,ids){const C=p.MOEOptimizerV2SearchContext,sources={...prep.snapshot.sources},candidates=ids.map(id=>{const found=prep.snapshot.candidates.find(c=>c.candidateId===id);if(found)return found;const catalogId=id.match(/^ov2:catalogId:(.*):quality:/)[1],item=p.equipmentCatalogItems().find(x=>x.catalogId===catalogId);assert.ok(item,id);const extra=p.MOEOptimizerV2Candidates.generate({items:[item]});Object.assign(sources,extra.sources);return extra.candidates[0];}),e=C.evaluate(ctx,candidates,sources);assert.ok(e.feasible);return {primary:e.score,secondary:e.secondaryScore,metrics:json(e.metrics),equipment:candidates.map(c=>({id:c.candidateId,slot:c.slot,name:c.name,row:json(p.MOEOptimizerV2Candidates.toEquipmentRow(c))}))};}
+if(require.main===module){
+ const resume=process.argv.includes('--resume'),report=resume?JSON.parse(fs.readFileSync('docs/optimizer-v2-phase4H-final-consistency.json','utf8')):{head:cp.execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),historical:'a00cfd2',started:new Date().toISOString()},save=()=>fs.writeFileSync('docs/optimizer-v2-phase4H-final-consistency.json',JSON.stringify(report,null,2));
+ const p=runtime(),ctx=context(p),items=p.equipmentCatalogItems();let t=performance.now();const prep=p.MOEOptimizerV2FacetSearch.prepare(items,ctx);if(!resume)report.current={catalog:items.length,context:summarizeContext(ctx),preparationMs:performance.now()-t,classes:classRows(prep.reduction)};
+ if(!resume){report.current.old=run(p,prep.reduction,{primaryStrataFastPath:false});report.current.new=run(p,prep.reduction);}assert.deepEqual(report.current.old.top,report.current.new.top);report.current.parity=true;report.current.contextUnchanged=hash(ctx)===report.current.context.signatureSha256;
+ report.current.oldTop1=evaluateIds(p,ctx,prep,report.current.old.top[0].ids);report.current.newTop1=evaluateIds(p,ctx,prep,report.current.new.top[0].ids);save();console.log('CURRENT',prep.reduction.candidates.length,report.current.old.top[0].secondary,report.current.new.top[0].secondary,'parity',report.current.parity);
+ const old=runtime('a00cfd2'),oldCtx=context(old),oldItems=old.equipmentCatalogItems();t=performance.now();const oldPrep=old.MOEOptimizerV2FacetSearch.prepare(oldItems,oldCtx);report.historical={catalog:oldItems.length,context:summarizeContext(oldCtx),preparationMs:performance.now()-t,classes:classRows(oldPrep.reduction)};
+ const saved=JSON.parse(fs.readFileSync('docs/optimizer-v2-phase4C-benchmark.json','utf8')).runs.find(r=>r.diagnostics.exact&&r.top[0].secondary===87.55);assert.ok(saved);
+ report.historical.savedTop=saved.top;report.historical.reconstructedTop1=evaluateIds(old,oldCtx,oldPrep,saved.top[0].ids);assert.equal(report.historical.reconstructedTop1.secondary,87.55);
+ report.current.historicalTop1Reevaluated=evaluateIds(p,ctx,prep,saved.top[0].ids);
+ report.historical.currentTop1Reevaluated=evaluateIds(old,oldCtx,oldPrep,report.current.new.top[0].ids);
+ const prior=new Map(report.historical.classes.map(c=>[c.id,c])),now=new Map(report.current.classes.map(c=>[c.id,c]));
+ report.classDelta={added:[...now].filter(([id])=>!prior.has(id)).map(([,c])=>c),removed:[...prior].filter(([id])=>!now.has(id)).map(([,c])=>c),changed:[...now].filter(([id,c])=>prior.has(id)&&c.key!==prior.get(id).key).map(([id,c])=>({id,before:prior.get(id),after:c}))};
+ report.historical.exact=run(old,oldPrep.reduction);save();assert.deepEqual(report.historical.exact.top.map(({rank,...x})=>x),saved.top);report.historical.savedTop20Parity=true;
+ save();console.log('HISTORICAL',oldPrep.reduction.candidates.length,report.historical.reconstructedTop1.secondary,'CURRENT-OLD-BUILD',report.current.historicalTop1Reevaluated.secondary,'OLD-CURRENT-BUILD',report.historical.currentTop1Reevaluated.secondary,'CLASS DELTA',report.classDelta.added.length,report.classDelta.removed.length,report.classDelta.changed.length);
+ // A controlled catalog swap isolates data from current reducer/search code.
+ const oldCatalogSource=cp.execFileSync('git',['show','a00cfd2:src/data/generated/equipmentCatalog.generated.js'],{encoding:'utf8',maxBuffer:64*1024*1024});
+ const swappedItems=items.filter(x=>!/^official-/.test(x.catalogId)).concat(oldItems.filter(x=>/^official-/.test(x.catalogId))),swap=p.MOEOptimizerV2FacetSearch.prepare(swappedItems,ctx);report.currentWithHistoricalEquipmentCatalog={catalog:swappedItems.length,classes:classRows(swap.reduction),exact:run(p,swap.reduction,{primaryStrataFastPath:false})};save();console.log('CATALOG-SWAP',swappedItems.length,swap.reduction.candidates.length,report.currentWithHistoricalEquipmentCatalog.exact.top[0].secondary);
+ report.completed=true;save();
+}
+module.exports={runtime,context,summarizeContext,run,evaluateIds,hash,json};

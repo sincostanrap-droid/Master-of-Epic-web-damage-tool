@@ -91,6 +91,7 @@ function catalogWorkspaceRefresh(shown, filter, refreshQuality) {
       section("装備条件・性能変動", catalogRequirementAndPerformanceSummary(item)) +
       section("装備の追加効果", catalogStatusSummary(item)) +
       section("装備Buff", catalogBuffSummary(item)) +
+      (typeof catalogSpecialDetailHtml === "function" ? catalogSpecialDetailHtml(item, filter.specialization) : "") +
       (item.info ? section("説明", item.info) : "") +
       '<div class="catalogDetailActions">' +
       ((+item.weaponDamage || +item.armorClass) ? '<label>品質<select id="catalogDetailQuality"><option value="raw">データ通り</option><option value="HG_MG">HG/MG（生産品×1.1）</option></select></label><p class="small">NG基準の生産品だけHG/MGを指定してください。補正済みの数値には適用しません。</p>' : '') +

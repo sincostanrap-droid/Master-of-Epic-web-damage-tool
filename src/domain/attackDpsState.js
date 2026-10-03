@@ -75,10 +75,20 @@ function attackDpsAddDelayPctSource(bucket, kind, name, value, note="") {
 }
 
 function collectAttackDpsDelaySources(st=state) {
-  const bucket = {equipmentTotal:0, buffTotal:0, total:0, sources:[], pctSources:[]};
   const baseState = st || state || {};
+  const normalizedEquipment = normalizeEquipmentRows(baseState.equipment);
+  let buffState = clone(baseState);
+  if (typeof expandSkillSimMasteryBuffState === "function") buffState = expandSkillSimMasteryBuffState(buffState);
+  if (typeof expandEquipmentBuffState === "function") buffState = expandEquipmentBuffState(buffState);
+  if (typeof applyBuffGroupRules === "function") buffState = applyBuffGroupRules(buffState);
+  return collectAttackDpsDelaySourcesPrepared(normalizedEquipment, buffState);
+}
 
-  normalizeEquipmentRows(baseState.equipment)
+// Both entry points use the same official delay-source collection. The prepared
+// path only skips normalization/Buff resolution already done by computeMetrics.
+function collectAttackDpsDelaySourcesPrepared(normalizedEquipment, resolvedBuffState) {
+  const bucket = {equipmentTotal:0, buffTotal:0, total:0, sources:[], pctSources:[]};
+  normalizedEquipment
     .filter(r => r.enabled !== false)
     .forEach(r => {
       const label = `${(r.slot || "装備").replace(/^武器: |^防具: |^装飾: /, "")} ${r.name || "名称未入力"}`.trim();
@@ -86,12 +96,7 @@ function collectAttackDpsDelaySources(st=state) {
       attackDpsAddDelayPctSource(bucket, "装備", label, r.extraAttackDelayPct, "攻撃ディレイ%はDPS枠には未反映");
     });
 
-  let buffState = clone(baseState);
-  if (typeof expandSkillSimMasteryBuffState === "function") buffState = expandSkillSimMasteryBuffState(buffState);
-  if (typeof expandEquipmentBuffState === "function") buffState = expandEquipmentBuffState(buffState);
-  if (typeof applyBuffGroupRules === "function") buffState = applyBuffGroupRules(buffState);
-
-  normalizeCompositeRows(buffState.composite)
+  normalizeCompositeRows(resolvedBuffState.composite)
     .filter(r => r.enabled && !r.excluded && compositeHasEffect(r))
     .forEach(r => {
       const isEquipBuff = /^装備由来[:：]/.test(r.note || "") || /装備Buff$/.test(r.name || "");

@@ -4339,3 +4339,246 @@ Object.assign(window.MOE_BUFF_RULES_MANUAL, {
     ]
   }
 });
+// 2026-10-03 source-to-runtime audit: explicit omissions only; preserve existing recovery/skill metadata.
+(function () {
+  const patch=(id,stats,memo)=>{const key='technic-'+id,prior=window.MOE_BUFF_RULES_MANUAL[key]||{};
+    window.MOE_BUFF_RULES_MANUAL[key]={...prior,officialTechnicId:id,verified:true,applyDefault:true,stats:{...(prior.stats||{}),...stats},authoritativeStats:[...new Set([...(prior.authoritativeStats||[]),...Object.keys(stats)])],memo:[prior.memo,memo].filter(Boolean).join('\n'),source:'manual-data-audit-20261003'};
+  };
+  patch(12720,{attack:5,magic:5,extraHit:10,extraAvoid:10},'ファラオの力: checked-in Wiki常時発動2本文と黄金のマスクScrapbox記録が攻撃/魔力+5・命中/回避+10で一致。元ルールのflatMagicは取り込み用magicキーになっていなかった。');
+  patch(11156,{attackPct:3},'獅子奮迅: checked-in Wiki本文の攻撃力+3%を補完。ST回復と戦闘技術の既存設定は保持。');
+  patch(7228,{attack:5,extraACPct:5,extraAvoidPct:5,attackPct:0},'鍛錬: checked-in Wiki本文とScrapboxの通常攻撃+5を補完。防御+5%・回避+5%。キック攻撃+15%は通常攻撃%として適用しない（専用効果の数値・単位は要再確認）。');
+})();
+
+// Official incremental import 2026-10-03: retain descriptions; numeric Buff rules pending review.
+Object.assign(window.MOE_BUFF_RULES_MANUAL, {
+  "technic-14636": {
+    "name": "多連装砲",
+    "officialTechnicId": 14636,
+    "verified": false,
+    "applyDefault": true,
+    "source": "manual-official-description",
+    "confidence": "unverified",
+    "reviewStatus": "unverified",
+    "reviewComplete": false,
+    "conflictGroup": "technic-14636",
+    "stackRule": "same-technic",
+    "stats": {},
+    "skillEffects": [],
+    "customEffects": [
+      {
+        "name": "公式説明（数値計算・併用未検証）: 命中が5%上昇して、専用技『 多連装ロケットランチャー 』が使用可能になる",
+        "value": 0,
+        "unit": ""
+      }
+    ],
+    "rawInfo": "命中が5%上昇して、専用技『 多連装ロケットランチャー 』が使用可能になる",
+    "sourceUrls": [
+      "https://idb.moepic.com/items/weapons/23493"
+    ],
+    "memo": "2026-10-03公式DBから追加。装備本体の付加値は計算対象。Buff効果量・条件・併用規則は未検証。"
+  },
+  "technic-14657": {
+    "name": "魔法瓶",
+    "officialTechnicId": 14657,
+    "verified": false,
+    "applyDefault": true,
+    "source": "manual-official-description",
+    "confidence": "unverified",
+    "reviewStatus": "unverified",
+    "reviewComplete": false,
+    "conflictGroup": "technic-14657",
+    "stackRule": "same-technic",
+    "stats": {},
+    "skillEffects": [],
+    "customEffects": [
+      {
+        "name": "公式説明（数値計算・併用未検証）: 満腹度の減少を和らげて、スタミナの消費量を減らし、スタミナの自然回復速度を上昇させる\n※WarAgeでは効果がない",
+        "value": 0,
+        "unit": ""
+      }
+    ],
+    "rawInfo": "満腹度の減少を和らげて、スタミナの消費量を減らし、スタミナの自然回復速度を上昇させる\n※WarAgeでは効果がない",
+    "sourceUrls": [
+      "https://idb.moepic.com/items/defences/23506"
+    ],
+    "memo": "2026-10-03公式DBから追加。装備本体の付加値は計算対象。Buff効果量・条件・併用規則は未検証。"
+  },
+  "technic-14654": {
+    "name": "マナ オーバードライブ",
+    "officialTechnicId": 14654,
+    "verified": false,
+    "applyDefault": true,
+    "source": "manual-official-description",
+    "confidence": "unverified",
+    "reviewStatus": "unverified",
+    "reviewComplete": false,
+    "conflictGroup": "technic-14654",
+    "stackRule": "same-technic",
+    "stats": {},
+    "skillEffects": [],
+    "customEffects": [
+      {
+        "name": "公式説明（数値計算・併用未検証）: 魔力の10%を攻撃力に加算して、物理ダメージと魔法ダメージの威力を増加させる\n※WarAgeでは効果がない",
+        "value": 0,
+        "unit": ""
+      }
+    ],
+    "rawInfo": "魔力の10%を攻撃力に加算して、物理ダメージと魔法ダメージの威力を増加させる\n※WarAgeでは効果がない",
+    "sourceUrls": [
+      "https://idb.moepic.com/items/defences/23504"
+    ],
+    "memo": "2026-10-03公式DBから追加。装備本体の付加値は計算対象。Buff効果量・条件・併用規則は未検証。"
+  },
+  "technic-14656": {
+    "name": "庇護の絆",
+    "officialTechnicId": 14656,
+    "verified": false,
+    "applyDefault": true,
+    "source": "manual-official-description",
+    "confidence": "unverified",
+    "reviewStatus": "unverified",
+    "reviewComplete": false,
+    "conflictGroup": "technic-14656",
+    "stackRule": "same-technic",
+    "stats": {},
+    "skillEffects": [],
+    "customEffects": [
+      {
+        "name": "公式説明（数値計算・併用未検証）: 守り育む心がペットとの深い絆を紡ぐ\nペットの取得経験値が少し上昇して、ペット死亡時の忠誠度低下を半減させる\n※WarAgeでは効果がない",
+        "value": 0,
+        "unit": ""
+      }
+    ],
+    "rawInfo": "守り育む心がペットとの深い絆を紡ぐ\nペットの取得経験値が少し上昇して、ペット死亡時の忠誠度低下を半減させる\n※WarAgeでは効果がない",
+    "sourceUrls": [
+      "https://idb.moepic.com/items/defences/23503"
+    ],
+    "memo": "2026-10-03公式DBから追加。装備本体の付加値は計算対象。Buff効果量・条件・併用規則は未検証。"
+  },
+  "technic-14655": {
+    "name": "アニマル トレーナー",
+    "officialTechnicId": 14655,
+    "verified": false,
+    "applyDefault": true,
+    "source": "manual-official-description",
+    "confidence": "unverified",
+    "reviewStatus": "unverified",
+    "reviewComplete": false,
+    "conflictGroup": "technic-14655",
+    "stackRule": "same-technic",
+    "stats": {},
+    "skillEffects": [],
+    "customEffects": [
+      {
+        "name": "公式説明（数値計算・併用未検証）: 調教スキルの効果とペットの取得経験値が大幅に増加する\n※WarAgeでは効果がない",
+        "value": 0,
+        "unit": ""
+      }
+    ],
+    "rawInfo": "調教スキルの効果とペットの取得経験値が大幅に増加する\n※WarAgeでは効果がない",
+    "sourceUrls": [
+      "https://idb.moepic.com/items/defences/23502",
+      "https://idb.moepic.com/items/defences/23501"
+    ],
+    "memo": "2026-10-03公式DBから追加。装備本体の付加値は計算対象。Buff効果量・条件・併用規則は未検証。"
+  },
+  "technic-14641": {
+    "name": "モフモフの加護",
+    "officialTechnicId": 14641,
+    "verified": false,
+    "applyDefault": true,
+    "source": "manual-official-description",
+    "confidence": "unverified",
+    "reviewStatus": "unverified",
+    "reviewComplete": false,
+    "conflictGroup": "technic-14641",
+    "stackRule": "same-technic",
+    "stats": {},
+    "skillEffects": [],
+    "customEffects": [
+      {
+        "name": "公式説明（数値計算・併用未検証）: モフモフが物理や魔法ダメージを和らげる\n調教スキルの効果が上昇して、ペット死亡時の忠誠度低下を半減させる\n※WarAgeでは効果がない",
+        "value": 0,
+        "unit": ""
+      }
+    ],
+    "rawInfo": "モフモフが物理や魔法ダメージを和らげる\n調教スキルの効果が上昇して、ペット死亡時の忠誠度低下を半減させる\n※WarAgeでは効果がない",
+    "sourceUrls": [
+      "https://idb.moepic.com/items/defences/23496"
+    ],
+    "memo": "2026-10-03公式DBから追加。装備本体の付加値は計算対象。Buff効果量・条件・併用規則は未検証。"
+  },
+  "technic-14640": {
+    "name": "賢者の力",
+    "officialTechnicId": 14640,
+    "verified": false,
+    "applyDefault": true,
+    "source": "manual-official-description",
+    "confidence": "unverified",
+    "reviewStatus": "unverified",
+    "reviewComplete": false,
+    "conflictGroup": "technic-14640",
+    "stackRule": "same-technic",
+    "stats": {},
+    "skillEffects": [],
+    "customEffects": [
+      {
+        "name": "公式説明（数値計算・併用未検証）: 魔法の威力と最大MPが10%増加する\n※WarAgeでは効果がない",
+        "value": 0,
+        "unit": ""
+      }
+    ],
+    "rawInfo": "魔法の威力と最大MPが10%増加する\n※WarAgeでは効果がない",
+    "sourceUrls": [
+      "https://idb.moepic.com/items/defences/23495"
+    ],
+    "memo": "2026-10-03公式DBから追加。装備本体の付加値は計算対象。Buff効果量・条件・併用規則は未検証。"
+  },
+  "technic-14491": {
+    "name": "第20回記念",
+    "officialTechnicId": 14491,
+    "verified": false,
+    "applyDefault": true,
+    "source": "manual-official-description",
+    "confidence": "unverified",
+    "reviewStatus": "unverified",
+    "reviewComplete": false,
+    "conflictGroup": "technic-14491",
+    "stackRule": "same-technic",
+    "stats": {},
+    "skillEffects": [],
+    "customEffects": [
+      {
+        "name": "公式説明（数値計算・併用未検証）: 通常攻撃HIT時に対象へ20%ダメージ増加のスタンプを押す\n専用技『 記念スタンプ 』が使用可能",
+        "value": 0,
+        "unit": ""
+      }
+    ],
+    "rawInfo": "通常攻撃HIT時に対象へ20%ダメージ増加のスタンプを押す\n専用技『 記念スタンプ 』が使用可能",
+    "sourceUrls": [
+      "https://idb.moepic.com/items/weapons/23411"
+    ],
+    "memo": "2026-10-03公式DBから追加。装備本体の付加値は計算対象。Buff効果量・条件・併用規則は未検証。"
+  }
+});
+
+// Supplied Wiki snapshots 2026-10-03: individual confirmed fields only.
+(function () {
+  const patch=(id,stats,notes)=>{const r=window.MOE_BUFF_RULES_MANUAL['technic-'+id];
+    r.stats={...r.stats,...stats};r.authoritativeStats=Object.keys(r.stats);
+    r.source='manual-official-wiki-review-20261003';r.reviewStatus='partial';r.reviewComplete=false;
+    r.memo+='\n'+notes;
+    r.sourceUrls.push('https://moeread.stars.ne.jp/?アイテム/追加効果/常時発動3');
+    r.customEffects[0].name=r.customEffects[0].name.replace('公式説明（数値計算・併用未検証）','公式説明（一部反映・残り未検証）');
+  };
+  patch(14636,{extraHitPct:5},'公式DBと添付Wikiで命中+5%一致。既存正式命中%計算へ反映。専用技は表示のみ、他Buffとの併用は未検証。');
+  patch(14640,{extraMPPct:10},'公式DBと添付Wikiで最大MP+10%一致。魔法与ダメージ+10%は魔力%ではないためmagicPctへ入れない。併用2グループN?は未確定。');
+  patch(14641,{},'添付Wikiで調教テクニック効果+20相当を確認。併用#調教は今回の添付に含まれないためstructured skillPlusへの反映は保留。被ダメージ軽減倍率も未記載。');
+  window.MOE_BUFF_RULES_MANUAL['technic-14641'].customEffects.push({name:'調教テクニック効果（併用未確認）',value:20,unit:'スキル相当'});
+  window.MOE_BUFF_RULES_MANUAL['technic-14491'].memo+='\n添付Wikiではアタック命中後の次回被弾のみ+20%、ダメージ解除の相手デバフ。自己の常時与ダメージ+20%へ変換しない。';
+})();
+
+// Supplied pet page: display growth multipliers; separate from skillPlus stacking.
+(function () {
+  for(const [id,value]of [[14655,1.2],[14656,1.1]]){const r=window.MOE_BUFF_RULES_MANUAL['technic-'+id];r.reviewStatus='partial';r.customEffects.push({name:'ペット成長率',value,unit:'倍'});r.sourceUrls.push('https://moeread.stars.ne.jp/?ペット#pet-equipment');r.memo+='\n2026-10-03添付ペットページで成長率'+value+'倍確認。候補検索へ反映。装備構成全体の成長率最適化は未対応。';}
+})();

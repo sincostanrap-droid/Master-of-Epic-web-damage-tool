@@ -10,7 +10,7 @@ const {performance} = require('node:perf_hooks');
 const root = path.resolve(__dirname, '..');
 const json = value => JSON.parse(JSON.stringify(value));
 function context(repo=root, {worker=false, data=true, catalog=false}={}) {
-  const ctx = vm.createContext({console, performance, setTimeout, clearTimeout});
+  const ctx = vm.createContext({console, performance, setTimeout, clearTimeout,setImmediate});
   ctx.self = ctx;
   const load = (file, legacy=false) => {
     let source = fs.readFileSync(path.join(repo, file), 'utf8');

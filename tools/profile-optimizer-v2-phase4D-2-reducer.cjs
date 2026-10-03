@@ -1,0 +1,20 @@
+// Preparation-only, private VM timing instrumentation; no production edits.
+const fs=require('node:fs'),vm=require('node:vm');
+const p=require('./inspect-optimizer-v2-context.cjs').contextRuntime();
+for(const n of ['equipmentEffectFacets','equipmentEffectFacetCatalog','equipmentSearchSpecification'])vm.runInContext(fs.readFileSync(`src/domain/${n}.js`,'utf8'),p);
+vm.runInContext(fs.readFileSync('src/optimizer-v2/facetSearch.js','utf8'),p);
+const items=p.equipmentCatalogItems(),base=vm.runInContext('DEFAULT_STATE()',p),C=p.MOEOptimizerV2SearchContext;
+p.MOEOptimizerV2FacetSearch.prepare(items,C.create({objective:'avoid',topK:20,baseState:base}));
+let source=fs.readFileSync('src/optimizer-v2/metricCandidateReducer.js','utf8');
+const markers=[['const preparation=legacy.candidatePreparation;','start'],['// Fixed pre-conflict external and mastery rows','projection'],['const visited=new Set();','externalSeeds'],['// Removing a disjoint group','closure'],['// If EVERY eligible ammo','priority'],['const allClasses=[...groups]','keysAndAllocation'],['const legacyClasses=allClasses.filter','dominance']];
+for(const [anchor,name] of markers)source=source.replace(anchor,`globalThis.__mark('${name}');${anchor}`);
+vm.runInContext(source,p);
+let marks=[],strings={calls:0,ms:0},sorts={calls:0,ms:0},objects={calls:0,ms:0},legacyProfile={};
+p.__mark=name=>marks.push({name,at:performance.now()});
+p.__stringMeasure=(ms)=>{strings.calls++;strings.ms+=ms;};p.__sortMeasure=ms=>{sorts.calls++;sorts.ms+=ms;};p.__objectMeasure=ms=>{objects.calls++;objects.ms+=ms;};
+vm.runInContext(`(()=>{const j=JSON.stringify,s=Array.prototype.sort,o=Object.fromEntries;JSON.stringify=function(...a){const t=performance.now();try{return j.apply(this,a);}finally{__stringMeasure(performance.now()-t);}};Array.prototype.sort=function(...a){const t=performance.now();try{return s.apply(this,a);}finally{__sortMeasure(performance.now()-t);}};Object.fromEntries=function(...a){const t=performance.now();try{return o.apply(this,a);}finally{__objectMeasure(performance.now()-t);}};})()`,p);
+const old=p.MOEOptimizerV2EffectiveCandidates;p.MOEOptimizerV2EffectiveCandidates=Object.freeze({...old,reduce(s,c){return old.reduce(s,c,legacyProfile);}});
+const start=performance.now(),prepared=p.MOEOptimizerV2FacetSearch.prepare(items,C.create({objective:'avoid',topK:20,baseState:base}));marks.push({name:'end',at:performance.now()});
+const phases=marks.slice(1).map((x,i)=>({name:x.name,ms:x.at-marks[i].at}));
+const result={prepareMs:performance.now()-start,legacyProfile,metricPhases:phases,stringify:strings,sorting:sorts,objectFromEntries:objects,note:'helper times are inclusive and overlap phase times; objectFromEntries measures only that allocation helper, not GC or all allocation',candidateCache:prepared.diagnostics.catalogCache,contextCache:prepared.reduction.candidatePreparation.diagnostics};
+fs.writeFileSync('docs/optimizer-v2-phase4D-2-reducer-profile.json',JSON.stringify(result,null,2));console.log(JSON.stringify(result));

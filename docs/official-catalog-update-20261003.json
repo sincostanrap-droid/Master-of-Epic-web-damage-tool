@@ -1,0 +1,168 @@
+{
+  "generatedAt": "2026-10-03T05:49:25.270Z",
+  "scope": "new IDs above baseline maximum plus explicitly selected missing IDs; existing items retained, not fully recrawled",
+  "coverage": [
+    {
+      "category": "weapons",
+      "baselineCount": 1843,
+      "baselineUniqueCount": 1843,
+      "officialTotal": 1845,
+      "cutoffId": 23492,
+      "pages": 1,
+      "lowestFetchedId": 23411
+    },
+    {
+      "category": "defences",
+      "baselineCount": 9595,
+      "baselineUniqueCount": 9590,
+      "officialTotal": 9597,
+      "cutoffId": 23491,
+      "pages": 2,
+      "lowestFetchedId": 23489
+    },
+    {
+      "category": "shields",
+      "baselineCount": 399,
+      "baselineUniqueCount": 334,
+      "officialTotal": 334,
+      "cutoffId": 23334,
+      "pages": 1,
+      "lowestFetchedId": 23170
+    }
+  ],
+  "included": [
+    "weapons:23411"
+  ],
+  "addedEquipment": [
+    "official-weapon-23493",
+    "official-defense-23506",
+    "official-defense-23504",
+    "official-defense-23503",
+    "official-defense-23502",
+    "official-defense-23501",
+    "official-defense-23496",
+    "official-defense-23495",
+    "official-weapon-23411"
+  ],
+  "newBuffs": [
+    "technic-14636",
+    "technic-14657",
+    "technic-14654",
+    "technic-14656",
+    "technic-14655",
+    "technic-14641",
+    "technic-14640",
+    "technic-14491"
+  ],
+  "changedBuffDescriptions": [],
+  "items": [
+    {
+      "category": "weapons",
+      "id": 23493,
+      "name": "アーム ストロング キャノン",
+      "technic": {
+        "id": 14636,
+        "name": "多連装砲",
+        "info": "命中が5%上昇して、専用技『 多連装ロケットランチャー 』が使用可能になる",
+        "created_at": "2026-09-29T05:47:31.000000Z",
+        "updated_at": "2026-09-29T05:47:31.000000Z"
+      }
+    },
+    {
+      "category": "defences",
+      "id": 23506,
+      "name": "クッキー ボトル",
+      "technic": {
+        "id": 14657,
+        "name": "魔法瓶",
+        "info": "満腹度の減少を和らげて、スタミナの消費量を減らし、スタミナの自然回復速度を上昇させる\n※WarAgeでは効果がない",
+        "created_at": "2026-09-29T05:47:31.000000Z",
+        "updated_at": "2026-09-29T05:47:31.000000Z"
+      }
+    },
+    {
+      "category": "defences",
+      "id": 23504,
+      "name": "マジック サークル ガントレット",
+      "technic": {
+        "id": 14654,
+        "name": "マナ オーバードライブ",
+        "info": "魔力の10%を攻撃力に加算して、物理ダメージと魔法ダメージの威力を増加させる\n※WarAgeでは効果がない",
+        "created_at": "2026-09-29T05:47:31.000000Z",
+        "updated_at": "2026-09-29T05:47:31.000000Z"
+      }
+    },
+    {
+      "category": "defences",
+      "id": 23503,
+      "name": "フェアリーモス ベルト",
+      "technic": {
+        "id": 14656,
+        "name": "庇護の絆",
+        "info": "守り育む心がペットとの深い絆を紡ぐ\nペットの取得経験値が少し上昇して、ペット死亡時の忠誠度低下を半減させる\n※WarAgeでは効果がない",
+        "created_at": "2026-09-29T05:47:31.000000Z",
+        "updated_at": "2026-09-29T05:47:31.000000Z"
+      }
+    },
+    {
+      "category": "defences",
+      "id": 23502,
+      "name": "ケモミミ バケット ハット B",
+      "technic": {
+        "id": 14655,
+        "name": "アニマル トレーナー",
+        "info": "調教スキルの効果とペットの取得経験値が大幅に増加する\n※WarAgeでは効果がない",
+        "created_at": "2026-09-29T05:47:31.000000Z",
+        "updated_at": "2026-09-29T05:47:31.000000Z"
+      }
+    },
+    {
+      "category": "defences",
+      "id": 23501,
+      "name": "ケモミミ バケット ハット A",
+      "technic": {
+        "id": 14655,
+        "name": "アニマル トレーナー",
+        "info": "調教スキルの効果とペットの取得経験値が大幅に増加する\n※WarAgeでは効果がない",
+        "created_at": "2026-09-29T05:47:31.000000Z",
+        "updated_at": "2026-09-29T05:47:31.000000Z"
+      }
+    },
+    {
+      "category": "defences",
+      "id": 23496,
+      "name": "フェアリーモス カチューシャ",
+      "technic": {
+        "id": 14641,
+        "name": "モフモフの加護",
+        "info": "モフモフが物理や魔法ダメージを和らげる\n調教スキルの効果が上昇して、ペット死亡時の忠誠度低下を半減させる\n※WarAgeでは効果がない",
+        "created_at": "2026-09-29T05:47:31.000000Z",
+        "updated_at": "2026-09-29T05:47:31.000000Z"
+      }
+    },
+    {
+      "category": "defences",
+      "id": 23495,
+      "name": "賢者のベルト",
+      "technic": {
+        "id": 14640,
+        "name": "賢者の力",
+        "info": "魔法の威力と最大MPが10%増加する\n※WarAgeでは効果がない",
+        "created_at": "2026-09-29T05:47:31.000000Z",
+        "updated_at": "2026-09-29T05:47:31.000000Z"
+      }
+    },
+    {
+      "category": "weapons",
+      "id": 23411,
+      "name": "第20回記念スタンプハンマー",
+      "technic": {
+        "id": 14491,
+        "name": "第20回記念",
+        "info": "通常攻撃HIT時に対象へ20%ダメージ増加のスタンプを押す\n専用技『 記念スタンプ 』が使用可能",
+        "created_at": "2026-09-29T05:47:31.000000Z",
+        "updated_at": "2026-09-29T05:47:31.000000Z"
+      }
+    }
+  ]
+}
