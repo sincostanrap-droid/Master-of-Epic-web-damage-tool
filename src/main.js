@@ -13957,7 +13957,7 @@ function applyEquipBuffRuleCandidateToEquipment(row, rule, opts={}) {
   if (!row || !rule) return false;
   repairKnownEquipmentBuffCompatibility(row);
   // Drop only the retired placeholder for these reviewed imports; preserve user effects.
-  if (rule.source === "manual-wiki-20260922") {
+  if (rule.source === "manual-wiki-20260922" || rule.replaceOfficialDescription) {
     row.extraEffects = normalizeAdditionalEffects(row.extraEffects || []).filter(e =>
       !(e.key === "custom" && String(e.name || "").startsWith("公式説明（数値計算・併用未検証）:")));
   }
@@ -13978,6 +13978,10 @@ function applyEquipBuffRuleCandidateToEquipment(row, rule, opts={}) {
   }
   row.equipBuffRuleConfidence = row.equipBuffRuleConfidence || rule.confidence || (rule.verified ? "verified" : "candidate");
   row.equipBuffRuleSource = row.equipBuffRuleSource || rule.source || "tsv-candidate";
+  if (rule.replaceOfficialDescription && rule.verified) {
+    row.equipBuffRuleConfidence = rule.confidence || "verified";
+    row.equipBuffRuleSource = rule.source;
+  }
 
   // 説明文に単位付きで明記された自然回復も、カタログ追加時は入力値として保存する。
   // 手動・生成済み stats の確定値を優先する。

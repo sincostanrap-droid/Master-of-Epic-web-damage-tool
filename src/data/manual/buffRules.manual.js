@@ -4406,19 +4406,22 @@ Object.assign(window.MOE_BUFF_RULES_MANUAL, {
   "technic-14654": {
     "name": "マナ オーバードライブ",
     "officialTechnicId": 14654,
-    "verified": false,
+    "verified": true,
     "applyDefault": true,
-    "source": "manual-official-description",
-    "confidence": "unverified",
-    "reviewStatus": "unverified",
-    "reviewComplete": false,
-    "conflictGroup": "technic-14654",
+    "source": "manual-user-confirmed-20261004",
+    "confidence": "verified",
+    "reviewStatus": "implemented",
+    "reviewComplete": true,
+    "replaceOfficialDescription": true,
+    "conflictGroup": "damage:physical:independent:technic-14654",
     "stackRule": "same-technic",
-    "stats": {},
+    "stats": { "dmgPct": 10 },
+    "conversions": { "magicToAttackPct": 10 },
+    "conditions": { "disabledInWarAge": true },
     "skillEffects": [],
     "customEffects": [
       {
-        "name": "公式説明（数値計算・併用未検証）: 魔力の10%を攻撃力に加算して、物理ダメージと魔法ダメージの威力を増加させる\n※WarAgeでは効果がない",
+        "name": "WarAgeでは無効",
         "value": 0,
         "unit": ""
       }
@@ -4427,7 +4430,7 @@ Object.assign(window.MOE_BUFF_RULES_MANUAL, {
     "sourceUrls": [
       "https://idb.moepic.com/items/defences/23504"
     ],
-    "memo": "2026-10-03公式DBから追加。装備本体の付加値は計算対象。Buff効果量・条件・併用規則は未検証。"
+    "memo": "2026-10-04ユーザー確認済み。魔力→攻撃力10%、物理与ダメージ+10%、魔法与ダメージ+10%。3効果とも既存Buffと併用可能な新規独立枠。WarAgeでは無効。変換・物理与ダメージは既存正式計算、魔法与ダメージは構造化表示・検索へ反映。"
   },
   "technic-14656": {
     "name": "庇護の絆",
@@ -4561,6 +4564,34 @@ Object.assign(window.MOE_BUFF_RULES_MANUAL, {
     "memo": "2026-10-03公式DBから追加。装備本体の付加値は計算対象。Buff効果量・条件・併用規則は未検証。"
   }
 });
+
+// User-confirmed independent slots, kept in manual data so regeneration preserves them.
+// Reuse the existing compatibility adapter: magic damage remains display/search only.
+window.MOE_DAMAGE_BUFF_COMPATIBILITY_MANUAL = [
+  ...(window.MOE_DAMAGE_BUFF_COMPATIBILITY_MANUAL || []).filter(r =>
+    !String(r.id || "").startsWith("mana-overdrive-")),
+  ...[
+    ["conversion", "attackConversion", "magicToAttackPct", "魔力→攻撃力", "equipBuffConvMagicRate", "conversion:attack", true],
+    ["physical", "physicalDamage", "physicalDmgPct", "物理与ダメージ", "equipBuffDmgPct", "damage:physical", true],
+    ["magic", "magicDamage", "magicDmgPct", "魔法与ダメージ", "displayOnly", "damage:magic", false]
+  ].map(([axis, effectCategory, effectKey, effectLabel, autoApplyKind, groupPrefix, physicalCalcRelevant]) => ({
+    id: `mana-overdrive-${axis}`,
+    source: "manual-user-confirmed-20261004",
+    sourceUrl: "https://idb.moepic.com/items/defences/23504",
+    sectionName: effectLabel,
+    buffName: "マナ オーバードライブ",
+    matchedTechnicIds: ["14654"],
+    effectCategory, effectKey, effectLabel, autoApplyKind, physicalCalcRelevant,
+    element: "",
+    value: 10, valueRaw: "+10%", valueUnit: "%", valueUncertain: false,
+    conversionSource: axis === "conversion" ? "magic" : "",
+    group: "independent:technic-14654", groupRaw: "新規独立枠（マナ オーバードライブ）", groupUncertain: false,
+    conflictGroup: `${groupPrefix}:independent:technic-14654`,
+    safeForValueAutoApply: true, safeForConflictAutoApply: true,
+    conditions: { disabledInWarAge: true },
+    note: "ユーザー確認済み。既存枠すべてと併用可能。WarAgeでは無効。"
+  }))
+];
 
 // Supplied Wiki snapshots 2026-10-03: individual confirmed fields only.
 (function () {

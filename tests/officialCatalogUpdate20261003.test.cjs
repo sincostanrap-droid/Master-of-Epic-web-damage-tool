@@ -14,5 +14,17 @@ for(const [name,key] of [['equipmentCatalog','EQUIPMENT'],['buffCatalog','BUFF']
 }
 const items=p.equipmentCatalogItems();
 for(const coverage of report.coverage){const cat={weapons:'weapon',defences:'defense',shields:'shield'}[coverage.category];const unique=new Set(p.MOE_EQUIPMENT_CATALOG_GENERATED.filter(x=>x.category===cat).map(x=>x.catalogId));assert.equal(unique.size,coverage.officialTotal);}
-for(const id of report.addedEquipment){const item=items.find(i=>i.catalogId===id);assert.ok(item);assert.equal(item.source,'official-idb');assert.equal(item.unmappedAddStatuses.length,0);const row=p.catalogEquipmentToRow(item);const b=p.findEquipBuffRuleCandidate({catalogId:item.buffRefs[0]});assert.equal(b.reviewComplete,false);assert.ok(['unverified','partial'].includes(b.reviewStatus));const expected={'technic-14636':{extraHitPct:5},'technic-14640':{extraMPPct:10}};assert.deepEqual(json(b.stats),expected[item.buffRefs[0]]||{});assert.ok(p.equipmentBuffEffectText(row).includes('公式説明'));assert.ok(p.catalogBuffEffectEntries(item).length);}
+for(const id of report.addedEquipment){
+ const item=items.find(i=>i.catalogId===id);assert.ok(item);assert.equal(item.source,'official-idb');assert.equal(item.unmappedAddStatuses.length,0);
+ const row=p.catalogEquipmentToRow(item),buffId=item.buffRefs[0],b=p.findEquipBuffRuleCandidate({catalogId:buffId});
+ if(buffId==='technic-14654'){
+  assert.equal(b.verified,true);assert.equal(b.reviewComplete,true);assert.equal(b.reviewStatus,'implemented');
+  assert.equal(b.conversions.magicToAttackPct,10);assert.match(p.equipmentBuffEffectText(row),/魔法与ダメージ\s*\+10%/);
+ }else{
+  assert.equal(b.reviewComplete,false);assert.ok(['unverified','partial'].includes(b.reviewStatus));
+  assert.ok(p.equipmentBuffEffectText(row).includes('公式説明'));
+ }
+ const expected={'technic-14636':{extraHitPct:5},'technic-14640':{extraMPPct:10},'technic-14654':{dmgPct:10}};
+ assert.deepEqual(json(b.stats),expected[buffId]||{});assert.ok(p.catalogBuffEffectEntries(item).length);
+}
 console.log('20261003 official import: 9 items/8 Buffs, all previous rows preserved, official unique totals match, searchable pending descriptions passed');

@@ -27,6 +27,10 @@ function catalogWeaponSummary(item) {
 function catalogBuffSummary(item) {
   const buff = item.equipBuff || null;
   if (!buff?.name && !(item.buffRefs || []).length) return "-";
+  const reviewed = globalThis.MOE_BUFF_RULES_MANUAL?.[buff?.catalogId || buff?.id || `technic-${buff?.officialTechnicId || item.technicId}`];
+  if (reviewed?.verified && reviewed.replaceOfficialDescription) {
+    return [buff?.name || reviewed.name, equipmentBuffEffectText(catalogEquipmentToRow(item))].join("：");
+  }
   return [buff?.name, buff?.info].filter(Boolean).join("：") || (item.buffRefs || []).join(" / ");
 }
 

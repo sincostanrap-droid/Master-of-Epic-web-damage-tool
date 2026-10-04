@@ -59,6 +59,7 @@ const CATALOG_BUFF_EFFECT_FILTER_TYPES = [
     ["stat:magic", "魔力"], ["stat:magicPct", "魔力%"],
     ["stat:speed", "移動速度"], ["stat:speedPct", "移動速度%"],
     ["stat:dmgPct", "物理与ダメージ%"],
+    ["stat:magicDmgPct", "魔法与ダメージ%"],
     ["stat:extraHit", "命中"], ["stat:extraHitPct", "命中%"],
     ["stat:extraAvoid", "回避"], ["stat:extraAvoidPct", "回避%"],
     ["stat:extraAC", "防御力"], ["stat:extraACPct", "防御力%"],
@@ -193,7 +194,7 @@ function catalogBuffEffectEntries(item) {
       const value = Number(rule?.value);
       if (!Number.isFinite(value) || value === 0 || rule?.valueUncertain) return;
       const kind = String(rule?.autoApplyKind || "");
-      const type = {
+      const type = rule.effectKey === "magicDmgPct" ? "stat:magicDmgPct" : {
         equipBuffDmgPct: "stat:dmgPct",
         equipBuffExtraCritRatePct: "stat:extraCritRatePct",
         equipBuffConvMagicRate: "conversion:magicToAttackPct",
