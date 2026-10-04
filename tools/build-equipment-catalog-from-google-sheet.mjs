@@ -536,7 +536,7 @@ export function toCatalog(items, addStatuses, equipBuffs) {
     if (!statusName || !value || statusName === 'なし') continue;
     const statKey = statusProp(statusName);
     const ignored = isKnownIgnoredStatus(statusName);
-    statusMap.get(key).push({
+    statusMap.get(key).push({fetchedAt: str(st.fetched_at), sourceUrl: str(st.source_url), status: {
       statusId: str(st.status_id),
       name: statusName,
       normalizedName: normalizeOfficialAddStatusName(statusName),
@@ -545,7 +545,7 @@ export function toCatalog(items, addStatuses, equipBuffs) {
       value,
       mapped: !!statKey,
       ignored,
-    });
+    }});
   }
 
   const buffMap = new Map();
@@ -587,7 +587,16 @@ export function toCatalog(items, addStatuses, equipBuffs) {
     if (!['weapon', 'defense', 'shield'].includes(cat)) continue;
     const id = str(row.id);
     const itemKey = `${cat}:${id}`;
-    const statuses = statusMap.get(itemKey) || [];
+    let statusRows = statusMap.get(itemKey) || [];
+    // Repeated crawls in add_status are snapshots, not additive effects.
+    // Select the item's own crawl only; retain repeated relations within it.
+    if (new Set(statusRows.map(st => st.fetchedAt)).size > 1) {
+      const fetchedAt = str(row.fetched_at), sourceUrl = str(row.source_url);
+      const snapshot = statusRows.filter(st => fetchedAt && sourceUrl && st.fetchedAt === fetchedAt && st.sourceUrl === sourceUrl);
+      if (!snapshot.length) throw new Error(`Ambiguous add_status snapshots: ${itemKey}`);
+      statusRows = snapshot;
+    }
+    const statuses = statusRows.map(st => st.status);
     const extraStats = {};
     const unmappedAddStatuses = [];
     for (const st of statuses) {

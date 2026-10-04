@@ -5,7 +5,12 @@ assert.equal(report.addedEquipment.length,9);assert.equal(report.newBuffs.length
 for(const [name,key] of [['equipmentCatalog','EQUIPMENT'],['buffCatalog','BUFF']]){
  const c=vm.createContext({window:{}});vm.runInContext(cp.execFileSync('git',['show','HEAD:src/data/generated/'+name+'.generated.js'],{maxBuffer:40*1024*1024}).toString(),c);
  const oldRows=c.window['MOE_'+key+'_CATALOG_GENERATED'];
- assert.deepEqual(json(p['MOE_'+key+'_CATALOG_GENERATED'].slice(0,oldRows.length)),json(oldRows),'all existing rows and duplicates preserved');
+ if(key==='EQUIPMENT' && oldRows.find(i=>i.catalogId==='official-shield-4900').addStatuses.length===4){
+  const fire=oldRows.find(i=>i.catalogId==='official-shield-4900');
+  assert.deepEqual(json(fire.addStatuses.map(s=>[s.statusId,s.value])),[['9',30],['10',-30],['9',30],['10',-30]]);
+  fire.addStatuses=fire.addStatuses.slice(0,2);fire.extraStats={extraFireRes:30,extraWaterRes:-30};
+ }
+ assert.deepEqual(json(p['MOE_'+key+'_CATALOG_GENERATED'].slice(0,oldRows.length)),json(oldRows),'only verified Fire Shield snapshot repair; all other existing rows preserved');
 }
 const items=p.equipmentCatalogItems();
 for(const coverage of report.coverage){const cat={weapons:'weapon',defences:'defense',shields:'shield'}[coverage.category];const unique=new Set(p.MOE_EQUIPMENT_CATALOG_GENERATED.filter(x=>x.category===cat).map(x=>x.catalogId));assert.equal(unique.size,coverage.officialTotal);}

@@ -9,3 +9,37 @@ p.document={getElementById:()=>null};p.applyCatalogSearch();assert.equal(shown.w
 select.onchange();assert.equal(shown.weaponDamage,71.5);add.onclick();assert.equal(registered.weaponDamage,71.5);
 select.value='raw';select.onchange();assert.equal(shown.weaponDamage,65);assert.equal(item.weaponDamage,65);
 console.log('cached catalog UI: quality change updates display and registration, restores raw without mutating source OK');
+
+// Exercise the real cache and the V23 button updater, including mode restoration.
+const q=context(undefined,{catalog:true}),elements=new Map(),listeners={};
+let filter={limit:25},rows=[];
+const summary={},pages={},more={hidden:true},limit={value:'25',options:[{value:'25'}],dataset:{},appendChild(o){this.options.push(o);}};
+elements.set('catalogSummary',summary);elements.set('catalogPageControls',pages);
+elements.set('catalogShowMoreV23',more);elements.set('catalogLimit',limit);
+elements.set('catalogResultsBody',{querySelectorAll:()=>[],set innerHTML(value){this.html=value;},get innerHTML(){return this.html;}});
+elements.set('catalogPrevPage',{});elements.set('catalogNextPage',{});
+q.byId=id=>elements.get(id)||null;
+q.equipmentCatalogItems=()=>rows;q.catalogFilterState=()=>filter;
+q.catalogItemMatches=(item,f)=>!f.query||item.name===f.query;
+q.sortCatalogItems=x=>x;q.catalogResultRowHtml=item=>`<tr>${item.name}</tr>`;
+q.catalogEffectProjection=()=>({});q.catalogCandidatePolicy={get:()=>''};
+q.MOEEquipmentEffectFacets={matches:()=>true,compare:()=>0};
+vm.runInContext(fs.readFileSync(root+'/src/ui/equipmentCatalogSearchCache.js','utf8'),q);
+q.document={getElementById:q.byId,addEventListener:(name,fn)=>{listeners[name]=fn;},createElement:()=>({})};
+const main=fs.readFileSync(root+'/src/main.js','utf8');
+const begin=main.indexOf('(function installCatalogRenderPerformanceV23(global) {');
+const end=main.indexOf('/* v21: skillPlus catalog filter',begin);
+vm.runInContext(main.slice(begin,end),q);
+rows=Array.from({length:60},(_,i)=>({catalogId:'row-'+i,name:i===0?'ファイアー シールド':'装備'+i}));
+q.applyCatalogSearch();assert.equal(more.textContent,'さらに表示（25/60件）');assert.equal(more.hidden,false);
+elements.get('catalogNextPage').onclick();assert.ok(summary.textContent.includes('表示 25件'));
+filter={limit:25,query:'ファイアー シールド'};q.applyCatalogSearch();
+assert.equal(more.hidden,true);assert.ok(summary.textContent.includes('該当 1件 / 表示 1件'));
+filter={limit:25,specialization:{enabled:true,axes:[],showExcluded:true}};
+q.restoreCatalogSearchMode('special');assert.equal(more.hidden,false);assert.equal(more.textContent,'さらに表示（25/60件）');
+q.restoreCatalogSearchMode('normal');assert.equal(more.hidden,true);
+assert.ok(summary.textContent.includes('該当 1件 / 表示 1件'));
+assert.ok(pages.innerHTML.includes('id="catalogNextPage" disabled'));
+filter={limit:25,query:'該当なし'};q.applyCatalogSearch();assert.equal(more.hidden,true);
+assert.ok(summary.textContent.includes('該当 0件 / 表示 0件'));
+console.log('cached catalog pagination: current counts, page reset, special/normal restoration, singleton and empty results OK');

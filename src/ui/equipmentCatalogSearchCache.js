@@ -163,6 +163,10 @@
       limit
     );
 
+    if (typeof global.refreshCatalogLoadMoreV23 === "function") {
+      global.refreshCatalogLoadMoreV23({matched: filtered.length, shown: shown.length});
+    }
+
     if (typeof global.catalogWorkspaceRefresh === "function") global.catalogWorkspaceRefresh(shown, filter, () => applySearch(false, true));
 
     body.querySelectorAll("[data-catalog-quality]").forEach(select => {

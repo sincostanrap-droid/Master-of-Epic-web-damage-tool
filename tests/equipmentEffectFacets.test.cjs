@@ -9,6 +9,11 @@ const F=p.MOEEquipmentEffectFacets;
 const api={toRow:p.catalogEquipmentToRow,resolveBuff:p.resolveEquipmentBuffRow,toComposite:p.equipmentBuffToCompositeRow,
  definitions:vm.runInContext("extraFieldDefsFor('summary')",p),effects:p.normalizeAdditionalEffects,
  groups:r=>p.normalizeEquipmentBuffConflictGroupsInput(r.equipBuffConflictGroups||r.equipBuffConflictGroup)};
+const fire=p.equipmentCatalogItems().find(i=>i.catalogId==='official-shield-4900');
+const fireFacet=F.projectEquipmentEffectFacets(fire,api);
+assert.equal(F.value(fireFacet,'stat:extraFireRes'),30);
+assert.equal(F.value(fireFacet,'stat:extraWaterRes'),-30);
+assert.equal(fireFacet.facets.find(f=>f.key==='stat:extraFireRes').sources.length,1);
 const item={catalogId:'facet-fixture',name:'要件不足fixture',category:'weapon',slot:'武器: 右手',weaponDamage:50,weaponReq:[{name:'刀剣',required:100}],addStatuses:[{name:'魔力',value:20,statKey:'magic'}]};
 const projected=F.projectEquipmentEffectFacets(item,api);
 assert.equal(F.value(projected,'stat:magic'),20);

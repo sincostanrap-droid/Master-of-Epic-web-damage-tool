@@ -15207,7 +15207,7 @@ if (typeof document !== "undefined") {
     };
   }
 
-  function ensureLoadMoreButton() {
+  function ensureLoadMoreButton(currentResults) {
     if (typeof document === "undefined") return;
     ensureCatalogLimitOptions();
     const limit = byIdV23("catalogLimit");
@@ -15235,11 +15235,13 @@ if (typeof document !== "undefined") {
       else document.body.appendChild(button);
     }
 
-    const summary = parseCatalogSummary();
+    const summary = currentResults && typeof currentResults === "object" ? currentResults : parseCatalogSummary();
     const hasMore = Number.isFinite(summary.matched) && Number.isFinite(summary.shown) && summary.shown < summary.matched;
     button.hidden = !hasMore;
     if (hasMore) button.textContent = `さらに表示（${summary.shown}/${summary.matched}件）`;
   }
+
+  global.refreshCatalogLoadMoreV23 = ensureLoadMoreButton;
 
   function renderCatalogNowV23() {
     if (typeof nativeRender !== "function") return;

@@ -1,0 +1,174 @@
+{
+  "sourceUrls": {
+    "items_all": "https://docs.google.com/spreadsheets/d/10nHr68XojjuxxJrpLBENrDWUB4TywMGy8CTe9lzclSE/gviz/tq?tqx=out:csv&sheet=items_all&tq=select%20*%20where%20C%20%3D%204900",
+    "add_status": "https://docs.google.com/spreadsheets/d/10nHr68XojjuxxJrpLBENrDWUB4TywMGy8CTe9lzclSE/gviz/tq?tqx=out:csv&sheet=add_status&tq=select%20*%20where%20C%20%3D%204900"
+  },
+  "officialUrl": "https://idb.moepic.com/items/shields/4900",
+  "checkedAt": "2026-10-03T15:14:58.608Z",
+  "items": [
+    {
+      "category": "shields",
+      "category_label": "盾",
+      "id": "4900",
+      "name": "ファイアー シールド",
+      "info": "装備すると　ゆらりと焔が揺れて見える　不思議な盾\n[効果]　火属性の攻撃に強く 水属性の攻撃に弱い\n[用途]　左手に装備する",
+      "source_url": "https://idb.moepic.com/items/shields/4900",
+      "equip": "左手",
+      "equipGender": "ALL",
+      "equipRace": "ALL",
+      "itemType": "",
+      "requiredSkill": "",
+      "need_level": "76",
+      "armor_class": "3",
+      "damage": "",
+      "delay_time": "",
+      "range": "",
+      "weponType": "",
+      "weponHand": "",
+      "technic_id": "0",
+      "technic_name": "",
+      "technic_info": "",
+      "add_status_text": "耐火属性 +30\n耐水属性 -30\nなし 0\nなし 0\n最大HP 0",
+      "ships": "ALL, ALL, ALL, ALL",
+      "created_at": "2026-06-23T05:48:09.000000Z",
+      "updated_at": "2026-06-23T05:48:09.000000Z",
+      "fetched_at": "2026-06-29T10:17:30.399Z",
+      "requirements_json": "",
+      "requirements_text": "",
+      "requirements_source": "",
+      "requirements_status": "",
+      "requirements_fetched_at": "",
+      "requirements_error": ""
+    }
+  ],
+  "statuses": [
+    {
+      "category": "shields",
+      "category_label": "盾",
+      "item_id": "4900",
+      "item_name": "ファイアー シールド",
+      "status_id": "9",
+      "status_name": "耐火属性",
+      "value": "30",
+      "source_url": "https://idb.moepic.com/items/shields/4900",
+      "fetched_at": "2026-06-29T10:16:30.644Z"
+    },
+    {
+      "category": "shields",
+      "category_label": "盾",
+      "item_id": "4900",
+      "item_name": "ファイアー シールド",
+      "status_id": "10",
+      "status_name": "耐水属性",
+      "value": "-30",
+      "source_url": "https://idb.moepic.com/items/shields/4900",
+      "fetched_at": "2026-06-29T10:16:30.644Z"
+    },
+    {
+      "category": "shields",
+      "category_label": "盾",
+      "item_id": "4900",
+      "item_name": "ファイアー シールド",
+      "status_id": "1",
+      "status_name": "最大HP",
+      "value": "0",
+      "source_url": "https://idb.moepic.com/items/shields/4900",
+      "fetched_at": "2026-06-29T10:16:30.644Z"
+    },
+    {
+      "category": "shields",
+      "category_label": "盾",
+      "item_id": "4900",
+      "item_name": "ファイアー シールド",
+      "status_id": "9",
+      "status_name": "耐火属性",
+      "value": "30",
+      "source_url": "https://idb.moepic.com/items/shields/4900",
+      "fetched_at": "2026-06-29T10:17:30.399Z"
+    },
+    {
+      "category": "shields",
+      "category_label": "盾",
+      "item_id": "4900",
+      "item_name": "ファイアー シールド",
+      "status_id": "10",
+      "status_name": "耐水属性",
+      "value": "-30",
+      "source_url": "https://idb.moepic.com/items/shields/4900",
+      "fetched_at": "2026-06-29T10:17:30.399Z"
+    },
+    {
+      "category": "shields",
+      "category_label": "盾",
+      "item_id": "4900",
+      "item_name": "ファイアー シールド",
+      "status_id": "1",
+      "status_name": "最大HP",
+      "value": "0",
+      "source_url": "https://idb.moepic.com/items/shields/4900",
+      "fetched_at": "2026-06-29T10:17:30.399Z"
+    }
+  ],
+  "official": {
+    "id": 4900,
+    "name": "ファイアー シールド",
+    "technic": null,
+    "add_statuses": [
+      {
+        "id": 9,
+        "name": "耐火属性",
+        "created_at": "2026-09-29T05:47:31.000000Z",
+        "updated_at": "2026-09-29T05:47:31.000000Z",
+        "pivot": {
+          "shield_id": 4900,
+          "add_status_id": 9,
+          "value": 30
+        }
+      },
+      {
+        "id": 10,
+        "name": "耐水属性",
+        "created_at": "2026-09-29T05:47:31.000000Z",
+        "updated_at": "2026-09-29T05:47:31.000000Z",
+        "pivot": {
+          "shield_id": 4900,
+          "add_status_id": 10,
+          "value": -30
+        }
+      },
+      {
+        "id": 0,
+        "name": "なし",
+        "created_at": "2026-09-29T05:47:31.000000Z",
+        "updated_at": "2026-09-29T05:47:31.000000Z",
+        "pivot": {
+          "shield_id": 4900,
+          "add_status_id": 0,
+          "value": 0
+        }
+      },
+      {
+        "id": 0,
+        "name": "なし",
+        "created_at": "2026-09-29T05:47:31.000000Z",
+        "updated_at": "2026-09-29T05:47:31.000000Z",
+        "pivot": {
+          "shield_id": 4900,
+          "add_status_id": 0,
+          "value": 0
+        }
+      },
+      {
+        "id": 1,
+        "name": "最大HP",
+        "created_at": "2026-09-29T05:47:31.000000Z",
+        "updated_at": "2026-09-29T05:47:31.000000Z",
+        "pivot": {
+          "shield_id": 4900,
+          "add_status_id": 1,
+          "value": 0
+        }
+      }
+    ]
+  }
+}

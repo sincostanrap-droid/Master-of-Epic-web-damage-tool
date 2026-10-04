@@ -30,7 +30,7 @@ function loadCatalogScriptsOnce() {
   catalogScriptsPromise = Promise.all(CATALOG_SCRIPT_URLS.map(src => new Promise(resolve => {
     if (document.querySelector(`script[data-catalog-src="${src}"]`)) return resolve();
     const script = document.createElement("script");
-    script.src = `${src}?v=1.24.12-pet-20261003`;
+    script.src = `${src}?v=${src === "src/data/generated/equipmentCatalog.generated.js" ? "20261004-status-snapshot" : "1.24.12-pet-20261003"}`;
     script.async = false;
     script.dataset.catalogSrc = src;
     script.onload = () => resolve();
