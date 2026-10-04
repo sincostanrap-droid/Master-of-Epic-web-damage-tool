@@ -13,7 +13,7 @@ for(const [name,key] of [['equipmentCatalog','EQUIPMENT'],['buffCatalog','BUFF']
  assert.deepEqual(json(p['MOE_'+key+'_CATALOG_GENERATED'].slice(0,oldRows.length)),json(oldRows),'only verified Fire Shield snapshot repair; all other existing rows preserved');
 }
 const items=p.equipmentCatalogItems();
-for(const coverage of report.coverage){const cat={weapons:'weapon',defences:'defense',shields:'shield'}[coverage.category];const unique=new Set(p.MOE_EQUIPMENT_CATALOG_GENERATED.filter(x=>x.category===cat).map(x=>x.catalogId));assert.equal(unique.size,coverage.officialTotal);}
+for(const coverage of report.coverage){const cat={weapons:'weapon',defences:'defense',shields:'shield'}[coverage.category];const unique=new Set(p.MOE_EQUIPMENT_CATALOG_GENERATED.filter(x=>x.category===cat && x.source!=='wiki-manual').map(x=>x.catalogId));assert.equal(unique.size,coverage.officialTotal);}
 for(const id of report.addedEquipment){
  const item=items.find(i=>i.catalogId===id);assert.ok(item);assert.equal(item.source,'official-idb');assert.equal(item.unmappedAddStatuses.length,0);
  const row=p.catalogEquipmentToRow(item),buffId=item.buffRefs[0],b=p.findEquipBuffRuleCandidate({catalogId:buffId});

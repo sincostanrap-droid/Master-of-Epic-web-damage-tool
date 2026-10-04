@@ -1,0 +1,260 @@
+{
+  "sourceFile": "MoE Wiki (main) - アイテム_防具_特産品.htm",
+  "sourceUrl": "https://moeread.stars.ne.jp/?%A5%A2%A5%A4%A5%C6%A5%E0/%CB%C9%B6%F1/%C6%C3%BB%BA%C9%CA#Skill91b",
+  "sourceEncoding": "EUC-JP",
+  "notes": "Wikiの総重量41.50は個別合計40.50と不一致。個別重量のみ採用し、セット総重量・セットAC・infoは取り込まない。",
+  "items": [
+    {
+      "catalogId": "wiki-shrine-knight-helm",
+      "name": "シュライン ナイト ヘルム",
+      "category": "defense",
+      "equip": "頭(防)",
+      "requiredSkill": "着こなし",
+      "need_level": 91,
+      "armor_class": 22,
+      "weight": 5,
+      "durability": 22,
+      "material": "オリハルコン",
+      "itemType": "PM",
+      "transfer": "○",
+      "addStatuses": [
+        {
+          "name": "攻撃力",
+          "value": 5
+        },
+        {
+          "name": "魔力",
+          "value": 5
+        },
+        {
+          "name": "攻撃ディレイ",
+          "value": -2
+        },
+        {
+          "name": "魔法ディレイ",
+          "value": -2
+        },
+        {
+          "name": "耐無属性",
+          "value": 10
+        }
+      ]
+    },
+    {
+      "catalogId": "wiki-shrine-knight-armor",
+      "name": "シュライン ナイト アーマー",
+      "category": "defense",
+      "equip": "胴(防)",
+      "requiredSkill": "着こなし",
+      "need_level": 91,
+      "armor_class": 25.3,
+      "weight": 7.5,
+      "durability": 22,
+      "material": "オリハルコン",
+      "itemType": "PM",
+      "transfer": "○",
+      "addStatuses": [
+        {
+          "name": "攻撃力",
+          "value": 5
+        },
+        {
+          "name": "魔力",
+          "value": 5
+        },
+        {
+          "name": "攻撃ディレイ",
+          "value": -2
+        },
+        {
+          "name": "魔法ディレイ",
+          "value": -2
+        },
+        {
+          "name": "耐無属性",
+          "value": 10
+        }
+      ]
+    },
+    {
+      "catalogId": "wiki-shrine-knight-armguards",
+      "name": "シュライン ナイト アームガード",
+      "category": "defense",
+      "equip": "手(防)",
+      "requiredSkill": "着こなし",
+      "need_level": 91,
+      "armor_class": 19.8,
+      "weight": 5.5,
+      "durability": 22,
+      "material": "オリハルコン",
+      "itemType": "PM",
+      "transfer": "○",
+      "addStatuses": [
+        {
+          "name": "攻撃力",
+          "value": 5
+        },
+        {
+          "name": "魔力",
+          "value": 5
+        },
+        {
+          "name": "攻撃ディレイ",
+          "value": -2
+        },
+        {
+          "name": "魔法ディレイ",
+          "value": -2
+        },
+        {
+          "name": "耐無属性",
+          "value": 10
+        }
+      ]
+    },
+    {
+      "catalogId": "wiki-shrine-knight-greaves",
+      "name": "シュライン ナイト グリーブス",
+      "category": "defense",
+      "equip": "パンツ(防)",
+      "requiredSkill": "着こなし",
+      "need_level": 91,
+      "armor_class": 23.1,
+      "weight": 6.5,
+      "durability": 22,
+      "material": "オリハルコン",
+      "itemType": "PM",
+      "transfer": "○",
+      "addStatuses": [
+        {
+          "name": "攻撃力",
+          "value": 5
+        },
+        {
+          "name": "魔力",
+          "value": 5
+        },
+        {
+          "name": "攻撃ディレイ",
+          "value": -2
+        },
+        {
+          "name": "魔法ディレイ",
+          "value": -2
+        },
+        {
+          "name": "耐無属性",
+          "value": 10
+        }
+      ]
+    },
+    {
+      "catalogId": "wiki-shrine-knight-caliga",
+      "name": "シュライン ナイト カリガ",
+      "category": "defense",
+      "equip": "靴(防)",
+      "requiredSkill": "着こなし",
+      "need_level": 91,
+      "armor_class": 19.8,
+      "weight": 6,
+      "durability": 22,
+      "material": "オリハルコン",
+      "itemType": "PM",
+      "transfer": "○",
+      "addStatuses": [
+        {
+          "name": "攻撃力",
+          "value": 5
+        },
+        {
+          "name": "魔力",
+          "value": 5
+        },
+        {
+          "name": "攻撃ディレイ",
+          "value": -2
+        },
+        {
+          "name": "魔法ディレイ",
+          "value": -2
+        },
+        {
+          "name": "耐無属性",
+          "value": 10
+        }
+      ]
+    },
+    {
+      "catalogId": "wiki-shrine-knight-shoulderguards",
+      "name": "シュライン ナイト ショルダーガード",
+      "category": "defense",
+      "equip": "肩(防)",
+      "requiredSkill": "着こなし",
+      "need_level": 91,
+      "armor_class": 14.3,
+      "weight": 4.5,
+      "durability": 22,
+      "material": "オリハルコン",
+      "itemType": "PM",
+      "transfer": "○",
+      "addStatuses": [
+        {
+          "name": "攻撃力",
+          "value": 5
+        },
+        {
+          "name": "魔力",
+          "value": 5
+        },
+        {
+          "name": "攻撃ディレイ",
+          "value": -2
+        },
+        {
+          "name": "魔法ディレイ",
+          "value": -2
+        },
+        {
+          "name": "耐無属性",
+          "value": 10
+        }
+      ]
+    },
+    {
+      "catalogId": "wiki-shrine-knight-legguards",
+      "name": "シュライン ナイト レッグガード",
+      "category": "defense",
+      "equip": "腰(防)",
+      "requiredSkill": "着こなし",
+      "need_level": 91,
+      "armor_class": 13.2,
+      "weight": 5.5,
+      "durability": 22,
+      "material": "オリハルコン",
+      "itemType": "PM",
+      "transfer": "○",
+      "addStatuses": [
+        {
+          "name": "攻撃力",
+          "value": 5
+        },
+        {
+          "name": "魔力",
+          "value": 5
+        },
+        {
+          "name": "攻撃ディレイ",
+          "value": -2
+        },
+        {
+          "name": "魔法ディレイ",
+          "value": -2
+        },
+        {
+          "name": "耐無属性",
+          "value": 10
+        }
+      ]
+    }
+  ]
+}

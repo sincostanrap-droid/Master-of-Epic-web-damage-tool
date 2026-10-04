@@ -73,7 +73,7 @@ const {context,json,root}=require('../tools/benchmark-optimizer.cjs');
   assert.deepEqual(json(bell.requirements),[{name:'こんぼう',required:21}]);
   assert.equal(bell.weaponAttackInterval,150);
   const later=JSON.parse(fs.readFileSync(path.join(root,'docs/official-catalog-update-20261003.json'),'utf8'));
-  assert.equal(p.MOE_EQUIPMENT_CATALOG_GENERATED.length,11837+later.addedEquipment.length);
+  assert.equal(p.MOE_EQUIPMENT_CATALOG_GENERATED.length,11837+later.addedEquipment.length+p.MOE_EQUIPMENT_CATALOG_META.supplementCount);
   assert.equal(p.MOE_BUFF_CATALOG_GENERATED.length,1673+later.newBuffs.length);
   console.log('official catalog update: OK (45 items, 25 imported Buffs, primary + secondary requirements, provenance, no overwrite)');
 })().catch(e=>{console.error(e);process.exitCode=1;});

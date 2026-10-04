@@ -5,7 +5,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import vm from 'node:vm';
 import {pathToFileURL} from 'node:url';
-import {toCatalog} from './build-equipment-catalog-from-google-sheet.mjs';
+import {toCatalog,loadEquipmentSupplements,mergeEquipmentSupplements} from './build-equipment-catalog-from-google-sheet.mjs';
 
 export const categories = {weapons:'weapon',defences:'defense',shields:'shield'};
 export function decodeText(value) {
@@ -108,7 +108,7 @@ async function main() {
   const cache=args['--cache-dir']||'dist/official-new-items';await fs.mkdir(cache,{recursive:true});
   const records=[],coverage=[];
   for(const [category,cat] of Object.entries(categories)) {
-    const baseline=base.MOE_EQUIPMENT_CATALOG_GENERATED.filter(x=>x.category===cat);
+    const baseline=base.MOE_EQUIPMENT_CATALOG_GENERATED.filter(x=>x.category===cat && x.source!=='wiki-manual');
     const cutoff=Math.max(...baseline.map(x=>x.officialId));
     if(!Number.isFinite(cutoff)) throw Error(`Missing baseline category ${cat}`);
     let previousId=Infinity,total=null,boundary=false;
@@ -160,10 +160,12 @@ async function main() {
   const report={generatedAt,scope:'new IDs above baseline maximum plus explicitly selected missing IDs; existing items retained, not fully recrawled',coverage,included,
     addedEquipment:merged.added,newBuffs:merged.newBuffs,changedBuffDescriptions:merged.changedBuffDescriptions,
     items:records.map(x=>({category:x.category,id:x.row.id,name:x.row.name,technic:x.row.technic}))};
+  const supplements=await loadEquipmentSupplements();
+  merged.equipment=mergeEquipmentSupplements(merged.equipment,supplements);
   await fs.mkdir(args['--out'],{recursive:true});
   const safe=value=>JSON.stringify(value,null,2).replace(/<\/script/gi,'<\\/script');
   for(const [name,key,items] of [['equipmentCatalog','EQUIPMENT',merged.equipment],['buffCatalog','BUFF',merged.buffs]]) {
-    const meta={...base[`MOE_${key}_CATALOG_META`],generatedAt,equipmentCount:merged.equipment.length,buffCount:merged.buffs.length,
+    const meta={...base[`MOE_${key}_CATALOG_META`],generatedAt,equipmentCount:merged.equipment.length,buffCount:merged.buffs.length,supplementCount:supplements.length,
       lastOfficialIncrementalUpdate:{generatedAt,scope:report.scope,coverage,addedEquipment:merged.added.length,newBuffs:merged.newBuffs.length}};
     for(const field of ['mappedStatusCounts','ignoredStatusCounts','unmappedStatusCounts']) meta[field]={};
     for(const item of merged.equipment) for(const status of item.addStatuses||[]) {
